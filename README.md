@@ -23,7 +23,7 @@ python3 /path/website_preservation.py
     * pip install python-dateutil
     
     
-2. Download the scripts and stylesheets folders and save them to your computer.
+2. Download the scripts folder and save them to your computer.
 3. Update the file path variables in the web_variables.py script for your local machine.
 4. Change permissions on the scripts so they are executable
 5. Follow the installation instructions for the [general aip scripts.](https://github.com/uga-libraries/general-aip)
