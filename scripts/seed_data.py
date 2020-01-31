@@ -61,19 +61,19 @@ for data in py_warcs['files']:
 
     # Uses the Partner API to get data about the seed.
 
-    seed_data = requests.get(f'{api}/seed?id={seed_id}', auth=(u, p))
+    api_seed = requests.get(f'{api}/seed?id={seed_id}', auth=(u, p))
 
 
     # If there was an error with the api call, updates seed_status and quits this script.
 
-    if not seed_data.status_code == 200:
+    if not api_seed.status_code == 200:
         seed_status = 'error'
         quit()
 
 
     # Converts the seed data from json to a Python object.
 
-    py_seed_data = seed_data.json()
+    py_seed_data = api_seed.json()
 
 
     # Constructs the aip id from the seed data.
