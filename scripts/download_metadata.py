@@ -155,7 +155,7 @@ for doc in os.listdir(metadata):
             # If not, moves to error folder and starts processing the next document.
 
             if not(row1[12] == 'login_password' and row1[13] == 'login_username'):
-                move_error('seed_table_structure', f'{aip_id}_{aip_title})
+                move_error('seed_table_structure', f'{aip_id}_{aip_title}')
                 continue
 
 
