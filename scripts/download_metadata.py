@@ -1,6 +1,7 @@
 # Purpose: Uses the Partner API to download metadata reports to include in the aips for archived websites.
 
 import csv
+import datetime
 import os
 import requests
 import sys
@@ -124,7 +125,7 @@ for doc in os.listdir(metadata):
 
     # Full file path of the file so it can be deleted if needed.
 
-    fullname = f'{webpres}/aips/{metadata}/{doc}'
+    fullname = f'{webpres}/aips_{datetime.date.today()}/{metadata}/{doc}'
 
 
     # Deletes any empty metadata files (file size of 0) and begins processing the next file.
