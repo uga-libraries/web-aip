@@ -104,25 +104,25 @@ for data in py_warcs['files']:
 
     # Makes the aip directory for the seed's aip (aip folder with metadata and objects subfolders).
 
-    subprocess.run(f'python3 {web_scripts}/aip_directory.py "{aip_id}" "{aip_title}"', shell=True)
+    subprocess.run(f'python3.6 {web_scripts}/aip_directory.py "{aip_id}" "{aip_title}"', shell=True)
 
 
     # Downloads the seed metadata from Archive-It into the seed's metadata folder.
 
-    subprocess.run(f'python3 {web_scripts}/download_metadata.py "{aip_id}" "{aip_title}" "{filename}" "{ait_collection}" "{crawl_def}" "{seed_id}"', shell=True)
+    subprocess.run(f'python3.6 {web_scripts}/download_metadata.py "{aip_id}" "{aip_title}" "{filename}" "{ait_collection}" "{crawl_def}" "{seed_id}"', shell=True)
 
 
     # Downloads the warc(s) from Archive-It into the seed's objects folder.
     # Checks if the aip folder is present in case it was moved due to errors from downloading metadata.
 
     if f'{aip_id}_{aip_title}' in os.listdir('.'):
-        subprocess.run(f'python3 {web_scripts}/download_warcs.py "{aip_id}" "{aip_title}" "{filename}" "{warc_url}" "{warc_md5}"', shell=True)
+        subprocess.run(f'python3.6 {web_scripts}/download_warcs.py "{aip_id}" "{aip_title}" "{filename}" "{warc_url}" "{warc_md5}"', shell=True)
 
 
 # Checks for empty metadata or objects folders in the aips.
 # These would be the result of a download error that the script did not catch.
 
-subprocess.run(f'python3 {web_scripts}/check_aip_directory.py', shell=True)
+subprocess.run(f'python3.6 {web_scripts}/check_aip_directory.py', shell=True)
 
 
 # ******************************************************************
@@ -199,19 +199,19 @@ for aip in os.listdir('.'):
     # Extracts technical metadata from the files using FITS.
 
     if aip_id in os.listdir('.'):
-        subprocess.run(f'python3 "{aip_scripts}/fits.py" "{aip_id}"', shell=True)
+        subprocess.run(f'python3.6 "{aip_scripts}/fits.py" "{aip_id}"', shell=True)
 
 
     # Transforms the FITS metadata into the PREMIS master.xml file.
 
     if aip_id in os.listdir('.'):
-        subprocess.run(f'python3 "{aip_scripts}/master_xml.py" "{aip_id}" "{aip_title}" "{department}"', shell=True)
+        subprocess.run(f'python3.6 "{aip_scripts}/master_xml.py" "{aip_id}" "{aip_title}" "{department}"', shell=True)
 
 
     # Bags, tars, and zips the aip.
 
     if aip_id in os.listdir('.'):
-        subprocess.run(f'python3 "{aip_scripts}/package.py" "{aip_id}"', shell=True)
+        subprocess.run(f'python3.6 "{aip_scripts}/package.py" "{aip_id}"', shell=True)
 
 
 # Makes a MD5 manifest of all aips the in this download using md5deep.
