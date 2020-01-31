@@ -2,6 +2,7 @@
 
 # Dependencies: md5deep
 
+import datetime
 import re
 import requests
 import subprocess
@@ -19,7 +20,7 @@ pre_md5 = sys.argv[5]
 
 # The path for where the warc is saved on the local machine (it is long and used twice in this script).
 
-warc_path = f'{webpres}/aips/{aip_id}_{aip_title}/objects/{filename}'
+warc_path = f'{webpres}/aips_{datetime.date.today()}/{aip_id}_{aip_title}/objects/{filename}'
 
 
 # Downloads the warc(s).
