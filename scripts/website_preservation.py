@@ -171,7 +171,7 @@ for aip in os.listdir('.'):
     try:
         regex = re.match('^((harg|rbrl)[a-z\d-]+)_(.*)', aip)
  
-   except AttributeError:
+    except AttributeError:
         move_error('folder_name', aip)
         continue
  
