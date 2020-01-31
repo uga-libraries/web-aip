@@ -205,7 +205,7 @@ for aip in os.listdir('.'):
     # Transforms the FITS metadata into the PREMIS master.xml file.
 
     if aip_id in os.listdir('.'):
-        subprocess.run(f'python3.6 "{aip_scripts}/master_xml.py" "{aip_id}" "{aip_title}" "{department}"', shell=True)
+        subprocess.run(f'python3.6 "{aip_scripts}/master_xml.py" "{aip_id}" "{aip_title}" "{department}" "website" ', shell=True)
 
 
     # Bags, tars, and zips the aip.
