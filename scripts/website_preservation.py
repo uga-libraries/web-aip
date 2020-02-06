@@ -96,10 +96,17 @@ for data in py_warcs['files']:
     # Gets data from seed metadata that other scripts need and saves to variables.
     # Data was saved to dictionary seed_data in seed_data.py.
     # These are given to the scripts as arguments.
-
-    aip_id = seed_data[seed_id][0]
-    aip_title = seed_data[seed_id][1]
-    crawl_def = seed_data[seed_id][2]
+              
+    # If there is a warc for the seed but it doesn't have metadata yet, stops processing this seed and starts the next one.
+    
+    try:
+        aip_id = seed_data[seed_id][0]
+        aip_title = seed_data[seed_id][1]
+        crawl_def = seed_data[seed_id][2]
+              
+    except KeyError:
+        print(f'{seed_id} does not have metadata and will be skipped.")
+        continue
 
 
     # Makes the aip directory for the seed's aip (aip folder with metadata and objects subfolders).
