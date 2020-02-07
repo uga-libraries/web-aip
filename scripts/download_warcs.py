@@ -46,7 +46,7 @@ else:
 result = subprocess.run(f'md5deep "{warc_path}"', stdout=subprocess.PIPE, shell=True)
 
 try:
-    regex = re.match("^.*b'([a-z0-9]*) ", str(result))
+    regex = re.match("^.*b['|\"]([a-z0-9]*) ", str(result))
     post_md5 = regex.group(1)
 
 except:
