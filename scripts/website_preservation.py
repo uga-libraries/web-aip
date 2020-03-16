@@ -105,7 +105,7 @@ for data in py_warcs['files']:
         crawl_def = seed_data[seed_id][2]
               
     except KeyError:
-        print(f'{seed_id} does not have metadata and will be skipped.")
+        print(f'{seed_id} does not have metadata and will be skipped.')
         continue
 
 
