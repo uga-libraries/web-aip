@@ -179,7 +179,7 @@ for doc in os.listdir(metadata):
 
 
 # If there were any download errors, saves the errors to a text file (metadata_download_errors.txt)
-# in the meatdata folder and moves the aip folder to an error folder.
+# in the metadata folder and moves the aip folder to an error folder.
 # This is done at end of this script so passwords are still redacted.
 
 if len(download_errors) != 0:
