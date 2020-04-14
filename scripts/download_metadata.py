@@ -34,7 +34,8 @@ metadata = f'{aip_id}_{aip_title}/metadata'
 download_errors = []
 
 
-# Gets the seed table for the seed.
+# Gets the seed table for the seed as a csv file.
+# Limit of -1 will return all matches. Default is only the first 100.
 
 filters = {'limit':-1, 'id':seed_id,'format':'csv'}
 
