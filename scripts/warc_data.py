@@ -71,6 +71,8 @@ for data in py_seeds:
 #     * Made since the last preservation download.
 #     * Part of a Hargrett or Russell collection.
 
+# crawl-start-after is inclusive so crawls done on the last download date will be included.
+
 filters = {'crawl-start-after':last_download, 'collection':collections, 'page_size':100}
 
 warcs = requests.get('https://warcs.archive-it.org/wasapi/v1/webdata', 
