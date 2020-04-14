@@ -72,6 +72,7 @@ for data in py_seeds:
 #     * Part of a Hargrett or Russell collection.
 
 # crawl-start-after is inclusive so crawls done on the last download date will be included.
+# page size increases the maximum number of warcs the call will return to 10,000.
 
 filters = {'crawl-start-after':last_download, 'collection':collections, 'page_size':100}
 
