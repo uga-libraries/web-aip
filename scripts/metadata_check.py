@@ -19,9 +19,9 @@ def get_metadata_value(data, field):
 
 # Archive-It account credentials
 partner_api = 'https://partner.archive-it.org/api'
-uga_page = 'https://partner.archive-it.org/1468'
-user = 'ahanson'
-password = 'digitalpreservation'
+uga_page = 'https://partner.archive-it.org/INSERT_ARCHIVE-IT_ACCOUNT_NUMBER'
+user = 'INSERT_ARCHIVE-IT_USERNAME'
+password = 'INSERT_ARCHIVE-IT_PASSWORD'
 
 # All seeds from these collections (BMAC, DLG, and tests) will be excluded from the reports.
 skip_collections = [11071, 12249, 12274, 12470]
