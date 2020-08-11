@@ -1,7 +1,9 @@
 # AIP Workflow for Web Content
 
 # Purpose and overview
-Creates a preservation backup of all content captured via the Archive-It web archiving service by the Hargrett or Russell libraries since the previous download. Downloads are run automatically on a quarterly basis, using chrontab on a Linux server. One aip is made per seed, which includes all warcs saved during that quarter and six metadata reports. After the script is complete, the aips are ready for staff review and ingest into the digital preservation system (ARCHive).
+Creates a preservation backup of web content captured via the Archive-It web archiving service by the Hargrett or Russell libraries. One AIP is made per seed, which includes all WARCs saved during the specified time period and six metadata reports. After the script is complete, the aips are ready for staff review and ingest into the digital preservation system (ARCHive).
+
+UGA downloads web content automatically on a quarterly basis, using chrontab on a Linux server (to schedule the download) and the web_aip_batch.py script. Alternately, the batch script can be used to download content from all seeds crawled since a specified date or the web_aip_single.py script can be used to download content from a specified seed.  
 
 # Script approach
 The script website_preservation.py governs the rest of the workflow. It runs the other scripts for getting the warcs and metadata using the Archive-It APIs and for each of the aip workflow steps. Variables used by more than one script are stored in web_variables.py. The workflow uses scripts that are part of the general born digital workflow for creating aips.
