@@ -1,7 +1,7 @@
 # AIP Workflow for Web Content
 
 # Purpose and overview
-Creates a preservation backup of web content captured via the Archive-It web archiving service by the Hargrett or Russell libraries. One AIP is made per seed, which includes all WARCs saved during the specified time period and six metadata reports. After the script is complete, the aips are ready for staff review and ingest into the digital preservation system (ARCHive).
+Creates a preservation backup of web content captured via the Archive-It web archiving service by the Hargrett or Russell libraries. One AIP is made per seed, which includes all WARCs saved during the specified time period and six metadata reports. After the script is complete, the AIPs are ready for staff review and ingest into the digital preservation system (ARCHive).
 
 UGA downloads web content automatically on a quarterly basis, using chrontab on a Linux server (to schedule the download) and the web_aip_batch.py script. Alternately, the batch script can be used to download content from all seeds crawled since a specified date or the web_aip_single.py script can be used to download content from a specified seed.  
 
@@ -13,7 +13,8 @@ The functions are called by either web_aip_batch.py or web_aip_single.py to impl
 If a known error is encountered while downloading the WARCs and metadata reports, the script will continue and the errors are detected by the check_aips() function which analyzes if all expected content is present. If a known errors is enountered while creating the AIPs, such as failing a validation test or a regular expression does not find a match, the AIP is moved to an error folder with the name of the error and the rest of the steps are skipped for that AIP. A log is also created as the script runs which saves deailts about the errors during both parts of the script. 
 
 # Script usage
-python /path/website_preservation.py
+python /path/web_aip_batch.py [last_download_date]
+python /path/web_aip_single.py seed_identifier aip_identifier archive-it_collection_identifier [last_download_date]
 
 # Dependencies
 * Mac or Linux operating system
