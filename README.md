@@ -37,42 +37,42 @@ This list includes the dependencies for the General AIP portion of the workflow.
     * pip install python-dateutil
     
     
-2. Download the scripts folder and save them to your computer.
-3. Update the file path variables in the web_variables.py script for your local machine.
-4. Change permissions on the scripts so they are executable
-5. Follow the installation instructions for the [general aip scripts.](https://github.com/uga-libraries/general-aip)
-6. To run quarterly, add it to the chrontab file.
+2. Download this repository and save to your computer.
+3. Update the constants variables for the script output and Archive-It credentials (line 18-22) in the web_variables.py script for your local machine.
+4. Download the [general aip repository](https://github.com/uga-libraries/general-aip) and follow the installation instructions.
+5. Copy the aip_functions.py document to the scripts folder of the downloaded web-aip repository.
+6. Change permissions on the scripts so they are executable.
+7. To run quarterly, add it to the chrontab file or use another scheduling method.
 
 # Workflow Details
+The workflow for each seed is the essentially the same for the batch script and single AIP script. The batch script downloads content and makes a directory for each seed in the batch before making AIPs. The single AIP script uses a different function for downloading the seed data (since the AIP identifier is supplied via argument instead of calculated by the function) and checking the AIP for completeness (since it needs to filter by seed identifier).
 
-1. Imports warc data as a Python object from warc_data.py and seed data as a dictionary from seed_data.py. Both scripts use Archive-It API's to get the data. Quits the script if there was any API connection status error. (website_preservation.py)
+1. Uses Archive-It API's to get data about the WARCs and seed(s) for this download. The WARC data is json converted to a Python object and the seed data is stored in a dictionary (batch) or variables (single).
 
 
-2. Downloads the warc and metadata files from Archive-It and organizes them into aip directories, with one aip per seed.
+2. Downloads the WARCs and metadata files from Archive-It and organizes them into AIP directories, with one AIP per seed.
 
-    * Stores the warc and seed metadata as variables. The variables are used as arguments for other scripts. This way, each API is only called once instead of repeating the call to get the specific information each of the other scripts requires. (website_preservation.py)
+    * The AIP directory folder has the naming convention aip-id_AIP Title and contains metadata and objects folders.
 
-    * Creates the aip directory: the aip folder has the naming convention aip-id_AIP Title and contains metadata and objects folders. (aip_directory.py)
+    * Uses WASAPI to download the WARC(s) for the seed from Archive-It and saves to the objects folder. Verifies fixity after downloading.
 
-    * Uses WASAPI to download the warc(s) for the seed from Archive-It and saves to the correct objects folder. Verifies fixity after downloading. (download_warcs.py)
+    * Uses the Partner API to download six reports for each AIP based on seed id, Archive-It collection id, and crawl definition id. Saves the reports to the metadata folder as csv files.
 
-    * Uses the Partner API to download six reports for each AIP based on seed id, Archive-It collection id, and crawl definition id. Saves the reports to the correct metadata folder as csv files. (download_metadata.py)
+    * Deletes any reports with a file size of 0 (which means there was no metadata in that report) and redacts login information from seed report (if the field is present).
 
-    * Deletes any reports with a file size of 0, which means there was no metadata in that report, and redacts login information from seed report. (download_metadata.py)
+    * Checks all AIP directories for empty metadata or objects folders and moves to an error folder if found.
 
-    * Checks all aip directories for empty metadata or objects folders, and moves to an error folder if found. (check_aip_directory.py)
+3. Makes folders for script outputs: aips-to-ingest, fits-xml, and preservaiton-xml.
 
-3. Makes folders for script outputs: master-xml, fits-xml, and aips-to-ingest. (website_preservation.py)
+4. Extracts technical metadata from each WARC in the objects folder with FITS and save the FITS xml to the metadata folder. Copies the information from each fits xml file into one file named combined-fits.xml, also saved in the metadata folder.
 
-4. Extracts technical metadata from each warc in the objects folder with FITS and save the FITS xml to the metadata folder. Copies the information from each fits xml file into one file named combined-fits.xml, also saved in the metadata folder. (fits.py)
+5. Transforms the combined-fits xml into Dublin Core and PREMIS metadata using Saxon and xslt stylesheets, which is saved as master.xml in the metadata folder. Verifies that the master.xml file meets UGA standards with xmllint and xsds.
 
-5. Transforms the combined-fits xml into PREMIS metadata using Saxon and xslt stylesheets, which is saved as master.xml in the metadata folder. Verifies that the master.xml file meets UGA standards with xmllint and xsds. (master_xml.py)
+6. Uses bagit to bag the AIP folder in place, making md5 and sha256 manifests. Validates the bag.
 
-6. Uses bagit.py to bag the aip folder in place, making md5 and sha256 manifests. Validates the bag. (package.py)
+7. Uses a perl script to tar and zip a copy of the bag, which is saved in the aips-to-ingest folder.
 
-7. Uses the prepare_bag perl script to tar and zip a copy of the bag, which is saved in the aips-to-ingest folder. (package.py)
-
-8. Once all aips are created, uses md5deep to calculate the md5 for each packaged aip and saves it to a manifest. (website_preservation.py)
+8. Once all AIPs are created, uses md5deep to calculate the md5 for each packaged AIP and saves it to a manifest.
 
 # Initial Author
 Adriane Hanson, Head of Digital Stewardship, January 2020
