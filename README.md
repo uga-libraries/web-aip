@@ -6,13 +6,14 @@ Creates a preservation backup of web content captured via the Archive-It web arc
 UGA downloads web content automatically on a quarterly basis, using chrontab on a Linux server (to schedule the download) and the web_aip_batch.py script. Alternately, the batch script can be used to download content from all seeds crawled since a specified date or the web_aip_single.py script can be used to download content from a specified seed.  
 
 # Script approach
-The script website_preservation.py governs the rest of the workflow. It runs the other scripts for getting the warcs and metadata using the Archive-It APIs and for each of the aip workflow steps. Variables used by more than one script are stored in web_variables.py. The workflow uses scripts that are part of the general born digital workflow for creating aips.
+Each step of the workflow is its own Python function. The functions are in a separate document (web_functions.py) so that they can easily be used in multilpe workflows. The workflow also uses functions that are part of the general born digital workflow for creating AIPs (aip_functions.py).
+
+The functions are called by either web_aip_batch.py or web_aip_single.py to implement the workflow. The workflow scripts call the web functions to download the WARCs and six metadata reports using the Archive-It APIs and call the functions for each of the AIP workflow steps. The batch version of the workflow script downloads content for all seeds from the specified departments (Hargrett and Russell) crawled within the specified time period (last_download date). The single version of the script downloads content for a specified seed, with an additional optional limit of the last_download date. 
  
-# Error handling
-If a known error is encountered, such an api connection issue or a regular expression does not find a match, the aip is moved to an error folder with the name of the error and the rest of the steps are skipped for that aip. 
+If a known error is encountered while downloading the WARCs and metadata reports, the script will continue and the errors are detected by the check_aips() function which analyzes if all expected content is present. If a known errors is enountered while creating the AIPs, such as failing a validation test or a regular expression does not find a match, the AIP is moved to an error folder with the name of the error and the rest of the steps are skipped for that AIP. A log is also created as the script runs which saves deailts about the errors during both parts of the script. 
 
 # Script usage
-python3 /path/website_preservation.py
+python /path/website_preservation.py
 
 # Dependencies
 * Mac or Linux operating system
