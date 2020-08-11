@@ -16,10 +16,20 @@ If a known error is encountered while downloading the WARCs and metadata reports
 python /path/web_aip_batch.py [last_download_date]
 python /path/web_aip_single.py seed_identifier aip_identifier archive-it_collection_identifier [last_download_date]
 
+This script has been tested on Windows 10 and Mac OS X.
+
 # Dependencies
-* Mac or Linux operating system
-* Python requests and dateutil libraries
-* [UGA Libraries' General AIP Preservation Scripts](https://github.com/uga-libraries/general-aip)
+This list includes the dependencies for the General AIP portion of the workflow. md5deep, perl, and xmllint are pre-installed on most Mac and Linux operating systems. xmllint is included with Strawberry Perl.
+* Archive-It login credentials
+* Python Libraries: requests and python-dateutil
+* [UGA Libraries' General AIP Script](https://github.com/uga-libraries/general-aip)
+* bagit.py (https://github.com/LibraryOfCongress/bagit-python)
+* FITS (https://projects.iq.harvard.edu/fits/downloads)
+* md5deep (https://github.com/jessek/hashdeep)
+* saxon9he (http://saxon.sourceforge.net/)
+* Strawberry Perl (Windows only) (http://strawberryperl.com/)
+* xmllint (http://xmlsoft.org/xmllint.html)
+* 7-Zip (Windows only) (https://www.7-zip.org/download.html)
 
 # Installation
 1. Install the dependencies (listed above).  To install the Python libraries using pip, the commands are:
