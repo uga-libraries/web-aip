@@ -1,7 +1,7 @@
 # AIP Workflow for Web Content
 
 # Purpose and overview
-Creates a preservation backup of web content captured via the Archive-It web archiving service by the Hargrett or Russell libraries. One AIP is made per seed, which includes all WARCs saved during the specified time period and six metadata reports. After the script is complete, the AIPs are ready for staff review and ingest into the digital preservation system (ARCHive).
+Creates a preservation backup of web content captured via the Archive-It web archiving service by the Hargrett or Russell libraries. One AIP is made per seed, which includes all WARCs saved during the specified time period and six metadata reports (seed, seed scope, collection, collection scope, crawl job, and crawl definition). After the script is complete, the AIPs are ready for staff review and ingest into the digital preservation system (ARCHive).
 
 UGA downloads web content automatically on a quarterly basis, using chrontab on a Linux server (to schedule the download) and the web_aip_batch.py script. Alternately, the batch script can be used to download content from all seeds crawled since a specified date or the web_aip_single.py script can be used to download content from a specified seed.  
 
