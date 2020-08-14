@@ -31,6 +31,7 @@ def seed_data():
     # If there was an error with the API call, quits the script.
     if not seed_report.status_code == 200:
         aip.log(log_path, f'\nAPI error {seed_report.status_code} for seed report.')
+        print("API error, ending script. See log for details.")
         exit()
 
     # Converts the seed data from json to a Python object.
@@ -166,7 +167,7 @@ try:
     aip_id = sys.argv[2]
     collection_id = sys.argv[3]
 except IndexError:
-    print('Missing required argument(s). Should include seed id, AIP id, and last download date (optional).')
+    print('Exiting script: missing required argument(s). Must include seed id, AIP id, and collection id.')
     exit()
 
 # Tests optional script argument was provided and assigns to variable. Must be formatted YYYY-MM-DD.
@@ -174,7 +175,7 @@ except IndexError:
 try:
     last_download = sys.argv[4]
     if not re.match(r'\d{4}-\d{2}-\d{2}', last_download):
-        print('Date argument must be formatted YYYY-MM-DD. Please try the script again.')
+        print('Exiting script: date argument must be formatted YYYY-MM-DD.')
         exit()
 except IndexError:
     last_download = '2019-06-01'
@@ -184,7 +185,7 @@ try:
     regex_dept = re.match('^(harg|rbrl).*', aip_id)
     department = regex_dept.group(1)
 except AttributeError:
-    print('AIP id is not formatted correctly. Department could not be identified.')
+    print('Exiting script: AIP id is not formatted correctly. Department could not be identified.')
     exit()
 
 print(f'Making AIP for {seed_id}.')
@@ -221,6 +222,7 @@ try:
     aip_title, crawl_definition = seed_data()
 except ValueError:
     aip.log(log_path, 'Seed has no metadata.')
+    print('Exiting script: seed has no metadata.')
     exit()
 
 # Makes the aip directory for the seed's aip (aip folder with metadata and objects subfolders). Unlike with the batch
