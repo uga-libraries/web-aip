@@ -125,8 +125,13 @@ def check_aip():
     expected_endings = ('_coll.csv', '_collscope.csv', '_crawldef.csv', '_crawljob.csv', '_seed.csv',
                         '_seedscope.csv', '_master.xml', '_fits.xml')
 
-    # Calculates the number of WARCs that should be in this AIP.
-    warcs_expected = aip_warcs_count()
+    # Calculates the number of WARCs that should be in this AIP. Exits the function if it is not calculated since
+    # multiple tests depend on this.
+    try:
+        warcs_expected = aip_warcs_count()
+    except ValueError:
+        print('Cannot check AIP for completeness. WARC count not calculated.')
+        return
 
     # Tests if there is a folder for this AIP in the AIPs directory.
     if not any(folder.startswith(aip_id) for folder in os.listdir(f'{web.script_output}/aips_{current_download}')):
