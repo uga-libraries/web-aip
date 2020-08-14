@@ -239,14 +239,12 @@ def download_metadata(aip_id, aip_folder, warc_collection, crawl_definition, see
         filters = {'limit': -1, filter_type: filter_value, 'format': 'csv'}
         metadata_report = requests.get(f'{partner_api}/{report_type}', params=filters, auth=(username, password))
 
-        # Checks if there was an error with the API and only saves the metadata report if there were no errors. For
-        # errors, raises a ValueError so that the download metadata function can move the AIP to an error folder.
+        # Saves the metadata report if there were no errors with the API.
         if metadata_report.status_code == 200:
             with open(f'{aip_folder}/metadata/{aip_id}_{code}.csv', 'wb') as report_csv:
                 report_csv.write(metadata_report.content)
         else:
             aip.log(log_path, f'Could not download {code} report. Error: {metadata_report.status_code}')
-            raise ValueError
 
     def redact(metadata_report_path):
         """Replaces the seed report with a redacted version of the file, removing login information if those columns
@@ -289,18 +287,13 @@ def download_metadata(aip_id, aip_folder, warc_collection, crawl_definition, see
             for row in redacted_rows:
                 report_write.writerow(row)
 
-    # Downloads the six metadata reports from Archive-It needed to understand the context of the WARC. If any have an
-    # API error, will attempt to download all six reports and quits the function.
-    try:
-        get_report('id', seed_id, 'seed', 'seed')
-        get_report('seed', seed_id, 'scope_rule', 'seedscope')
-        get_report('collection', warc_collection, 'scope_rule', 'collscope')
-        get_report('id', warc_collection, 'collection', 'coll')
-        get_report('collection', warc_collection, 'crawl_job', 'crawljob')
-        get_report('id', crawl_definition, 'crawl_definition', 'crawldef')
-    except ValueError:
-        aip.log(log_path, f'Error when downloading metadata reports.')
-        return
+    # Downloads the six metadata reports from Archive-It needed to understand the context of the WARC.
+    get_report('id', seed_id, 'seed', 'seed')
+    get_report('seed', seed_id, 'scope_rule', 'seedscope')
+    get_report('collection', warc_collection, 'scope_rule', 'collscope')
+    get_report('id', warc_collection, 'collection', 'coll')
+    get_report('collection', warc_collection, 'crawl_job', 'crawljob')
+    get_report('id', crawl_definition, 'crawl_definition', 'crawldef')
 
     # Iterates over each report in the metadata folder to delete empty reports and redact login information from the
     # seed report.
