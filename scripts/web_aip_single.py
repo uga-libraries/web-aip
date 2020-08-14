@@ -48,7 +48,7 @@ def seed_data():
             crawl_def = seed_info['crawl_definition']
         except (KeyError, IndexError):
             aip.log(log_path, f'Seed {seed_info["id"]} has no metadata.')
-            continue
+            raise ValueError
 
     return title, crawl_def
 
