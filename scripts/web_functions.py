@@ -44,6 +44,7 @@ def warc_data(last_download, log_path, collections=None):
         # If there was an error with the API call, quits the script.
         if not seed_reports.status_code == 200:
             aip.log(log_path, f'\nAPI error {seed_reports.status_code} for collection list.')
+            print("API error, ending script. See log for details.")
             exit()
 
         # Converts the seed data from json to a Python object.
@@ -89,6 +90,7 @@ def warc_data(last_download, log_path, collections=None):
     # If there was an error with the API call, quits the script.
     if not warcs.status_code == 200:
         aip.log(log_path, f'\nAPI error {warcs.status_code} when getting warc data.')
+        print("API error, ending script. See log for details.")
         exit()
 
     # Converts the WARC data from json to a Python object and returns that Python object.
@@ -137,6 +139,7 @@ def seed_data(py_warcs, current_download, log_path):
         # If there was an error with the API call, quits the script.
         if not seed_report.status_code == 200:
             aip.log(log_path, f'\nAPI error {seed_report.status_code} for seed report.')
+            print("API error, ending script. See log for details.")
             exit()
 
         # Converts the seed data from json to a Python object.
