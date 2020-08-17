@@ -18,6 +18,7 @@ import sys
 
 # Import functions and constant variables from other UGA scripts.
 import aip_functions as aip
+import configuration as c
 import web_functions as web
 
 
@@ -26,7 +27,7 @@ def seed_data():
     function used by web_aip_batch.py since the AIP id does not need to be calculated."""
 
     # Uses the Partner API to get data about this seed.
-    seed_report = requests.get(f'{web.partner_api}/seed?id={seed_id}', auth=(web.username, web.password))
+    seed_report = requests.get(f'{c.partner_api}/seed?id={seed_id}', auth=(c.username, c.password))
 
     # If there was an error with the API call, quits the script.
     if not seed_report.status_code == 200:
@@ -63,7 +64,7 @@ def check_aip():
         instead of the API to filter the results for a more independent analysis."""
 
         # Downloads the entire WARC list, in json, and converts it to a python object.
-        warcs = requests.get(web.wasapi, params={'page_size': 1000}, auth=(web.username, web.password))
+        warcs = requests.get(c.wasapi, params={'page_size': 1000}, auth=(c.username, c.password))
         py_warcs = warcs.json()
 
         # If there was an API error, ends the function.
@@ -118,8 +119,8 @@ def check_aip():
         return warcs_include
 
     # Saves the file paths to the metadata and objects folders to variables, since they are long and reused.
-    objects = f'{web.script_output}/aips_{current_download}/{aip_id}_bag/data/objects'
-    metadata = f'{web.script_output}/aips_{current_download}/{aip_id}_bag/data/metadata'
+    objects = f'{c.script_output}/aips_{current_download}/{aip_id}_bag/data/objects'
+    metadata = f'{c.script_output}/aips_{current_download}/{aip_id}_bag/data/metadata'
 
     # List of suffixes used for the expected metadata reports.
     expected_endings = ('_coll.csv', '_collscope.csv', '_crawldef.csv', '_crawljob.csv', '_seed.csv',
@@ -134,7 +135,7 @@ def check_aip():
         return
 
     # Tests if there is a folder for this AIP in the AIPs directory.
-    if not any(folder.startswith(aip_id) for folder in os.listdir(f'{web.script_output}/aips_{current_download}')):
+    if not any(folder.startswith(aip_id) for folder in os.listdir(f'{c.script_output}/aips_{current_download}')):
         print('The AIP folder was not created.')
 
     # Tests if each of the expected metadata reports is present. Skips FITS because the filename is formatted
@@ -201,11 +202,11 @@ print(f'Making AIP for {seed_id}.')
 # function, and depending on how long it takes to download WARCs, recalculating today() may give a different result.
 current_download = datetime.date.today()
 aips_directory = f'aips_{current_download}'
-if not os.path.exists(f'{web.script_output}/{aips_directory}'):
-    os.makedirs(f'{web.script_output}/{aips_directory}')
+if not os.path.exists(f'{c.script_output}/{aips_directory}'):
+    os.makedirs(f'{c.script_output}/{aips_directory}')
 
 # Changes current directory to the aips folder.
-os.chdir(f'{web.script_output}/{aips_directory}')
+os.chdir(f'{c.script_output}/{aips_directory}')
 
 # Starts a log for saving status information about the script. Saving to a document instead of printing to the screen
 # since it allows for a permanent record of the download and because the terminal closed at the end of a script when
@@ -276,7 +277,7 @@ aip.make_output_directories()
 
 # Extracts technical metadata from the files using FITS.
 if aip_id in os.listdir('.'):
-    aip.extract_metadata(aip_id, f'{web.script_output}/{aips_directory}', log_path)
+    aip.extract_metadata(aip_id, f'{c.script_output}/{aips_directory}', log_path)
 
 # Transforms the FITS metadata into the PREMIS master.xml file using saxon and xslt stylesheets. Determines the
 # third argument (ARCHive group name) from the department code parsed from the folder name.
