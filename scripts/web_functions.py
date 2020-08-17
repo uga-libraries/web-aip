@@ -328,7 +328,7 @@ def download_warc(aip_folder, warc_filename, warc_url, warc_md5, current_downloa
 
     # Calculates the md5 for the downloaded WARC, using a regular expression to get the md5 from the md5deep output.
     # If the output is not formatted as expected, quits the function.
-    md5deep_output = subprocess.run(f'"{aip.md5deep}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
+    md5deep_output = subprocess.run(f'"{c.md5deep}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
     try:
         regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
         downloaded_warc_md5 = regex_md5.group(1)
