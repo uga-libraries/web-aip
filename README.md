@@ -6,14 +6,15 @@ Creates a preservation backup of web content captured via the Archive-It web arc
 UGA downloads web content automatically on a quarterly basis, using chrontab on a Linux server (to schedule the download) and the web_aip_batch.py script. Alternately, the batch script can be used to download content from all seeds crawled since a specified date or the web_aip_single.py script can be used to download content from a specified seed.  
 
 # Script approach
-Each step of the workflow is its own Python function. The functions are in a separate document (web_functions.py) so that they can easily be used in multilpe workflows. The workflow also uses functions that are part of the general born digital workflow for creating AIPs (aip_functions.py).
+Each step of the workflow is its own Python function. The functions are in separate documents (web_functions.py and aip_functions.py) so that they can easily be used in multiple workflows. Passwords and local file paths used in the workflow are also stored in a separate document (configuration.py) so that this information can be kept out of the GitHub repository for security reasons.
 
-The functions are called by either web_aip_batch.py or web_aip_single.py to implement the workflow. The workflow scripts call the web functions to download the WARCs and six metadata reports using the Archive-It APIs and call the functions for each of the AIP workflow steps. The batch version of the workflow script downloads content for all seeds from the specified departments (Hargrett and Russell) crawled within the specified time period (last_download date). The single version of the script downloads content for a specified seed, with an additional optional limit of the last_download date. 
+The functions are called by either web_aip_batch.py or web_aip_single.py to implement the workflow. The workflow scripts call the web functions to download the WARCs and six metadata reports using the Archive-It APIs and call the functions for each of the AIP workflow steps. The batch version of the workflow script downloads content for all seeds from the Hargrett and Russell departments crawled after the specified date (last_download date). The single version of the script downloads content for a specified seed, with an additional optional limit of the last_download date. 
  
 If a known error is encountered while downloading the WARCs and metadata reports, the script will continue and the errors are detected by the check_aips() function which analyzes if all expected content is present. If a known errors is enountered while creating the AIPs, such as failing a validation test or a regular expression does not find a match, the AIP is moved to an error folder with the name of the error and the rest of the steps are skipped for that AIP. A log is also created as the script runs which saves deailts about the errors during both parts of the script. 
 
 # Script usage
 python /path/web_aip_batch.py [last_download_date]
+
 python /path/web_aip_single.py seed_identifier aip_identifier archive-it_collection_identifier [last_download_date]
 
 This script has been tested on Windows 10 and Mac OS X.
@@ -38,7 +39,7 @@ This list includes the dependencies for the General AIP portion of the workflow.
     
     
 2. Download this repository and save to your computer.
-3. Update the constants variables for the script output and Archive-It credentials (line 18-22) in the web_variables.py script for your local machine.
+3. Create a configuration.py file modeled after the configuration_template.py file with variables for Archive-It credentials and local file paths.
 4. Download the [general aip repository](https://github.com/uga-libraries/general-aip) and follow the installation instructions.
 5. Copy the aip_functions.py document to the scripts folder of the downloaded web-aip repository.
 6. Change permissions on the scripts so they are executable.
