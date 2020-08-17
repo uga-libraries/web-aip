@@ -288,13 +288,14 @@ if aip_id in os.listdir('.'):
 if aip_id in os.listdir('.'):
     aip.package(aip_id, log_path)
 
-# Makes MD5 manifest of the AIP.
-aip.make_manifest()
-
 # If the AIP has not been moved to the errors folder, verifies the AIP is complete. Errors are printed to the terminal.
+print(os.listdir('.'))
 if f'{aip_id}_bag' in os.listdir('.'):
     print('\nStarting completeness check.')
     check_aip()
+
+# Makes MD5 manifest of the AIP.
+aip.make_manifest()
 
 # Adds completion of the script to the log.
 aip.log(log_path, f'\nScript finished running at {datetime.datetime.today()}.')
