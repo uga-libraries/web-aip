@@ -12,7 +12,7 @@ Dependencies:
 Prior to the preservation download, all seed metadata should be entered into Archive-It. Use the metadata_check.py
 script to verify all required fields are present. """
 
-# # Usage: python /path/web_aip_batch.py [last_download_date]
+# Usage: python /path/web_aip_batch.py [last_download_date]
 
 import datetime
 import os
@@ -23,6 +23,7 @@ import dateutil.relativedelta
 
 # Import functions and constant variables from other UGA scripts.
 import aip_functions as aip
+import configuration as c
 import web_functions as web
 
 # The preservation download is limited to warcs created since the last download date. This can be calculated by the
@@ -43,11 +44,11 @@ except IndexError:
 # function, and depending on how long it takes to download WARCs, recalculating today() may give a different result.
 current_download = datetime.date.today()
 aips_directory = f'aips_{current_download}'
-if not os.path.exists(f'{web.script_output}/{aips_directory}'):
-    os.makedirs(f'{web.script_output}/{aips_directory}')
+if not os.path.exists(f'{c.script_output}/{aips_directory}'):
+    os.makedirs(f'{c.script_output}/{aips_directory}')
 
 # Changes current directory to the AIPs folder.
-os.chdir(f'{web.script_output}/{aips_directory}')
+os.chdir(f'{c.script_output}/{aips_directory}')
 
 # Starts a log for saving status information about the script. Saving to a document instead of printing to the screen
 # since it allows for a permanent record of the download and because the terminal closed at the end of a script when
@@ -168,7 +169,7 @@ for aip_folder in os.listdir('.'):
 
     # Extracts technical metadata from the files using FITS.
     if aip_id in os.listdir('.'):
-        aip.extract_metadata(aip_id, f'{web.script_output}/{aips_directory}', log_path)
+        aip.extract_metadata(aip_id, f'{c.script_output}/{aips_directory}', log_path)
 
     # Transforms the FITS metadata into the PREMIS master.xml file using saxon and xslt stylesheets.
     if aip_id in os.listdir('.'):
@@ -191,7 +192,7 @@ aip.log(log_path, f'\nScript finished running at {datetime.datetime.today()}.')
 
 # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) into the AIPs folder for this
 # download to keep everything together if another set is downloaded before these are deleted.
-os.chdir(web.script_output)
+os.chdir(c.script_output)
 to_move = ['aips-to-ingest', 'errors', 'fits-xml', 'preservation-xml', f'script_log_{current_download}.txt']
 for item in os.listdir('.'):
     if item in to_move:

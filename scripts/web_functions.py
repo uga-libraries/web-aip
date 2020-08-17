@@ -13,13 +13,7 @@ import subprocess
 
 # Import functions and constant variables from another UGA script.
 import aip_functions as aip
-
-# Constants. Folder for script output and Archive-It APIs and credentials.
-script_output = 'INSERT_PATH_TO_FOLDER_FOR_SCRIPT_OUTPUT'
-partner_api = 'https://partner.archive-it.org/api'
-wasapi = 'https://warcs.archive-it.org/wasapi/v1/webdata'
-username = 'INSERT_ARCHIVE-IT_USERNAME'
-password = 'INSERT_ARCHIVE-IT_PASSWORD'
+import configuration as c
 
 
 def warc_data(last_download, log_path, collections=None):
@@ -39,11 +33,12 @@ def warc_data(last_download, log_path, collections=None):
 
         # Uses the Partner API to get the data from the seed report, which has repository information.
         # Limit of -1 means it will get data on all seeds, no matter how many there are.
-        seed_reports = requests.get(f'{partner_api}/seed?limit=-1', auth=(username, password))
+        seed_reports = requests.get(f'{c.partner_api}/seed?limit=-1', auth=(c.username, c.password))
 
         # If there was an error with the API call, quits the script.
         if not seed_reports.status_code == 200:
             aip.log(log_path, f'\nAPI error {seed_reports.status_code} for collection list.')
+            print("API error, ending script. See log for details.")
             exit()
 
         # Converts the seed data from json to a Python object.
@@ -84,11 +79,12 @@ def warc_data(last_download, log_path, collections=None):
     if not collections:
         collections = collection_list()
     filters = {'crawl-start-after': last_download, 'collection': collections, 'page_size': 1000}
-    warcs = requests.get(wasapi, params=filters, auth=(username, password))
+    warcs = requests.get(c.wasapi, params=filters, auth=(c.username, c.password))
 
     # If there was an error with the API call, quits the script.
     if not warcs.status_code == 200:
         aip.log(log_path, f'\nAPI error {warcs.status_code} when getting warc data.')
+        print("API error, ending script. See log for details.")
         exit()
 
     # Converts the WARC data from json to a Python object and returns that Python object.
@@ -132,11 +128,12 @@ def seed_data(py_warcs, current_download, log_path):
             continue
 
         # Uses the Partner API to get data about this seed.
-        seed_report = requests.get(f'{partner_api}/seed?id={seed_identifier}', auth=(username, password))
+        seed_report = requests.get(f'{c.partner_api}/seed?id={seed_identifier}', auth=(c.username, c.password))
 
         # If there was an error with the API call, quits the script.
         if not seed_report.status_code == 200:
             aip.log(log_path, f'\nAPI error {seed_report.status_code} for seed report.')
+            print("API error, ending script. See log for details.")
             exit()
 
         # Converts the seed data from json to a Python object.
@@ -234,16 +231,14 @@ def download_metadata(aip_id, aip_folder, warc_collection, crawl_definition, see
         # Builds the API call to get the report as a csv.
         # Limit of -1 will return all matches. Default is only the first 100.
         filters = {'limit': -1, filter_type: filter_value, 'format': 'csv'}
-        metadata_report = requests.get(f'{partner_api}/{report_type}', params=filters, auth=(username, password))
+        metadata_report = requests.get(f'{c.partner_api}/{report_type}', params=filters, auth=(c.username, c.password))
 
-        # Checks if there was an error with the API and only saves the metadata report if there were no errors. For
-        # errors, raises a ValueError so that the download metadata function can move the AIP to an error folder.
+        # Saves the metadata report if there were no errors with the API.
         if metadata_report.status_code == 200:
             with open(f'{aip_folder}/metadata/{aip_id}_{code}.csv', 'wb') as report_csv:
                 report_csv.write(metadata_report.content)
         else:
             aip.log(log_path, f'Could not download {code} report. Error: {metadata_report.status_code}')
-            raise ValueError
 
     def redact(metadata_report_path):
         """Replaces the seed report with a redacted version of the file, removing login information if those columns
@@ -286,25 +281,20 @@ def download_metadata(aip_id, aip_folder, warc_collection, crawl_definition, see
             for row in redacted_rows:
                 report_write.writerow(row)
 
-    # Downloads the six metadata reports from Archive-It needed to understand the context of the WARC. If any have an
-    # API error, will attempt to download all six reports and quits the function.
-    try:
-        get_report('id', seed_id, 'seed', 'seed')
-        get_report('seed', seed_id, 'scope_rule', 'seedscope')
-        get_report('collection', warc_collection, 'scope_rule', 'collscope')
-        get_report('id', warc_collection, 'collection', 'coll')
-        get_report('collection', warc_collection, 'crawl_job', 'crawljob')
-        get_report('id', crawl_definition, 'crawl_definition', 'crawldef')
-    except ValueError:
-        aip.log(log_path, f'Error when downloading metadata reports.')
-        return
+    # Downloads the six metadata reports from Archive-It needed to understand the context of the WARC.
+    get_report('id', seed_id, 'seed', 'seed')
+    get_report('seed', seed_id, 'scope_rule', 'seedscope')
+    get_report('collection', warc_collection, 'scope_rule', 'collscope')
+    get_report('id', warc_collection, 'collection', 'coll')
+    get_report('collection', warc_collection, 'crawl_job', 'crawljob')
+    get_report('id', crawl_definition, 'crawl_definition', 'crawldef')
 
     # Iterates over each report in the metadata folder to delete empty reports and redact login information from the
     # seed report.
     for report in os.listdir(f'{aip_folder}/metadata'):
 
         # Saves the full file path of the report.
-        report_path = f'{script_output}/aips_{current_download}/{aip_folder}/metadata/{report}'
+        report_path = f'{c.script_output}/aips_{current_download}/{aip_folder}/metadata/{report}'
 
         # Deletes any empty metadata files (file size of 0) and begins processing the next file. A file is empty if
         # there is no metadata of that type, which is most common for collection and seed scope reports.
@@ -322,10 +312,10 @@ def download_warc(aip_folder, warc_filename, warc_url, warc_md5, current_downloa
     """Downloads a warc file and verifies that fixity is unchanged after downloading."""
 
     # The path for where the warc will be saved on the local machine (it is long and used twice in this script).
-    warc_path = f'{script_output}/aips_{current_download}/{aip_folder}/objects/{warc_filename}'
+    warc_path = f'{c.script_output}/aips_{current_download}/{aip_folder}/objects/{warc_filename}'
 
     # Downloads the warc.
-    warc_download = requests.get(f"{warc_url}", auth=(username, password))
+    warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
 
     # If there was an error with the API call, quits the function.
     if not warc_download.status_code == 200:
@@ -338,7 +328,7 @@ def download_warc(aip_folder, warc_filename, warc_url, warc_md5, current_downloa
 
     # Calculates the md5 for the downloaded WARC, using a regular expression to get the md5 from the md5deep output.
     # If the output is not formatted as expected, quits the function.
-    md5deep_output = subprocess.run(f'"{aip.md5deep}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
+    md5deep_output = subprocess.run(f'"{c.md5deep}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
     try:
         regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
         downloaded_warc_md5 = regex_md5.group(1)
@@ -392,7 +382,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
         the AIP id, warc count, and url. """
 
         # Downloads the entire WARC list, in json, and converts it to a python object.
-        warcs = requests.get(wasapi, params={'page_size': 1000}, auth=(username, password))
+        warcs = requests.get(c.wasapi, params={'page_size': 1000}, auth=(c.username, c.password))
         py_warcs = warcs.json()
 
         # If there was an API error, ends the function.
@@ -447,7 +437,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
             except (KeyError, IndexError):
 
                 # Gets the seed report for this seed.
-                seed_report = requests.get(f'{partner_api}/seed?id={seed_identifier}', auth=(username, password))
+                seed_report = requests.get(f'{c.partner_api}/seed?id={seed_identifier}', auth=(c.username, c.password))
                 json_seed = seed_report.json()
 
                 # If there was an API error, ends the function.
@@ -493,15 +483,15 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
 
         # Tests if there is a folder for this AIP in the AIPs directory. If not, returns the result for this AIP and
         # does not run the rest of the function's tests since there is no directory to check for completeness.
-        if any(folder.startswith(aip_id) for folder in os.listdir(f'{script_output}/aips_{current_download}')):
+        if any(folder.startswith(aip_id) for folder in os.listdir(f'{c.script_output}/aips_{current_download}')):
             result.append(True)
         else:
             result.extend([False, 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a'])
             return result
 
         # Saves the file paths to the metadata and objects folders to variables, since they are long and reused.
-        objects = f'{script_output}/aips_{current_download}/{aip_id}_bag/data/objects'
-        metadata = f'{script_output}/aips_{current_download}/{aip_id}_bag/data/metadata'
+        objects = f'{c.script_output}/aips_{current_download}/{aip_id}_bag/data/objects'
+        metadata = f'{c.script_output}/aips_{current_download}/{aip_id}_bag/data/metadata'
 
         # Tests if each of the six Archive-It metadata reports is present. os.path.exists() returns True/False.
         result.append(os.path.exists(f'{metadata}/{aip_id}_coll.csv'))
@@ -557,7 +547,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
         extras = []
 
         # Iterates through the folder with the AIPs.
-        for aip_directory in os.listdir(f'{script_output}/aips_{current_download}'):
+        for aip_directory in os.listdir(f'{c.script_output}/aips_{current_download}'):
 
             # Skips the csv made by the check_aips function.
             if aip_directory.startswith('completeness_check'):
@@ -587,7 +577,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
         return
 
     # Starts a csv for the results of the quality review.
-    csv_path = f'{script_output}/aips_{current_download}/completeness_check_{current_download}.csv'
+    csv_path = f'{c.script_output}/aips_{current_download}/completeness_check_{current_download}.csv'
     with open(csv_path, 'w', newline='') as complete_csv:
         complete_write = csv.writer(complete_csv)
 
