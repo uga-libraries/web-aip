@@ -292,8 +292,9 @@ if aip_id in os.listdir('.'):
 aip.make_manifest()
 
 # If the AIP has not been moved to the errors folder, verifies the AIP is complete. Errors are printed to the terminal.
-print('\nStarting completeness check.')
-check_aip()
+if f'{aip_id}_bag' in os.listdir('.'):
+    print('\nStarting completeness check.')
+    check_aip()
 
 # Adds completion of the script to the log.
 aip.log(log_path, f'\nScript finished running at {datetime.datetime.today()}.')
