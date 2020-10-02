@@ -73,7 +73,6 @@ def warc_data(last_download, log_path, collections=None):
         return collections_include
 
     # Gets data about WARCs to include in this download using WASAPI. Explanation of filters:
-    #   * crawl-start-after is inclusive so crawls done on the last download date will be included.
     #   * collections are the Archive-It ids for the relevant collections.
     #   * page size is the maximum number of WARCs the API call will return.
     if not collections:
