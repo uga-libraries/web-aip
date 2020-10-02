@@ -5,6 +5,8 @@ import csv
 import os
 import requests
 
+# Gets Archive-It account credentials from the configuration file
+import configuration as c
 
 def get_metadata_value(data, field):
     """Looks up the value of a field in the Archive-It API output for a particular collection or seed. If the field
@@ -14,14 +16,6 @@ def get_metadata_value(data, field):
     except KeyError:
         return 'NONE'
 
-
-# VARIABLES: UPDATE IF NEEDED BEFORE RUNNING THE SCRIPT
-
-# Archive-It account credentials
-partner_api = 'https://partner.archive-it.org/api'
-uga_page = 'https://partner.archive-it.org/INSERT_ARCHIVE-IT_ACCOUNT_NUMBER'
-user = 'INSERT_ARCHIVE-IT_USERNAME'
-password = 'INSERT_ARCHIVE-IT_PASSWORD'
 
 # All seeds from these collections (BMAC, DLG, and tests) will be excluded from the reports.
 skip_collections = [11071, 12249, 12274, 12470]
@@ -34,7 +28,7 @@ os.chdir(output_directory)
 print("Making collection metadata reports.")
 
 # Gets the Archive-It collection report with data on all the collections.
-collections = requests.get(f'{partner_api}/collection?limit=-1', auth=(user, password))
+collections = requests.get(f'{c.partner_api}/collection?limit=-1', auth=(c.user, c.password))
 
 # If there was an error with the API call, quits the script.
 if not collections.status_code == 200:
@@ -62,7 +56,7 @@ with open('hargrett_collections_metadata.csv', 'w', newline='') as harg_output, 
             continue
 
         # Constructs the URL of the collection's metadata page to make it easy to edit a record.
-        collection_metadata_page = f"{uga_page}/collections/{coll_data['id']}/metadata"
+        collection_metadata_page = f"{c.uga_page}/collections/{coll_data['id']}/metadata"
 
         # Gets the values of the required metadata fields (or 'NONE' if the field has no metadata).
         coll_collector = get_metadata_value(coll_data, 'Collector')
@@ -85,7 +79,7 @@ with open('hargrett_collections_metadata.csv', 'w', newline='') as harg_output, 
 print("Making seed metadata reports.")
 
 # Gets the Archive-It seed report with data on all the seeds.
-seeds = requests.get(f'{partner_api}/seed?limit=-1', auth=(user, password))
+seeds = requests.get(f'{c.partner_api}/seed?limit=-1', auth=(c.user, c.password))
 
 # If there was an error with the API call, quits the script.
 if not seeds.status_code == 200:
@@ -113,7 +107,7 @@ with open('hargrett_seeds_metadata.csv', 'w', newline='') as harg_output, open('
             continue
 
         # Constructs the URL of the seed's metadata page to make it easy to edit a record.
-        seed_metadata_page = f"{uga_page}/collections/{seed_data['collection']}/seeds/{seed_data['id']}/metadata"
+        seed_metadata_page = f"{c.uga_page}/collections/{seed_data['collection']}/seeds/{seed_data['id']}/metadata"
 
         # Gets the values of the required metadata fields (or 'NONE' if the field has no metadata).
         collector = get_metadata_value(seed_data, 'Collector')
