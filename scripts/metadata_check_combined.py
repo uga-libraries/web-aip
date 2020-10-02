@@ -78,21 +78,13 @@ if not seeds.status_code == 200:
 py_seeds = seeds.json()
 
 # Makes CSVs (one per department) to save results to, including adding header rows.
-with open('hargrett_seeds_metadata.csv', 'w', newline='') as harg_output, open('russell_seeds_metadata.csv', 'w', newline='') as rbrl_output, open('none_seeds_metadata.csv', 'w', newline='') as none_output:
+with open('seeds_metadata.csv', 'w', newline='') as output:
     seed_header = ['Seed ID', 'URL', 'Collector', 'Creator', 'Date', 'Identifier', 'Language', 'Rights', 'Title', 'Metadata Page']
-    harg_write = csv.writer(harg_output)
-    harg_write.writerow(seed_header)
-    rbrl_write = csv.writer(rbrl_output)
-    rbrl_write.writerow([seed_header])
-    none_write = csv.writer(none_output)
-    none_write.writerow([seed_header])
+    write = csv.writer(output)
+    write.writerow(seed_header)
 
     # Iterates over the metadata for each seed.
     for seed_data in py_seeds:
-
-        # Does not check seeds from collections if they are not Hargrett or Russell.
-        if seed_data['collection'] in skip_collections:
-            continue
 
         # Constructs the URL of the seed's metadata page to make it easy to edit a record.
         seed_metadata_page = f"{c.uga_page}/collections/{seed_data['collection']}/seeds/{seed_data['id']}/metadata"
@@ -107,12 +99,5 @@ with open('hargrett_seeds_metadata.csv', 'w', newline='') as harg_output, open('
         title = get_metadata_value(seed_data, 'Title')
 
         # Adds a row to the appropriate CSV with the metadata for the seed.
-        if collector == 'Hargrett Rare Book & Manuscript Library':
-            harg_write.writerow([seed_data['id'], seed_data['url'], collector, creator, date, identifier, language,
-                                 rights, title, seed_metadata_page])
-        elif collector == 'NONE':
-            none_write.writerow([seed_data['id'], seed_data['url'], collector, creator, date, identifier, language,
-                                 rights, title, seed_metadata_page])
-        else:
-            rbrl_write.writerow([seed_data['id'], seed_data['url'], collector, creator, date, identifier, language,
-                                 rights, title, seed_metadata_page])
+        write.writerow([seed_data['id'], seed_data['url'], collector, creator, date, identifier, language, rights,
+                        title, seed_metadata_page])
