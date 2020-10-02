@@ -1,9 +1,12 @@
 # Purpose: Generate reports of required collection and seed metadata fields to check for completeness prior to
 # downloading the WARCs and metadata for preservation. Information for all departments is saved in one report.
 
+# Usage python /path/metadata_check_combined.py /path/output_directory
+
 import csv
 import os
 import requests
+import sys
 
 # Gets Archive-It account credentials from the configuration file
 import configuration as c
@@ -21,7 +24,7 @@ def get_metadata_value(data, field):
 skip_collections = [11071, 12249, 12274, 12470]
 
 # Folder where the reports should be saved.
-output_directory = 'C:/Users/amhan/Documents/Work_From_Home/web-aip-master'
+output_directory = sys.argv[1]
 os.chdir(output_directory)
 
 # PART ONE: COLLECTION REPORTS
