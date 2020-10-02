@@ -31,7 +31,7 @@ os.chdir(output_directory)
 print("Making collection metadata reports.")
 
 # Gets the Archive-It collection report with data on all the collections.
-collections = requests.get(f'{c.partner_api}/collection?limit=-1', auth=(c.user, c.password))
+collections = requests.get(f'{c.partner_api}/collection?limit=-1', auth=(c.username, c.password))
 
 # If there was an error with the API call, quits the script.
 if not collections.status_code == 200:
@@ -82,7 +82,7 @@ with open('hargrett_collections_metadata.csv', 'w', newline='') as harg_output, 
 print("Making seed metadata reports.")
 
 # Gets the Archive-It seed report with data on all the seeds.
-seeds = requests.get(f'{c.partner_api}/seed?limit=-1', auth=(c.user, c.password))
+seeds = requests.get(f'{c.partner_api}/seed?limit=-1', auth=(c.username, c.password))
 
 # If there was an error with the API call, quits the script.
 if not seeds.status_code == 200:
