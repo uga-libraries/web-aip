@@ -8,8 +8,9 @@ import os
 import requests
 import sys
 
-# Gets Archive-It account credentials from the configuration file
+# Gets Archive-It account credentials from the configuration file.
 import configuration as c
+
 
 def get_metadata_value(data, field):
     """Looks up the value of a field in the Archive-It API output for a particular collection or seed. If the field
@@ -20,12 +21,10 @@ def get_metadata_value(data, field):
         return 'NONE'
 
 
-# All seeds from these collections (BMAC, DLG, and tests) will be excluded from the reports.
-skip_collections = [11071, 12249, 12274, 12470]
-
-# Folder where the reports should be saved.
+# Makes the folder where the reports will be saved (provided by user) the current directory.
 output_directory = sys.argv[1]
 os.chdir(output_directory)
+
 
 # PART ONE: COLLECTION REPORTS
 print("Making collection metadata reports.")
@@ -41,22 +40,14 @@ if not collections.status_code == 200:
 # Saves the collection data as a Python object.
 py_collections = collections.json()
 
-# Makes CSVs (one per department) to save results to, including adding header rows.
-with open('hargrett_collections_metadata.csv', 'w', newline='') as harg_output, open('russell_collections_metadata.csv', 'w', newline='') as rbrl_output, open('none_collections_metadata.csv', 'w', newline='') as none_output:
+# Makes a CSV to save results to, including adding header rows.
+with open('collections_metadata.csv', 'w', newline='') as output:
     collection_header = ['Collection ID', 'Collection Name', 'Collector', 'Date', 'Description', 'Title', 'Collection Page']
-    harg_write = csv.writer(harg_output)
-    harg_write.writerow(collection_header)
-    rbrl_write = csv.writer(rbrl_output)
-    rbrl_write.writerow(collection_header)
-    none_write = csv.writer(none_output)
-    none_write.writerow(collection_header)
+    write = csv.writer(output)
+    write.writerow(collection_header)
 
     # Iterates over the metadata for each collection.
     for coll_data in py_collections:
-
-        # Does not check collections if they are not Hargrett or Russell.
-        if coll_data['id'] in skip_collections:
-            continue
 
         # Constructs the URL of the collection's metadata page to make it easy to edit a record.
         collection_metadata_page = f"{c.uga_page}/collections/{coll_data['id']}/metadata"
@@ -67,16 +58,10 @@ with open('hargrett_collections_metadata.csv', 'w', newline='') as harg_output, 
         coll_description = get_metadata_value(coll_data, 'Description')
         coll_title = get_metadata_value(coll_data, 'Title')
 
-        # Adds a row to the appropriate CSV with the metadata for the collection.
-        if coll_collector == 'Hargrett Rare Book & Manuscript Library':
-            harg_write.writerow([coll_data['id'], coll_data['name'], coll_collector, coll_date, coll_description,
-                                 coll_title, collection_metadata_page])
-        elif coll_collector == 'NONE':
-            none_write.writerow([coll_data['id'], coll_data['name'], coll_collector, coll_date, coll_description,
-                                 coll_title, collection_metadata_page])
-        else:
-            rbrl_write.writerow([coll_data['id'], coll_data['name'], coll_collector, coll_date, coll_description,
-                                 coll_title, collection_metadata_page])
+        # Adds a row to the CSV with the metadata for the collection.
+        write.writerow([coll_data['id'], coll_data['name'], coll_collector, coll_date, coll_description, coll_title,
+                        collection_metadata_page])
+
 
 # PART TWO: SEED REPORTS
 print("Making seed metadata reports.")
