@@ -1,9 +1,12 @@
 # Purpose: Generate reports of required collection and seed metadata fields to check for completeness prior to
 # downloading the WARCs and metadata for preservation. Hargrett and Russell reports are saved separately.
 
+# Usage: python /path/metadata_check.py /path/output_directory
+
 import csv
 import os
 import requests
+import sys
 
 # Gets Archive-It account credentials from the configuration file.
 import configuration as c
@@ -20,9 +23,10 @@ def get_metadata_value(data, field):
 # All seeds from these collections (BMAC, DLG, and tests) will be excluded from the reports.
 skip_collections = [11071, 12249, 12274, 12470]
 
-# Folder where the reports should be saved.
-output_directory = 'C:/Users/amhan/Documents/Work_From_Home/web'
+# Makes the folder where the reports will be saved (provided by user) the current directory.
+output_directory = sys.argv[1]
 os.chdir(output_directory)
+
 
 # PART ONE: COLLECTION REPORTS
 print("Making collection metadata reports.")
@@ -74,6 +78,7 @@ with open('hargrett_collections_metadata.csv', 'w', newline='') as harg_output, 
         else:
             rbrl_write.writerow([coll_data['id'], coll_data['name'], coll_collector, coll_date, coll_description,
                                  coll_title, collection_metadata_page])
+
 
 # PART TWO: SEED REPORTS
 print("Making seed metadata reports.")

@@ -1,7 +1,7 @@
 # Purpose: Generate reports of required collection and seed metadata fields to check for completeness prior to
 # downloading the WARCs and metadata for preservation. Information for all departments is saved in one report.
 
-# Usage python /path/metadata_check_combined.py /path/output_directory
+# Usage: python /path/metadata_check_combined.py /path/output_directory
 
 import csv
 import os
