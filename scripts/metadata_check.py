@@ -56,7 +56,7 @@ with open('hargrett_collections_metadata.csv', 'w', newline='') as harg_output, 
             continue
 
         # Constructs the URL of the collection's metadata page to make it easy to edit a record.
-        collection_metadata_page = f"{c.uga_page}/collections/{coll_data['id']}/metadata"
+        collection_metadata_page = f"{c.inst_page}/collections/{coll_data['id']}/metadata"
 
         # Gets the values of the required metadata fields (or 'NONE' if the field has no metadata).
         coll_collector = get_metadata_value(coll_data, 'Collector')
@@ -107,7 +107,7 @@ with open('hargrett_seeds_metadata.csv', 'w', newline='') as harg_output, open('
             continue
 
         # Constructs the URL of the seed's metadata page to make it easy to edit a record.
-        seed_metadata_page = f"{c.uga_page}/collections/{seed_data['collection']}/seeds/{seed_data['id']}/metadata"
+        seed_metadata_page = f"{c.inst_page}/collections/{seed_data['collection']}/seeds/{seed_data['id']}/metadata"
 
         # Gets the values of the required metadata fields (or 'NONE' if the field has no metadata).
         collector = get_metadata_value(seed_data, 'Collector')

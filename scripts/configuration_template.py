@@ -4,6 +4,7 @@ script_output = '/insert/path'
 # Archive-It APIs and credentials
 partner_api = 'https://partner.archive-it.org/api'
 wasapi = 'https://warcs.archive-it.org/wasapi/v1/webdata'
+inst_page = 'https://partner.archive-it.org/insert-number'
 username = 'insert-username'
 password = 'insert-password'
 
