@@ -37,7 +37,7 @@ def get_metadata_value(data, field):
 try:
     output_directory = sys.argv[1]
     os.chdir(output_directory)
-except (IndexError, FileNotFoundError) as e:
+except (IndexError, FileNotFoundError):
     print('There was an error in the command for running the script. Please try again')
     print('Script usage: python /path/metadata_check_combined.py /path/output_directory')
     exit()
