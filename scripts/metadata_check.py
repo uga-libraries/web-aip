@@ -102,10 +102,6 @@ with open('hargrett_seeds_metadata.csv', 'w', newline='') as harg_output, open('
     # Iterates over the metadata for each seed.
     for seed_data in py_seeds:
 
-        # Does not check seeds from collections if they are not Hargrett or Russell.
-        if seed_data['collection'] in skip_collections:
-            continue
-
         # Constructs the URL of the seed's metadata page to make it easy to edit a record.
         seed_metadata_page = f"{c.inst_page}/collections/{seed_data['collection']}/seeds/{seed_data['id']}/metadata"
 
