@@ -11,6 +11,10 @@ import sys
 # Gets Archive-It account credentials from the configuration file.
 import configuration as c
 
+
+def get_collection_report():
+
+
 def get_metadata_value(data, field):
     """Looks up the value of a field in the Archive-It API output for a particular collection or seed. If the field
     is not in the output, returns the string NONE instead."""
@@ -19,9 +23,6 @@ def get_metadata_value(data, field):
     except KeyError:
         return 'NONE'
 
-
-# All seeds from these collections (BMAC, DLG, and tests) will be excluded from the reports.
-skip_collections = [11071, 12249, 12274, 12470]
 
 # Makes the folder where the reports will be saved (provided by user) the current directory.
 output_directory = sys.argv[1]
@@ -54,10 +55,6 @@ with open('hargrett_collections_metadata.csv', 'w', newline='') as harg_output, 
 
     # Iterates over the metadata for each collection.
     for coll_data in py_collections:
-
-        # Does not check collections if they are not Hargrett or Russell.
-        if coll_data['id'] in skip_collections:
-            continue
 
         # Constructs the URL of the collection's metadata page to make it easy to edit a record.
         collection_metadata_page = f"{c.inst_page}/collections/{coll_data['id']}/metadata"
