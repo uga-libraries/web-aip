@@ -13,11 +13,20 @@ import configuration as c
 
 
 def get_metadata_value(data, field):
-    """Looks up the value of a field in the Archive-It API output for a particular collection or seed. If the field
-    is not in the output, returns the string NONE instead."""
-    # TODO: if there is more than one value for the same metadata field, this only gets the value of one. See seed language for example.
+    """Looks up the value(s) of a field in the Archive-It API output for a particular collection or seed. If the
+    field is not in the output, returns the string NONE instead. """
+
     try:
-        return data['metadata'][field][0]['value']
+        # Makes a list of all the values for that data field. Some fields may repeat, e.g. language.
+        values_list = []
+        for value in data['metadata'][field]:
+            values_list.append(value['value'])
+
+        # Converts the list to a string.
+        # When there are multiple values in the list, each value is separated by a semicolon.
+        values = '; '.join(values_list)
+        return values
+
     except KeyError:
         return 'NONE'
 
