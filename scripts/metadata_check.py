@@ -30,7 +30,6 @@ os.chdir(output_directory)
 
 
 # PART ONE: COLLECTION REPORTS
-print("Making collection metadata reports.")
 
 # Gets the Archive-It collection report with data on all the collections.
 collections = requests.get(f'{c.partner_api}/collection?limit=-1', auth=(c.username, c.password))
@@ -78,7 +77,6 @@ with open('hargrett_collections_metadata.csv', 'w', newline='') as harg_output, 
 
 
 # PART TWO: SEED REPORTS
-print("Making seed metadata reports.")
 
 # Gets the Archive-It seed report with data on all the seeds.
 seeds = requests.get(f'{c.partner_api}/seed?limit=-1', auth=(c.username, c.password))
