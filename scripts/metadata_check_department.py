@@ -33,8 +33,14 @@ def get_metadata_value(data, field):
 
 
 # Changes the current directory to the folder where the reports will be saved, which is provided by user.
-output_directory = sys.argv[1]
-os.chdir(output_directory)
+# If this cannot be done, prints an error for the user and quits the script.
+try:
+    output_directory = sys.argv[1]
+    os.chdir(output_directory)
+except (IndexError, FileNotFoundError) as e:
+    print('There was an error in the command for running the script. Please try again')
+    print('Script usage: python /path/metadata_check_combined.py /path/output_directory')
+    exit()
 
 
 # PART ONE: COLLECTION REPORTS
