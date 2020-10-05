@@ -15,7 +15,7 @@ import configuration as c
 
 def get_metadata_value(data, field):
     """Looks up the value(s) of a field in the Archive-It API output for a particular collection or seed. If the
-    field is not in the output, returns the string NONE instead. """
+    field is not in the output, returns the string MISSING instead. """
 
     try:
         # Makes a list of all the values for that data field. Some fields may repeat, e.g. language.
@@ -29,7 +29,7 @@ def get_metadata_value(data, field):
         return values
 
     except KeyError:
-        return 'NONE'
+        return 'MISSING'
 
 
 # Makes the folder where the reports will be saved (provided by user) the current directory.
