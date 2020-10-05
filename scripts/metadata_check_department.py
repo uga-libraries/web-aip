@@ -2,7 +2,7 @@
 # downloading the WARCs and metadata for preservation. Separate reports are made for each department (collector) so
 # the results can be shared with the responsible archivist.
 
-# Usage: python /path/metadata_check.py /path/output_directory
+# Usage: python /path/metadata_check_combined.py /path/output_directory
 
 import csv
 import os
@@ -15,7 +15,7 @@ import configuration as c
 
 def get_metadata_value(data, field):
     """Looks up the value(s) of a field in the Archive-It API output for a particular collection or seed. If the
-    field is not in the output, returns the string MISSING instead. """
+    field is not in the output, returns the string MISSING instead."""
 
     try:
         # Makes a list of all the values for that data field. Some fields may repeat, e.g. language.
@@ -32,7 +32,7 @@ def get_metadata_value(data, field):
         return 'MISSING'
 
 
-# Makes the folder where the reports will be saved (provided by user) the current directory.
+# Changes the current directory to the folder where the reports will be saved, which is provided by user.
 output_directory = sys.argv[1]
 os.chdir(output_directory)
 
@@ -53,16 +53,16 @@ py_collections = collections.json()
 # Iterates over the metadata for each collection.
 for coll_data in py_collections:
 
-    # Constructs the URL of the collection's metadata page to make it easy to edit a record.
+    # Constructs the URL of the collection's metadata page. Included in the report to make it easy to edit a record.
     collection_metadata_page = f"{c.inst_page}/collections/{coll_data['id']}/metadata"
 
-    # Gets the values of the required metadata fields (or 'NONE' if the field has no metadata).
+    # Gets the values of the required metadata fields (or 'MISSING' if the field has no metadata).
     coll_collector = get_metadata_value(coll_data, 'Collector')
     coll_date = get_metadata_value(coll_data, 'Date')
     coll_description = get_metadata_value(coll_data, 'Description')
     coll_title = get_metadata_value(coll_data, 'Title')
 
-    # If this is the first collection for this department, makes a CSV with a header row for collection metadata.
+    # If this is the first collection for this department, makes a CSV with a header row for the collection metadata.
     if not os.path.exists(f'{coll_collector}_collections_metadata.csv'):
         with open(f'{coll_collector}_collections_metadata.csv', 'w', newline='') as output:
             collection_header = ['Collection ID', 'Collection Name', 'Collector', 'Date', 'Description', 'Title',
@@ -93,10 +93,10 @@ py_seeds = seeds.json()
 # Iterates over the metadata for each seed.
 for seed_data in py_seeds:
 
-    # Constructs the URL of the seed's metadata page to make it easy to edit a record.
+    # Constructs the URL of the seed's metadata page. Included in the report to make it easy to edit a record.
     seed_metadata_page = f"{c.inst_page}/collections/{seed_data['collection']}/seeds/{seed_data['id']}/metadata"
 
-    # Gets the values of the required metadata fields (or 'NONE' if the field has no metadata).
+    # Gets the values of the required metadata fields (or 'MISSING' if the field has no metadata).
     collector = get_metadata_value(seed_data, 'Collector')
     creator = get_metadata_value(seed_data, 'Creator')
     date = get_metadata_value(seed_data, 'Date')
@@ -105,7 +105,7 @@ for seed_data in py_seeds:
     rights = get_metadata_value(seed_data, 'Rights')
     title = get_metadata_value(seed_data, 'Title')
 
-    # If this is the first seed for this department, makes a CSV with a header row for seed metadata.
+    # If this is the first seed for this department, makes a CSV with a header row for the seed metadata.
     if not os.path.exists(f'{collector}_seeds_metadata.csv'):
         with open(f'{collector}_seeds_metadata.csv', 'w', newline='') as output:
             seed_header = ['Seed ID', 'URL', 'Collector', 'Creator', 'Date', 'Identifier', 'Language', 'Rights',
