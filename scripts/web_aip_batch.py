@@ -175,8 +175,12 @@ for aip_folder in os.listdir('.'):
     if aip_id in os.listdir('.'):
         aip.make_preservationxml(aip_id, aip_title, department, 'website', log_path)
 
-    # Bags, tars, and zips the AIP.
+    # Bags the aip.
     if aip_id in os.listdir('.'):
+        aip.bag(aip_id, log_path)
+
+    # Tars, and zips the aip.
+    if f'{aip_id}_bag' in os.listdir('.'):
         aip.package(aip_id, log_path)
 
 # Makes MD5 manifests of all AIPs the in this download using md5deep, with one manifest per department.
