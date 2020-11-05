@@ -124,7 +124,7 @@ def check_aip():
 
     # List of suffixes used for the expected metadata reports.
     expected_endings = ('_coll.csv', '_collscope.csv', '_crawldef.csv', '_crawljob.csv', '_seed.csv',
-                        '_seedscope.csv', '_master.xml', '_fits.xml')
+                        '_seedscope.csv', '_preservation.xml', '_fits.xml')
 
     # Calculates the number of WARCs that should be in this AIP. Exits the function if it is not calculated since
     # multiple tests depend on this.
@@ -279,10 +279,10 @@ aip.make_output_directories()
 if aip_id in os.listdir('.'):
     aip.extract_metadata(aip_id, f'{c.script_output}/{aips_directory}', log_path)
 
-# Transforms the FITS metadata into the PREMIS master.xml file using saxon and xslt stylesheets. Determines the
+# Transforms the FITS metadata into the PREMIS preservation.xml file using saxon and xslt stylesheets. Determines the
 # third argument (ARCHive group name) from the department code parsed from the folder name.
 if aip_id in os.listdir('.'):
-    aip.make_masterxml(aip_id, aip_title, department, 'website', log_path)
+    aip.make_preservationxml(aip_id, aip_title, department, 'website', log_path)
 
 # Bags, tars, and zips the aip.
 if aip_id in os.listdir('.'):

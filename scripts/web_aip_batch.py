@@ -171,9 +171,9 @@ for aip_folder in os.listdir('.'):
     if aip_id in os.listdir('.'):
         aip.extract_metadata(aip_id, f'{c.script_output}/{aips_directory}', log_path)
 
-    # Transforms the FITS metadata into the PREMIS master.xml file using saxon and xslt stylesheets.
+    # Transforms the FITS metadata into the PREMIS preservation.xml file using saxon and xslt stylesheets.
     if aip_id in os.listdir('.'):
-        aip.make_masterxml(aip_id, aip_title, department, 'website', log_path)
+        aip.make_preservationxml(aip_id, aip_title, department, 'website', log_path)
 
     # Bags, tars, and zips the AIP.
     if aip_id in os.listdir('.'):
