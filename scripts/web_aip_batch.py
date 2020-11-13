@@ -192,21 +192,21 @@ for aip_folder in os.listdir('.'):
     if f'{aip_id}_bag' in os.listdir('.'):
         aip.package(aip_id, f'{c.script_output}/{aips_directory}')
 
-# # Makes MD5 manifests of all AIPs the in this download using md5deep, with one manifest per department.
-# aip.make_manifest()
-#
-# # Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
-# # errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
-# print('\nStarting completeness check.')
-# web.check_aips(current_download, last_download, seed_to_aip, log_path)
-#
-# # Adds completion of the script to the log.
-# aip.log(log_path, f'\nScript finished running at {datetime.datetime.today()}.')
-#
-# # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) into the AIPs folder for this
-# # download to keep everything together if another set is downloaded before these are deleted.
-# os.chdir(c.script_output)
-# to_move = ['aips-to-ingest', 'errors', 'fits-xml', 'preservation-xml', f'script_log_{current_download}.txt']
-# for item in os.listdir('.'):
-#     if item in to_move:
-#         os.replace(item, f'{aips_directory}/{item}')
+# Makes MD5 manifests of all AIPs the in this download using md5deep, with one manifest per department.
+aip.make_manifest()
+
+# Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
+# errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
+print('\nStarting completeness check.')
+web.check_aips(current_download, last_download, seed_to_aip, log_path)
+
+# Adds completion of the script to the log.
+aip.log(log_path, f'\nScript finished running at {datetime.datetime.today()}.')
+
+# Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) into the AIPs folder for this
+# download to keep everything together if another set is downloaded before these are deleted.
+os.chdir(c.script_output)
+to_move = ['aips-to-ingest', 'errors', 'fits-xml', 'preservation-xml', f'script_log_{current_download}.txt']
+for item in os.listdir('.'):
+    if item in to_move:
+        os.replace(item, f'{aips_directory}/{item}')
