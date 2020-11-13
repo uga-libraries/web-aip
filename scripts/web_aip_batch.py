@@ -187,11 +187,11 @@ for aip_folder in os.listdir('.'):
     # JUST FOR TESTING, ONLY DOING THE BAG RENAME AND VALIDATION
     if aip_id in os.listdir('.'):
         aip.bag(aip_id, log_path)
-#
-#     # Tars, and zips the aip.
-#     if f'{aip_id}_bag' in os.listdir('.'):
-#         aip.package(aip_id, log_path)
-#
+
+    # Tars, and zips the aip.
+    if f'{aip_id}_bag' in os.listdir('.'):
+        aip.package(aip_id, f'{c.script_output}/{aips_directory}')
+
 # # Makes MD5 manifests of all AIPs the in this download using md5deep, with one manifest per department.
 # aip.make_manifest()
 #
