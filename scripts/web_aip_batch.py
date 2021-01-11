@@ -180,7 +180,7 @@ for aip_folder in os.listdir('.'):
 
     # Tars, and zips the aip.
     if f'{aip_id}_bag' in os.listdir('.'):
-        aip.package(aip_id, f'{c.script_output}/{aips_directory}')
+        aip.package(aip_id, aips_directory)
 
 # Makes MD5 manifests of all AIPs the in this download using md5deep, with one manifest per department.
 aip.make_manifest()
