@@ -290,10 +290,9 @@ if aip_id in os.listdir('.'):
 
 # Tars, and zips the aip.
 if f'{aip_id}_bag' in os.listdir('.'):
-    aip.package(aip_id, log_path)
+    aip.package(aip_id, aips_directory)
 
 # If the AIP has not been moved to the errors folder, verifies the AIP is complete. Errors are printed to the terminal.
-print(os.listdir('.'))
 if f'{aip_id}_bag' in os.listdir('.'):
     print('\nStarting completeness check.')
     check_aip()
