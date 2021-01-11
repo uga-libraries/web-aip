@@ -148,9 +148,6 @@ for aip_folder in os.listdir('.'):
     aip.log(log_path, f'\n>>>Processing {aip_folder} ({current_aip} of {total_aips}).')
     print(f'\n>>>Processing {aip_folder} ({current_aip} of {total_aips}).')
 
-    # JUST FOR TESTING: AIP FOLDER IS THE AIP ID (NO TITLE PRESENT)
-    aip_id = aip_folder
-
     # Extracts the AIP id, department, and AIP title from the folder name and saves them to variables. If the folder
     # name doesn't match this pattern, moves the AIP to an error folder and begins processing the next AIP.
     #   (Group 1) The AIP id is before the first underscore and is only lowercase letters, numbers, or dashes.
