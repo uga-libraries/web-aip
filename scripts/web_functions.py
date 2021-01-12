@@ -380,14 +380,18 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
         information is aggregated into a dictionary organized by seed/AIP. The key is the seed id and the values are
         the AIP id, warc count, and url. """
 
-        # Downloads the entire WARC list, in json, and converts it to a python object.
-        warcs = requests.get(c.wasapi, params={'page_size': 1000}, auth=(c.username, c.password))
-        py_warcs = warcs.json()
+        # Downloads the entire WARC list.
+        filters = {'page_size': 1000}
+        warcs = requests.get(c.wasapi, params=filters, auth=(c.username, c.password))
 
         # If there was an API error, ends the function.
         if warcs.status_code != 200:
             aip.log(log_path, f'WASAPI error: {warcs.status_code}.')
+            print("WASAPI Status code:", warcs.status_code)
             raise ValueError
+
+        # Converts json from API to a python object.
+        py_warcs = warcs.json()
 
         # Starts variables used to verify that the script processes the right number of WARCs. The total number of WARCs
         # that are either part of this download (include) or not part of it (exclude) are compared to the total
