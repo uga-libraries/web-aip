@@ -504,8 +504,8 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
         result.append(os.path.exists(f'{metadata}/{aip_id}_seed.csv'))
         result.append(os.path.exists(f'{metadata}/{aip_id}_seedscope.csv'))
 
-        # Tests if the master.xml file is present.
-        result.append(os.path.exists(f'{metadata}/{aip_id}_master.xml'))
+        # Tests if the preservation.xml file is present.
+        result.append(os.path.exists(f'{metadata}/{aip_id}_preservation.xml'))
 
         # Tests if the number of WARCs is correct. Compares the number of WARCs in the objects folder, calculated
         # with len(), to the number of WARCs expected from the API (warc_count).
@@ -535,7 +535,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
         # there is a file of a different type, based on the end of the filename, it updates the value to False.
         result.append(True)
         expected_endings = ('_coll.csv', '_collscope.csv', '_crawldef.csv', '_crawljob.csv', '_seed.csv',
-                            '_seedscope.csv', '_master.xml', '_fits.xml')
+                            '_seedscope.csv', '_preservation.xml', '_fits.xml')
         for file in os.listdir(metadata):
             if not file.endswith(expected_endings):
                 result[-1] = False
@@ -587,7 +587,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
         # Adds a header row to the csv.
         complete_write.writerow(
             ['AIP', 'URL', 'AIP Folder Made', 'coll.csv', 'collscope.csv', 'crawldef.csv', 'crawljob.csv', 'seed.csv',
-             'seedscope.csv', 'master.xml', 'WARC Count Correct', 'Objects is all WARCs', 'fits.xml Count Correct',
+             'seedscope.csv', 'preservation.xml', 'WARC Count Correct', 'Objects is all WARCs', 'fits.xml Count Correct',
              'No Extra Metadata'])
 
         # Tests each AIP for completeness and saves the results.
