@@ -6,6 +6,9 @@ Dependencies:
     * Tools: bagit.py, fits, md5deep, saxon, xmllint
 
 Prior to the preservation download, all seed metadata should be entered into Archive-It.
+
+Ideas for improvement: make a log of completeness check instead of printing to the terminal to have a record;
+include time in log start date and calculate how long it took to run.
 """
 
 # Usage: python /path/web_aip_single.py seed_id aip_id collection_id [last_download_date]
@@ -197,7 +200,7 @@ except AttributeError:
 print(f'Making AIP for {seed_id}.')
 
 # Makes a folder for aips within the script_output folder, a designated place on the local machine for web archiving
-# documents). The folder name includes today's date to keep it separate from previous downloads which may still be
+# documents. The folder name includes today's date to keep it separate from previous downloads which may still be
 # saved on the same machine. current_download is a variable because it is also used as part of the quality_control
 # function, and depending on how long it takes to download WARCs, recalculating today() may give a different result.
 current_download = datetime.date.today()

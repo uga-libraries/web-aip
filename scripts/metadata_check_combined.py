@@ -4,6 +4,9 @@
 
 # Usage: python /path/metadata_check_combined.py /path/output_directory
 
+# Ideas for improvement: use default location from configuration file for output directory if none supplied; add
+# limit by date to see just this download; differentiate between active and inactive collections.
+
 import csv
 import os
 import requests
