@@ -576,7 +576,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
     try:
         aips_metadata = aip_dictionary()
     except ValueError:
-        aip.log(log_path, 'Unable to check AIPs for completeness. AIP dictionary not generated.')
+        aip.log(log_path, '\nUnable to check AIPs for completeness. AIP dictionary not generated.')
         return
 
     # Starts a csv for the results of the quality review.
