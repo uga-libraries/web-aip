@@ -293,7 +293,7 @@ if aip_id in os.listdir('.'):
 
 # Tars, and zips the aip.
 if f'{aip_id}_bag' in os.listdir('.'):
-    aip.package(aip_id, aips_directory)
+    aip.package(aip_id, os.getcwd())
 
 # If the AIP has not been moved to the errors folder, verifies the AIP is complete. Errors are printed to the terminal.
 if f'{aip_id}_bag' in os.listdir('.'):
