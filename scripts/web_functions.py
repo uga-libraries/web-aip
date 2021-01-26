@@ -17,9 +17,9 @@ import configuration as c
 
 
 def warc_data(last_download, log_path, collections=None):
-    """Gets data about WARCs to include in this download using WASAPI. A WARC is included if it was made since the
-    last preservation download date and is part of a relevant collection. The collection list is either provided as
-    an argument or the function will calculate a list of current Hargrett and Russell collections.
+    """Gets data about WARCs to include in this download using WASAPI. A WARC is included if it was saved since the
+    last preservation download date and is part of a relevant collection. The relevant collection list is either
+    provided as an argument or the function will calculate a list of current Hargrett and Russell collections.
 
     Returns json converted to a Python object with all the WASAPI data on the included WARCs."""
 
@@ -73,11 +73,12 @@ def warc_data(last_download, log_path, collections=None):
         return collections_include
 
     # Gets data about WARCs to include in this download using WASAPI. Explanation of filters:
-    #   * collections are the Archive-It ids for the relevant collections.
+    #   * store time is when the WARC was saved, so test crawls saved in the quarter after they were run aren't missed.
+    #   * collections are the Archive-It ids for collections to include in the download.
     #   * page size is the maximum number of WARCs the API call will return.
     if not collections:
         collections = collection_list()
-    filters = {'crawl-start-after': last_download, 'collection': collections, 'page_size': 1000}
+    filters = {'store-time-after': last_download, 'collection': collections, 'page_size': 1000}
     warcs = requests.get(c.wasapi, params=filters, auth=(c.username, c.password))
 
     # If there was an error with the API call, quits the script.
