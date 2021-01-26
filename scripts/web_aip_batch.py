@@ -57,7 +57,6 @@ os.chdir(f'{c.script_output}/{aips_directory}')
 log_path = f'../script_log_{current_download}.txt'
 aip.log(log_path, f'Starting web preservation script on {current_download}.\n')
 
-
 # PART ONE: DOWNLOAD WARCS AND METADATA INTO AIP DIRECTORY STRUCTURE.
 
 # Uses Archive-It APIs to get information about the WARCs and seeds in this download. If there is an API failure,
@@ -171,13 +170,17 @@ for aip_folder in os.listdir('.'):
     if aip_id in os.listdir('.'):
         aip.extract_metadata(aip_id, f'{c.script_output}/{aips_directory}', log_path)
 
-    # Transforms the FITS metadata into the PREMIS master.xml file using saxon and xslt stylesheets.
+    # Transforms the FITS metadata into the PREMIS preservation.xml file using saxon and xslt stylesheets.
     if aip_id in os.listdir('.'):
-        aip.make_masterxml(aip_id, aip_title, department, 'website', log_path)
+        aip.make_preservationxml(aip_id, aip_title, department, 'website', log_path)
 
-    # Bags, tars, and zips the AIP.
+    # Bags the aip.
     if aip_id in os.listdir('.'):
-        aip.package(aip_id, log_path)
+        aip.bag(aip_id, log_path)
+
+    # Tars, and zips the aip.
+    if f'{aip_id}_bag' in os.listdir('.'):
+        aip.package(aip_id, os.getcwd())
 
 # Makes MD5 manifests of all AIPs the in this download using md5deep, with one manifest per department.
 aip.make_manifest()

@@ -2,7 +2,10 @@
 # downloading the WARCs and metadata for preservation. Separate reports are made for each department (collector) so
 # the results can be shared with the responsible archivist.
 
-# Usage: python /path/metadata_check_combined.py /path/output_directory
+# Usage: python /path/metadata_check_department.py /path/output_directory
+
+# Ideas for improvement: use default location from configuration file for output directory if none supplied; add
+# limit by date to see just this download; differentiate between active and inactive collections.
 
 import csv
 import os
@@ -39,7 +42,7 @@ try:
     os.chdir(output_directory)
 except (IndexError, FileNotFoundError):
     print('There was an error in the command for running the script. Please try again')
-    print('Script usage: python /path/metadata_check_combined.py /path/output_directory')
+    print('Script usage: python /path/metadata_check_department.py /path/output_directory')
     exit()
 
 

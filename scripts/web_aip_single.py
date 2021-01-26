@@ -6,6 +6,9 @@ Dependencies:
     * Tools: bagit.py, fits, md5deep, saxon, xmllint
 
 Prior to the preservation download, all seed metadata should be entered into Archive-It.
+
+Ideas for improvement: make a log of completeness check instead of printing to the terminal to have a record;
+include time in log start date and calculate how long it took to run.
 """
 
 # Usage: python /path/web_aip_single.py seed_id aip_id collection_id [last_download_date]
@@ -124,7 +127,7 @@ def check_aip():
 
     # List of suffixes used for the expected metadata reports.
     expected_endings = ('_coll.csv', '_collscope.csv', '_crawldef.csv', '_crawljob.csv', '_seed.csv',
-                        '_seedscope.csv', '_master.xml', '_fits.xml')
+                        '_seedscope.csv', '_preservation.xml', '_fits.xml')
 
     # Calculates the number of WARCs that should be in this AIP. Exits the function if it is not calculated since
     # multiple tests depend on this.
@@ -197,7 +200,7 @@ except AttributeError:
 print(f'Making AIP for {seed_id}.')
 
 # Makes a folder for aips within the script_output folder, a designated place on the local machine for web archiving
-# documents). The folder name includes today's date to keep it separate from previous downloads which may still be
+# documents. The folder name includes today's date to keep it separate from previous downloads which may still be
 # saved on the same machine. current_download is a variable because it is also used as part of the quality_control
 # function, and depending on how long it takes to download WARCs, recalculating today() may give a different result.
 current_download = datetime.date.today()
@@ -279,17 +282,20 @@ aip.make_output_directories()
 if aip_id in os.listdir('.'):
     aip.extract_metadata(aip_id, f'{c.script_output}/{aips_directory}', log_path)
 
-# Transforms the FITS metadata into the PREMIS master.xml file using saxon and xslt stylesheets. Determines the
+# Transforms the FITS metadata into the PREMIS preservation.xml file using saxon and xslt stylesheets. Determines the
 # third argument (ARCHive group name) from the department code parsed from the folder name.
 if aip_id in os.listdir('.'):
-    aip.make_masterxml(aip_id, aip_title, department, 'website', log_path)
+    aip.make_preservationxml(aip_id, aip_title, department, 'website', log_path)
 
-# Bags, tars, and zips the aip.
+# Bags the aip.
 if aip_id in os.listdir('.'):
-    aip.package(aip_id, log_path)
+    aip.bag(aip_id, log_path)
+
+# Tars, and zips the aip.
+if f'{aip_id}_bag' in os.listdir('.'):
+    aip.package(aip_id, os.getcwd())
 
 # If the AIP has not been moved to the errors folder, verifies the AIP is complete. Errors are printed to the terminal.
-print(os.listdir('.'))
 if f'{aip_id}_bag' in os.listdir('.'):
     print('\nStarting completeness check.')
     check_aip()
