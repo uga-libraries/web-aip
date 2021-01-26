@@ -4,6 +4,7 @@
 # usage: python /path/warc_xml_to_csv.py /path/warc.xml
 
 import csv
+import os
 import re
 import sys
 import xml.etree.ElementTree as et
@@ -21,8 +22,9 @@ try:
 except FileNotFoundError:
     print("Provided path to the warc xml is not correct.")
 
-# Start a csv for data
-warc_csv = open("converted_warc_xml.csv", "w", newline="")
+# Start a csv for data in the same folder as the xml file.
+warc_xml_folder = os.path.dirname(os.path.abspath(warc_xml))
+warc_csv = open(os.path.join(warc_xml_folder, "converted_warc_xml.csv"), "w", newline="")
 csv_writer = csv.writer(warc_csv)
 csv_writer.writerow(["filename", "collection", "seed", "crawl-time", "crawl-start", "store-time"])
 
