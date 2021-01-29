@@ -25,9 +25,9 @@ import configuration as c
 import web_functions as web
 
 
-def seed_data():
-    """Returns the AIP title and crawl definition id from the seed report. This is different from the seed_data()
-    function used by web_aip_batch.py since the AIP id does not need to be calculated."""
+def get_title():
+    """Returns the AIP title from the seed report. Replaces the functionality of seed_data(), which also calculates
+    the AIP ID for batch downloads. """
 
     # Uses the Partner API to get data about this seed.
     seed_report = requests.get(f"{c.partner_api}/seed?id={seed_id}", auth=(c.username, c.password))
@@ -41,21 +41,14 @@ def seed_data():
     # Converts the seed data from json to a Python object.
     py_seed_report = seed_report.json()
 
-    # Constructs the aip id from the seed data. If at any stage a piece of the aip id cannot be calculated,
-    # the seed is added to the exclude list and the next warc is processed.
-    for seed_info in py_seed_report:
+    # Gets the title for the seed from the Title field.
+    # Raises an error if the title is missing so the script stops processing the seed. Title is required.
+    try:
+        title = py_seed_report[0]['metadata']['Title'][0]['value']
+    except (KeyError, IndexError):
+        raise ValueError
 
-        # Gets the title for the seed from the Title field.
-        # Stops processing this seed if the title is missing. It is required.
-        # TODO: don't need crawl definition anymore. This is only the most recent.
-        try:
-            title = seed_info['metadata']['Title'][0]['value']
-            crawl_def = seed_info['crawl_definition']
-        except (KeyError, IndexError):
-            aip.log(log_path, f"Seed {seed_info['id']} has no metadata.")
-            raise ValueError
-
-    return title, crawl_def
+    return title
 
 
 def check_aip():
@@ -218,7 +211,7 @@ os.chdir(f"{c.script_output}/{aips_directory}")
 # it is run automatically with chronjob. The log is not started until after the current_download variable is set so that
 # can be included in the file name.
 log_path = f"../script_log_{current_download}.txt"
-aip.log(log_path, f"\nStarting web preservation script on {current_download}.\n")
+aip.log(log_path, f"\nStarting web preservation script for seed {seed_id} on {current_download}.\n")
 
 
 # PART ONE: DOWNLOAD WARCS AND METADATA INTO THE AIP DIRECTORY STRUCTURE.
@@ -228,13 +221,12 @@ print("Downloading AIP content.")
 # is downloaded to skip other seeds from this collection. It is not possible to filter by seed using WASAPI.
 warc_metadata = web.warc_data(last_download, log_path, collection_id)
 
-# Uses the Archive-It Partner API to get information about this seed.
-# TODO: don't get crawl definition here anymore
+# Uses the Archive-It Partner API to get the seed's title.
 try:
-    aip_title, crawl_definition = seed_data()
+    aip_title = get_title()
 except ValueError:
-    aip.log(log_path, "Seed has no metadata.")
-    print("Exiting script: seed has no metadata.")
+    aip.log(log_path, "Seed has no title.")
+    print("Exiting script: seed has no title.")
     exit()
 
 # Makes the aip directory for the seed's aip (aip folder with metadata and objects subfolders). Unlike with the batch
@@ -243,8 +235,7 @@ web.make_aip_directory(aip_id)
 
 # Downloads the seed metadata from Archive-It into the seed's metadata folder.
 # The aip_id is passed twice, as both the AIP id and AIP folder. These are different values for the batch script.
-# TODO: don't need crawl definition here anymore
-web.download_metadata(aip_id, aip_id, collection_id, crawl_definition, seed_id, current_download, log_path)
+web.download_metadata(aip_id, aip_id, collection_id, seed_id, current_download, log_path)
 
 # Iterates through information about each WARC.
 for warc in warc_metadata['files']:
