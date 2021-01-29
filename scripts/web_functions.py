@@ -218,12 +218,12 @@ def make_aip_directory(aip_folder):
         os.makedirs(f'{aip_folder}/objects')
 
 
-def download_metadata(aip_id, aip_folder, warc_collection, crawl_definition, seed_id, current_download, log_path):
+def download_metadata(aip_id, aip_folder, warc_collection, job_id, seed_id, current_download, log_path):
     """Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
     deletes any empty reports (meaning there was no data of that type for this seed), and redacts login information
     from the seed report. """
-    # TODO: do crawl definition separately
 
+    # TODO: update get_report to name crawl definitions to include their id.
     def get_report(filter_type, filter_value, report_type, code):
         """Downloads a single metadata report and saves it as a csv in the AIP's metadata folder.
             filter_type and filter_value are used to filter the API call to the right AIP's report
@@ -283,13 +283,25 @@ def download_metadata(aip_id, aip_folder, warc_collection, crawl_definition, see
             for row in redacted_rows:
                 report_write.writerow(row)
 
-    # Downloads the six metadata reports from Archive-It needed to understand the context of the WARC.
+    # Downloads five of the six metadata reports from Archive-It needed to understand the context of the WARC.
+    # These are reports where there is only one report per seed or collection.
     get_report('id', seed_id, 'seed', 'seed')
     get_report('seed', seed_id, 'scope_rule', 'seedscope')
     get_report('collection', warc_collection, 'scope_rule', 'collscope')
     get_report('id', warc_collection, 'collection', 'coll')
     get_report('collection', warc_collection, 'crawl_job', 'crawljob')
-    get_report('id', crawl_definition, 'crawl_definition', 'crawldef')
+
+    # Downloads the crawl definition report for the job this WARC was part of.
+    # The crawl definition id is obtained from the crawl job report using the job id.
+    # There may be more than one crawl definition report per AIP.
+    with open(f'{aip_folder}/metadata/{aip_id}_crawljob.csv', 'r') as crawljob_csv:
+        crawljob_data = csv.DictReader(crawljob_csv)
+        for job in crawljob_data:
+            if job_id == job['id']:
+                crawl_def_id = job['crawl_definition']
+                # TODO: verify if this report already exists prior to downloading it.
+                get_report('id', crawl_def_id, 'crawl_definition', 'crawldef')
+                break
 
     # Iterates over each report in the metadata folder to delete empty reports and redact login information from the
     # seed report.
