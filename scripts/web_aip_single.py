@@ -233,10 +233,6 @@ except ValueError:
 # script, the folder does not need to temporarily include the AIP title since the title is already stored in a variable.
 web.make_aip_directory(aip_id)
 
-# Downloads the seed metadata from Archive-It into the seed's metadata folder.
-# The aip_id is passed twice, as both the AIP id and AIP folder. These are different values for the batch script.
-web.download_metadata(aip_id, aip_id, collection_id, seed_id, current_download, log_path)
-
 # Iterates through information about each WARC.
 for warc in warc_metadata['files']:
 
@@ -259,6 +255,19 @@ for warc in warc_metadata['files']:
         continue
     if not seed_id == warc_seed_id:
         continue
+
+    # Calculates the job id from the WARC filename.
+    try:
+        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
+        job_id = regex_job_id.group(1)
+    except AttributeError:
+        aip.log(log_path, "Cannot calculate the WARC job id.")
+        continue
+
+    # Downloads the seed metadata from Archive-It into the seed's metadata folder.
+    # The aip_id is passed twice, as both the AIP id and AIP folder. These are different values for the batch script.
+    # While five of the reports are the same for each WARC, the crawl definition could be different.
+    web.download_metadata(aip_id, aip_id, collection_id, job_id, seed_id, current_download, log_path)
 
     # Downloads the warc from Archive-It into the seed's objects folder.
     web.download_warc(aip_id, warc_filename, warc_url, warc_md5, current_download, log_path)
