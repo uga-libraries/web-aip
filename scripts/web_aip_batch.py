@@ -99,13 +99,19 @@ for warc in warc_metadata['files']:
         aip.log(log_path, 'WARC information is formatted wrong.')
         continue
 
+    # Calculates the job id from the WARC filename.
+    try:
+        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
+        job_id = regex_job_id.group(1)
+    except AttributeError:
+        aip.log(log_path, "Cannot calculate the WARC job id.")
+        continue
+
     # Saves relevant information the WARC's seed in variables for future use.
     # Stops processing if the WARC does not the required metadata.
-    # TODO: dont' get crawl definition here anymore
     try:
         aip_id = seed_metadata[seed_id][0]
         aip_title = seed_metadata[seed_id][1]
-        crawl_definition = seed_metadata[seed_id][2]
     except (KeyError, IndexError):
         aip.log(log_path, 'Seed has no metadata.')
         continue
@@ -123,7 +129,7 @@ for warc in warc_metadata['files']:
     # the folder is empty). A seed may have multiple WARCs and only want to download the seed's reports once.
     # TODO: don't need crawl definition here anymore
     if len(os.listdir(f'{aip_name}/metadata')) == 0:
-        web.download_metadata(aip_id, aip_name, warc_collection, crawl_definition, seed_id, current_download, log_path)
+        web.download_metadata(aip_id, aip_name, warc_collection, job_id, seed_id, current_download, log_path)
 
     # Downloads the WARC from Archive-It into the seed's objects folder.
     web.download_warc(aip_name, warc_filename, warc_url, warc_md5, current_download, log_path)
