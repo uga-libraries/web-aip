@@ -233,8 +233,10 @@ def download_metadata(aip_id, aip_folder, warc_collection, job_id, seed_id, curr
         filters = {'limit': -1, filter_type: filter_value, 'format': 'csv'}
         metadata_report = requests.get(f'{c.partner_api}/{report_type}', params=filters, auth=(c.username, c.password))
 
-        # Saves the metadata report if there were no errors with the API.
-        if metadata_report.status_code == 200:
+        # Saves the metadata report if there were no errors with the API and the report has not already been downloaded.
+        # If there is more than one WARC for a seed, reports may already be in the metadata folder.
+        report_path = f'{c.script_output}/aips_{current_download}/{aip_folder}/metadata/{report_name}'
+        if metadata_report.status_code == 200 and not os.path.exists(report_path):
             with open(f'{aip_folder}/metadata/{report_name}', 'wb') as report_csv:
                 report_csv.write(metadata_report.content)
         else:
@@ -297,7 +299,6 @@ def download_metadata(aip_id, aip_folder, warc_collection, job_id, seed_id, curr
         for job in crawljob_data:
             if job_id == job['id']:
                 crawl_def_id = job['crawl_definition']
-                # TODO: verify if this report already exists prior to downloading it.
                 get_report('id', crawl_def_id, 'crawl_definition', f'{aip_id}_{crawl_def_id}_crawldef.csv')
                 break
 
