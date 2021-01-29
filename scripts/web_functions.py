@@ -200,6 +200,7 @@ def seed_data(py_warcs, current_download, log_path):
             identifier = f'{department_code}-{related_collection}-web-{download_date_code}-{sequential_number}'
 
             # Saves AIP id, AIP title, and crawl definition id to the seeds_include dictionary.
+            # TODO: don't need crawl definition anymore
             # This only contains information about seeds that had no errors and were fully processed.
             seeds_include[seed_identifier] = [identifier, title, seed_info['crawl_definition']]
 
@@ -221,6 +222,7 @@ def download_metadata(aip_id, aip_folder, warc_collection, crawl_definition, see
     """Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
     deletes any empty reports (meaning there was no data of that type for this seed), and redacts login information
     from the seed report. """
+    # TODO: do crawl definition separately
 
     def get_report(filter_type, filter_value, report_type, code):
         """Downloads a single metadata report and saves it as a csv in the AIP's metadata folder.
@@ -498,6 +500,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
         metadata = f'{c.script_output}/aips_{current_download}/{aip_id}_bag/data/metadata'
 
         # Tests if each of the six Archive-It metadata reports is present. os.path.exists() returns True/False.
+        # TODO: possible to check for the correct number of crawl definitions?
         result.append(os.path.exists(f'{metadata}/{aip_id}_coll.csv'))
         result.append(os.path.exists(f'{metadata}/{aip_id}_collscope.csv'))
         result.append(os.path.exists(f'{metadata}/{aip_id}_crawldef.csv'))

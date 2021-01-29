@@ -101,6 +101,7 @@ for warc in warc_metadata['files']:
 
     # Saves relevant information the WARC's seed in variables for future use.
     # Stops processing if the WARC does not the required metadata.
+    # TODO: dont' get crawl definition here anymore
     try:
         aip_id = seed_metadata[seed_id][0]
         aip_title = seed_metadata[seed_id][1]
@@ -120,6 +121,7 @@ for warc in warc_metadata['files']:
 
     # Downloads the seed metadata from Archive-It into the seed's metadata folder if it is not already there (and so
     # the folder is empty). A seed may have multiple WARCs and only want to download the seed's reports once.
+    # TODO: don't need crawl definition here anymore
     if len(os.listdir(f'{aip_name}/metadata')) == 0:
         web.download_metadata(aip_id, aip_name, warc_collection, crawl_definition, seed_id, current_download, log_path)
 

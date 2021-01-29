@@ -47,6 +47,7 @@ def seed_data():
 
         # Gets the title for the seed from the Title field.
         # Stops processing this seed if the title is missing. It is required.
+        # TODO: don't need crawl definition anymore. This is only the most recent.
         try:
             title = seed_info['metadata']['Title'][0]['value']
             crawl_def = seed_info['crawl_definition']
@@ -143,6 +144,7 @@ def check_aip():
 
     # Tests if each of the expected metadata reports is present. Skips FITS because the filename is formatted
     # differently and it is checked in the next test.
+    # TODO: Is there a way to verify the number of crawl definition reports is correct?
     for end in expected_endings:
         if end == '_fits.xml':
             continue
@@ -227,6 +229,7 @@ print('Downloading AIP content.')
 warc_metadata = web.warc_data(last_download, log_path, collection_id)
 
 # Uses the Archive-It Partner API to get information about this seed.
+# TODO: don't get crawl definition here anymore
 try:
     aip_title, crawl_definition = seed_data()
 except ValueError:
@@ -240,6 +243,7 @@ web.make_aip_directory(aip_id)
 
 # Downloads the seed metadata from Archive-It into the seed's metadata folder.
 # The aip_id is passed twice, as both the AIP id and AIP folder. These are different values for the batch script.
+# TODO: don't need crawl definition here anymore
 web.download_metadata(aip_id, aip_id, collection_id, crawl_definition, seed_id, current_download, log_path)
 
 # Iterates through information about each WARC.
