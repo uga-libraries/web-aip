@@ -199,10 +199,9 @@ def seed_data(py_warcs, current_download, log_path):
             # Constructs the AIP id for the seed.
             identifier = f'{department_code}-{related_collection}-web-{download_date_code}-{sequential_number}'
 
-            # Saves AIP id, AIP title, and crawl definition id to the seeds_include dictionary.
-            # TODO: don't need crawl definition anymore
+            # Saves AIP id and AIP title to the seeds_include dictionary.
             # This only contains information about seeds that had no errors and were fully processed.
-            seeds_include[seed_identifier] = [identifier, title, seed_info['crawl_definition']]
+            seeds_include[seed_identifier] = [identifier, title]
 
     return seeds_include
 
