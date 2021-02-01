@@ -62,9 +62,9 @@ def warc_data(last_download, log_path, collections=None):
                 aip.log(log_path, f'Collection {collection_id} not included. No metadata.')
                 continue
 
-            # If the department is Hargrett or Russell, adds the collection id to the collections list. Otherwise,
-            # adds it to the excluded list.
-            if department_name.startswith('Hargrett') or department_name.startswith('Richard B. Russell'):
+            # If the department is Brown, Hargrett or Russell, adds the collection id to the collections list.
+            # Otherwise, adds it to the excluded list.
+            if department_name.startswith('Hargrett') or department_name.startswith('Richard B. Russell') or department_name.startswith('The Walter J. Brown Media'):
                 collections_include.append(seed['collection'])
             else:
                 collections_exclude.append(collection_id)

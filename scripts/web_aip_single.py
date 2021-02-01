@@ -192,7 +192,7 @@ except IndexError:
 
 # Extracts the department from the aip_id saves it to a variable. Quits the script if the AIP id is formatted wrong.
 try:
-    regex_dept = re.match('^(harg|rbrl).*', aip_id)
+    regex_dept = re.match('^(bmac|harg|rbrl).*', aip_id)
     department = regex_dept.group(1)
 except AttributeError:
     print('Exiting script: AIP id is not formatted correctly. Department could not be identified.')
