@@ -9,7 +9,7 @@ Future development idea: want to be able to review the URLS and remove unwanted 
 Could combine the URLs to a single CSV for staff review and do the download from that CSV.
 """
 
-# Usage: python /path/download_files.py /path/input_folder
+# Usage: python /path/download_files.py /path/input_directory
 
 import csv
 import os
@@ -17,6 +17,13 @@ import sys
 
 # Gets the path to the input folder and makes it the current directory.
 # If the path is missing or not valid, prints and error and quits the script.
+try:
+    input_directory = sys.argv[1]
+    os.chdir(input_directory)
+except (IndexError, FileNotFoundError, NotADirectoryError):
+    print("The required argument input_directory is missing or not a valid directory.")
+    print("Script usage: python /path/download_files.py /path/input_directory")
+    exit()
 
 # Gets the document URLs from each CSV in the input folder and saves them to a list.
 
