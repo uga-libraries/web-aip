@@ -14,6 +14,7 @@ Future development ideas:
 
 import csv
 import os
+import re
 import sys
 
 # Gets the path to the input folder and makes it the current directory.
@@ -26,9 +27,14 @@ except (IndexError, FileNotFoundError, NotADirectoryError):
     print("Script usage: python /path/download_files.py /path/input_directory")
     exit()
 
+
 # Gets the document URLs from each CSV in the input folder and saves them to a list.
 download_urls = []
 for input_csv in os.listdir("."):
+
+    # TODO: this is for testing only. Remove when done.
+    if input_csv == "skip":
+        continue
 
     # Reads each row in the CSV file.
     with open(input_csv) as csvfile:
@@ -37,7 +43,6 @@ for input_csv in os.listdir("."):
         # Verify the first column name in the first row is "url".
         # If not, this CSV is not formatted as expected. Prints an error and starts the next CSV.
         header = next(data)
-        print(header)
         if not header[0] == "url":
             print("This file is not formatted correctly and will be skipped:", input_csv)
             break
@@ -46,5 +51,20 @@ for input_csv in os.listdir("."):
         for row in data:
             download_urls.append(row[0])
 
-# Downloads the document for each URL in the list and saves it to a folder named with the seed URL.
 
+# Downloads the document for each URL in the list and saves it to a folder named with the seed.
+for url in download_urls:
+
+    # Calculates the seed from the url, which is the first part of the path minus the http:// or https://.
+    # If the seed cannot be calculated, prints an error and does not try to download this url.
+    try:
+        regex = re.match("^https?://(.*?)/", url)
+        seed = regex.group(1)
+        print(seed)
+    except AttributeError:
+        print("Could not calculate seed from this URL and will not download:", url)
+
+    # Makes a folder for the seed, if it does not already exist, for saving the file to.
+    # TODO: test if the destination folder needs to be made for wget to work.
+    if not os.path.exists(seed):
+        os.makedirs(seed)
