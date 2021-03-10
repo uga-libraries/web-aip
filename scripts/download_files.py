@@ -33,7 +33,7 @@ download_urls = []
 for input_csv in os.listdir("."):
 
     # TODO: this is for testing only. Remove when done.
-    if input_csv == "skip":
+    if os.path.isdir(input_csv):
         continue
 
     # Reads each row in the CSV file.
@@ -60,11 +60,27 @@ for url in download_urls:
     try:
         regex = re.match("^https?://(.*?)/", url)
         seed = regex.group(1)
-        print(seed)
     except AttributeError:
         print("Could not calculate seed from this URL and will not download:", url)
 
     # Makes a folder for the seed, if it does not already exist, for saving the file to.
-    # TODO: test if the destination folder needs to be made for wget to work.
     if not os.path.exists(seed):
         os.makedirs(seed)
+
+    # Calculates the desired name for the file. Generally, this is the last part of the URL plus .pdf.
+    # If the last part of the URL is download, gets the previous part of the URL.
+    # If the last part of the URL is pdf, removes that before adding .pdf extension.
+    # TODO there may be other generic naming conventions to address as well
+
+    if url.endswith("download"):
+        regex = re.match("(.*)/download", url)
+        filename = regex.group(1) + ".pdf"
+    else:
+        regex = re.match(".*/(.*)", url)
+        if url.endswith(".pdf") or url.endswith(".PDF"):
+            filename = regex.group(1)
+        elif url.endswith("pdf") or url.endswith("PDF"):
+            filename = regex.group(1)[:-3] + ".pdf"
+        else:
+            filename = regex.group(1) + ".pdf"
+
