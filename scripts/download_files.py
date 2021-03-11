@@ -9,7 +9,6 @@ Dependency: wget https://www.gnu.org/software/wget/
 
 Future development ideas:
     * Save all URLs to a CSV for staff review to remove unwanted things prior to download?
-    * In test, some showed as duplicate in the CSV, although is only in the CSV once. Skip because is in another crawl?
     * Expand beyond PDF? Need to change how renamed.
     * Need to be able to download from more than one collection at a time?
     * Want any logging, summary statistics about how many were downloaded, and/or showing progress?
@@ -44,6 +43,7 @@ except IndexError:
     exit()
 
 # Gets the document URLs from each CSV in the input folder and saves them to a list.
+# TODO: switch to a dictionary to track seed at the same time, since seed is not always the first part of the url.
 download_urls = []
 for input_csv in os.listdir("."):
 
@@ -57,21 +57,26 @@ for input_csv in os.listdir("."):
 
         # Verify the first column name in the first row is "url".
         # If not, this CSV is not formatted as expected. Prints an error and starts the next CSV.
+        # TODO: also test for header[2] == is_duplicate
         header = next(data)
         if not header[0] == "url":
             print("This file is not formatted correctly and will be skipped:", input_csv)
             break
 
         # Gets the URL, which is the first item in the row, and saves to the URLS list.
+        # TODO: only include if a duplicate.
+        # TODO: dictionary with one list per seed.
         for row in data:
             download_urls.append(row[0])
 
 
 # Downloads the document for each URL in the list and saves it to a folder named with the seed.
+# TODO: Iterate over seeds in the dictionary before iterate over the urls
 for url in download_urls:
 
     # Calculates the seed from the url, which is the first part of the path minus the http:// or https://.
     # If the seed cannot be calculated, prints an error and does not try to download this url.
+    # TODO: seed is from dictionary
     try:
         regex = re.match("^https?://(.*?)/", url)
         seed = regex.group(1)
@@ -81,6 +86,7 @@ for url in download_urls:
 
     # Makes a folder for the seed, if it does not already exist, for saving the PDF to.
     # Changes the current directory to the seed folder so the downloaded PDF is saved to it.
+    # TODO: do this once per seed, not once per url
     if not os.path.exists(seed):
         os.makedirs(seed)
     os.chdir(os.path.join(input_directory, seed))
@@ -107,5 +113,5 @@ for url in download_urls:
     archiveit_url = f"https://wayback.archive-it.org/{collection}/3/{url}"
 
     # Downloads the PDF to the seed's directory, named with the desired name.
-    subprocess.run(f"wget -O {filename} {archiveit_url}", shell=True)
+    subprocess.run(f'wget -O "{filename}" "{archiveit_url}"', shell=True)
 
