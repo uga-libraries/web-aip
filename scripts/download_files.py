@@ -8,6 +8,9 @@ save the CSVs to a single folder. These files are the script input.
 Future development ideas:
     * Save all URLs to a CSV for staff review to remove unwanted things prior to download?
     * In test, some showed as duplicate in the CSV, although is only in the CSV once. Skip because is in another crawl?
+    * Expand beyond PDF? Need to change how renamed.
+    * Need to be able to download from more than one collection at a time?
+    * Want any logging, summary statistics about how many were downloaded, and/or showing progress?
 """
 
 # Usage: python /path/download_files.py /path/input_directory
@@ -63,7 +66,8 @@ for url in download_urls:
     except AttributeError:
         print("Could not calculate seed from this URL and will not download:", url)
 
-    # Makes a folder for the seed, if it does not already exist, for saving the file to.
+    # Makes a folder for the seed, if it does not already exist, for saving the PDF to.
+    # TODO: Changes the current directory to this folder so the downloaded PDF is saved to it.
     if not os.path.exists(seed):
         os.makedirs(seed)
 
@@ -71,7 +75,6 @@ for url in download_urls:
     # If the last part of the URL is download, gets the previous part of the URL.
     # If the last part of the URL is pdf, removes that before adding .pdf extension.
     # TODO there may be other generic naming conventions to address as well
-
     if url.endswith("download"):
         regex = re.match("(.*)/download", url)
         filename = regex.group(1) + ".pdf"
@@ -83,4 +86,8 @@ for url in download_urls:
             filename = regex.group(1)[:-3] + ".pdf"
         else:
             filename = regex.group(1) + ".pdf"
+
+    # Calculates the URL in Archive-It by adding the Wayback URL, the collection, and 3 for the most recent capture.
+
+    # Downloads the PDF to the seed's directory, named with the desired name.
 
