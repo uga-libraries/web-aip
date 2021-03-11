@@ -75,5 +75,14 @@ The workflow for each seed is the essentially the same for the batch script and 
 
 8. Once all AIPs are created, uses md5deep to calculate the md5 for each packaged AIP and saves it to a manifest.
 
+# Additional Scripts
+These are scripts that support the web preservation workflow. See the notes at the beginning of each script for further information and usage instructions.
+
+* **download_files.py**: Downloads individual PDF files instead of an entire WARC using the document URLs from the file types report and wget.
+  
+* **metadata_check_combined.py**: Generates reports of UGA's required collection and seed metadata fields. Used for a holistic review of Archive-It usage.
+* **metadata_check_department.py**: Generates reports of UGA's required collection and seed metadata fields organized by the collector (department). Used to verify all required metadata is present prior to a preservation download.
+* **warc_xml_to_csv.py**: Reformats the WASAPI XML download into a CSV for reviewing data about all WARCs. Includes filename, collection, seed, and the three crawl dates. Used for auditing that all WARCs have been downloaded and for previewing which WARCs will be in an upcoming preservation download.
+
 # Initial Author
 Adriane Hanson, Head of Digital Stewardship, January 2020
