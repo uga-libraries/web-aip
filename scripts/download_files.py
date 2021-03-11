@@ -92,17 +92,8 @@ for seed in download_urls.keys():
     os.makedirs(os.path.join(input_directory, seed_directory_name))
     os.chdir(os.path.join(input_directory, seed_directory_name))
 
-    for url in download_urls:
-
-        # Calculates the seed from the url, which is the first part of the path minus the http:// or https://.
-        # If the seed cannot be calculated, prints an error and does not try to download this url.
-        # TODO: seed is from dictionary
-        try:
-            regex = re.match("^https?://(.*?)/", url)
-            seed = regex.group(1)
-        except AttributeError:
-            print("Could not calculate seed from this URL and will not download:", url)
-            continue
+    # Saves the document, with the desired file name, to the seed folder.
+    for url in download_urls[seed]:
 
         # Calculates the desired name for the file. Generally, this is the last part of the URL plus .pdf.
         # If the last part of the URL is download, gets the previous part of the URL.
