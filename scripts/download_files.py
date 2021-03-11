@@ -5,6 +5,8 @@ Designed for PDF-only crawls, where publications need to be saved and cataloged 
 Prior to running the script, download the File Type List for every file type and every crawl to include and
 save the CSVs to a single folder. These files are the script input.
 
+Dependency: wget https://www.gnu.org/software/wget/
+
 Future development ideas:
     * Save all URLs to a CSV for staff review to remove unwanted things prior to download?
     * In test, some showed as duplicate in the CSV, although is only in the CSV once. Skip because is in another crawl?
@@ -18,6 +20,7 @@ Future development ideas:
 import csv
 import os
 import re
+import subprocess
 import sys
 
 # Gets the path to the input folder from the script argument and makes it the current directory.
@@ -104,4 +107,5 @@ for url in download_urls:
     archiveit_url = f"https://wayback.archive-it.org/{collection}/3/{url}"
 
     # Downloads the PDF to the seed's directory, named with the desired name.
+    subprocess.run(f"wget -O {filename} {archiveit_url}", shell=True)
 
