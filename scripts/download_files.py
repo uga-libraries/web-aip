@@ -67,9 +67,10 @@ for url in download_urls:
         print("Could not calculate seed from this URL and will not download:", url)
 
     # Makes a folder for the seed, if it does not already exist, for saving the PDF to.
-    # TODO: Changes the current directory to this folder so the downloaded PDF is saved to it.
+    # Changes the current directory to the seed folder so the downloaded PDF is saved to it.
     if not os.path.exists(seed):
         os.makedirs(seed)
+    os.chdir(os.path.join(input_directory, seed))
 
     # Calculates the desired name for the file. Generally, this is the last part of the URL plus .pdf.
     # If the last part of the URL is download, gets the previous part of the URL.
