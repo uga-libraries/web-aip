@@ -47,10 +47,6 @@ except IndexError:
 download_urls = {}
 for input_csv in os.listdir("."):
 
-    # TODO: this is for testing only. Remove when done.
-    if os.path.isdir(input_csv):
-        continue
-
     # Reads each row in the CSV file.
     with open(input_csv) as csvfile:
         data = csv.reader(csvfile)
@@ -77,48 +73,59 @@ for input_csv in os.listdir("."):
                 download_urls[row[3]].append(row[0])
 
 
-# Downloads the document for each URL in the list and saves it to a folder named with the seed.
-# TODO: Iterate over seeds in the dictionary before iterate over the urls
-for url in download_urls:
+# For each seed, downloads the document for each URL in the list and saves it to a folder named with the seed.
+for seed in download_urls.keys():
 
-    # Calculates the seed from the url, which is the first part of the path minus the http:// or https://.
-    # If the seed cannot be calculated, prints an error and does not try to download this url.
-    # TODO: seed is from dictionary
-    try:
-        regex = re.match("^https?://(.*?)/", url)
-        seed = regex.group(1)
-    except AttributeError:
-        print("Could not calculate seed from this URL and will not download:", url)
-        continue
+    # Makes a version of the seed URL which can be used for a folder name.
+    # Removes http:// or https:// from the beginning if present, / from the end if present, and replaces other / with _
+    # TODO: try again with regular expressions. I wasn't getting the optional / at the end to work right the first try.
+    seed_directory_name = seed
+    if seed_directory_name.startswith("http://"):
+        seed_directory_name = seed.replace("http://", "")
+    elif seed_directory_name.startswith("https://"):
+        seed_directory_name = seed.replace("https://", "")
+    if seed_directory_name.endswith("/"):
+        seed_directory_name = seed_directory_name[:-1]
+    seed_directory_name = seed_directory_name.replace("/", "_")
 
-    # Makes a folder for the seed, if it does not already exist, for saving the PDF to.
-    # Changes the current directory to the seed folder so the downloaded PDF is saved to it.
-    # TODO: do this once per seed, not once per url
-    if not os.path.exists(seed):
-        os.makedirs(seed)
-    os.chdir(os.path.join(input_directory, seed))
+    # Makes a folder for the seed and makes it the current directory.
+    os.makedirs(os.path.join(input_directory, seed_directory_name))
+    os.chdir(os.path.join(input_directory, seed_directory_name))
 
-    # Calculates the desired name for the file. Generally, this is the last part of the URL plus .pdf.
-    # If the last part of the URL is download, gets the previous part of the URL.
-    # If the last part of the URL is pdf, removes that before adding .pdf extension.
-    # TODO there may be other generic naming conventions to address as well
-    if url.endswith("download"):
-        regex = re.match("(.*)/download", url)
-        filename = regex.group(1) + ".pdf"
-    else:
-        regex = re.match(".*/(.*)", url)
-        if url.endswith(".pdf") or url.endswith(".PDF"):
-            filename = regex.group(1)
-        elif url.endswith("pdf") or url.endswith("PDF"):
-            filename = regex.group(1)[:-3] + ".pdf"
-        else:
+    for url in download_urls:
+
+        # Calculates the seed from the url, which is the first part of the path minus the http:// or https://.
+        # If the seed cannot be calculated, prints an error and does not try to download this url.
+        # TODO: seed is from dictionary
+        try:
+            regex = re.match("^https?://(.*?)/", url)
+            seed = regex.group(1)
+        except AttributeError:
+            print("Could not calculate seed from this URL and will not download:", url)
+            continue
+
+        # Calculates the desired name for the file. Generally, this is the last part of the URL plus .pdf.
+        # If the last part of the URL is download, gets the previous part of the URL.
+        # If the last part of the URL is pdf, removes that before adding .pdf extension.
+        # TODO there may be other generic naming conventions to address as well
+        if url.endswith("download"):
+            regex = re.match("(.*)/download", url)
             filename = regex.group(1) + ".pdf"
+        else:
+            regex = re.match(".*/(.*)", url)
+            if url.endswith(".pdf") or url.endswith(".PDF"):
+                filename = regex.group(1)
+            elif url.endswith("pdf") or url.endswith("PDF"):
+                filename = regex.group(1)[:-3] + ".pdf"
+            else:
+                filename = regex.group(1) + ".pdf"
 
-    # Calculates the URL in Archive-It by adding the Wayback URL, the collection, and 3 for the most recent capture.
-    # TODO: this may only work on Windows because of the direction of the slashes.
-    # Can't use os.path.join because url already has slashes in it.
-    archiveit_url = f"https://wayback.archive-it.org/{collection}/3/{url}"
+        # Calculates the URL in Archive-It by adding the Wayback URL, the collection, and 3 for the most recent capture.
+        # TODO: this may only work on Windows because of the direction of the slashes.
+        # Can't use os.path.join because url already has slashes in it.
+        archiveit_url = f"https://wayback.archive-it.org/{collection}/3/{url}"
 
-    # Downloads the PDF to the seed's directory, named with the desired name.
-    subprocess.run(f'wget -O "{filename}" "{archiveit_url}"', shell=True)
-
+        # Downloads the PDF to the seed's directory, named with the desired name.
+        # TODO: prints a lot to the terminal. Make it quiet?
+        # TODO: error handling
+        subprocess.run(f'wget -O "{filename}" "{archiveit_url}"', shell=True)
