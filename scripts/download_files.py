@@ -55,19 +55,26 @@ for input_csv in os.listdir("."):
     with open(input_csv) as csvfile:
         data = csv.reader(csvfile)
 
-        # Verify the first column name in the first row is "url" and the third is "is_duplicate.
-        # If not, this CSV is not formatted as expected. Prints an error and starts the next CSV.
-        # TODO: also test for header[2] == is_duplicate
+        # Verify the headers have the expected values. If not, prints an error and starts the next CSV.
         header = next(data)
         if not header == ["url", "size", "is_duplicate", "seed"]:
             print("This file is not formatted correctly and will be skipped:", input_csv)
             continue
 
-        # Gets the URL, which is the first item in the row, and saves to the URLS list.
-        # TODO: only include if a duplicate.
-        # TODO: dictionary with one list per seed.
+        # Add each URL to the download_urls dictionary if it is not a duplicate in Archive-It or the dictionary.
         for row in data:
-            download_urls.append(row[0])
+
+            # If the URL is a duplicate from Archive-It, skip it and start the next URL.
+            if row[2] == "1":
+                continue
+
+            # Add the seed to download_urls dictionary if not already there, with this URL as its first value.
+            # Otherwise, adds the URL to the download_urls dictionary list for its seed.
+            # TODO: is it possible for one url to be repeated but be for different documents?
+            if not row[3] in download_urls:
+                download_urls[row[3]] = [row[0]]
+            else:
+                download_urls[row[3]].append(row[0])
 
 
 # Downloads the document for each URL in the list and saves it to a folder named with the seed.
