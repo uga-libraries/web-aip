@@ -42,9 +42,9 @@ except IndexError:
     print("Script usage: python /path/download_files.py /path/input_directory archiveit_collection_id")
     exit()
 
-# Gets the document URLs from each CSV in the input folder and saves them to a list.
-# TODO: switch to a dictionary to track seed at the same time, since seed is not always the first part of the url.
-download_urls = []
+# Gets the document URLs from each CSV in the input folder and saves them to a dictionary.
+# The dictionary keys are the seeds and values are lists of URLS for that seeds.
+download_urls = {}
 for input_csv in os.listdir("."):
 
     # TODO: this is for testing only. Remove when done.
@@ -55,13 +55,13 @@ for input_csv in os.listdir("."):
     with open(input_csv) as csvfile:
         data = csv.reader(csvfile)
 
-        # Verify the first column name in the first row is "url".
+        # Verify the first column name in the first row is "url" and the third is "is_duplicate.
         # If not, this CSV is not formatted as expected. Prints an error and starts the next CSV.
         # TODO: also test for header[2] == is_duplicate
         header = next(data)
-        if not header[0] == "url":
+        if not header == ["url", "size", "is_duplicate", "seed"]:
             print("This file is not formatted correctly and will be skipped:", input_csv)
-            break
+            continue
 
         # Gets the URL, which is the first item in the row, and saves to the URLS list.
         # TODO: only include if a duplicate.
