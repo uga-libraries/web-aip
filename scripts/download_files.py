@@ -13,23 +13,32 @@ Future development ideas:
     * Want any logging, summary statistics about how many were downloaded, and/or showing progress?
 """
 
-# Usage: python /path/download_files.py /path/input_directory
+# Usage: python /path/download_files.py /path/input_directory archiveit_collection_id
 
 import csv
 import os
 import re
 import sys
 
-# Gets the path to the input folder and makes it the current directory.
-# If the path is missing or not valid, prints and error and quits the script.
+# Gets the path to the input folder from the script argument and makes it the current directory.
+# If the path is missing or not valid, prints an error and quits the script.
 try:
     input_directory = sys.argv[1]
     os.chdir(input_directory)
 except (IndexError, FileNotFoundError, NotADirectoryError):
     print("The required argument input_directory is missing or not a valid directory.")
-    print("Script usage: python /path/download_files.py /path/input_directory")
+    print("Script usage: python /path/download_files.py /path/input_directory archiveit_collection_id")
     exit()
 
+# Gets the Archive-It collection id from the script argument, which is used for making the Archive-It URL.
+# If the id is missing, prints an error and quits the script.
+# TODO: could also check if the id is a number.
+try:
+    collection = sys.argv[2]
+except IndexError:
+    print("The required argument Archive-It collection id is missing.")
+    print("Script usage: python /path/download_files.py /path/input_directory archiveit_collection_id")
+    exit()
 
 # Gets the document URLs from each CSV in the input folder and saves them to a list.
 download_urls = []
@@ -65,6 +74,7 @@ for url in download_urls:
         seed = regex.group(1)
     except AttributeError:
         print("Could not calculate seed from this URL and will not download:", url)
+        continue
 
     # Makes a folder for the seed, if it does not already exist, for saving the PDF to.
     # Changes the current directory to the seed folder so the downloaded PDF is saved to it.
@@ -89,6 +99,9 @@ for url in download_urls:
             filename = regex.group(1) + ".pdf"
 
     # Calculates the URL in Archive-It by adding the Wayback URL, the collection, and 3 for the most recent capture.
+    # TODO: this may only work on Windows because of the direction of the slashes.
+    # Can't use os.path.join because url already has slashes in it.
+    archiveit_url = f"https://wayback.archive-it.org/{collection}/3/{url}"
 
     # Downloads the PDF to the seed's directory, named with the desired name.
 
