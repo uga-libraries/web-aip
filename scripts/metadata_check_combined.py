@@ -2,7 +2,8 @@
 # downloading the WARCs and metadata for preservation. Information for all departments is saved in one report so the
 # library metadata can be reviewed in aggregate.
 
-# Usage: python /path/metadata_check_combined.py /path/output_directory
+# Usage: python /path/metadata_check_combined.py /path/output_directory [all_fields]
+#   Include "all_fields" as an optional second argument to include optional as well as required fields.
 
 # Ideas for improvement: use default location from configuration file for output directory if none supplied; add
 # limit by date to see just this download; differentiate between active and inactive collections.
@@ -41,9 +42,20 @@ try:
     output_directory = sys.argv[1]
     os.chdir(output_directory)
 except (IndexError, FileNotFoundError):
-    print('There was an error in the command for running the script. Please try again')
-    print('Script usage: python /path/metadata_check_combined.py /path/output_directory')
+    print('The required output_directory was either missing or is not a valid directory. Please try again')
+    print('Script usage: python /path/metadata_check_combined.py /path/output_directory [all_fields]')
     exit()
+
+# If the optional argument was provided, sets a variable optional to True.
+# If the second argument is not the expected value, prints an error for the user and quits the script.
+optional = False
+if len(sys.argv) == 3:
+    if sys.argv[2] == "all_fields":
+        optional = True
+    else:
+        print('The provided value for the second argument is not the expected value of "all_fields".')
+        print('Script usage: python /path/metadata_check_combined.py /path/output_directory [all_fields]')
+        exit()
 
 
 # PART ONE: COLLECTION REPORTS
