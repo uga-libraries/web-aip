@@ -19,7 +19,7 @@ import configuration as c
 
 def get_metadata_value(data, field):
     """Looks up the value(s) of a field in the Archive-It API output for a particular collection or seed. If the
-    field is not in the output, returns the string MISSING instead. """
+    field is not in the output, returns the string NONE instead. """
 
     try:
         # Makes a list of all the values for that data field. Some fields may repeat, e.g. language.
@@ -33,7 +33,7 @@ def get_metadata_value(data, field):
         return values
 
     except KeyError:
-        return 'MISSING'
+        return 'NONE'
 
 
 # Changes the current directory to the folder where the reports will be saved, which is provided by user.
@@ -90,7 +90,7 @@ with open('collections_metadata.csv', 'w', newline='') as output:
         # Constructs the URL of the collection's metadata page. Included in the report to make it easy to edit a record.
         coll_metadata = f"{c.inst_page}/collections/{coll_data['id']}/metadata"
 
-        # Gets the values of the required metadata fields (or 'MISSING' if the field has no metadata).
+        # Gets the values of the required metadata fields (or 'NONE' if the field has no metadata).
         coll_collector = get_metadata_value(coll_data, 'Collector')
         coll_date = get_metadata_value(coll_data, 'Date')
         coll_description = get_metadata_value(coll_data, 'Description')
@@ -141,7 +141,7 @@ with open('seeds_metadata.csv', 'w', newline='') as output:
         # Constructs the URL of the seed's metadata page. Included in the report to make it easy to edit a record.
         seed_metadata_page = f"{c.inst_page}/collections/{seed_data['collection']}/seeds/{seed_data['id']}/metadata"
 
-        # Gets the values of the required metadata fields (or 'MISSING' if the field has no metadata).
+        # Gets the values of the required metadata fields (or 'NONE' if the field has no metadata).
         collector = get_metadata_value(seed_data, 'Collector')
         creator = get_metadata_value(seed_data, 'Creator')
         date = get_metadata_value(seed_data, 'Date')
