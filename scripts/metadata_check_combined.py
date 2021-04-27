@@ -39,52 +39,71 @@ def get_metadata_value(data, field):
 def make_csv(json, report_type, include_optional):
     """Saves the values from the desired fields (required only or all) for either the collections or seeds to a CSV. """
 
+    # Dictionary of metadata terms, with values of if they are required for collection and seed.
+    # Collection and seed have the same set of metadata terms, but different rules about what is required.
+    metadata = {"Collector": {"collection": "required", "seed": "required"},
+                "Creator": {"collection": "not_required", "seed": "required"},
+                "Date": {"collection": "required", "seed": "required"},
+                "Description": {"collection": "required", "seed": "not_required"},
+                "Identifier": {"collection": "not_required", "seed": "required"},
+                "Language": {"collection": "not_required", "seed": "required"},
+                "Relation": {"collection": "not_required", "seed": "not_required"},
+                "Rights": {"collection": "not_required", "seed": "required"},
+                "Subject": {"collection": "not_required", "seed": "not_required"},
+                "Title": {"collection": "required", "seed": "required"}}
+
+    # Makes a list of metadata fields to include in this report:
+    # all fields, required collection fields, or required seed fields.
+    if include_optional:
+        metadata_fields = list(metadata.keys())
+    elif report_type == "collections":
+        metadata_fields = [key for key, value in metadata.items() if value["collection"] == "required"]
+    else:
+        metadata_fields = [key for key, value in metadata.items() if value["seed"] == "required"]
+
+    # Makes a CSV to save the metadata to.
     with open(f'{report_type}_metadata.csv', 'w', newline='') as output:
 
-        # Makes the header row, with different vales depending on if the optional fields are included.
-        # TODO: this is for collection. Need to include seed required/not required as well.
-        if optional:
-            header = ['Collection ID', 'Collection Name', 'Collector [required]', 'Creator', 'Date [required]',
-                      'Description [required]', 'Identifier', 'Language', 'Relation', 'Rights', 'Subject',
-                      'Title [required]', 'Collection Page']
-        else:
-            header = ['Collection ID', 'Collection Name', 'Collector', 'Date', 'Description', 'Title', 'Collection Page']
+        # Makes the header row, an alphabetically sorted list of the metadata fields,
+        # with ID and Name added to the beginning and Archive-It page added to end.
+        metadata_fields.sort()
+        header = ["ID", "Name"]
+        for field in metadata_fields:
+            # If optional fields are included, note which are required.
+            if metadata[field][report_type] == "required":
+                field = field + " [required]"
+            header.append(field)
+        header.append("Archive-It Metadata Page")
         write = csv.writer(output)
         write.writerow(header)
 
         # Iterates over the metadata for each item.
-        for data in json:
+        for item in json:
+
+            # Gets the value of the item name, which is name for collection and url for seed.
+            if report_type == "collection":
+                name = item['name']
+            else:
+                name = item['url']
+
+            # Gets the values of each of the metadata fields and saves to a list.
+            # If the field is repeated, all values are included. If the field has no data, the value is NONE.
+            metadata_values = []
+            for field in metadata_fields:
+                metadata_values.append(get_metadata_value(item, field))
 
             # Constructs the URL of the Archive-It metadata page.
             # Included in the report to make it easy to edit a record.
-            # TODO: this is for a collection. Needs to work for seed.
-            metadata = f"{c.inst_page}/collections/{data['id']}/metadata"
-
-            # Gets the values of the required metadata fields (or 'NONE' if the field has no metadata).
-            # TODO: these are what are required for a collection. Needs to work for seed.
-            collector = get_metadata_value(data, 'Collector')
-            date = get_metadata_value(data, 'Date')
-            description = get_metadata_value(data, 'Description')
-            title = get_metadata_value(data, 'Title')
-
-            # Gets the values of the optional metadata fields, if desired.
-            # TODO: these are what is optional for a collection. Needs to work for seed.
-            if optional:
-                creator = get_metadata_value(data, 'Creator')
-                identifier = get_metadata_value(data, 'Identifier')
-                language = get_metadata_value(data, 'Language')
-                relation = get_metadata_value(data, 'Relation')
-                rights = get_metadata_value(data, 'Rights')
-                subject = get_metadata_value(data, 'Subject')
-
-            # Constructs the row of metadata to save to the CSV, including optional metadata fields if desired.
-            # TODO: these are what is required or optional for a collection. Needs to work for seed.
-            if optional:
-                row = [data['id'], data['name'], collector, creator, date, description, identifier, language, relation, rights, subject, title, metadata]
+            if report_type == "collection":
+                ait_page = f"{c.inst_page}/collections/{item['id']}/metadata"
             else:
-                row = [data['id'], data['name'], collector, date, description, title, metadata]
+                ait_page = f"{c.inst_page}/collections/{item['collection']}/seeds/{item['id']}/metadata"
 
-            # Adds the metadata as a row to the CSV.
+            # Makes a single list with the item metadata by combining three lists:
+            # the id and name, the metadata values, and the Archive-It metadata page URL.
+            row = [item["id"], name] + metadata_values + [ait_page]
+
+            # Adds the complete metadata list as a row to the CSV.
             write.writerow(row)
 
 
