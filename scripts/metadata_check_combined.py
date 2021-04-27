@@ -36,6 +36,58 @@ def get_metadata_value(data, field):
         return 'NONE'
 
 
+def make_csv(json, report_type, include_optional):
+    """Saves the values from the desired fields (required only or all) for either the collections or seeds to a CSV. """
+
+    with open(f'{report_type}_metadata.csv', 'w', newline='') as output:
+
+        # Makes the header row, with different vales depending on if the optional fields are included.
+        # TODO: this is for collection. Need to include seed required/not required as well.
+        if optional:
+            header = ['Collection ID', 'Collection Name', 'Collector [required]', 'Creator', 'Date [required]',
+                      'Description [required]', 'Identifier', 'Language', 'Relation', 'Rights', 'Subject',
+                      'Title [required]', 'Collection Page']
+        else:
+            header = ['Collection ID', 'Collection Name', 'Collector', 'Date', 'Description', 'Title', 'Collection Page']
+        write = csv.writer(output)
+        write.writerow(header)
+
+        # Iterates over the metadata for each item.
+        for data in json:
+
+            # Constructs the URL of the Archive-It metadata page.
+            # Included in the report to make it easy to edit a record.
+            # TODO: this is for a collection. Needs to work for seed.
+            metadata = f"{c.inst_page}/collections/{data['id']}/metadata"
+
+            # Gets the values of the required metadata fields (or 'NONE' if the field has no metadata).
+            # TODO: these are what are required for a collection. Needs to work for seed.
+            collector = get_metadata_value(data, 'Collector')
+            date = get_metadata_value(data, 'Date')
+            description = get_metadata_value(data, 'Description')
+            title = get_metadata_value(data, 'Title')
+
+            # Gets the values of the optional metadata fields, if desired.
+            # TODO: these are what is optional for a collection. Needs to work for seed.
+            if optional:
+                creator = get_metadata_value(data, 'Creator')
+                identifier = get_metadata_value(data, 'Identifier')
+                language = get_metadata_value(data, 'Language')
+                relation = get_metadata_value(data, 'Relation')
+                rights = get_metadata_value(data, 'Rights')
+                subject = get_metadata_value(data, 'Subject')
+
+            # Constructs the row of metadata to save to the CSV, including optional metadata fields if desired.
+            # TODO: these are what is required or optional for a collection. Needs to work for seed.
+            if optional:
+                row = [data['id'], data['name'], collector, creator, date, description, identifier, language, relation, rights, subject, title, metadata]
+            else:
+                row = [data['id'], data['name'], collector, date, description, title, metadata]
+
+            # Adds the metadata as a row to the CSV.
+            write.writerow(row)
+
+
 # Changes the current directory to the folder where the reports will be saved, which is provided by user.
 # If this cannot be done, prints an error for the user and quits the script.
 try:
@@ -57,7 +109,6 @@ if len(sys.argv) == 3:
         print('Script usage: python /path/metadata_check_combined.py /path/output_directory [all_fields]')
         exit()
 
-
 # PART ONE: COLLECTION REPORTS
 
 # Gets the Archive-It collection report with data on all the collections.
@@ -71,49 +122,8 @@ if not collections.status_code == 200:
 # Saves the collection data as a Python object.
 py_collections = collections.json()
 
-# Makes a CSV with a header row to save the collection metadata to.
-with open('collections_metadata.csv', 'w', newline='') as output:
-
-    # Makes the header row, with different vales depending on if the optional fields are included.
-    if optional:
-        header = ['Collection ID', 'Collection Name', 'Collector [required]', 'Creator', 'Date [required]',
-                  'Description [required]', 'Identifier', 'Language', 'Relation', 'Rights', 'Subject',
-                  'Title [required]', 'Collection Page']
-    else:
-        header = ['Collection ID', 'Collection Name', 'Collector', 'Date', 'Description', 'Title', 'Collection Page']
-    write = csv.writer(output)
-    write.writerow(header)
-
-    # Iterates over the metadata for each collection.
-    for coll_data in py_collections:
-
-        # Constructs the URL of the collection's metadata page. Included in the report to make it easy to edit a record.
-        coll_metadata = f"{c.inst_page}/collections/{coll_data['id']}/metadata"
-
-        # Gets the values of the required metadata fields (or 'NONE' if the field has no metadata).
-        coll_collector = get_metadata_value(coll_data, 'Collector')
-        coll_date = get_metadata_value(coll_data, 'Date')
-        coll_description = get_metadata_value(coll_data, 'Description')
-        coll_title = get_metadata_value(coll_data, 'Title')
-
-        # Gets the values of the optional metadata fields, if desired.
-        if optional:
-            coll_creator = get_metadata_value(coll_data, 'Creator')
-            coll_identifier = get_metadata_value(coll_data, 'Identifier')
-            coll_language = get_metadata_value(coll_data, 'Language')
-            coll_relation = get_metadata_value(coll_data, 'Relation')
-            coll_rights = get_metadata_value(coll_data, 'Rights')
-            coll_subject = get_metadata_value(coll_data, 'Subject')
-
-        # Constructs the row with the collection's data, including optional metadata fields if desired.
-        if optional:
-            row = [coll_data['id'], coll_data['name'], coll_collector, coll_creator, coll_date, coll_description,
-                   coll_identifier, coll_language, coll_relation, coll_rights, coll_subject, coll_title, coll_metadata]
-        else:
-            row = [coll_data['id'], coll_data['name'], coll_collector, coll_date, coll_description, coll_title, coll_metadata]
-
-        # Adds the collection metadata as a row to the CSV.
-        write.writerow(row)
+# Saves the collection data to a CSV.
+make_csv(py_collections, "collection", optional)
 
 
 # PART TWO: SEED REPORTS
@@ -129,48 +139,5 @@ if not seeds.status_code == 200:
 # Saves the seed data as a Python object.
 py_seeds = seeds.json()
 
-# Makes a CSV with a header row to save the seed metadata to.
-with open('seeds_metadata.csv', 'w', newline='') as output:
-
-    # Makes the header row, with different vales depending on if the optional fields are included.
-    if optional:
-        header = ['Seed ID', 'URL', 'Collector [Required]', 'Creator [Required]', 'Date [Required]', 'Description',
-                  'Identifier [Required]', 'Language [Required]', 'Relation', 'Rights [Required]', 'Subject',
-                  'Title [Required]', 'Metadata Page']
-    else:
-        header = ['Seed ID', 'URL', 'Collector', 'Creator', 'Date', 'Identifier', 'Language', 'Rights', 'Title',
-                  'Metadata Page']
-    write = csv.writer(output)
-    write.writerow(header)
-
-    # Iterates over the metadata for each seed.
-    for seed_data in py_seeds:
-
-        # Constructs the URL of the seed's metadata page. Included in the report to make it easy to edit a record.
-        seed_metadata = f"{c.inst_page}/collections/{seed_data['collection']}/seeds/{seed_data['id']}/metadata"
-
-        # Gets the values of the required metadata fields (or 'NONE' if the field has no metadata).
-        collector = get_metadata_value(seed_data, 'Collector')
-        creator = get_metadata_value(seed_data, 'Creator')
-        date = get_metadata_value(seed_data, 'Date')
-        identifier = get_metadata_value(seed_data, 'Identifier')
-        language = get_metadata_value(seed_data, 'Language')
-        rights = get_metadata_value(seed_data, 'Rights')
-        title = get_metadata_value(seed_data, 'Title')
-
-        # Gets the values of the optional metadata fields, if desired.
-        if optional:
-            description = get_metadata_value(seed_data, 'Description')
-            relation = get_metadata_value(seed_data, 'Relation')
-            subject = get_metadata_value(seed_data, 'Subject')
-
-        # Constructs the row with the collection's data, including optional metadata fields if desired.
-        if optional:
-            row = [seed_data['id'], seed_data['url'], collector, creator, date, description, identifier, language,
-                   relation, rights, subject, title, seed_metadata]
-        else:
-            row = [seed_data['id'], seed_data['url'], collector, creator, date, identifier, language, rights, title,
-                   seed_metadata]
-
-        # Adds the seed metadata as a row to the CSV.
-        write.writerow(row)
+# Saves the seed data to a CSV.
+make_csv(py_seeds, "seed", optional)
