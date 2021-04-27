@@ -33,7 +33,7 @@ except FileNotFoundError:
 warc_xml_folder = os.path.dirname(os.path.abspath(warc_xml))
 warc_csv = open(os.path.join(warc_xml_folder, "converted_warc_xml.csv"), "w", newline="")
 csv_writer = csv.writer(warc_csv)
-csv_writer.writerow(["filename", "collection", "seed", "size", "crawl-time", "crawl-start", "store-time"])
+csv_writer.writerow(["filename", "collection", "seed", "size", "store-time"])
 
 # Gets the data for each WARC from the XML file.
 root = tree.getroot()
@@ -42,13 +42,9 @@ for warc in files.findall("list-item"):
     filename = warc.find("filename").text
     collection = warc.find("collection").text
     size = warc.find("size").text
-    crawl_time = warc.find("crawl-time").text
-    crawl_start = warc.find("crawl-start").text
     store_time = warc.find("store-time").text
 
-    # Adds a space before the dates so they keep their original formatting when the CSV is opened in Excel.
-    crawl_time = " " + crawl_time
-    crawl_start = " " + crawl_start
+    # Adds a space before the date so it keeps the original formatting when the CSV is opened in Excel.
     store_time = " " + store_time
 
     # Gets the seed id, which is the numbers in the WARC filename between "-SEED" and "-".
@@ -59,6 +55,6 @@ for warc in files.findall("list-item"):
         seed_id = "COULD NOT CALCULATE"
 
     # Saves the WARC data as a row in the CSV.
-    csv_writer.writerow([filename, collection, seed_id, size, crawl_time, crawl_start, store_time])
+    csv_writer.writerow([filename, collection, seed_id, size, store_time])
 
 warc_csv.close()
