@@ -94,16 +94,21 @@ The workflow for each seed is the essentially the same for the batch script and 
 # Additional Scripts
 These are scripts that support the web preservation workflow. See the notes at the beginning of each script for further information and usage instructions.
 
-* **download_files.py**: Downloads individual PDF files instead of an entire WARC using the document URLs from the file types report and wget.
-  
+* **download_files.py**: Downloads individual PDF files instead of an entire WARC using the document URLs from the file types report and wget. Document URLs are saved to CSV files, which are located within a single directory (input_directory). WARNING: This is a proof of concept and has only been minimally tested. Script usage: 
+  ```
+  python path/download_files.py path/input_directory archiveit_collection_id
 
-* **metadata_check_combined.py**: Generates reports of UGA's required collection and seed metadata fields. Used for a holistic review of Archive-It usage.
+* **metadata_check_combined.py**: Generates reports of UGA's collection and seed metadata fields, either required only or all fields depending on the if the second optional argument is included. Used for a holistic review of Archive-It usage. Script usage:
+   ```
+  python path/metadata_check_combined.py path/output_directory [all_fields]
 
+* **metadata_check_department.py**: Generates reports of UGA's required collection and seed metadata fields organized by the collector (department). Used to verify all required metadata is present prior to a preservation download. Script usage:
+   ```
+   python path/metadata_check_department.py path/output_directory
 
-* **metadata_check_department.py**: Generates reports of UGA's required collection and seed metadata fields organized by the collector (department). Used to verify all required metadata is present prior to a preservation download.
-
-
-* **warc_xml_to_csv.py**: Reformats the WASAPI XML download into a CSV for reviewing data about all WARCs. Includes filename, collection, seed, job, store date, and size in GB. Used for auditing that all WARCs have been downloaded and for previewing which WARCs will be in an upcoming preservation download.
+* **warc_xml_to_csv.py**: Reformats the WASAPI XML download (warc.xml) into a CSV for reviewing data about all WARCs. Includes file name, collection, seed, job, store date, and size in GB. Used for auditing that all WARCs have been downloaded and for previewing which WARCs will be in an upcoming preservation download. Script usage:
+   ```
+   python path/warc_xml_to_csv.py path/warc.xml
 
 # Initial Author
 Adriane Hanson, Head of Digital Stewardship, January 2020
