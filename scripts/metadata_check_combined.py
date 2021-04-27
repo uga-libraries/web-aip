@@ -52,14 +52,11 @@ def make_csv(json, report_type, include_optional):
                 "Subject": {"collection": "not_required", "seed": "not_required"},
                 "Title": {"collection": "required", "seed": "required"}}
 
-    # Makes a list of metadata fields to include in this report:
-    # all fields, required collection fields, or required seed fields.
+    # Makes a list of metadata fields to include in this report.
     if include_optional:
         metadata_fields = list(metadata.keys())
-    elif report_type == "collections":
-        metadata_fields = [key for key, value in metadata.items() if value["collection"] == "required"]
     else:
-        metadata_fields = [key for key, value in metadata.items() if value["seed"] == "required"]
+        metadata_fields = [key for key, value in metadata.items() if value[report_type] == "required"]
 
     # Makes a CSV to save the metadata to.
     with open(f'{report_type}_metadata.csv', 'w', newline='') as output:
@@ -70,7 +67,7 @@ def make_csv(json, report_type, include_optional):
         header = ["ID", "Name"]
         for field in metadata_fields:
             # If optional fields are included, note which are required.
-            if metadata[field][report_type] == "required":
+            if include_optional and metadata[field][report_type] == "required":
                 field = field + " [required]"
             header.append(field)
         header.append("Archive-It Metadata Page")
