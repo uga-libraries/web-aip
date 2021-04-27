@@ -34,7 +34,7 @@ except FileNotFoundError:
 warc_xml_folder = os.path.dirname(os.path.abspath(warc_xml))
 warc_csv = open(os.path.join(warc_xml_folder, "converted_warc_xml.csv"), "w", newline="")
 csv_writer = csv.writer(warc_csv)
-csv_writer.writerow(["filename", "collection", "seed", "job", "store-time", "size"])
+csv_writer.writerow(["filename", "collection", "seed", "job", "store-time", "size (GB)"])
 
 # Gets the data for each WARC from the XML file.
 root = tree.getroot()
@@ -56,6 +56,9 @@ for warc in files.findall("list-item"):
     except AttributeError:
         job_id = "COULD NOT CALCULATE"
         seed_id = "COULD NOT CALCULATE"
+
+    # Converts the size from bytes to GB, rounded to 2 decimal places.
+    size = round(float(size) / 1000000000, 2)
 
     # Saves the WARC data as a row in the CSV.
     csv_writer.writerow([filename, collection, seed_id, job_id, store_time, size])
