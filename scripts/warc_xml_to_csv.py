@@ -50,7 +50,7 @@ for warc in files.findall("list-item"):
 
     # Gets the job id and seed id from the WARC filename.
     try:
-        regex = re.match(r'^.*-JOB(\d+)-SEED(\d+)-', filename)
+        regex = re.match(r'^.*-JOB(\d+)-.*?SEED(\d+)-', filename)
         job_id = regex.group(1)
         seed_id = regex.group(2)
     except AttributeError:
