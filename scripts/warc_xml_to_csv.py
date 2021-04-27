@@ -1,7 +1,8 @@
 # Convert WARC information downloaded from WASAPI as XML into a CSV for analyzing WARC information.
 
-# Script input is downloaded from https://warcs.archive-it.org/wasapi/v1/webdata.
-# Copy information from all result pages into a single document.
+# XML for the script input is downloaded from https://warcs.archive-it.org/wasapi/v1/webdata. Combine the information
+# from all result pages into a single document, with one root and files element and every list-item element. Do not
+# include the elements before or after files.
 
 # Script usage: python /path/warc_xml_to_csv.py /path/warc.xml
 
