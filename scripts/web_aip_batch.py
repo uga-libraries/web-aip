@@ -54,8 +54,9 @@ os.chdir(f'{c.script_output}/{aips_directory}')
 # since it allows for a permanent record of the download and because the terminal closed at the end of a script when
 # it is run automatically with chronjob. The log is not started until after the current_download variable is set so that
 # can be included in the file name.
-log_path = f'../script_log_{current_download}.txt'
-aip.log(log_path, f'Starting web preservation script on {current_download}.\n')
+log_path = f'../web_preservation_download_log_{current_download}.txt'
+aip.log(log_path, f'Creating AIPs for a batch of seeds using the web_aip_batch.py script.\n'
+                  f'Script started running at {datetime.datetime.today()}.')
 
 # PART ONE: DOWNLOAD WARCS AND METADATA INTO AIP DIRECTORY STRUCTURE.
 
@@ -71,12 +72,15 @@ total_warcs = warc_metadata['count']
 # Starts a dictionary to store a mapping of seed id to AIP id, used for checking the downloaded AIPs for completeness.
 seed_to_aip = {}
 
+# Adds name for the next section to the log.
+aip.log(log_path, f'\nPROCESSING WARCS ({total_warcs} TOTAL)\n_________________________\n')
+
 # Iterates through information about each WARC.
 for warc in warc_metadata['files']:
 
     # Updates the current WARC number and displays the script progress.
     current_warc += 1
-    aip.log(log_path, f"\nProcessing {warc['filename']} ({current_warc} of {total_warcs}).")
+    aip.log(log_path, warc['filename'])
     print(f"\nProcessing {warc['filename']} ({current_warc} of {total_warcs}).")
 
     # Calculates seed id, which is a portion of the WARC filename between "-SEED" and "-".
@@ -85,7 +89,8 @@ for warc in warc_metadata['files']:
         regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc['filename'])
         seed_id = regex_seed_id.group(1)
     except AttributeError:
-        aip.log(log_path, 'Cannot calculate seed id.')
+        aip.log(log_path, f"Cannot calculate seed id from the WARC filename: {warc['filename']}.\n"
+                          f"This WARC and its metadata reports will not be downloaded.")
         continue
 
     # Saves relevant information about the WARC in variables for future use.
@@ -96,7 +101,8 @@ for warc in warc_metadata['files']:
         warc_md5 = warc['checksums']['md5']
         warc_collection = warc['collection']
     except (KeyError, IndexError):
-        aip.log(log_path, 'WARC information is formatted wrong.')
+        aip.log(log_path, f'WARC information is formatted wrong. JSON from API:\n {warc}\n '
+                          f'This WARC and its metadata reports will not be downloaded.')
         continue
 
     # Saves relevant information the WARC's seed in variables for future use.
@@ -106,7 +112,8 @@ for warc in warc_metadata['files']:
         aip_title = seed_metadata[seed_id][1]
         crawl_definition = seed_metadata[seed_id][2]
     except (KeyError, IndexError):
-        aip.log(log_path, 'Seed has no metadata.')
+        aip.log(log_path, f"This WARC's seed is missing required metadata. JSON from API:\n {seed_metadata}\n"
+                          f"This WARC will not be downloaded.")
         continue
 
     # Adds the seed to the seed_to_aip dictionary. This is used for checking the downloaded AIPs for completeness.
@@ -139,13 +146,16 @@ aip.make_output_directories()
 current_aip = 0
 total_aips = len(os.listdir('.'))
 
+# Adds name for the next section to the log.
+aip.log(log_path, f'\nPROCESSING AIPS ({total_aips} TOTAL)\n_________________________\n')
+
 # Runs the scripts for each step of making an AIP, one folder at a time. Checks if the AIP is still present before
 # running each script, in case it was moved due to an error in the previous script.
 for aip_folder in os.listdir('.'):
 
     # Updates the current AIP number and displays the script progress.
     current_aip += 1
-    aip.log(log_path, f'\n>>>Processing {aip_folder} ({current_aip} of {total_aips}).')
+    aip.log(log_path, aip_folder)
     print(f'\n>>>Processing {aip_folder} ({current_aip} of {total_aips}).')
 
     # Extracts the AIP id, department, and AIP title from the folder name and saves them to variables. If the folder
@@ -159,7 +169,7 @@ for aip_folder in os.listdir('.'):
         department = regex_aip.group(2)
         aip_title = regex_aip.group(3)
     except AttributeError:
-        aip.log(log_path, 'Stop processing. Folder name not structured correctly.')
+        aip.log(log_path, f'Folder name not structured correctly: {aip_folder}. AIP moved to error folder.')
         aip.move_error('folder_name', aip_folder)
         continue
 
@@ -196,7 +206,8 @@ aip.log(log_path, f'\nScript finished running at {datetime.datetime.today()}.')
 # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) into the AIPs folder for this
 # download to keep everything together if another set is downloaded before these are deleted.
 os.chdir(c.script_output)
-to_move = ['aips-to-ingest', 'errors', 'fits-xml', 'preservation-xml', f'script_log_{current_download}.txt']
+to_move = ['aips-to-ingest', 'errors', 'fits-xml', 'preservation-xml',
+           f'web_preservation_download_log_{current_download}.txt']
 for item in os.listdir('.'):
     if item in to_move:
         os.replace(item, f'{aips_directory}/{item}')
