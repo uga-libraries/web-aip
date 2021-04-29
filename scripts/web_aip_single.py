@@ -131,8 +131,8 @@ def check_aip():
     metadata = f'{c.script_output}/aips_{current_download}/{aip_id}_bag/data/metadata'
 
     # List of suffixes used for the expected metadata reports.
-    expected_endings = ('_coll.csv', '_collscope.csv', '_crawldef.csv', '_crawljob.csv', '_seed.csv',
-                        '_seedscope.csv', '_preservation.xml', '_fits.xml')
+    expected_endings = ('coll.csv', 'collscope.csv', 'crawldef.csv', 'crawljob.csv', 'seed.csv',
+                        'seedscope.csv', 'preservation.xml', 'fits.xml')
 
     # Calculates the number of WARCs that should be in this AIP. Exits the function if it is not calculated since
     # multiple tests depend on this.
