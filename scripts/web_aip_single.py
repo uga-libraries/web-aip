@@ -142,9 +142,13 @@ def check_aip():
         aip.log(log_path, 'Cannot check AIP for completeness. WARC count was not correct.')
         return
 
+    # Variable tracks if anything has been found missing so a summary can be printed to the terminal.
+    missing = False
+
     # Tests if there is a folder for this AIP in the AIPs directory.
     if not any(folder.startswith(aip_id) for folder in os.listdir(f'{c.script_output}/aips_{current_download}')):
         aip.log(log_path, 'The AIP folder was not created.')
+        missing = True
 
     # Tests if each of the expected metadata reports is present. Skips FITS because the filename is formatted
     # differently and it is checked in the next test.
@@ -153,26 +157,39 @@ def check_aip():
             continue
         if not os.path.exists(f'{metadata}/{aip_id}{end}'):
             aip.log(log_path, f'{end} was not created.')
+            missing = True
 
     # Tests if the number of FITS files is correct (one for each WARC).
     fits_count = len([file for file in os.listdir(metadata) if file.endswith('_fits.xml')])
     if not fits_count == warcs_expected:
         aip.log(log_path, f'The number of FITS files is incorrect: {fits_count} instead of {warcs_expected}.')
+        missing = True
 
     # Tests if everything in the AIP's metadata folder is an expected file type.
     for file in os.listdir(metadata):
         if not file.endswith(expected_endings):
             aip.log(log_path, f'File in metadata folder that is not expected: {file}')
+            missing = True
 
     # Tests if the number of WARCs is correct.
     warcs_in_objects = len([file for file in os.listdir(objects) if file.endswith('.warc.gz')])
     if not warcs_expected == warcs_in_objects:
         aip.log(log_path, f'The number of WARCs is incorrect: {warcs_in_objects} instead of {warcs_expected}')
+        missing = True
 
     # Tests if everything in the AIP's objects folder is a WARC.
     for file in os.listdir(objects):
         if not file.endswith('.warc.gz'):
             aip.log(log_path, f'File in objects folder that is not a WARC: {file}.')
+            missing = True
+
+    # Log if nothing was missing.
+    # If some things were missing, they are already in the log and no additional indication is needed.
+    if missing is False:
+        aip.log(log_path, f'The AIP is complete.')
+
+    # Return value of missing to print a summary to the terminal.
+    return missing
 
 
 # Tests required script arguments were provided and assigns to variables.
@@ -223,7 +240,6 @@ os.chdir(f'{c.script_output}/{aips_directory}')
 log_path = f'../web_preservation_download_log_{aip_id}.txt'
 aip.log(log_path, f'Creating AIP {aip_id} (for seed {seed_id}) using the web_aip_single.py script.'
                   f'\nScript started running at {datetime.datetime.today()}.')
-
 
 # PART ONE: DOWNLOAD WARCS AND METADATA INTO THE AIP DIRECTORY STRUCTURE.
 print('Downloading AIP content.')
@@ -277,7 +293,6 @@ for warc in warc_metadata['files']:
 # Checks for empty metadata or objects folders in the AIPs. These happens if there were uncaught download errors.
 web.find_empty_directory(log_path)
 
-
 # PART TWO: CREATE AIPS THAT ARE READY FOR INGEST INTO ARCHIVE
 print('Converting into an AIP.')
 
@@ -301,10 +316,15 @@ if aip_id in os.listdir('.'):
 if f'{aip_id}_bag' in os.listdir('.'):
     aip.package(aip_id, os.getcwd())
 
-# If the AIP has not been moved to the errors folder, verifies the AIP is complete. Errors are printed to the terminal.
+# If the AIP has not been moved to the errors folder, verifies the AIP is complete.
+# Anything that is missing is added to the log. A notification if anything was missing or not prints to the terminal.
 if f'{aip_id}_bag' in os.listdir('.'):
     print('\nStarting completeness check.')
-    check_aip()
+    any_missing = check_aip()
+    if any_missing is True:
+        print("At least one file is missing, although this may not be an error. See the log for details.")
+    else:
+        print("The AIP is complete.")
 
 # Makes MD5 manifest of the AIP.
 aip.make_manifest()
