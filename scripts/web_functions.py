@@ -27,9 +27,6 @@ def warc_data(last_download, log_path, collections=None):
         """Makes a list of Hargrett and Russell Archive-It collections. Used to skip collections by other departments
         (e.g. BMAC or DLG) or collections without metadata (test collections). """
 
-        # Adds name for the next section to the log.
-        aip.log(log_path, f'\nPROCESSING ARCHIVE-IT COLLECTIONS\n_________________________\n')
-
         # Starts lists to store the collections to include (Hargrett and Russell) and exclude (everything else).
         collections_include = []
         collections_exclude = []
@@ -62,7 +59,6 @@ def warc_data(last_download, log_path, collections=None):
                 department_name = seed['metadata']['Collector'][0]['value']
             except (KeyError, IndexError):
                 collections_exclude.append(collection_id)
-                aip.log(log_path, f'Collection {collection_id} not included. No metadata.')
                 continue
 
             # If the department is Brown, Hargrett or Russell, adds the collection id to the collections list.
@@ -71,7 +67,6 @@ def warc_data(last_download, log_path, collections=None):
                 collections_include.append(seed['collection'])
             else:
                 collections_exclude.append(collection_id)
-                aip.log(log_path, f'Collection {collection_id} not included. Department is {department_name}.')
 
         return collections_include
 
@@ -100,7 +95,7 @@ def seed_data(py_warcs, current_download, log_path):
     Returns this data in a dictionary with the seed id as the key."""
 
     # Adds name for the next section to the log.
-    aip.log(log_path, f'\nPROCESSING ARCHIVE-IT SEEDS\n_________________________\n')
+    aip.log(log_path, f'\n\nPROCESSING ARCHIVE-IT SEEDS')
 
     # Starts a dictionary for the number of seeds per collection, which is used in the AIP id.
     seed_count = {}

@@ -77,14 +77,14 @@ seed_to_aip = {}
 aip_to_title = {}
 
 # Adds name for the next section to the log.
-aip.log(log_path, f'\nPROCESSING WARCS ({total_warcs} TOTAL)\n_________________________\n')
+aip.log(log_path, f'\n\nPROCESSING WARCS ({total_warcs} TOTAL)')
 
 # Iterates through information about each WARC.
 for warc in warc_metadata['files']:
 
     # Updates the current WARC number and displays the script progress.
     current_warc += 1
-    aip.log(log_path, warc['filename'])
+    aip.log(log_path, f"\n{warc['filename']}")
     print(f"\nProcessing {warc['filename']} ({current_warc} of {total_warcs}).")
 
     # Calculates seed id, which is a portion of the WARC filename between "-SEED" and "-".
@@ -151,7 +151,7 @@ current_aip = 0
 total_aips = len(os.listdir('.'))
 
 # Adds name for the next section to the log.
-aip.log(log_path, f'\nPROCESSING AIPS ({total_aips} TOTAL)\n_________________________\n')
+aip.log(log_path, f'\n\nPROCESSING AIPS ({total_aips} TOTAL)')
 
 # Runs the scripts for each step of making an AIP, one folder at a time. Checks if the AIP is still present before
 # running each script, in case it was moved due to an error in the previous script.
@@ -159,8 +159,8 @@ for aip_folder in os.listdir('.'):
 
     # Updates the current AIP number and displays the script progress.
     current_aip += 1
-    aip.log(log_path, aip_folder)
-    print(f'\n>>>Processing {aip_folder} ({current_aip} of {total_aips}).')
+    aip.log(log_path, f'\n{aip_folder}')
+    print(f'\nProcessing {aip_folder} ({current_aip} of {total_aips}).')
 
     # Calculates the department group name in ARCHive from the folder name (the AIP ID).
     # If it does not match the expected pattern, moves the AIP to an error folder and begins processing the next AIP.
@@ -197,6 +197,7 @@ aip.make_manifest()
 # errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
 print('\nStarting completeness check.')
 web.check_aips(current_download, last_download, seed_to_aip, log_path)
+print('\nFinished completeness check. See completeness_check_YYYY-MM-DD.csv for details.')
 
 # Adds completion of the script to the log.
 aip.log(log_path, f'\nScript finished running at {datetime.datetime.today()}.')
