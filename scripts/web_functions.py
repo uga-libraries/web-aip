@@ -213,8 +213,8 @@ def seed_data(py_warcs, current_download, log_path):
 
 
 def make_aip_directory(aip_folder):
-    """Makes the AIP directory structure: a folder named aip-id_AIP Title with subfolders metadata and objects.
-    Checks that the folders do not already exist prior to making them. """
+    """Makes the AIP directory structure: a folder named with the AIP ID that contains folders named "metadata" and
+    "objects", provided they are not already present from processing a previous WARC. """
 
     if not os.path.exists(f'{aip_folder}/metadata'):
         os.makedirs(f'{aip_folder}/metadata')
@@ -223,7 +223,7 @@ def make_aip_directory(aip_folder):
         os.makedirs(f'{aip_folder}/objects')
 
 
-def download_metadata(aip_id, aip_folder, warc_collection, crawl_definition, seed_id, current_download, log_path):
+def download_metadata(aip_id, warc_collection, crawl_definition, seed_id, current_download, log_path):
     """Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
     deletes any empty reports (meaning there was no data of that type for this seed), and redacts login information
     from the seed report. """
@@ -241,7 +241,7 @@ def download_metadata(aip_id, aip_folder, warc_collection, crawl_definition, see
 
         # Saves the metadata report if there were no errors with the API.
         if metadata_report.status_code == 200:
-            with open(f'{aip_folder}/metadata/{aip_id}_{code}.csv', 'wb') as report_csv:
+            with open(f'{aip_id}/metadata/{aip_id}_{code}.csv', 'wb') as report_csv:
                 report_csv.write(metadata_report.content)
         else:
             aip.log(log_path, f'Could not download {code} report. Error: {metadata_report.status_code}')
@@ -297,10 +297,10 @@ def download_metadata(aip_id, aip_folder, warc_collection, crawl_definition, see
 
     # Iterates over each report in the metadata folder to delete empty reports and redact login information from the
     # seed report.
-    for report in os.listdir(f'{aip_folder}/metadata'):
+    for report in os.listdir(f'{aip_id}/metadata'):
 
         # Saves the full file path of the report.
-        report_path = f'{c.script_output}/aips_{current_download}/{aip_folder}/metadata/{report}'
+        report_path = f'{c.script_output}/aips_{current_download}/{aip_id}/metadata/{report}'
 
         # Deletes any empty metadata files (file size of 0) and begins processing the next file. A file is empty if
         # there is no metadata of that type, which is most common for collection and seed scope reports.
@@ -314,11 +314,11 @@ def download_metadata(aip_id, aip_folder, warc_collection, crawl_definition, see
             redact(report_path)
 
 
-def download_warc(aip_folder, warc_filename, warc_url, warc_md5, current_download, log_path):
+def download_warc(aip_id, warc_filename, warc_url, warc_md5, current_download, log_path):
     """Downloads a warc file and verifies that fixity is unchanged after downloading."""
 
     # The path for where the warc will be saved on the local machine (it is long and used twice in this script).
-    warc_path = f'{c.script_output}/aips_{current_download}/{aip_folder}/objects/{warc_filename}'
+    warc_path = f'{c.script_output}/aips_{current_download}/{aip_id}/objects/{warc_filename}'
 
     # Downloads the warc.
     warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))

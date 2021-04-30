@@ -61,7 +61,7 @@ aip.log(log_path, f'Creating AIPs for a batch of seeds using the web_aip_batch.p
 # PART ONE: DOWNLOAD WARCS AND METADATA INTO AIP DIRECTORY STRUCTURE.
 
 # Uses Archive-It APIs to get information about the WARCs and seeds in this download. If there is an API failure,
-# warc_data() and seed_data() returns the API status code instead of the expected data, which quits the script.
+# warc_data() and seed_data() quit the script.
 warc_metadata = web.warc_data(last_download, log_path)
 seed_metadata = web.seed_data(warc_metadata, current_download, log_path)
 
@@ -71,6 +71,10 @@ total_warcs = warc_metadata['count']
 
 # Starts a dictionary to store a mapping of seed id to AIP id, used for checking the downloaded AIPs for completeness.
 seed_to_aip = {}
+
+# Starts a dictionary to store the title for each AIP. Using a dictionary instead of making it part of the initial AIP
+# folder name like the general aip script to allow for using characters in the title which cannot be part of a folder.
+aip_to_title = {}
 
 # Adds name for the next section to the log.
 aip.log(log_path, f'\nPROCESSING WARCS ({total_warcs} TOTAL)\n_________________________\n')
@@ -119,19 +123,19 @@ for warc in warc_metadata['files']:
     # Adds the seed to the seed_to_aip dictionary. This is used for checking the downloaded AIPs for completeness.
     seed_to_aip[seed_id] = aip_id
 
-    # Title is included in the folder temporarily so the AIP functions can access the title.
-    aip_name = f'{aip_id}_{aip_title}'
+    # Adds the AIP title to the aip_to_title dictionary. This is used for making the preservation.xml later.
+    aip_to_title[aip_id] = aip_title
 
     # Makes the AIP directory for the seed's AIP (AIP folder with metadata and objects subfolders).
-    web.make_aip_directory(aip_name)
+    web.make_aip_directory(aip_id)
 
     # Downloads the seed metadata from Archive-It into the seed's metadata folder if it is not already there (and so
     # the folder is empty). A seed may have multiple WARCs and only want to download the seed's reports once.
-    if len(os.listdir(f'{aip_name}/metadata')) == 0:
-        web.download_metadata(aip_id, aip_name, warc_collection, crawl_definition, seed_id, current_download, log_path)
+    if len(os.listdir(f'{aip_id}/metadata')) == 0:
+        web.download_metadata(aip_id, warc_collection, crawl_definition, seed_id, current_download, log_path)
 
     # Downloads the WARC from Archive-It into the seed's objects folder.
-    web.download_warc(aip_name, warc_filename, warc_url, warc_md5, current_download, log_path)
+    web.download_warc(aip_id, warc_filename, warc_url, warc_md5, current_download, log_path)
 
 # Checks for empty metadata or objects folders in the AIPs. These happens if there were uncaught download errors.
 web.find_empty_directory(log_path)
@@ -158,39 +162,33 @@ for aip_folder in os.listdir('.'):
     aip.log(log_path, aip_folder)
     print(f'\n>>>Processing {aip_folder} ({current_aip} of {total_aips}).')
 
-    # Extracts the AIP id, department, and AIP title from the folder name and saves them to variables. If the folder
-    # name doesn't match this pattern, moves the AIP to an error folder and begins processing the next AIP.
-    #   (Group 1) The AIP id is before the first underscore and is only lowercase letters, numbers, or dashes.
-    #   (Group 2) The department is indicated by the first part of the AIP id, either 'harg' or 'rbrl'.
-    #   (Group 3) The AIP title is everything after the first underscore.
-    try:
-        regex_aip = re.match('^((harg|rbrl)[a-z0-9-]+)_(.*)', aip_folder)
-        aip_id = regex_aip.group(1)
-        department = regex_aip.group(2)
-        aip_title = regex_aip.group(3)
-    except AttributeError:
-        aip.log(log_path, f'Folder name not structured correctly: {aip_folder}. AIP moved to error folder.')
-        aip.move_error('folder_name', aip_folder)
+    # Calculates the department group name in ARCHive from the folder name (the AIP ID).
+    # If it does not match the expected pattern, moves the AIP to an error folder and begins processing the next AIP.
+    if aip_folder.startswith('harg'):
+        department = 'hargrett'
+    elif aip_folder.startswith('rbrl'):
+        department = 'russell'
+    else:
+        aip.log(log_path, f'AIP ID {aip_folder} does not start with an expected department prefix. '
+                          f'AIP moved to error folder.')
+        aip.move_error('department_prefix', aip_folder)
         continue
 
-    # Renames the AIP folder to just the AIP id.
-    os.replace(aip_folder, aip_id)
-
     # Extracts technical metadata from the files using FITS.
-    if aip_id in os.listdir('.'):
-        aip.extract_metadata(aip_id, f'{c.script_output}/{aips_directory}', log_path)
+    if aip_folder in os.listdir('.'):
+        aip.extract_metadata(aip_folder, f'{c.script_output}/{aips_directory}', log_path)
 
     # Transforms the FITS metadata into the PREMIS preservation.xml file using saxon and xslt stylesheets.
-    if aip_id in os.listdir('.'):
-        aip.make_preservationxml(aip_id, aip_title, department, 'website', log_path)
+    if aip_folder in os.listdir('.'):
+        aip.make_preservationxml(aip_folder, aip_to_title[aip_folder], department, 'website', log_path)
 
     # Bags the aip.
-    if aip_id in os.listdir('.'):
-        aip.bag(aip_id, log_path)
+    if aip_folder in os.listdir('.'):
+        aip.bag(aip_folder, log_path)
 
     # Tars, and zips the aip.
-    if f'{aip_id}_bag' in os.listdir('.'):
-        aip.package(aip_id, os.getcwd())
+    if f'{aip_folder}_bag' in os.listdir('.'):
+        aip.package(aip_folder, os.getcwd())
 
 # Makes MD5 manifests of all AIPs the in this download using md5deep, with one manifest per department.
 aip.make_manifest()
