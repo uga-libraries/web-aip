@@ -109,12 +109,19 @@ for warc in warc_metadata['files']:
                           f'This WARC and its metadata reports will not be downloaded.')
         continue
 
+    # Calculates the job id from the WARC filename.
+    try:
+        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
+        job_id = regex_job_id.group(1)
+    except AttributeError:
+        aip.log(log_path, "Cannot calculate the WARC job id.")
+        continue
+
     # Saves relevant information the WARC's seed in variables for future use.
     # Stops processing if the WARC does not the required metadata.
     try:
         aip_id = seed_metadata[seed_id][0]
         aip_title = seed_metadata[seed_id][1]
-        crawl_definition = seed_metadata[seed_id][2]
     except (KeyError, IndexError):
         aip.log(log_path, f"This WARC's seed is missing required metadata. JSON from API:\n {seed_metadata}\n"
                           f"This WARC will not be downloaded.")

@@ -200,9 +200,9 @@ def seed_data(py_warcs, current_download, log_path):
             # Constructs the AIP id for the seed.
             identifier = f'{department_code}-{related_collection}-web-{download_date_code}-{sequential_number}'
 
-            # Saves AIP id, AIP title, and crawl definition id to the seeds_include dictionary.
+            # Saves AIP id and AIP title to the seeds_include dictionary.
             # This only contains information about seeds that had no errors and were fully processed.
-            seeds_include[seed_identifier] = [identifier, title, seed_info['crawl_definition']]
+            seeds_include[seed_identifier] = [identifier, title]
 
     return seeds_include
 
@@ -223,23 +223,25 @@ def download_metadata(aip_id, warc_collection, crawl_definition, seed_id, curren
     deletes any empty reports (meaning there was no data of that type for this seed), and redacts login information
     from the seed report. """
 
-    def get_report(filter_type, filter_value, report_type, code):
+    def get_report(filter_type, filter_value, report_type, report_name):
         """Downloads a single metadata report and saves it as a csv in the AIP's metadata folder.
             filter_type and filter_value are used to filter the API call to the right AIP's report
             report_type is the Archive-It name for the report
-            code is the ARCHive metadata code for the report"""
+            report_name is the name for the report saved in the AIP, including the ARCHive metadata code """
 
         # Builds the API call to get the report as a csv.
         # Limit of -1 will return all matches. Default is only the first 100.
         filters = {'limit': -1, filter_type: filter_value, 'format': 'csv'}
         metadata_report = requests.get(f'{c.partner_api}/{report_type}', params=filters, auth=(c.username, c.password))
 
-        # Saves the metadata report if there were no errors with the API.
+        # Saves the metadata report if there were no errors with the API and the report has not already been downloaded.
+        # If there is more than one WARC for a seed, reports may already be in the metadata folder.
+        report_path = f'{c.script_output}/aips_{current_download}/{aip_folder}/metadata/{report_name}'
         if metadata_report.status_code == 200:
             with open(f'{aip_id}/metadata/{aip_id}_{code}.csv', 'wb') as report_csv:
                 report_csv.write(metadata_report.content)
         else:
-            aip.log(log_path, f'Could not download {code} report. Error: {metadata_report.status_code}')
+            aip.log(log_path, f'Could not download {report_type} report. Error: {metadata_report.status_code}')
 
     def redact(metadata_report_path):
         """Replaces the seed report with a redacted version of the file, removing login information if those columns
@@ -282,13 +284,24 @@ def download_metadata(aip_id, warc_collection, crawl_definition, seed_id, curren
             for row in redacted_rows:
                 report_write.writerow(row)
 
-    # Downloads the six metadata reports from Archive-It needed to understand the context of the WARC.
-    get_report('id', seed_id, 'seed', 'seed')
-    get_report('seed', seed_id, 'scope_rule', 'seedscope')
-    get_report('collection', warc_collection, 'scope_rule', 'collscope')
-    get_report('id', warc_collection, 'collection', 'coll')
-    get_report('collection', warc_collection, 'crawl_job', 'crawljob')
-    get_report('id', crawl_definition, 'crawl_definition', 'crawldef')
+    # Downloads five of the six metadata reports from Archive-It needed to understand the context of the WARC.
+    # These are reports where there is only one report per seed or collection.
+    get_report('id', seed_id, 'seed', f'{aip_id}_seed.csv')
+    get_report('seed', seed_id, 'scope_rule', f'{aip_id}_seedscope.csv')
+    get_report('collection', warc_collection, 'scope_rule', f'{aip_id}_collscope.csv')
+    get_report('id', warc_collection, 'collection', f'{aip_id}_coll.csv')
+    get_report('collection', warc_collection, 'crawl_job', f'{aip_id}_crawljob.csv')
+
+    # Downloads the crawl definition report for the job this WARC was part of.
+    # The crawl definition id is obtained from the crawl job report using the job id.
+    # There may be more than one crawl definition report per AIP.
+    with open(f'{aip_folder}/metadata/{aip_id}_crawljob.csv', 'r') as crawljob_csv:
+        crawljob_data = csv.DictReader(crawljob_csv)
+        for job in crawljob_data:
+            if job_id == job['id']:
+                crawl_def_id = job['crawl_definition']
+                get_report('id', crawl_def_id, 'crawl_definition', f'{aip_id}_{crawl_def_id}_crawldef.csv')
+                break
 
     # Iterates over each report in the metadata folder to delete empty reports and redact login information from the
     # seed report.
@@ -499,6 +512,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
         metadata = f'{c.script_output}/aips_{current_download}/{aip_id}_bag/data/metadata'
 
         # Tests if each of the six Archive-It metadata reports is present. os.path.exists() returns True/False.
+        # TODO: possible to check for the correct number of crawl definitions?
         result.append(os.path.exists(f'{metadata}/{aip_id}_coll.csv'))
         result.append(os.path.exists(f'{metadata}/{aip_id}_collscope.csv'))
         result.append(os.path.exists(f'{metadata}/{aip_id}_crawldef.csv'))

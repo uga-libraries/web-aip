@@ -25,37 +25,30 @@ import configuration as c
 import web_functions as web
 
 
-def seed_data():
-    """Returns the AIP title and crawl definition id from the seed report. This is different from the seed_data()
-    function used by web_aip_batch.py since the AIP id does not need to be calculated."""
+def get_title():
+    """Returns the AIP title from the seed report. Replaces the functionality of seed_data(), which also calculates
+    the AIP ID for batch downloads. """
 
     # Uses the Partner API to get data about this seed.
-    seed_report = requests.get(f'{c.partner_api}/seed?id={seed_id}', auth=(c.username, c.password))
+    seed_report = requests.get(f"{c.partner_api}/seed?id={seed_id}", auth=(c.username, c.password))
 
     # If there was an error with the API call, quits the script.
     if not seed_report.status_code == 200:
-        aip.log(log_path, f'\nAPI error {seed_report.status_code} for seed report.')
+        aip.log(log_path, f"\nAPI error {seed_report.status_code} for seed report.")
         print("API error, ending script. See log for details.")
         exit()
 
     # Converts the seed data from json to a Python object.
     py_seed_report = seed_report.json()
 
-    # Constructs the aip id from the seed data. If at any stage a piece of the aip id cannot be calculated,
-    # the seed is added to the exclude list and the next warc is processed.
-    for seed_info in py_seed_report:
+    # Gets the title for the seed from the Title field.
+    # Raises an error if the title is missing so the script stops processing the seed. Title is required.
+    try:
+        title = py_seed_report[0]['metadata']['Title'][0]['value']
+    except (KeyError, IndexError):
+        raise ValueError
 
-        # Gets the title for the seed from the Title field.
-        # Stops processing this seed if the title is missing. It is required.
-        try:
-            title = seed_info['metadata']['Title'][0]['value']
-            crawl_def = seed_info['crawl_definition']
-        except (KeyError, IndexError):
-            aip.log(log_path, f'Seed {seed_info["id"]} is missing a title or crawl definition. JSON from API:\n')
-            aip.log(log_path, py_seed_report)
-            raise ValueError
-
-    return title, crawl_def
+    return title
 
 
 def check_aip():
@@ -73,7 +66,7 @@ def check_aip():
 
         # If there was an API error, ends the function.
         if warcs.status_code != 200:
-            aip.log(log_path, f'WASAPI error: {warcs.status_code}.')
+            aip.log(log_path, f"WASAPI error: {warcs.status_code}.")
             raise ValueError
 
         # Starts variables used to verify that the script processes the right number of WARCs. The total number of WARCs
@@ -91,7 +84,7 @@ def check_aip():
                 regex_seed = re.match(r".*-SEED(\d+)-.*", warc_info['filename'])
                 warc_seed_identifier = regex_seed.group(1)
             except AttributeError:
-                aip.log(log_path, f'No seed for {warc_info["warc_filename"]}.')
+                aip.log(log_path, f"No seed for {warc_info['warc_filename']}.")
                 raise ValueError
 
             # Filter one: do not count the WARC if it is from a different seed.
@@ -106,7 +99,7 @@ def check_aip():
                 regex_crawl_date = re.match(r"(\d{4}-\d{2}-\d{2})T.*", warc_info['store-time'])
                 crawl_date = regex_crawl_date.group(1)
             except AttributeError:
-                aip.log(log_path, f'No date for {warc_info["warc_filename"]}.')
+                aip.log(log_path, f"No date for {warc_info['warc_filename']}.")
                 raise ValueError
 
             if crawl_date < last_download:
@@ -118,7 +111,7 @@ def check_aip():
 
         # Checks that the right number of WARCs were evaluated.
         if warcs_from_api != warcs_include + warcs_exclude:
-            aip.log(log_path, 'Script did not review expected number of WARCs.')
+            aip.log(log_path, "Script did not review expected number of WARCs.")
             raise ValueError
 
         return warcs_include
@@ -127,8 +120,8 @@ def check_aip():
     aip.log(log_path, '\nCompleteness check results:')
 
     # Saves the file paths to the metadata and objects folders to variables, since they are long and reused.
-    objects = f'{c.script_output}/aips_{current_download}/{aip_id}_bag/data/objects'
-    metadata = f'{c.script_output}/aips_{current_download}/{aip_id}_bag/data/metadata'
+    objects = f"{c.script_output}/aips_{current_download}/{aip_id}_bag/data/objects"
+    metadata = f"{c.script_output}/aips_{current_download}/{aip_id}_bag/data/metadata"
 
     # List of suffixes used for the expected metadata reports.
     expected_endings = ('coll.csv', 'collscope.csv', 'crawldef.csv', 'crawljob.csv', 'seed.csv',
@@ -152,15 +145,16 @@ def check_aip():
 
     # Tests if each of the expected metadata reports is present. Skips FITS because the filename is formatted
     # differently and it is checked in the next test.
+    # TODO: Is there a way to verify the number of crawl definition reports is correct?
     for end in expected_endings:
-        if end == '_fits.xml':
+        if end == "_fits.xml":
             continue
         if not os.path.exists(f'{metadata}/{aip_id}{end}'):
             aip.log(log_path, f'{end} was not created.')
             missing = True
 
     # Tests if the number of FITS files is correct (one for each WARC).
-    fits_count = len([file for file in os.listdir(metadata) if file.endswith('_fits.xml')])
+    fits_count = len([file for file in os.listdir(metadata) if file.endswith("_fits.xml")])
     if not fits_count == warcs_expected:
         aip.log(log_path, f'The number of FITS files is incorrect: {fits_count} instead of {warcs_expected}.')
         missing = True
@@ -172,7 +166,7 @@ def check_aip():
             missing = True
 
     # Tests if the number of WARCs is correct.
-    warcs_in_objects = len([file for file in os.listdir(objects) if file.endswith('.warc.gz')])
+    warcs_in_objects = len([file for file in os.listdir(objects) if file.endswith(".warc.gz")])
     if not warcs_expected == warcs_in_objects:
         aip.log(log_path, f'The number of WARCs is incorrect: {warcs_in_objects} instead of {warcs_expected}')
         missing = True
@@ -198,40 +192,40 @@ try:
     aip_id = sys.argv[2]
     collection_id = sys.argv[3]
 except IndexError:
-    print('Exiting script: missing required argument(s). Must include seed id, AIP id, and collection id.')
+    print("Exiting script: missing required argument(s). Must include seed id, AIP id, and collection id.")
     exit()
 
 # Tests optional script argument was provided and assigns to variable. Must be formatted YYYY-MM-DD.
 # If no last download date is given, sets the date as when UGA Libraries' began web archiving.
 try:
     last_download = sys.argv[4]
-    if not re.match(r'\d{4}-\d{2}-\d{2}', last_download):
-        print('Exiting script: date argument must be formatted YYYY-MM-DD.')
+    if not re.match(r"\d{4}-\d{2}-\d{2}", last_download):
+        print("Exiting script: date argument must be formatted YYYY-MM-DD.")
         exit()
 except IndexError:
-    last_download = '2019-06-01'
+    last_download = "2019-06-01"
 
 # Extracts the department from the aip_id saves it to a variable. Quits the script if the AIP id is formatted wrong.
 try:
     regex_dept = re.match('^(bmac|harg|rbrl).*', aip_id)
     department = regex_dept.group(1)
 except AttributeError:
-    print('Exiting script: AIP id is not formatted correctly. Department could not be identified.')
+    print("Exiting script: AIP id is not formatted correctly. Department could not be identified.")
     exit()
 
-print(f'Making AIP for {seed_id}.')
+print(f"Making AIP for {seed_id}.")
 
 # Makes a folder for aips within the script_output folder, a designated place on the local machine for web archiving
 # documents. The folder name includes today's date to keep it separate from previous downloads which may still be
 # saved on the same machine. current_download is a variable because it is also used as part of the quality_control
 # function, and depending on how long it takes to download WARCs, recalculating today() may give a different result.
 current_download = datetime.date.today()
-aips_directory = f'aips_{current_download}'
-if not os.path.exists(f'{c.script_output}/{aips_directory}'):
-    os.makedirs(f'{c.script_output}/{aips_directory}')
+aips_directory = f"aips_{current_download}"
+if not os.path.exists(f"{c.script_output}/{aips_directory}"):
+    os.makedirs(f"{c.script_output}/{aips_directory}")
 
 # Changes current directory to the aips folder.
-os.chdir(f'{c.script_output}/{aips_directory}')
+os.chdir(f"{c.script_output}/{aips_directory}")
 
 # Starts a log for saving status information about the script. Saving to a document instead of printing to the screen
 # since it allows for a permanent record of the download and because the terminal closed at the end of a script when
@@ -242,26 +236,22 @@ aip.log(log_path, f'Creating AIP {aip_id} (for seed {seed_id}) using the web_aip
                   f'\nScript started running at {datetime.datetime.today()}.')
 
 # PART ONE: DOWNLOAD WARCS AND METADATA INTO THE AIP DIRECTORY STRUCTURE.
-print('Downloading AIP content.')
+print("Downloading AIP content.")
 
 # Uses WASAPI to get information about the WARCs for this seed's collection. The WARC's seed id is checked before it
 # is downloaded to skip other seeds from this collection. It is not possible to filter by seed using WASAPI.
 warc_metadata = web.warc_data(last_download, log_path, collection_id)
 
-# Uses the Archive-It Partner API to get information about this seed.
+# Uses the Archive-It Partner API to get the seed's title.
 try:
-    aip_title, crawl_definition = seed_data()
+    aip_title = get_title()
 except ValueError:
+    aip.log(log_path, "Seed has no title.")
     print('Exiting script: seed is missing metadata in Archive-It. See log for details.')
-    exit()
 
 # Makes the aip directory for the seed's aip (aip folder with metadata and objects subfolders). Unlike with the batch
 # script, the folder does not need to temporarily include the AIP title since the title is already stored in a variable.
 web.make_aip_directory(aip_id)
-
-# Downloads the seed metadata from Archive-It into the seed's metadata folder.
-# The aip_id is passed twice, as both the AIP id and AIP folder. These are different values for the batch script.
-web.download_metadata(aip_id, aip_id, collection_id, crawl_definition, seed_id, current_download, log_path)
 
 # Iterates through information about each WARC.
 for warc in warc_metadata['files']:
@@ -279,13 +269,26 @@ for warc in warc_metadata['files']:
     # Checks if the WARC is from the seed being downloaded. If not, skips the WARC.
     # The WARC's seed id is the portion of the WARC's filename between "-SEED" and "-".
     try:
-        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
+        regex_seed_id = re.match(r"^.*-SEED(\d+)-", warc_filename)
         warc_seed_id = regex_seed_id.group(1)
     except AttributeError:
         aip.log(log_path, f'Cannot calculate the WARC seed id from {warc_filename}.')
         continue
     if not seed_id == warc_seed_id:
         continue
+
+    # Calculates the job id from the WARC filename.
+    try:
+        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
+        job_id = regex_job_id.group(1)
+    except AttributeError:
+        aip.log(log_path, "Cannot calculate the WARC job id.")
+        continue
+
+    # Downloads the seed metadata from Archive-It into the seed's metadata folder.
+    # The aip_id is passed twice, as both the AIP id and AIP folder. These are different values for the batch script.
+    # While five of the reports are the same for each WARC, the crawl definition could be different.
+    web.download_metadata(aip_id, aip_id, collection_id, job_id, seed_id, current_download, log_path)
 
     # Downloads the warc from Archive-It into the seed's objects folder.
     web.download_warc(aip_id, warc_filename, warc_url, warc_md5, current_download, log_path)
@@ -294,26 +297,26 @@ for warc in warc_metadata['files']:
 web.find_empty_directory(log_path)
 
 # PART TWO: CREATE AIPS THAT ARE READY FOR INGEST INTO ARCHIVE
-print('Converting into an AIP.')
+print("Converting into an AIP.")
 
 # Makes directories used to store script outputs, if they aren't already there.
 aip.make_output_directories()
 
 # Extracts technical metadata from the files using FITS.
 if aip_id in os.listdir('.'):
-    aip.extract_metadata(aip_id, f'{c.script_output}/{aips_directory}', log_path)
+    aip.extract_metadata(aip_id, f"{c.script_output}/{aips_directory}", log_path)
 
 # Transforms the FITS metadata into the PREMIS preservation.xml file using saxon and xslt stylesheets. Determines the
 # third argument (ARCHive group name) from the department code parsed from the folder name.
 if aip_id in os.listdir('.'):
-    aip.make_preservationxml(aip_id, aip_title, department, 'website', log_path)
+    aip.make_preservationxml(aip_id, aip_title, department, "website", log_path)
 
 # Bags the aip.
 if aip_id in os.listdir('.'):
     aip.bag(aip_id, log_path)
 
 # Tars, and zips the aip.
-if f'{aip_id}_bag' in os.listdir('.'):
+if f"{aip_id}_bag" in os.listdir('.'):
     aip.package(aip_id, os.getcwd())
 
 # If the AIP has not been moved to the errors folder, verifies the AIP is complete.
