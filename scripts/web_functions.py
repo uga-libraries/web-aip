@@ -37,7 +37,7 @@ def warc_data(last_download, log_path, collections=None):
 
         # If there was an error with the API call, quits the script.
         if not seed_reports.status_code == 200:
-            aip.log(log_path, f'\nAPI error {seed_reports.status_code} for collection list.')
+            aip.log(log_path, f'\nAPI error {seed_reports.status_code} for collection list. Script cannot complete.')
             print("API error, ending script. See log for details.")
             exit()
 
@@ -59,16 +59,14 @@ def warc_data(last_download, log_path, collections=None):
                 department_name = seed['metadata']['Collector'][0]['value']
             except (KeyError, IndexError):
                 collections_exclude.append(collection_id)
-                aip.log(log_path, f'Collection {collection_id} not included. No metadata.')
                 continue
 
-            # If the department is Hargrett or Russell, adds the collection id to the collections list. Otherwise,
-            # adds it to the excluded list.
-            if department_name.startswith('Hargrett') or department_name.startswith('Richard B. Russell'):
+            # If the department is Brown, Hargrett or Russell, adds the collection id to the collections list.
+            # Otherwise, adds it to the excluded list.
+            if department_name.startswith('Hargrett') or department_name.startswith('Richard B. Russell') or department_name.startswith('The Walter J. Brown Media'):
                 collections_include.append(seed['collection'])
             else:
                 collections_exclude.append(collection_id)
-                aip.log(log_path, f'Collection {collection_id} department is {department_name}. Do not include.')
 
         return collections_include
 
@@ -83,7 +81,7 @@ def warc_data(last_download, log_path, collections=None):
 
     # If there was an error with the API call, quits the script.
     if not warcs.status_code == 200:
-        aip.log(log_path, f'\nAPI error {warcs.status_code} when getting warc data.')
+        aip.log(log_path, f'\nAPI error {warcs.status_code} when getting WARC data. Script cannot complete.')
         print("API error, ending script. See log for details.")
         exit()
 
@@ -95,6 +93,9 @@ def warc_data(last_download, log_path, collections=None):
 def seed_data(py_warcs, current_download, log_path):
     """Extracts information from the warc and seed data to define the AIP id, AIP title, and crawl definition id.
     Returns this data in a dictionary with the seed id as the key."""
+
+    # Adds name for the next section to the log.
+    aip.log(log_path, f'\n\nPROCESSING ARCHIVE-IT SEEDS')
 
     # Starts a dictionary for the number of seeds per collection, which is used in the AIP id.
     seed_count = {}
@@ -119,7 +120,7 @@ def seed_data(py_warcs, current_download, log_path):
             regex_seed = re.match(r'^.*-SEED(\d+)-', warc_info['filename'])
             seed_identifier = regex_seed.group(1)
         except AttributeError:
-            aip.log(log_path, f'Cannot calculate seed id for {warc_info["filename"]}.')
+            aip.log(log_path, f'Cannot calculate seed id for {warc_info["filename"]}. This WARC will not be downloaded.')
             continue
 
         # Stops processing this warc and starts the next one if the script has already assigned an AIP id to this seed.
@@ -132,7 +133,7 @@ def seed_data(py_warcs, current_download, log_path):
 
         # If there was an error with the API call, quits the script.
         if not seed_report.status_code == 200:
-            aip.log(log_path, f'\nAPI error {seed_report.status_code} for seed report.')
+            aip.log(log_path, f'\nAPI error {seed_report.status_code} for seed report. Script cannot complete.')
             print("API error, ending script. See log for details.")
             exit()
 
@@ -149,7 +150,7 @@ def seed_data(py_warcs, current_download, log_path):
                 title = seed_info['metadata']['Title'][0]['value']
             except (KeyError, IndexError):
                 seeds_exclude.append(seed_info['id'])
-                aip.log(log_path, f'Seed {seed_info["id"]} has no title.')
+                aip.log(log_path, f'Seed {seed_info["id"]} has no title. This WARC will not be downloaded.')
                 continue
 
             # Gets the department from the Collector field.
@@ -158,7 +159,7 @@ def seed_data(py_warcs, current_download, log_path):
                 department_name = seed_info['metadata']['Collector'][0]['value']
             except (KeyError, IndexError):
                 seeds_exclude.append(seed_info['id'])
-                aip.log(log_path, f'Seed {seed_info["id"]} has no collector metadata.')
+                aip.log(log_path, f'Seed {seed_info["id"]} has no collector metadata. This WARC will not be downloaded.')
                 continue
 
             # Assigns the Hargrett department code and collection number.
@@ -186,7 +187,7 @@ def seed_data(py_warcs, current_download, log_path):
             # error in making the collections list.
             else:
                 seeds_exclude.append(seed_info['id'])
-                aip.log(log_path, f'Seed {seed_info["id"]} is not Hargrett or Russell.')
+                aip.log(log_path, f'Seed {seed_info["id"]} is not Hargrett or Russell. This WARC will not be downloaded.')
                 continue
 
             # Updates the count for the number of seeds from this collection in the seed_count dictionary.
@@ -207,8 +208,8 @@ def seed_data(py_warcs, current_download, log_path):
 
 
 def make_aip_directory(aip_folder):
-    """Makes the AIP directory structure: a folder named aip-id_AIP Title with subfolders metadata and objects.
-    Checks that the folders do not already exist prior to making them. """
+    """Makes the AIP directory structure: a folder named with the AIP ID that contains folders named "metadata" and
+    "objects", provided they are not already present from processing a previous WARC. """
 
     if not os.path.exists(f'{aip_folder}/metadata'):
         os.makedirs(f'{aip_folder}/metadata')
@@ -217,7 +218,7 @@ def make_aip_directory(aip_folder):
         os.makedirs(f'{aip_folder}/objects')
 
 
-def download_metadata(aip_id, aip_folder, warc_collection, job_id, seed_id, current_download, log_path):
+def download_metadata(aip_id, warc_collection, crawl_definition, seed_id, current_download, log_path):
     """Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
     deletes any empty reports (meaning there was no data of that type for this seed), and redacts login information
     from the seed report. """
@@ -237,9 +238,8 @@ def download_metadata(aip_id, aip_folder, warc_collection, job_id, seed_id, curr
         # If there is more than one WARC for a seed, reports may already be in the metadata folder.
         report_path = f'{c.script_output}/aips_{current_download}/{aip_folder}/metadata/{report_name}'
         if metadata_report.status_code == 200:
-            if not os.path.exists(report_path):
-                with open(f'{aip_folder}/metadata/{report_name}', 'wb') as report_csv:
-                    report_csv.write(metadata_report.content)
+            with open(f'{aip_id}/metadata/{aip_id}_{code}.csv', 'wb') as report_csv:
+                report_csv.write(metadata_report.content)
         else:
             aip.log(log_path, f'Could not download {report_type} report. Error: {metadata_report.status_code}')
 
@@ -305,15 +305,15 @@ def download_metadata(aip_id, aip_folder, warc_collection, job_id, seed_id, curr
 
     # Iterates over each report in the metadata folder to delete empty reports and redact login information from the
     # seed report.
-    for report in os.listdir(f'{aip_folder}/metadata'):
+    for report in os.listdir(f'{aip_id}/metadata'):
 
         # Saves the full file path of the report.
-        report_path = f'{c.script_output}/aips_{current_download}/{aip_folder}/metadata/{report}'
+        report_path = f'{c.script_output}/aips_{current_download}/{aip_id}/metadata/{report}'
 
         # Deletes any empty metadata files (file size of 0) and begins processing the next file. A file is empty if
         # there is no metadata of that type, which is most common for collection and seed scope reports.
         if os.path.getsize(report_path) == 0:
-            aip.log(log_path, f'Empty file deleted: {report}')
+            aip.log(log_path, f'Empty file deleted (seed has no metadata of this type): {report}')
             os.remove(report_path)
             continue
 
@@ -322,18 +322,18 @@ def download_metadata(aip_id, aip_folder, warc_collection, job_id, seed_id, curr
             redact(report_path)
 
 
-def download_warc(aip_folder, warc_filename, warc_url, warc_md5, current_download, log_path):
+def download_warc(aip_id, warc_filename, warc_url, warc_md5, current_download, log_path):
     """Downloads a warc file and verifies that fixity is unchanged after downloading."""
 
     # The path for where the warc will be saved on the local machine (it is long and used twice in this script).
-    warc_path = f'{c.script_output}/aips_{current_download}/{aip_folder}/objects/{warc_filename}'
+    warc_path = f'{c.script_output}/aips_{current_download}/{aip_id}/objects/{warc_filename}'
 
     # Downloads the warc.
     warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
 
     # If there was an error with the API call, quits the function.
     if not warc_download.status_code == 200:
-        aip.log(log_path, f'API error {warc_download.status_code} when downloading a WARC.')
+        aip.log(log_path, f'API error {warc_download.status_code}. Cannot download this WARC.')
         return
 
     # Saves the warc in the objects folder, keeping the original filename.
@@ -429,11 +429,11 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
                 aip.log(log_path, f'No seed for {warc_info["warc_filename"]}.')
                 raise ValueError
 
-            # Filter one: only includes the WARC in the dictionary if it was created since the last download.
-            # Simplifies the date format to YYYY-MM-DD by removing the time information before comparing it to the
-            # last download date.
+            # Filter one: only includes the WARC in the dictionary if it was created since the last download. Store
+            # time is used so test crawls are evaluated based on the date they were saved. Simplifies the date format
+            # to YYYY-MM-DD by removing the time information before comparing it to the last download date.
             try:
-                regex_crawl_date = re.match(r"(\d{4}-\d{2}-\d{2})T.*", warc_info['crawl-start'])
+                regex_crawl_date = re.match(r"(\d{4}-\d{2}-\d{2})T.*", warc_info['store-time'])
                 crawl_date = regex_crawl_date.group(1)
             except AttributeError:
                 aip.log(log_path, f'No date for {warc_info["warc_filename"]}.')
@@ -471,7 +471,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
                     continue
 
                 # Does not include the WARC in the dictionary if the repository is not Hargrett or Russell.
-                if not repository.startswith('Hargrett') or repository.startswith('Richard B. Russell'):
+                if not repository.startswith('Hargrett') and not repository.startswith('Richard B. Russell'):
                     warcs_exclude += 1
                     continue
 

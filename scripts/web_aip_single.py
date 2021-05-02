@@ -92,10 +92,11 @@ def check_aip():
                 warcs_exclude += 1
                 continue
 
-            # Filter two: do not count the WARC if it was created before the last download. Simplifies the date format
-            # to YYYY-MM-DD by removing the time information before comparing it to the last download date.
+            # Filter two: do not count the WARC if it was created before the last download. Store time is used so
+            # test crawls are evaluated based on the date they were saved. Simplifies the date format to YYYY-MM-DD
+            # by removing the time information before comparing it to the last download date.
             try:
-                regex_crawl_date = re.match(r"(\d{4}-\d{2}-\d{2})T.*", warc_info['crawl-start'])
+                regex_crawl_date = re.match(r"(\d{4}-\d{2}-\d{2})T.*", warc_info['store-time'])
                 crawl_date = regex_crawl_date.group(1)
             except AttributeError:
                 aip.log(log_path, f"No date for {warc_info['warc_filename']}.")
@@ -115,25 +116,32 @@ def check_aip():
 
         return warcs_include
 
+    # Starts a section in the log for the completeness check.
+    aip.log(log_path, '\nCompleteness check results:')
+
     # Saves the file paths to the metadata and objects folders to variables, since they are long and reused.
     objects = f"{c.script_output}/aips_{current_download}/{aip_id}_bag/data/objects"
     metadata = f"{c.script_output}/aips_{current_download}/{aip_id}_bag/data/metadata"
 
     # List of suffixes used for the expected metadata reports.
-    expected_endings = ("_coll.csv", "_collscope.csv", "_crawldef.csv", "_crawljob.csv", "_seed.csv",
-                        "_seedscope.csv", "_preservation.xml", "_fits.xml")
+    expected_endings = ('coll.csv', 'collscope.csv', 'crawldef.csv', 'crawljob.csv', 'seed.csv',
+                        'seedscope.csv', 'preservation.xml', 'fits.xml')
 
     # Calculates the number of WARCs that should be in this AIP. Exits the function if it is not calculated since
     # multiple tests depend on this.
     try:
         warcs_expected = aip_warcs_count()
     except ValueError:
-        print("Cannot check AIP for completeness. WARC count not calculated.")
+        aip.log(log_path, 'Cannot check AIP for completeness. WARC count was not correct.')
         return
 
+    # Variable tracks if anything has been found missing so a summary can be printed to the terminal.
+    missing = False
+
     # Tests if there is a folder for this AIP in the AIPs directory.
-    if not any(folder.startswith(aip_id) for folder in os.listdir(f"{c.script_output}/aips_{current_download}")):
-        print("The AIP folder was not created.")
+    if not any(folder.startswith(aip_id) for folder in os.listdir(f'{c.script_output}/aips_{current_download}')):
+        aip.log(log_path, 'The AIP folder was not created.')
+        missing = True
 
     # Tests if each of the expected metadata reports is present. Skips FITS because the filename is formatted
     # differently and it is checked in the next test.
@@ -141,28 +149,41 @@ def check_aip():
     for end in expected_endings:
         if end == "_fits.xml":
             continue
-        if not os.path.exists(f"{metadata}/{aip_id}{end}"):
-            print(end, "was not created.")
+        if not os.path.exists(f'{metadata}/{aip_id}{end}'):
+            aip.log(log_path, f'{end} was not created.')
+            missing = True
 
     # Tests if the number of FITS files is correct (one for each WARC).
     fits_count = len([file for file in os.listdir(metadata) if file.endswith("_fits.xml")])
     if not fits_count == warcs_expected:
-        print(f"The number of FITS files is incorrect: {fits_count} instead of {warcs_expected}.")
+        aip.log(log_path, f'The number of FITS files is incorrect: {fits_count} instead of {warcs_expected}.')
+        missing = True
 
     # Tests if everything in the AIP's metadata folder is an expected file type.
     for file in os.listdir(metadata):
         if not file.endswith(expected_endings):
-            print("File in metadata folder that is not expected:", file)
+            aip.log(log_path, f'File in metadata folder that is not expected: {file}')
+            missing = True
 
     # Tests if the number of WARCs is correct.
     warcs_in_objects = len([file for file in os.listdir(objects) if file.endswith(".warc.gz")])
     if not warcs_expected == warcs_in_objects:
-        print(f"The number of WARCs is incorrect: {warcs_in_objects} instead of {warcs_expected}")
+        aip.log(log_path, f'The number of WARCs is incorrect: {warcs_in_objects} instead of {warcs_expected}')
+        missing = True
 
     # Tests if everything in the AIP's objects folder is a WARC.
     for file in os.listdir(objects):
-        if not file.endswith(".warc.gz"):
-            print("File in objects folder that is not a WARC:", file)
+        if not file.endswith('.warc.gz'):
+            aip.log(log_path, f'File in objects folder that is not a WARC: {file}.')
+            missing = True
+
+    # Log if nothing was missing.
+    # If some things were missing, they are already in the log and no additional indication is needed.
+    if missing is False:
+        aip.log(log_path, f'The AIP is complete.')
+
+    # Return value of missing to print a summary to the terminal.
+    return missing
 
 
 # Tests required script arguments were provided and assigns to variables.
@@ -186,7 +207,7 @@ except IndexError:
 
 # Extracts the department from the aip_id saves it to a variable. Quits the script if the AIP id is formatted wrong.
 try:
-    regex_dept = re.match("^(harg|rbrl).*", aip_id)
+    regex_dept = re.match('^(bmac|harg|rbrl).*', aip_id)
     department = regex_dept.group(1)
 except AttributeError:
     print("Exiting script: AIP id is not formatted correctly. Department could not be identified.")
@@ -210,9 +231,9 @@ os.chdir(f"{c.script_output}/{aips_directory}")
 # since it allows for a permanent record of the download and because the terminal closed at the end of a script when
 # it is run automatically with chronjob. The log is not started until after the current_download variable is set so that
 # can be included in the file name.
-log_path = f"../script_log_{current_download}.txt"
-aip.log(log_path, f"\nStarting web preservation script for seed {seed_id} on {current_download}.\n")
-
+log_path = f'../web_preservation_download_log_{aip_id}.txt'
+aip.log(log_path, f'Creating AIP {aip_id} (for seed {seed_id}) using the web_aip_single.py script.'
+                  f'\nScript started running at {datetime.datetime.today()}.')
 
 # PART ONE: DOWNLOAD WARCS AND METADATA INTO THE AIP DIRECTORY STRUCTURE.
 print("Downloading AIP content.")
@@ -226,8 +247,7 @@ try:
     aip_title = get_title()
 except ValueError:
     aip.log(log_path, "Seed has no title.")
-    print("Exiting script: seed has no title.")
-    exit()
+    print('Exiting script: seed is missing metadata in Archive-It. See log for details.')
 
 # Makes the aip directory for the seed's aip (aip folder with metadata and objects subfolders). Unlike with the batch
 # script, the folder does not need to temporarily include the AIP title since the title is already stored in a variable.
@@ -242,7 +262,8 @@ for warc in warc_metadata['files']:
         warc_url = warc['locations'][0]
         warc_md5 = warc['checksums']['md5']
     except (KeyError, IndexError):
-        aip.log(log_path, "WARC information is formatted wrong.")
+        aip.log(log_path, 'WARC information is formatted wrong. JSON from API:\n')
+        aip.log(log_path, warc)
         continue
 
     # Checks if the WARC is from the seed being downloaded. If not, skips the WARC.
@@ -251,7 +272,7 @@ for warc in warc_metadata['files']:
         regex_seed_id = re.match(r"^.*-SEED(\d+)-", warc_filename)
         warc_seed_id = regex_seed_id.group(1)
     except AttributeError:
-        aip.log(log_path, "Cannot calculate the WARC seed id.")
+        aip.log(log_path, f'Cannot calculate the WARC seed id from {warc_filename}.')
         continue
     if not seed_id == warc_seed_id:
         continue
@@ -274,7 +295,6 @@ for warc in warc_metadata['files']:
 
 # Checks for empty metadata or objects folders in the AIPs. These happens if there were uncaught download errors.
 web.find_empty_directory(log_path)
-
 
 # PART TWO: CREATE AIPS THAT ARE READY FOR INGEST INTO ARCHIVE
 print("Converting into an AIP.")
@@ -299,13 +319,19 @@ if aip_id in os.listdir('.'):
 if f"{aip_id}_bag" in os.listdir('.'):
     aip.package(aip_id, os.getcwd())
 
-# If the AIP has not been moved to the errors folder, verifies the AIP is complete. Errors are printed to the terminal.
-if f"{aip_id}_bag" in os.listdir('.'):
-    print("\nStarting completeness check.")
-    check_aip()
+# If the AIP has not been moved to the errors folder, verifies the AIP is complete.
+# Anything that is missing is added to the log. A notification if anything was missing or not prints to the terminal.
+if f'{aip_id}_bag' in os.listdir('.'):
+    print('\nStarting completeness check.')
+    any_missing = check_aip()
+    if any_missing is True:
+        print("At least one file is missing, although this may not be an error. See the log for details.")
+    else:
+        print("The AIP is complete.")
 
 # Makes MD5 manifest of the AIP.
 aip.make_manifest()
 
 # Adds completion of the script to the log.
-aip.log(log_path, f"\nScript finished running at {datetime.datetime.today()}.")
+aip.log(log_path, f'\nScript finished running at {datetime.datetime.today()}.')
+print('Script is complete.')

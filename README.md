@@ -39,10 +39,20 @@ This list includes the dependencies for the General AIP portion of the workflow.
     
     
 2. Download this repository and save to your computer.
+
+
 3. Create a configuration.py file modeled after the configuration_template.py file with variables for Archive-It credentials and local file paths.
+
+
 4. Download the [general aip repository](https://github.com/uga-libraries/general-aip) and follow the installation instructions.
+
+
 5. Copy the aip_functions.py document to the scripts folder of the downloaded web-aip repository.
+
+
 6. Change permissions on the scripts so they are executable.
+
+
 7. To run quarterly, add it to the chrontab file or use another scheduling method.
 
 # Workflow Details
@@ -54,7 +64,7 @@ The workflow for each seed is the essentially the same for the batch script and 
 2. Downloads the WARCs and metadata files from Archive-It and organizes them into AIP directories, with one AIP per seed.
 
     * The AIP directory folder has the naming convention aip-id_AIP Title and contains metadata and objects folders.
-
+   
     * Uses WASAPI to download the WARC(s) for the seed from Archive-It and saves to the objects folder. Verifies fixity after downloading.
 
     * Uses the Partner API to download six reports for each AIP based on seed id, Archive-It collection id, and crawl definition id. Saves the reports to the metadata folder as csv files.
@@ -63,17 +73,42 @@ The workflow for each seed is the essentially the same for the batch script and 
 
     * Checks all AIP directories for empty metadata or objects folders and moves to an error folder if found.
 
+
 3. Makes folders for script outputs: aips-to-ingest, fits-xml, and preservaiton-xml.
+
 
 4. Extracts technical metadata from each WARC in the objects folder with FITS and save the FITS xml to the metadata folder. Copies the information from each fits xml file into one file named combined-fits.xml, also saved in the metadata folder.
 
+
 5. Transforms the combined-fits xml into Dublin Core and PREMIS metadata using Saxon and xslt stylesheets, which is saved as master.xml in the metadata folder. Verifies that the master.xml file meets UGA standards with xmllint and xsds.
+
 
 6. Uses bagit to bag the AIP folder in place, making md5 and sha256 manifests. Validates the bag.
 
+
 7. Uses a perl script to tar and zip a copy of the bag, which is saved in the aips-to-ingest folder.
 
+
 8. Once all AIPs are created, uses md5deep to calculate the md5 for each packaged AIP and saves it to a manifest.
+
+# Additional Scripts
+These are scripts that support the web preservation workflow. See the notes at the beginning of each script for further information and usage instructions.
+
+* **download_files.py**: Downloads individual PDF files instead of an entire WARC using the document URLs from the file types report and wget. Document URLs are saved to CSV files, which are located within a single directory (input_directory). WARNING: This is a proof of concept and has only been minimally tested. Script usage: 
+  ```
+  python path/download_files.py path/input_directory archiveit_collection_id
+
+* **metadata_check_combined.py**: Generates reports of UGA's collection and seed metadata fields, either required only or all fields depending on the if the second optional argument is included. Used for a holistic review of Archive-It usage. Script usage:
+   ```
+  python path/metadata_check_combined.py path/output_directory [all_fields]
+
+* **metadata_check_department.py**: Generates reports of UGA's required collection and seed metadata fields organized by the collector (department). Used to verify all required metadata is present prior to a preservation download. Script usage:
+   ```
+   python path/metadata_check_department.py path/output_directory
+
+* **warc_xml_to_csv.py**: Reformats the WASAPI XML download (warc.xml) into a CSV for reviewing data about all WARCs. Includes file name, collection, seed, job, store date, and size in GB. Used for auditing that all WARCs have been downloaded and for previewing which WARCs will be in an upcoming preservation download. Script usage:
+   ```
+   python path/warc_xml_to_csv.py path/warc.xml
 
 # Initial Author
 Adriane Hanson, Head of Digital Stewardship, January 2020

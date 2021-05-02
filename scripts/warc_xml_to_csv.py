@@ -1,7 +1,9 @@
-# Convert WARC information downloaded from WASAPI as XML into a CSV for analyzing WARC information.
+# Convert WARC information downloaded from WASAPI as XML into a CSV for analyzing WARC information. The resulting CSV
+# is saved in the same folder as the input.
 
-# Script input is downloaded from https://warcs.archive-it.org/wasapi/v1/webdata.
-# Copy information from all result pages into a single document.
+# XML for the script input is downloaded from https://warcs.archive-it.org/wasapi/v1/webdata. Combine the information
+# from all result pages into a single document, with one root and files element and every list-item element. Do not
+# include the elements before or after files.
 
 # Script usage: python /path/warc_xml_to_csv.py /path/warc.xml
 
@@ -32,7 +34,7 @@ except FileNotFoundError:
 warc_xml_folder = os.path.dirname(os.path.abspath(warc_xml))
 warc_csv = open(os.path.join(warc_xml_folder, "converted_warc_xml.csv"), "w", newline="")
 csv_writer = csv.writer(warc_csv)
-csv_writer.writerow(["filename", "collection", "seed", "crawl-time", "crawl-start", "store-time"])
+csv_writer.writerow(["filename", "collection", "seed", "job", "store-time", "size (GB)"])
 
 # Gets the data for each WARC from the XML file.
 root = tree.getroot()
@@ -40,23 +42,25 @@ files = root.find("files")
 for warc in files.findall("list-item"):
     filename = warc.find("filename").text
     collection = warc.find("collection").text
-    crawl_time = warc.find("crawl-time").text
-    crawl_start = warc.find("crawl-start").text
+    size = warc.find("size").text
     store_time = warc.find("store-time").text
 
-    # Adds a space before the dates so they keep their original formatting when the CSV is opened in Excel.
-    crawl_time = " " + crawl_time
-    crawl_start = " " + crawl_start
+    # Adds a space before the date so it keeps the original formatting when the CSV is opened in Excel.
     store_time = " " + store_time
 
-    # Gets the seed id, which is the numbers in the WARC filename between "-SEED" and "-".
+    # Gets the job id and seed id from the WARC filename.
     try:
-        regex_seed_id = re.match(r'^.*-SEED(\d+)-', filename)
-        seed_id = regex_seed_id.group(1)
+        regex = re.match(r'^.*-JOB(\d+)-.*?SEED(\d+)-', filename)
+        job_id = regex.group(1)
+        seed_id = regex.group(2)
     except AttributeError:
+        job_id = "COULD NOT CALCULATE"
         seed_id = "COULD NOT CALCULATE"
 
+    # Converts the size from bytes to GB, rounded to 2 decimal places.
+    size = round(float(size) / 1000000000, 2)
+
     # Saves the WARC data as a row in the CSV.
-    csv_writer.writerow([filename, collection, seed_id, crawl_time, crawl_start, store_time])
+    csv_writer.writerow([filename, collection, seed_id, job_id, store_time, size])
 
 warc_csv.close()
