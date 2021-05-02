@@ -218,7 +218,7 @@ def make_aip_directory(aip_folder):
         os.makedirs(f'{aip_folder}/objects')
 
 
-def download_metadata(aip_id, warc_collection, crawl_definition, seed_id, current_download, log_path):
+def download_metadata(aip_id, warc_collection, job_id, seed_id, current_download, log_path):
     """Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
     deletes any empty reports (meaning there was no data of that type for this seed), and redacts login information
     from the seed report. """
@@ -236,9 +236,9 @@ def download_metadata(aip_id, warc_collection, crawl_definition, seed_id, curren
 
         # Saves the metadata report if there were no errors with the API and the report has not already been downloaded.
         # If there is more than one WARC for a seed, reports may already be in the metadata folder.
-        report_path = f'{c.script_output}/aips_{current_download}/{aip_folder}/metadata/{report_name}'
+        report_path = f'{c.script_output}/aips_{current_download}/{aip_id}/metadata/{report_name}'
         if metadata_report.status_code == 200:
-            with open(f'{aip_id}/metadata/{aip_id}_{code}.csv', 'wb') as report_csv:
+            with open(f'{aip_id}/metadata/{report_name}', 'wb') as report_csv:
                 report_csv.write(metadata_report.content)
         else:
             aip.log(log_path, f'Could not download {report_type} report. Error: {metadata_report.status_code}')
@@ -295,7 +295,7 @@ def download_metadata(aip_id, warc_collection, crawl_definition, seed_id, curren
     # Downloads the crawl definition report for the job this WARC was part of.
     # The crawl definition id is obtained from the crawl job report using the job id.
     # There may be more than one crawl definition report per AIP.
-    with open(f'{aip_folder}/metadata/{aip_id}_crawljob.csv', 'r') as crawljob_csv:
+    with open(f'{aip_id}/metadata/{aip_id}_crawljob.csv', 'r') as crawljob_csv:
         crawljob_data = csv.DictReader(crawljob_csv)
         for job in crawljob_data:
             if job_id == job['id']:
@@ -512,7 +512,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
         metadata = f'{c.script_output}/aips_{current_download}/{aip_id}_bag/data/metadata'
 
         # Tests if each of the six Archive-It metadata reports is present. os.path.exists() returns True/False.
-        # TODO: possible to check for the correct number of crawl definitions?
+        # TODO: this doesn't work for crawldef anymore, since the crawldef id is part of the file name.
         result.append(os.path.exists(f'{metadata}/{aip_id}_coll.csv'))
         result.append(os.path.exists(f'{metadata}/{aip_id}_collscope.csv'))
         result.append(os.path.exists(f'{metadata}/{aip_id}_crawldef.csv'))

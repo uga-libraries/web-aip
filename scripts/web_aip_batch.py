@@ -139,7 +139,7 @@ for warc in warc_metadata['files']:
     # Downloads the seed metadata from Archive-It into the seed's metadata folder if it is not already there (and so
     # the folder is empty). A seed may have multiple WARCs and only want to download the seed's reports once.
     if len(os.listdir(f'{aip_id}/metadata')) == 0:
-        web.download_metadata(aip_id, warc_collection, crawl_definition, seed_id, current_download, log_path)
+        web.download_metadata(aip_id, warc_collection, job_id, seed_id, current_download, log_path)
 
     # Downloads the WARC from Archive-It into the seed's objects folder.
     web.download_warc(aip_id, warc_filename, warc_url, warc_md5, current_download, log_path)
