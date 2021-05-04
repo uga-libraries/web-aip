@@ -149,7 +149,7 @@ def check_aip():
     for end in expected_endings:
         if end == "_fits.xml":
             continue
-        if not os.path.exists(f'{metadata}/{aip_id}{end}'):
+        if not os.path.exists(f'{metadata}/{aip_id}_{end}'):
             aip.log(log_path, f'{end} was not created.')
             missing = True
 
