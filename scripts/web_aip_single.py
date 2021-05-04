@@ -286,7 +286,6 @@ for warc in warc_metadata['files']:
         continue
 
     # Downloads the seed metadata from Archive-It into the seed's metadata folder.
-    # The aip_id is passed twice, as both the AIP id and AIP folder. These are different values for the batch script.
     # While five of the reports are the same for each WARC, the crawl definition could be different.
     web.download_metadata(aip_id, collection_id, job_id, seed_id, current_download, log_path)
 
