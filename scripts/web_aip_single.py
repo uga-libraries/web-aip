@@ -233,7 +233,7 @@ os.chdir(f"{c.script_output}/{aips_directory}")
 # can be included in the file name.
 log_path = f'../web_preservation_download_log_{aip_id}.txt'
 aip.log(log_path, f'Creating AIP {aip_id} (for seed {seed_id}) using the web_aip_single.py script.'
-                  f'\nScript started running at {datetime.datetime.today()}.')
+                  f'\nScript started running at {datetime.datetime.today()}.\n')
 
 # PART ONE: DOWNLOAD WARCS AND METADATA INTO THE AIP DIRECTORY STRUCTURE.
 print("Downloading AIP content.")
