@@ -2,9 +2,6 @@
 # Using a separate script for ease of customization, but basically it is the second half of web_aip_batch.
 # Extras: creates metadata dictionaries from a csv with the information and extra checking.
 
-# TODO: once the AIPs are made, run the completeness check
-#  OR adapt the web_aip_single.py completeness check for what is in the folder.
-
 import csv
 import datetime
 import os
@@ -135,9 +132,11 @@ def check_aip(aip_id, seed_id):
 
 
 # SUBSTITUTES FOR PART ONE: ARGUMENTS, VARIABLES CALCULATED, SETTING CURRENT DIRECTORY, STARTING LOG.
-last_download = "2021-02-01"
-current_download = "2021-05-01"
+# Update this prior to running the script
+last_download = "YYYY-MM-DD"
+current_download = "YYYY-MM-DD"
 aips_directory = f'aips_{current_download}'
+metadata_path = "PATH"
 
 os.chdir(f'{c.script_output}/{aips_directory}')
 
@@ -151,7 +150,7 @@ aip_to_title = {}
 
 # Read data from CSV about the AIPs which would usually be calculated from the API.
 # For every row, other than the header, get the seed id, title, and aip id, and add to the two dictionaries.
-with open('C:/Users/amhan/Desktop/russell_aip_metadata.csv', 'r') as data_file:
+with open(metadata_path, 'r') as data_file:
     data_read = csv.reader(data_file)
     next(data_read)
     for row in data_read:
