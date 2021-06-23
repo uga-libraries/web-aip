@@ -94,6 +94,10 @@ The workflow for each seed is the essentially the same for the batch script and 
 # Additional Scripts
 These are scripts that support the web preservation workflow. See the notes at the beginning of each script for further information and usage instructions.
 
+* **aip_from_download.py**: Converts a batch of folders organized as AIP directories (metadata and objects folders) with already downloaded WARCs and metadata files into an AIP. Use this where space limitations prevent you from duplicating the files to create the AIPs. WARNING: Created for one time use so variables are part of the code (lines 136-139) instead of script arguments. Script usage: 
+  ```
+  python path/aip_from_download.py
+
 * **download_files.py**: Downloads individual PDF files instead of an entire WARC using the document URLs from the file types report and wget. Document URLs are saved to CSV files, which are located within a single directory (input_directory). WARNING: This is a proof of concept and has only been minimally tested. Script usage: 
   ```
   python path/download_files.py path/input_directory archiveit_collection_id
