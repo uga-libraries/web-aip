@@ -108,7 +108,7 @@ These are scripts that support the web preservation workflow. See the notes at t
 
 * **metadata_check_department.py**: Generates reports of UGA's required collection and seed metadata fields organized by the collector (department). Used to verify all required metadata is present prior to a preservation download. Script usage:
    ```
-   python path/metadata_check_department.py path/output_directory
+   python path/metadata_check_department.py [path/output_directory]
 
 * **warc_xml_to_csv.py**: Reformats the WASAPI XML download (warc.xml) into a CSV for reviewing data about all WARCs. Includes file name, collection, seed, job, store date, and size in GB. Used for auditing that all WARCs have been downloaded and for previewing which WARCs will be in an upcoming preservation download. Script usage:
    ```

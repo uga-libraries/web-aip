@@ -2,17 +2,19 @@
 # downloading the WARCs and metadata for preservation. Separate reports are made for each department (collector) so
 # the results can be shared with the responsible archivist.
 
-# Usage: python /path/metadata_check_department.py /path/output_directory
+# Usage: python /path/metadata_check_department.py [/path/output_directory]
+# If the path for the output is not provided, the script uses the script output path from the configuration file.
 
-# Ideas for improvement: use default location from configuration file for output directory if none supplied; add
-# limit by date to see just this download; differentiate between active and inactive collections.
+# Ideas for improvement:
+# add limit by date to see just this download;
+# differentiate between active and inactive collections.
 
 import csv
 import os
 import requests
 import sys
 
-# Gets Archive-It account credentials from the configuration file.
+# Gets Archive-It account credentials and the script output path from the configuration file.
 import configuration as c
 
 
@@ -35,14 +37,20 @@ def get_metadata_value(data, field):
         return 'MISSING'
 
 
-# Changes the current directory to the folder where the reports will be saved, which is provided by user.
-# If this cannot be done, prints an error for the user and quits the script.
+# Gets the folder where the metadata reports should be saved.
+# The path may be provided by the user with a script argument or may come from the configuration file.
 try:
     output_directory = sys.argv[1]
+except IndexError:
+    output_directory = c.script_output
+
+# Changes the current directory to the folder where the reports will be saved.
+# If this cannot be done, prints an error for the user and quits the script.
+try:
     os.chdir(output_directory)
-except (IndexError, FileNotFoundError):
-    print('There was an error in the command for running the script. Please try again')
-    print('Script usage: python /path/metadata_check_department.py /path/output_directory')
+except (FileNotFoundError, NotADirectoryError):
+    print(f'The output directory "{output_directory}" is not a valid directory. Please try again.')
+    print('Script usage: python /path/metadata_check_department.py [/path/output_directory]')
     exit()
 
 
