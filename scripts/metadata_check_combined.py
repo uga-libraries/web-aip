@@ -116,10 +116,10 @@ except (IndexError, FileNotFoundError):
 
 # If the optional argument was provided, sets a variable optional to True.
 # If the second argument is not the expected value, prints an error for the user and quits the script.
-optional = False
+include_optional = False
 if len(sys.argv) == 3:
     if sys.argv[2] == "all_fields":
-        optional = True
+        include_optional = True
     else:
         print('The provided value for the second argument is not the expected value of "all_fields".')
         print('Script usage: python /path/metadata_check_combined.py /path/output_directory [all_fields]')
@@ -139,7 +139,7 @@ if not collections.status_code == 200:
 py_collections = collections.json()
 
 # Saves the collection data to a CSV.
-make_csv(py_collections, "collection", optional)
+make_csv(py_collections, "collection", include_optional)
 
 
 # PART TWO: SEED REPORTS
@@ -156,4 +156,4 @@ if not seeds.status_code == 200:
 py_seeds = seeds.json()
 
 # Saves the seed data to a CSV.
-make_csv(py_seeds, "seed", optional)
+make_csv(py_seeds, "seed", include_optional)
