@@ -71,12 +71,15 @@ total_warcs = warc_metadata['count']
 # Starts a dictionary to store a mapping of seed id to AIP id, used for checking the downloaded AIPs for completeness.
 seed_to_aip = {}
 
+# Adds name for the next section to the log.
+aip.log(log_path, f'\n\nPROCESSING WARCS ({total_warcs} TOTAL)')
+
 # Iterates through information about each WARC.
 for warc in warc_metadata['files']:
 
     # Updates the current WARC number and displays the script progress.
     current_warc += 1
-    aip.log(log_path, f"\nProcessing {warc['filename']} ({current_warc} of {total_warcs}).")
+    aip.log(log_path, f"\n{warc['filename']}")
     print(f"\nProcessing {warc['filename']} ({current_warc} of {total_warcs}).")
 
     # Calculates seed id, which is a portion of the WARC filename between "-SEED" and "-".
@@ -85,7 +88,8 @@ for warc in warc_metadata['files']:
         regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc['filename'])
         seed_id = regex_seed_id.group(1)
     except AttributeError:
-        aip.log(log_path, 'Cannot calculate seed id.')
+        aip.log(log_path, f"Cannot calculate seed id from the WARC filename: {warc['filename']}.\n"
+                          f"This WARC and its metadata reports will not be downloaded.")
         continue
 
     # Saves relevant information about the WARC in variables for future use.
@@ -96,7 +100,8 @@ for warc in warc_metadata['files']:
         warc_md5 = warc['checksums']['md5']
         warc_collection = warc['collection']
     except (KeyError, IndexError):
-        aip.log(log_path, 'WARC information is formatted wrong.')
+        aip.log(log_path, f'WARC information is formatted wrong. JSON from API:\n {warc}\n '
+                          f'This WARC and its metadata reports will not be downloaded.')
         continue
 
     # Calculates the job id from the WARC filename.
@@ -113,7 +118,8 @@ for warc in warc_metadata['files']:
         aip_id = seed_metadata[seed_id][0]
         aip_title = seed_metadata[seed_id][1]
     except (KeyError, IndexError):
-        aip.log(log_path, 'Seed has no metadata.')
+        aip.log(log_path, f"This WARC's seed is missing required metadata. JSON from API:\n {seed_metadata}\n"
+                          f"This WARC will not be downloaded.")
         continue
 
     # Adds the seed to the seed_to_aip dictionary. This is used for checking the downloaded AIPs for completeness.
@@ -145,13 +151,16 @@ aip.make_output_directories()
 current_aip = 0
 total_aips = len(os.listdir('.'))
 
+# Adds name for the next section to the log.
+aip.log(log_path, f'\n\nPROCESSING AIPS ({total_aips} TOTAL)')
+
 # Runs the scripts for each step of making an AIP, one folder at a time. Checks if the AIP is still present before
 # running each script, in case it was moved due to an error in the previous script.
 for aip_folder in os.listdir('.'):
 
     # Updates the current AIP number and displays the script progress.
     current_aip += 1
-    aip.log(log_path, f'\n>>>Processing {aip_folder} ({current_aip} of {total_aips}).')
+    aip.log(log_path, f'\n{aip_folder}')
     print(f'\n>>>Processing {aip_folder} ({current_aip} of {total_aips}).')
 
     # Extracts the AIP id, department, and AIP title from the folder name and saves them to variables. If the folder
