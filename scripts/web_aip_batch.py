@@ -211,7 +211,8 @@ aip.log(log_path, f'\nScript finished running at {datetime.datetime.today()}.')
 # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) into the AIPs folder for this
 # download to keep everything together if another set is downloaded before these are deleted.
 os.chdir(c.script_output)
-to_move = ['aips-to-ingest', 'errors', 'fits-xml', 'preservation-xml', f'script_log_{current_download}.txt']
+to_move = ['aips-to-ingest', 'errors', 'fits-xml', 'preservation-xml',
+           f'web_preservation_download_log_{current_download}.txt']
 for item in os.listdir('.'):
     if item in to_move:
         os.replace(item, f'{aips_directory}/{item}')
