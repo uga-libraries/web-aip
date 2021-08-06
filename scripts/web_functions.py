@@ -436,7 +436,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
             # Simplifies the date format to YYYY-MM-DD by removing the time information before comparing it to the
             # last download date.
             try:
-                regex_crawl_date = re.match(r"(\d{4}-\d{2}-\d{2})T.*", warc_info['crawl-start'])
+                regex_crawl_date = re.match(r"(\d{4}-\d{2}-\d{2})T.*", warc_info['store-time'])
                 crawl_date = regex_crawl_date.group(1)
             except AttributeError:
                 aip.log(log_path, f'No date for {warc_info["warc_filename"]}.')
