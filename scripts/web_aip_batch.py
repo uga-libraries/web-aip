@@ -54,7 +54,7 @@ os.chdir(f'{c.script_output}/{aips_directory}')
 # since it allows for a permanent record of the download and because the terminal closed at the end of a script when
 # it is run automatically with chronjob. The log is not started until after the current_download variable is set so that
 # can be included in the file name.
-log_path = f'../script_log_{current_download}.txt'
+log_path = f'../web_preservation_download_log_{current_download}.txt'
 aip.log(log_path, f'Starting web preservation script on {current_download}.\n')
 
 # PART ONE: DOWNLOAD WARCS AND METADATA INTO AIP DIRECTORY STRUCTURE.
