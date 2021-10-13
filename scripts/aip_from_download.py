@@ -1,4 +1,4 @@
-# The WARCs and metadata files for a group of web AIPs were downloaded by the AIPs still need to be made.
+# The WARCs and metadata files for a group of web AIPs were downloaded but the AIPs still need to be made.
 # Using a separate script for ease of customization, but basically it is the second half of web_aip_batch.
 # Extras: creates metadata dictionaries from a csv with the information and extra checking.
 
