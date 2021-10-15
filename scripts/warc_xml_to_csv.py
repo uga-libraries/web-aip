@@ -1,13 +1,18 @@
-"""Convert WARC information downloaded from WASAPI as XML into a CSV for analyzing WARC information.
-The resulting CSV is saved in the same folder as the input XML.
+"""Makes a CSV with information about each WARC saved during a specified time frame:
+    * WARC Filename
+    * AIT Collection ID
+    * Seed ID
+    * Crawl Job ID
+    * Date (store-time)
+    * Size (GB)
+    * Crawl Definition ID
+    * Seed Title
 
-To make the script input (warc.xml):
-    1. Log into your Archive-It account.
-    2. Downloaded XML from https://warcs.archive-it.org/wasapi/v1/webdata (under "GET").
-    3. Copy the <root> section to a plain text document and click back on your web browser.
-    4. If there is a URL under "next", go to the next page.
-    5. Get the XML for that page and copy all <list-item> elements to the end of the <files> section.
-    6. Repeat 4-5 until next is null. Save the plain text document as an XML file."""
+Using this script instead of the WASAPI CSV download so data can be manipulated,
+added from the Partner API, and reformatted.
+
+UGA uses this script to generate a list of all WARCs expected in the quarterly preservation download
+and adds them to a WARC Inventory for all downloaded WARCs to track that nothing is missed."""
 
 # Script usage: python path\\warc_xml_to_csv.py path\\warc.xml
 
@@ -16,7 +21,6 @@ import os
 import re
 import requests
 import sys
-import xml.etree.ElementTree as et
 
 import configuration as c
 
@@ -57,44 +61,34 @@ def get_crawl_def(job):
         return "No crawl definition in Archive-It"
 
 
-# Gets the path to the XML file to be converted from the script argument.
-try:
-    WARC_XML = sys.argv[1]
-except IndexError:
-    print("Including the path to the XML file as a script argument.")
-    print("Script usage: python path\\warc_xml_to_csv.py path\\warc.xml")
+# Gets the WARC data from WASAPI and converts to Python.
+# If there is an API error, quits the script.
+WARC_DATA = requests.get(c.wasapi, auth=(c.username, c.password))
+if not WARC_DATA.status_code == 200:
+    print("WASAPI error, ending script. See log for details.")
     sys.exit()
-
-# Reads the XML file.
-try:
-    TREE = et.parse(WARC_XML)
-except FileNotFoundError:
-    print("The path to the XML file is not correct:", WARC_XML)
-    print("Script usage: python path\\warc_xml_to_csv.py path\\warc.xml")
-    sys.exit()
+PY_WARC_DATA = WARC_DATA.json()
 
 # Starts dictionaries for crawl definitions and titles.
 # These are looked up via the API for each WARC, which is slow.
 # Saving time by saving the results since there are many WARCs with the same values.
-job_to_crawl = {}
-seed_to_title = {}
+JOB_TO_CRAWL = {}
+SEED_TO_TITLE = {}
 
-# Starts a CSV file, with a header, for the WARC data in the same folder as the XML file.
-WARC_XML_FOLDER = os.path.dirname(os.path.abspath(WARC_XML))
-WARC_CSV = open(os.path.join(WARC_XML_FOLDER, "converted_warc_xml.csv"), "w", newline="")
+# Starts a CSV file, with a header, for the WARC data.
+# It is saved to the script output folder indicated in the configuration file.
+WARC_CSV = open(os.path.join(c.script_output, "converted_warc_xml.csv"), "w", newline="")
 CSV_WRITER = csv.writer(WARC_CSV)
-CSV_WRITER.writerow(["WARC Filename", "AIT Collection", "Seed", "Job", "Date (store-time",
+CSV_WRITER.writerow(["WARC Filename", "AIT Collection", "Seed", "Job", "Date (store-time)",
                      "Size (GB)", "Crawl Def", "AIP", "AIP Title"])
 
-# Gets the data for each WARC from the XML file.
-ROOT = TREE.getroot()
-FILES = ROOT.find("files")
-for warc in FILES.findall("list-item"):
-    filename = warc.find("filename").text
-    size = warc.find("size").text
-    collection = warc.find("collection").text
-    job_id = warc.find("crawl").text
-    store_time = warc.find("store-time").text
+# Gets the data for each WARC.
+for warc in PY_WARC_DATA["files"]:
+    filename = warc["filename"]
+    size = warc["size"]
+    collection = warc["collection"]
+    job_id = warc["crawl"]
+    store_time = warc["store-time"]
 
     # Adds a space before the date to keep the original formatting if the file is opened in Excel.
     store_time = " " + store_time
@@ -114,25 +108,23 @@ for warc in FILES.findall("list-item"):
 
     # Gets the crawl definition from the dictionary (if previously calculated) or API.
     try:
-        crawl_def = job_to_crawl[job_id]
+        crawl_def = JOB_TO_CRAWL[job_id]
     except KeyError:
         crawl_def = get_crawl_def(job_id)
-        job_to_crawl[job_id] = crawl_def
+        JOB_TO_CRAWL[job_id] = crawl_def
 
     # Gets the seed/AIP title from the dictionary (if previously calculated) or API.
     try:
-        title = seed_to_title[seed_id]
+        title = SEED_TO_TITLE[seed_id]
     except KeyError:
         title = get_title(seed_id)
-        seed_to_title[seed_id] = title
+        SEED_TO_TITLE[seed_id] = title
 
     # Saves the WARC data as a row in the CSV.
     CSV_WRITER.writerow([filename, collection, seed_id, job_id, store_time, size, crawl_def, "", title])
 
 WARC_CSV.close()
 
-# Get the total number of WARCs from WASAPI to compare to the WARC Inventory after these are added.
-warc_api_data = requests.get(c.wasapi, auth=(c.username, c.password))
-py_warc_api_data = warc_api_data.json()
-warc_count = py_warc_api_data["count"]
+# Print the total number of WARCs from WASAPI to compare to the WARC Inventory after these are added.
+warc_count = PY_WARC_DATA["count"]
 print(f"There will be {warc_count} WARCs in the WARC Inventory once these are added.")
