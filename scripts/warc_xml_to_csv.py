@@ -106,8 +106,11 @@ for warc in FILES.findall("list-item"):
     except AttributeError:
         seed_id = "COULD NOT CALCULATE"
 
-    # Converts the size from bytes to GB, rounded to 2 decimal places.
-    size = round(float(size) / 1000000000, 2)
+    # Converts the size from bytes to GB.
+    # As long as it won't result in 0, round to 2 decimal places.
+    size = float(size) / 1000000000
+    if size > 0.01:
+        size = round(size, 2)
 
     # Gets the crawl definition from the dictionary (if previously calculated) or API.
     try:
