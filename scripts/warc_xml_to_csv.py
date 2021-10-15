@@ -45,20 +45,19 @@ ROOT = TREE.getroot()
 FILES = ROOT.find("files")
 for warc in FILES.findall("list-item"):
     filename = warc.find("filename").text
-    collection = warc.find("collection").text
     size = warc.find("size").text
+    collection = warc.find("collection").text
+    job_id = warc.find("crawl").text
     store_time = warc.find("store-time").text
 
     # Adds a space before the date to keep the original formatting if the file is opened in Excel.
     store_time = " " + store_time
 
-    # Gets the job id and seed id from the WARC filename.
+    # Gets the seed id from the WARC filename.
     try:
-        regex = re.match(r'^.*-JOB(\d+)-.*?SEED(\d+)-', filename)
-        job_id = regex.group(1)
-        seed_id = regex.group(2)
+        regex = re.match(r'^.*?SEED(\d+)-', filename)
+        seed_id = regex.group(1)
     except AttributeError:
-        job_id = "COULD NOT CALCULATE"
         seed_id = "COULD NOT CALCULATE"
 
     # Converts the size from bytes to GB, rounded to 2 decimal places.
