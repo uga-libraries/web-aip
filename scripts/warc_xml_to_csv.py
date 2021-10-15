@@ -34,9 +34,29 @@ def get_title(seed):
     py_seed_report = seed_report.json()
     try:
         seed_title = py_seed_report[0]["metadata"]["Title"][0]["value"]
+        print(seed_title)
         return seed_title
     except (KeyError, IndexError):
         return "No title in Archive-It"
+
+
+def get_crawl_def(job):
+    """Uses the Partner API to get the report for this job, which includes the crawl definition.
+    Returns the crawl definition id or an error message to put in the CSV in its place."""
+
+    # Gets the crawl job report using the Partner API.
+    job_report = requests.get(f'{c.partner_api}/crawl_job?id={job}', auth=(c.username, c.password))
+    if not job_report.status_code == 200:
+        return "API Error for job report"
+
+    # Reads the crawl job report and extracts the crawl definition identifier.
+    py_job_report = job_report.json()
+    try:
+        crawl_definition = py_job_report[0]["crawl_definition"]
+        print(crawl_definition)
+        return crawl_definition
+    except (KeyError, IndexError):
+        return "No crawl definition in Archive-It"
 
 
 # Gets the path to the XML file to be converted from the script argument.
@@ -85,10 +105,13 @@ for warc in FILES.findall("list-item"):
     # Converts the size from bytes to GB, rounded to 2 decimal places.
     size = round(float(size) / 1000000000, 2)
 
+    # Uses the job id and the Partner API to get the crawl definition.
+    crawl_def = get_crawl_def(job_id)
+
     # Uses the seed id and the Partner API to get the AIP title.
     title = get_title(seed_id)
 
     # Saves the WARC data as a row in the CSV.
-    CSV_WRITER.writerow([filename, collection, seed_id, job_id, store_time, size, "Crawl Def", "", title])
+    CSV_WRITER.writerow([filename, collection, seed_id, job_id, store_time, size, crawl_def, "", title])
 
 WARC_CSV.close()
