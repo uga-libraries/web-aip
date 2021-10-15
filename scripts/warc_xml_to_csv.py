@@ -75,6 +75,12 @@ except FileNotFoundError:
     print("Script usage: python path\\warc_xml_to_csv.py path\\warc.xml")
     sys.exit()
 
+# Starts dictionaries for crawl definitions and titles.
+# These are looked up via the API for each WARC, which is slow.
+# Saving time by saving the results since there are many WARCs with the same values.
+job_to_crawl = {}
+seed_to_title = {}
+
 # Starts a CSV file, with a header, for the WARC data in the same folder as the XML file.
 WARC_XML_FOLDER = os.path.dirname(os.path.abspath(WARC_XML))
 WARC_CSV = open(os.path.join(WARC_XML_FOLDER, "converted_warc_xml.csv"), "w", newline="")
@@ -105,11 +111,19 @@ for warc in FILES.findall("list-item"):
     # Converts the size from bytes to GB, rounded to 2 decimal places.
     size = round(float(size) / 1000000000, 2)
 
-    # Uses the job id and the Partner API to get the crawl definition.
-    crawl_def = get_crawl_def(job_id)
+    # Gets the crawl definition from the dictionary (if previously calculated) or API.
+    try:
+        crawl_def = job_to_crawl[job_id]
+    except KeyError:
+        crawl_def = get_crawl_def(job_id)
+        job_to_crawl[job_id] = crawl_def
 
-    # Uses the seed id and the Partner API to get the AIP title.
-    title = get_title(seed_id)
+    # Gets the seed/AIP title from the dictionary (if previously calculated) or API.
+    try:
+        title = seed_to_title[seed_id]
+    except KeyError:
+        title = get_title(seed_id)
+        seed_to_title[seed_id] = title
 
     # Saves the WARC data as a row in the CSV.
     CSV_WRITER.writerow([filename, collection, seed_id, job_id, store_time, size, crawl_def, "", title])
