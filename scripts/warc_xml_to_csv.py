@@ -34,7 +34,6 @@ def get_title(seed):
     py_seed_report = seed_report.json()
     try:
         seed_title = py_seed_report[0]["metadata"]["Title"][0]["value"]
-        print(seed_title)
         return seed_title
     except (KeyError, IndexError):
         return "No title in Archive-It"
@@ -53,7 +52,6 @@ def get_crawl_def(job):
     py_job_report = job_report.json()
     try:
         crawl_definition = py_job_report[0]["crawl_definition"]
-        print(crawl_definition)
         return crawl_definition
     except (KeyError, IndexError):
         return "No crawl definition in Archive-It"
