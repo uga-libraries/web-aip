@@ -38,7 +38,7 @@ except FileNotFoundError:
 WARC_XML_FOLDER = os.path.dirname(os.path.abspath(WARC_XML))
 WARC_CSV = open(os.path.join(WARC_XML_FOLDER, "converted_warc_xml.csv"), "w", newline="")
 CSV_WRITER = csv.writer(WARC_CSV)
-CSV_WRITER.writerow(["filename", "collection", "seed", "job", "store-time", "size (GB)"])
+CSV_WRITER.writerow(["WARC Filename", "AIT Collection", "Seed", "Job", "Date", "Size (GB)"])
 
 # Gets the data for each WARC from the XML file.
 ROOT = TREE.getroot()
