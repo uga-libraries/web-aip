@@ -110,9 +110,9 @@ These are scripts that support the web preservation workflow. See the notes at t
    ```
    python path/metadata_check_department.py [path/output_directory]
 
-* **warc_xml_to_csv.py**: Reformats the WASAPI XML download (warc.xml) into a CSV for reviewing data about all WARCs. Includes file name, collection, seed, job, store date, and size in GB. Used for auditing that all WARCs have been downloaded and for previewing which WARCs will be in an upcoming preservation download. Script usage:
+* **warc_csv.py**: Generates a CSV with information about each WARC stored during a specified time frame using both APIs. Includes WARC file name, collection id, seed id, crawl job id, crawl definition id, store date, size in GB, and seed title. Used for auditing that all WARCs have been downloaded and for previewing which WARCs will be in an upcoming preservation download. Script usage:
    ```
-   python path/warc_xml_to_csv.py path/warc.xml
+   python path/warc_xml_to_csv.py
 
 # Initial Author
 Adriane Hanson, Head of Digital Stewardship, January 2020

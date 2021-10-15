@@ -14,7 +14,7 @@ added from the Partner API, and reformatted.
 UGA uses this script to generate a list of all WARCs expected in the quarterly preservation download
 and adds them to a WARC Inventory for all downloaded WARCs to track that nothing is missed."""
 
-# Script usage: python path\\warc_xml_to_csv.py path\\warc.xml
+# Script usage: python path\\warc_csv.py
 
 import csv
 import os
