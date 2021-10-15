@@ -14,8 +14,29 @@ To make the script input (warc.xml):
 import csv
 import os
 import re
+import requests
 import sys
 import xml.etree.ElementTree as et
+
+import configuration as c
+
+
+def get_title(seed):
+    """Uses the Partner API to get the seed report for this seed, which includes the seed title.
+    Returns the title or an error message to put in the CSV in place of the title."""
+
+    # Gets the seed report using the Partner API.
+    seed_report = requests.get(f'{c.partner_api}/seed?id={seed}', auth=(c.username, c.password))
+    if not seed_report.status_code == 200:
+        return "API Error for seed report"
+
+    # Reads the seed report and extracts the title.
+    py_seed_report = seed_report.json()
+    try:
+        seed_title = py_seed_report[0]["metadata"]["Title"][0]["value"]
+        return seed_title
+    except (KeyError, IndexError):
+        return "No title in Archive-It"
 
 
 # Gets the path to the XML file to be converted from the script argument.
@@ -38,7 +59,8 @@ except FileNotFoundError:
 WARC_XML_FOLDER = os.path.dirname(os.path.abspath(WARC_XML))
 WARC_CSV = open(os.path.join(WARC_XML_FOLDER, "converted_warc_xml.csv"), "w", newline="")
 CSV_WRITER = csv.writer(WARC_CSV)
-CSV_WRITER.writerow(["WARC Filename", "AIT Collection", "Seed", "Job", "Date", "Size (GB)"])
+CSV_WRITER.writerow(["WARC Filename", "AIT Collection", "Seed", "Job", "Date (store-time",
+                     "Size (GB)", "Crawl Def", "AIP", "AIP Title"])
 
 # Gets the data for each WARC from the XML file.
 ROOT = TREE.getroot()
@@ -63,7 +85,10 @@ for warc in FILES.findall("list-item"):
     # Converts the size from bytes to GB, rounded to 2 decimal places.
     size = round(float(size) / 1000000000, 2)
 
+    # Uses the seed id and the Partner API to get the AIP title.
+    title = get_title(seed_id)
+
     # Saves the WARC data as a row in the CSV.
-    CSV_WRITER.writerow([filename, collection, seed_id, job_id, store_time, size])
+    CSV_WRITER.writerow([filename, collection, seed_id, job_id, store_time, size, "Crawl Def", "", title])
 
 WARC_CSV.close()
