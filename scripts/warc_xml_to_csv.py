@@ -130,3 +130,9 @@ for warc in FILES.findall("list-item"):
     CSV_WRITER.writerow([filename, collection, seed_id, job_id, store_time, size, crawl_def, "", title])
 
 WARC_CSV.close()
+
+# Get the total number of WARCs from WASAPI to compare to the WARC Inventory after these are added.
+warc_api_data = requests.get(c.wasapi, auth=(c.username, c.password))
+py_warc_api_data = warc_api_data.json()
+warc_count = py_warc_api_data["count"]
+print(f"There will be {warc_count} WARCs in the WARC Inventory once these are added.")
