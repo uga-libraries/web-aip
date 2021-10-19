@@ -14,7 +14,7 @@ added from the Partner API, and reformatted.
 UGA uses this script to generate a list of all WARCs expected in the quarterly preservation download
 and adds them to a WARC Inventory for all downloaded WARCs to track that nothing is missed."""
 
-# Script usage: python path\\warc_csv.py
+# Script usage: python path\\warc_csv.py earliest_date
 
 import csv
 import os
@@ -61,9 +61,22 @@ def get_crawl_def(job):
         return "No crawl definition in Archive-It"
 
 
+# Gets the earliest date for WARCs to include in the CSV from the script argument.
+# If it is missing or not formatted like a date, prints an error and quits the script.
+try:
+    EARLIEST_DATE = sys.argv[1]
+    if not re.match(r'\d{4}-\d{2}-\d{2}', EARLIEST_DATE):
+        print('Date argument must be formatted YYYY-MM-DD. Please try the script again.')
+        sys.exit()
+except IndexError:
+    print("Missing required date argument for limiting the WARCs to include.")
+    print("Script usage: python path\\warc_csv.py earliest_date")
+    sys.exit()
+
 # Gets the WARC data from WASAPI and converts to Python.
 # If there is an API error, quits the script.
-WARC_DATA = requests.get(c.wasapi, auth=(c.username, c.password))
+FILTERS = {'store-time-after': EARLIEST_DATE, 'page_size': 1000}
+WARC_DATA = requests.get(c.wasapi, params=FILTERS, auth=(c.username, c.password))
 if not WARC_DATA.status_code == 200:
     print("WASAPI error, ending script. See log for details.")
     sys.exit()
@@ -124,7 +137,3 @@ for warc in PY_WARC_DATA["files"]:
     CSV_WRITER.writerow([filename, collection, seed_id, job_id, store_time, size, crawl_def, "", title])
 
 WARC_CSV.close()
-
-# Print the total number of WARCs from WASAPI to compare to the WARC Inventory after these are added.
-warc_count = PY_WARC_DATA["count"]
-print(f"There will be {warc_count} WARCs in the WARC Inventory once these are added.")
