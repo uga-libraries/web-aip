@@ -62,7 +62,7 @@ aip.log(log_path, f'Creating AIPs for a batch of seeds using the web_aip_batch.p
 
 # Uses Archive-It APIs to get information about the WARCs and seeds in this download. If there is an API failure,
 # warc_data() and seed_data() quit the script.
-warc_metadata = web.warc_data(last_download, log_path)
+warc_metadata = web.warc_data(last_download, current_download, log_path)
 seed_metadata = web.seed_data(warc_metadata, current_download, log_path)
 
 # Starts counts for tracking script progress. Some processes are slow, so this shows the script is still working.

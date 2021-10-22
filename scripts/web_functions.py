@@ -16,7 +16,7 @@ import aip_functions as aip
 import configuration as c
 
 
-def warc_data(last_download, log_path, collections=None):
+def warc_data(last_download, current_download, log_path, collections=None):
     """Gets data about WARCs to include in this download using WASAPI. A WARC is included if it was saved since the
     last preservation download date and is part of a relevant collection. The relevant collection list is either
     provided as an argument or the function will calculate a list of current Hargrett and Russell collections.
@@ -76,7 +76,9 @@ def warc_data(last_download, log_path, collections=None):
     #   * page size is the maximum number of WARCs the API call will return.
     if not collections:
         collections = collection_list()
-    filters = {'store-time-after': last_download, 'collection': collections, 'page_size': 1000}
+
+    filters = {'store-time-after': last_download, 'store-time-before': current_download,
+               'collection': collections, 'page_size': 1000}
     warcs = requests.get(c.wasapi, params=filters, auth=(c.username, c.password))
 
     # If there was an error with the API call, quits the script.
