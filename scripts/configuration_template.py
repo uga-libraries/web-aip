@@ -1,5 +1,5 @@
 # Folder for script output
-script_output = '/insert/path'
+script_output = 'C:\\INSERT\\PATH\\'
 
 # Archive-It APIs and credentials
 partner_api = 'https://partner.archive-it.org/api'
@@ -8,9 +8,25 @@ inst_page = 'https://partner.archive-it.org/INSERT-NUMBER'
 username = 'INSERT-USERNAME'
 password = 'INSERT-PASSWORD'
 
-# Local paths to programs used in the script
-#   * fits: Mac/Linux use fits.sh, Windows use fits.bat
-fits = '/INSERT-PATH/Fits/fits-1.5.0/fits.bat'
-saxon = '/INSERT-PATH/SaxonHE10-1J/saxon-he-10.1.jar'
-md5deep = '/INSERT-PATH/md5deep-4.4./md5deep64.exe'
-stylesheets = 'INSERT-PATH/stylesheets'
+# Local paths to programs used in the AIP functions.
+# The first three are dependencies and the stylesheets folder is part of the General AIP GitHub repo.
+
+"""
+To use, make a copy of this file named configuration.py and update the paths to match your local machine.
+    C: may need to be replaced with a different drive letter.
+    INSERT\\PATH\\ is replaced with the path on your local machine.
+    # is replaced by the number for your version of the programs.
+
+In a Mac or Linux environment:
+    Use the path to fits.sh instead of fits.bat
+    Change \\ to /
+"""
+
+FITS = 'C:\\INSERT\\PATH\\fits.bat'
+SAXON = 'C:\\INSERT\\PATH\\saxon-he-#.#.jar'
+MD5DEEP = 'C:\\INSERT\\PATH\\md5deep64.exe'
+STYLESHEETS = 'C:\\INSERT\\PATH\\stylesheets'
+
+# Namespace for the AIP identifiers.
+# For UGA, this is the URI for the ARCHive.
+NAMESPACE = 'INSERT_NAMESPACE'
