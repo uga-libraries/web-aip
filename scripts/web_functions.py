@@ -293,12 +293,12 @@ def download_metadata(aip_id, aip_folder, warc_collection, job_id, seed_id, curr
     get_report('seed', seed_id, 'scope_rule', f'{aip_id}_seedscope.csv')
     get_report('collection', warc_collection, 'scope_rule', f'{aip_id}_collscope.csv')
     get_report('id', warc_collection, 'collection', f'{aip_id}_coll.csv')
-    get_report('collection', warc_collection, 'crawl_job', f'{aip_id}_crawljob.csv')
+    get_report('collection', warc_collection, 'crawl_job', f'{aip_id}_{job_id}_crawljob.csv')
 
     # Downloads the crawl definition report for the job this WARC was part of.
     # The crawl definition id is obtained from the crawl job report using the job id.
     # There may be more than one crawl definition report per AIP.
-    with open(f'{aip_id}/metadata/{aip_id}_crawljob.csv', 'r') as crawljob_csv:
+    with open(f'{aip_id}/metadata/{aip_id}_{job_id}_crawljob.csv', 'r') as crawljob_csv:
         crawljob_data = csv.DictReader(crawljob_csv)
         for job in crawljob_data:
             if job_id == job['id']:
