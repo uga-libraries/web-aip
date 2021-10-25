@@ -293,7 +293,7 @@ def download_metadata(aip_id, aip_folder, warc_collection, job_id, seed_id, curr
     get_report('seed', seed_id, 'scope_rule', f'{aip_id}_seedscope.csv')
     get_report('collection', warc_collection, 'scope_rule', f'{aip_id}_collscope.csv')
     get_report('id', warc_collection, 'collection', f'{aip_id}_coll.csv')
-    get_report('collection', warc_collection, 'crawl_job', f'{aip_id}_{job_id}_crawljob.csv')
+    get_report('id', job_id, 'crawl_job', f'{aip_id}_{job_id}_crawljob.csv')
 
     # Downloads the crawl definition report for the job this WARC was part of.
     # The crawl definition id is obtained from the crawl job report using the job id.
