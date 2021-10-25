@@ -16,7 +16,7 @@ import aip_functions as aip
 import configuration as c
 
 
-def warc_data(last_download, log_path, collections=None):
+def warc_data(last_download, current_download, log_path, collections=None):
     """Gets data about WARCs to include in this download using WASAPI. A WARC is included if it was saved since the
     last preservation download date and is part of a relevant collection. The relevant collection list is either
     provided as an argument or the function will calculate a list of current Hargrett and Russell collections.
@@ -37,7 +37,7 @@ def warc_data(last_download, log_path, collections=None):
 
         # If there was an error with the API call, quits the script.
         if not seed_reports.status_code == 200:
-            aip.log(log_path, f'\nAPI error {seed_reports.status_code} for collection list.')
+            aip.log(log_path, f'\nAPI error {seed_reports.status_code} for collection list. Script cannot complete.')
             print("API error, ending script. See log for details.")
             exit()
 
@@ -59,16 +59,14 @@ def warc_data(last_download, log_path, collections=None):
                 department_name = seed['metadata']['Collector'][0]['value']
             except (KeyError, IndexError):
                 collections_exclude.append(collection_id)
-                aip.log(log_path, f'Collection {collection_id} not included. No metadata.')
                 continue
 
-            # If the department is Hargrett or Russell, adds the collection id to the collections list. Otherwise,
-            # adds it to the excluded list.
-            if department_name.startswith('Hargrett') or department_name.startswith('Richard B. Russell'):
+            # If the department is Brown, Hargrett or Russell, adds the collection id to the collections list.
+            # Otherwise, adds it to the excluded list.
+            if department_name.startswith('Hargrett') or department_name.startswith('Richard B. Russell') or department_name.startswith('The Walter J. Brown Media'):
                 collections_include.append(seed['collection'])
             else:
                 collections_exclude.append(collection_id)
-                aip.log(log_path, f'Collection {collection_id} department is {department_name}. Do not include.')
 
         return collections_include
 
@@ -78,12 +76,14 @@ def warc_data(last_download, log_path, collections=None):
     #   * page size is the maximum number of WARCs the API call will return.
     if not collections:
         collections = collection_list()
-    filters = {'store-time-after': last_download, 'collection': collections, 'page_size': 1000}
+
+    filters = {'store-time-after': last_download, 'store-time-before': current_download,
+               'collection': collections, 'page_size': 1000}
     warcs = requests.get(c.wasapi, params=filters, auth=(c.username, c.password))
 
     # If there was an error with the API call, quits the script.
     if not warcs.status_code == 200:
-        aip.log(log_path, f'\nAPI error {warcs.status_code} when getting warc data.')
+        aip.log(log_path, f'\nAPI error {warcs.status_code} when getting WARC data. Script cannot complete.')
         print("API error, ending script. See log for details.")
         exit()
 
@@ -135,7 +135,7 @@ def seed_data(py_warcs, current_download, log_path):
 
         # If there was an error with the API call, quits the script.
         if not seed_report.status_code == 200:
-            aip.log(log_path, f'\nAPI error {seed_report.status_code} for seed report.')
+            aip.log(log_path, f'\nAPI error {seed_report.status_code} for seed report. Script cannot complete.')
             print("API error, ending script. See log for details.")
             exit()
 
@@ -210,8 +210,8 @@ def seed_data(py_warcs, current_download, log_path):
 
 
 def make_aip_directory(aip_folder):
-    """Makes the AIP directory structure: a folder named aip-id_AIP Title with subfolders metadata and objects.
-    Checks that the folders do not already exist prior to making them. """
+    """Makes the AIP directory structure: a folder named with the AIP ID that contains folders named "metadata" and
+    "objects", provided they are not already present from processing a previous WARC. """
 
     if not os.path.exists(f'{aip_folder}/metadata'):
         os.makedirs(f'{aip_folder}/metadata')
@@ -325,11 +325,11 @@ def download_metadata(aip_id, aip_folder, warc_collection, job_id, seed_id, curr
             redact(report_path)
 
 
-def download_warc(aip_folder, warc_filename, warc_url, warc_md5, current_download, log_path):
+def download_warc(aip_id, warc_filename, warc_url, warc_md5, current_download, log_path):
     """Downloads a warc file and verifies that fixity is unchanged after downloading."""
 
     # The path for where the warc will be saved on the local machine (it is long and used twice in this script).
-    warc_path = f'{c.script_output}/aips_{current_download}/{aip_folder}/objects/{warc_filename}'
+    warc_path = f'{c.script_output}/aips_{current_download}/{aip_id}/objects/{warc_filename}'
 
     # Downloads the warc.
     warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
@@ -345,7 +345,7 @@ def download_warc(aip_folder, warc_filename, warc_url, warc_md5, current_downloa
 
     # Calculates the md5 for the downloaded WARC, using a regular expression to get the md5 from the md5deep output.
     # If the output is not formatted as expected, quits the function.
-    md5deep_output = subprocess.run(f'"{c.md5deep}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
+    md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
     try:
         regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
         downloaded_warc_md5 = regex_md5.group(1)
@@ -432,9 +432,9 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
                 aip.log(log_path, f'No seed for {warc_info["warc_filename"]}.')
                 raise ValueError
 
-            # Filter one: only includes the WARC in the dictionary if it was created since the last download.
-            # Simplifies the date format to YYYY-MM-DD by removing the time information before comparing it to the
-            # last download date.
+            # Filter one: only includes the WARC in the dictionary if it was created since the last download. Store
+            # time is used so test crawls are evaluated based on the date they were saved. Simplifies the date format
+            # to YYYY-MM-DD by removing the time information before comparing it to the last download date.
             try:
                 regex_crawl_date = re.match(r"(\d{4}-\d{2}-\d{2})T.*", warc_info['store-time'])
                 crawl_date = regex_crawl_date.group(1)
@@ -474,7 +474,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
                     continue
 
                 # Does not include the WARC in the dictionary if the repository is not Hargrett or Russell.
-                if not repository.startswith('Hargrett') or repository.startswith('Richard B. Russell'):
+                if not repository.startswith('Hargrett') and not repository.startswith('Richard B. Russell'):
                     warcs_exclude += 1
                     continue
 
@@ -515,7 +515,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
         metadata = f'{c.script_output}/aips_{current_download}/{aip_id}_bag/data/metadata'
 
         # Tests if each of the six Archive-It metadata reports is present. os.path.exists() returns True/False.
-        # TODO: possible to check for the correct number of crawl definitions?
+        # TODO: this doesn't work for crawldef anymore, since the crawldef id is part of the file name.
         result.append(os.path.exists(f'{metadata}/{aip_id}_coll.csv'))
         result.append(os.path.exists(f'{metadata}/{aip_id}_collscope.csv'))
         result.append(os.path.exists(f'{metadata}/{aip_id}_crawldef.csv'))
