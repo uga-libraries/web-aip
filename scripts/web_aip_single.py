@@ -241,7 +241,7 @@ print("Downloading AIP content.")
 
 # Uses WASAPI to get information about the WARCs for this seed's collection. The WARC's seed id is checked before it
 # is downloaded to skip other seeds from this collection. It is not possible to filter by seed using WASAPI.
-warc_metadata = web.warc_data(last_download, log_path, collection_id)
+warc_metadata = web.warc_data(last_download, current_download, log_path, collection_id)
 
 # Uses the Archive-It Partner API to get the seed's title.
 try:
