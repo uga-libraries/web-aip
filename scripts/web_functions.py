@@ -238,10 +238,10 @@ def download_metadata(aip_id, aip_folder, warc_collection, job_id, seed_id, curr
 
         # Saves the metadata report if there were no errors with the API and the report has not already been downloaded.
         # If there is more than one WARC for a seed, reports may already be in the metadata folder.
-        report_path = f'{c.script_output}/aips_{current_download}/{aip_folder}/metadata/{report_name}'
+        report_path = f'{c.script_output}/aips_{current_download}/{aip_id}/metadata/{report_name}'
         if metadata_report.status_code == 200:
             if not os.path.exists(report_path):
-                with open(f'{aip_folder}/metadata/{report_name}', 'wb') as report_csv:
+                with open(f'{aip_id}/metadata/{report_name}', 'wb') as report_csv:
                     report_csv.write(metadata_report.content)
         else:
             aip.log(log_path, f'Could not download {report_type} report. Error: {metadata_report.status_code}')
@@ -298,7 +298,7 @@ def download_metadata(aip_id, aip_folder, warc_collection, job_id, seed_id, curr
     # Downloads the crawl definition report for the job this WARC was part of.
     # The crawl definition id is obtained from the crawl job report using the job id.
     # There may be more than one crawl definition report per AIP.
-    with open(f'{aip_folder}/metadata/{aip_id}_crawljob.csv', 'r') as crawljob_csv:
+    with open(f'{aip_id}/metadata/{aip_id}_crawljob.csv', 'r') as crawljob_csv:
         crawljob_data = csv.DictReader(crawljob_csv)
         for job in crawljob_data:
             if job_id == job['id']:
@@ -308,10 +308,10 @@ def download_metadata(aip_id, aip_folder, warc_collection, job_id, seed_id, curr
 
     # Iterates over each report in the metadata folder to delete empty reports and redact login information from the
     # seed report.
-    for report in os.listdir(f'{aip_folder}/metadata'):
+    for report in os.listdir(f'{aip_id}/metadata'):
 
         # Saves the full file path of the report.
-        report_path = f'{c.script_output}/aips_{current_download}/{aip_folder}/metadata/{report}'
+        report_path = f'{c.script_output}/aips_{current_download}/{aip_id}/metadata/{report}'
 
         # Deletes any empty metadata files (file size of 0) and begins processing the next file. A file is empty if
         # there is no metadata of that type, which is most common for collection and seed scope reports.
