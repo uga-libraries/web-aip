@@ -231,18 +231,21 @@ def download_metadata(aip_id, aip_folder, warc_collection, job_id, seed_id, curr
             report_type is the Archive-It name for the report
             report_name is the name for the report saved in the AIP, including the ARCHive metadata code """
 
+        # Checks if the report has already been downloaded and ends the function if so.
+        # If there is more than one WARC for a seed, reports may already be in the metadata folder.
+        report_path = f'{c.script_output}/aips_{current_download}/{aip_id}/metadata/{report_name}'
+        if os.path.exists(report_path):
+            return
+
         # Builds the API call to get the report as a csv.
         # Limit of -1 will return all matches. Default is only the first 100.
         filters = {'limit': -1, filter_type: filter_value, 'format': 'csv'}
         metadata_report = requests.get(f'{c.partner_api}/{report_type}', params=filters, auth=(c.username, c.password))
 
-        # Saves the metadata report if there were no errors with the API and the report has not already been downloaded.
-        # If there is more than one WARC for a seed, reports may already be in the metadata folder.
-        report_path = f'{c.script_output}/aips_{current_download}/{aip_id}/metadata/{report_name}'
+        # Saves the metadata report if there were no errors with the API or logs the error.
         if metadata_report.status_code == 200:
-            if not os.path.exists(report_path):
-                with open(f'{aip_id}/metadata/{report_name}', 'wb') as report_csv:
-                    report_csv.write(metadata_report.content)
+            with open(f'{aip_id}/metadata/{report_name}', 'wb') as report_csv:
+                report_csv.write(metadata_report.content)
         else:
             aip.log(log_path, f'Could not download {report_type} report. Error: {metadata_report.status_code}')
 
