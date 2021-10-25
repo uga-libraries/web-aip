@@ -517,14 +517,17 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
         objects = f'{c.script_output}/aips_{current_download}/{aip_id}_bag/data/objects'
         metadata = f'{c.script_output}/aips_{current_download}/{aip_id}_bag/data/metadata'
 
-        # Tests if each of the six Archive-It metadata reports is present. os.path.exists() returns True/False.
-        # TODO: this doesn't work for crawldef anymore, since the crawldef id is part of the file name.
+        # Tests if each of the four Archive-It metadata reports that never repeat are present.
+        # os.path.exists() returns True/False.
         result.append(os.path.exists(f'{metadata}/{aip_id}_coll.csv'))
         result.append(os.path.exists(f'{metadata}/{aip_id}_collscope.csv'))
-        result.append(os.path.exists(f'{metadata}/{aip_id}_crawldef.csv'))
-        result.append(os.path.exists(f'{metadata}/{aip_id}_crawljob.csv'))
         result.append(os.path.exists(f'{metadata}/{aip_id}_seed.csv'))
         result.append(os.path.exists(f'{metadata}/{aip_id}_seedscope.csv'))
+
+        # Counts the number of instances of the two Archive-It metadata reports than can repeat.
+        # Compare to expected results in the WARC inventory.
+        result.append(len([file for file in os.listdir(metadata) if file.endswith('_crawldef.csv')]))
+        result.append(len([file for file in os.listdir(metadata) if file.endswith('_crawljob.csv')]))
 
         # Tests if the preservation.xml file is present.
         result.append(os.path.exists(f'{metadata}/{aip_id}_preservation.xml'))
@@ -608,9 +611,9 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
 
         # Adds a header row to the csv.
         complete_write.writerow(
-            ['AIP', 'URL', 'AIP Folder Made', 'coll.csv', 'collscope.csv', 'crawldef.csv', 'crawljob.csv', 'seed.csv',
-             'seedscope.csv', 'preservation.xml', 'WARC Count Correct', 'Objects is all WARCs', 'fits.xml Count Correct',
-             'No Extra Metadata'])
+            ['AIP', 'URL', 'AIP Folder Made', 'coll.csv', 'collscope.csv', 'seed.csv',
+             'seedscope.csv', 'crawldef.csv count', 'crawljob.csv count', 'preservation.xml', 'WARC Count Correct',
+             'Objects is all WARCs', 'fits.xml Count Correct', 'No Extra Metadata'])
 
         # Tests each AIP for completeness and saves the results.
         for seed in aips_metadata:
