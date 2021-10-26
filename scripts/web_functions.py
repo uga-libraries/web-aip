@@ -220,7 +220,7 @@ def make_aip_directory(aip_folder):
         os.makedirs(f'{aip_folder}/objects')
 
 
-def download_metadata(aip_id, aip_folder, warc_collection, job_id, seed_id, current_download, log_path):
+def download_metadata(aip_id, warc_collection, job_id, seed_id, current_download, log_path):
     """Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
     deletes any empty reports (meaning there was no data of that type for this seed), and redacts login information
     from the seed report. """

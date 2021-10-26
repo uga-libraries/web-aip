@@ -137,7 +137,7 @@ for warc in warc_metadata['files']:
     web.make_aip_directory(aip_id)
 
     # Downloads the seed metadata from Archive-It into the seed's metadata folder.
-    web.download_metadata(aip_id, aip_name, warc_collection, job_id, seed_id, current_download, log_path)
+    web.download_metadata(aip_id, warc_collection, job_id, seed_id, current_download, log_path)
 
     # Downloads the WARC from Archive-It into the seed's objects folder.
     web.download_warc(aip_id, warc_filename, warc_url, warc_md5, current_download, log_path)
