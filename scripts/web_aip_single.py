@@ -131,7 +131,7 @@ def check_aip():
     try:
         warcs_expected = aip_warcs_count()
     except ValueError:
-        print("Cannot check AIP for completeness. WARC count not calculated.")
+        aip.log(log_path, "Cannot check AIP for completeness. WARC count not calculated.")
         return
 
     # Variable tracks if anything has been found missing so a summary can be printed to the terminal.
@@ -248,8 +248,8 @@ os.chdir(f"{c.script_output}/{aips_directory}")
 # it is run automatically with chronjob. The log is not started until after the current_download variable is set so that
 # can be included in the file name.
 log_path = f'../web_preservation_download_log_{aip_id}.txt'
-aip.log(log_path, f'Creating AIP {aip_id} (for seed {seed_id}) using the web_aip_single.py script.'
-                  f'\nScript started running at {datetime.datetime.today()}.\n')
+aip.log(log_path, f'Creating AIP {aip_id} (for seed {seed_id}) using the web_aip_single.py script. '
+                  f'Script started running at {datetime.datetime.today()}.\n')
 
 
 # PART ONE: DOWNLOAD WARCS AND METADATA INTO THE AIP DIRECTORY STRUCTURE.

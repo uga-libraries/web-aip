@@ -65,7 +65,7 @@ os.chdir(f'{c.script_output}/{aips_directory}')
 # it is run automatically with chronjob. The log is not started until after the current_download variable is set so that
 # can be included in the file name.
 log_path = f'../web_preservation_download_log_{current_download}.txt'
-aip.log(log_path, f'Creating AIPs for a batch of seeds using the web_aip_batch.py script.\n'
+aip.log(log_path, f'Creating AIPs for a batch of seeds using the web_aip_batch.py script. '
                   f'Script started running at {datetime.datetime.today()}.')
 
 # PART ONE: DOWNLOAD WARCS AND METADATA INTO AIP DIRECTORY STRUCTURE.
