@@ -142,15 +142,21 @@ def check_aip():
         aip.log(log_path, 'The AIP folder was not created.')
         missing = True
 
-    # Tests if each of the expected metadata reports is present. Skips FITS because the filename is formatted
-    # differently and it is checked in the next test.
-    # TODO: Is there a way to verify the number of crawl definition reports is correct?
+    # Tests if each of the expected metadata reports is present.
+    # Skips crawldef, crawljob, and FITS because the filenames are formatted
+    # differently and are checked in the next test.
     for end in expected_endings:
-        if end == "_fits.xml":
+        if end in ("_crawldef.csv", "_crawljob.csv", "_fits.xml"):
             continue
         if not os.path.exists(f'{metadata}/{aip_id}_{end}'):
             aip.log(log_path, f'{end} was not created.')
             missing = True
+
+    # Saves the number of crawldef and crawljob reports to the log so staff can verify the count.
+    crawldef_count = len([file for file in os.listdir(metadata) if file.endswith('_crawldef.csv')])
+    aip.log(log_path, f'Number of crawl definitions: {crawldef_count}.')
+    crawljob_count = len([file for file in os.listdir(metadata) if file.endswith('_crawljob.csv')])
+    aip.log(log_path, f'Number of crawl jobs: {crawljob_count}.')
 
     # Tests if the number of FITS files is correct (one for each WARC).
     fits_count = len([file for file in os.listdir(metadata) if file.endswith("_fits.xml")])
