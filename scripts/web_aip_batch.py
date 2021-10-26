@@ -38,6 +38,16 @@ try:
 except IndexError:
     last_download = datetime.date.today() - dateutil.relativedelta.relativedelta(months=3)
 
+# Tests the paths in the configuration file to verify they exist. Quits the script if any are incorrect.
+# It is common to get typos when setting up the configuration file on a new machine.
+valid_errors = aip.check_paths()
+if not valid_errors == "no errors":
+    print('The following path(s) in the configuration file are not correct:')
+    for error in valid_errors:
+        print(error)
+    print('Correct the configuration file and run the script again.')
+    sys.exit()
+
 # Makes a folder for AIPs within the script_output folder, a designated place on the local machine for web archiving
 # documents). The folder name includes today's date to keep it separate from previous downloads which may still be
 # saved on the same machine. current_download is a variable because it is also used as part of the quality_control

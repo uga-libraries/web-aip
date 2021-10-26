@@ -219,6 +219,16 @@ except AttributeError:
     print("Exiting script: AIP id is not formatted correctly. Department could not be identified.")
     exit()
 
+# Tests the paths in the configuration file to verify they exist. Quits the script if any are incorrect.
+# It is common to get typos when setting up the configuration file on a new machine.
+valid_errors = aip.check_paths()
+if not valid_errors == "no errors":
+    print('The following path(s) in the configuration file are not correct:')
+    for error in valid_errors:
+        print(error)
+    print('Correct the configuration file and run the script again.')
+    sys.exit()
+
 print(f"Making AIP for {seed_id}.")
 
 # Makes a folder for aips within the script_output folder, a designated place on the local machine for web archiving
