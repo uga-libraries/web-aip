@@ -140,8 +140,8 @@ for warc in warc_metadata['files']:
     # Adds the seed to the seed_to_aip dictionary. This is used for checking the downloaded AIPs for completeness.
     seed_to_aip[seed_id] = aip_id
 
-    # Title is included in the folder temporarily so the AIP functions can access the title.
-    aip_name = f'{aip_id}_{aip_title}'
+    # Adds the AIP title to the aip_to_title dictionary. This is used for making the preservation.xml later.
+    aip_to_title[aip_id] = aip_title
 
     # Makes the AIP directory for the seed's AIP (AIP folder with metadata and objects subfolders).
     web.make_aip_directory(aip_id)
