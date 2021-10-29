@@ -231,14 +231,18 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, current_download
             report_type is the Archive-It name for the report
             report_name is the name for the report saved in the AIP, including the ARCHive metadata code """
 
+        # Checks if the report has already been downloaded and ends the function if so.
+        # If there is more than one WARC for a seed, reports may already be in the metadata folder.
+        report_path = f'{c.script_output}/aips_{current_download}/{aip_id}/metadata/{report_name}'
+        if os.path.exists(report_path):
+            return
+
         # Builds the API call to get the report as a csv.
         # Limit of -1 will return all matches. Default is only the first 100.
         filters = {'limit': -1, filter_type: filter_value, 'format': 'csv'}
         metadata_report = requests.get(f'{c.partner_api}/{report_type}', params=filters, auth=(c.username, c.password))
 
-        # Saves the metadata report if there were no errors with the API and the report has not already been downloaded.
-        # If there is more than one WARC for a seed, reports may already be in the metadata folder.
-        report_path = f'{c.script_output}/aips_{current_download}/{aip_id}/metadata/{report_name}'
+        # Saves the metadata report if there were no errors with the API or logs the error.
         if metadata_report.status_code == 200:
             with open(f'{aip_id}/metadata/{report_name}', 'wb') as report_csv:
                 report_csv.write(metadata_report.content)
@@ -292,12 +296,12 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, current_download
     get_report('seed', seed_id, 'scope_rule', f'{aip_id}_seedscope.csv')
     get_report('collection', warc_collection, 'scope_rule', f'{aip_id}_collscope.csv')
     get_report('id', warc_collection, 'collection', f'{aip_id}_coll.csv')
-    get_report('collection', warc_collection, 'crawl_job', f'{aip_id}_crawljob.csv')
+    get_report('id', job_id, 'crawl_job', f'{aip_id}_{job_id}_crawljob.csv')
 
     # Downloads the crawl definition report for the job this WARC was part of.
     # The crawl definition id is obtained from the crawl job report using the job id.
     # There may be more than one crawl definition report per AIP.
-    with open(f'{aip_id}/metadata/{aip_id}_crawljob.csv', 'r') as crawljob_csv:
+    with open(f'{aip_id}/metadata/{aip_id}_{job_id}_crawljob.csv', 'r') as crawljob_csv:
         crawljob_data = csv.DictReader(crawljob_csv)
         for job in crawljob_data:
             if job_id == job['id']:
@@ -431,9 +435,10 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
                 aip.log(log_path, f'No seed for {warc_info["warc_filename"]}.')
                 raise ValueError
 
-            # Filter one: only includes the WARC in the dictionary if it was created since the last download. Store
-            # time is used so test crawls are evaluated based on the date they were saved. Simplifies the date format
-            # to YYYY-MM-DD by removing the time information before comparing it to the last download date.
+            # Filter one: only includes the WARC in the dictionary if it was created since the last download and
+            # before the current download. Store time is used so test crawls are evaluated based on the date they
+            # were saved. Simplifies the date format to YYYY-MM-DD by removing the time information before comparing
+            # it to the last download date.
             try:
                 regex_crawl_date = re.match(r"(\d{4}-\d{2}-\d{2})T.*", warc_info['store-time'])
                 crawl_date = regex_crawl_date.group(1)
@@ -441,7 +446,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
                 aip.log(log_path, f'No date for {warc_info["warc_filename"]}.')
                 raise ValueError
 
-            if crawl_date < last_download:
+            if crawl_date < last_download or crawl_date > str(current_download):
                 warcs_exclude += 1
                 continue
 
@@ -513,14 +518,17 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
         objects = f'{c.script_output}/aips_{current_download}/{aip_id}_bag/data/objects'
         metadata = f'{c.script_output}/aips_{current_download}/{aip_id}_bag/data/metadata'
 
-        # Tests if each of the six Archive-It metadata reports is present. os.path.exists() returns True/False.
-        # TODO: this doesn't work for crawldef anymore, since the crawldef id is part of the file name.
+        # Tests if each of the four Archive-It metadata reports that never repeat are present.
+        # os.path.exists() returns True/False.
         result.append(os.path.exists(f'{metadata}/{aip_id}_coll.csv'))
         result.append(os.path.exists(f'{metadata}/{aip_id}_collscope.csv'))
-        result.append(os.path.exists(f'{metadata}/{aip_id}_crawldef.csv'))
-        result.append(os.path.exists(f'{metadata}/{aip_id}_crawljob.csv'))
         result.append(os.path.exists(f'{metadata}/{aip_id}_seed.csv'))
         result.append(os.path.exists(f'{metadata}/{aip_id}_seedscope.csv'))
+
+        # Counts the number of instances of the two Archive-It metadata reports than can repeat.
+        # Compare to expected results in the WARC inventory.
+        result.append(len([file for file in os.listdir(metadata) if file.endswith('_crawldef.csv')]))
+        result.append(len([file for file in os.listdir(metadata) if file.endswith('_crawljob.csv')]))
 
         # Tests if the preservation.xml file is present.
         result.append(os.path.exists(f'{metadata}/{aip_id}_preservation.xml'))
@@ -604,9 +612,9 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
 
         # Adds a header row to the csv.
         complete_write.writerow(
-            ['AIP', 'URL', 'AIP Folder Made', 'coll.csv', 'collscope.csv', 'crawldef.csv', 'crawljob.csv', 'seed.csv',
-             'seedscope.csv', 'preservation.xml', 'WARC Count Correct', 'Objects is all WARCs', 'fits.xml Count Correct',
-             'No Extra Metadata'])
+            ['AIP', 'URL', 'AIP Folder Made', 'coll.csv', 'collscope.csv', 'seed.csv',
+             'seedscope.csv', 'crawldef.csv count', 'crawljob.csv count', 'preservation.xml', 'WARC Count Correct',
+             'Objects is all WARCs', 'fits.xml Count Correct', 'No Extra Metadata'])
 
         # Tests each AIP for completeness and saves the results.
         for seed in aips_metadata:

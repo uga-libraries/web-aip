@@ -125,16 +125,15 @@ def check_aip():
     metadata = f"{c.script_output}/aips_{current_download}/{aip_id}_bag/data/metadata"
 
     # List of suffixes used for the expected metadata reports.
-    expected_endings = ('coll.csv', 'collscope.csv', 'crawldef.csv', 'crawljob.csv', 'seed.csv',
-                        'seedscope.csv', 'preservation.xml', 'fits.xml')
+    expected_endings = ("coll.csv", "collscope.csv", "crawldef.csv", "crawljob.csv", "seed.csv",
+                        "seedscope.csv", "preservation.xml", "fits.xml")
 
     # Calculates the number of WARCs that should be in this AIP. Exits the function if it is not calculated since
     # multiple tests depend on this.
     try:
         warcs_expected = aip_warcs_count()
     except ValueError:
-        aip.log(log_path, 'Cannot check AIP for completeness. WARC count was not correct.')
-        return
+        aip.log(log_path, "Cannot check AIP for completeness. WARC count not calculated.")
 
     # Variable tracks if anything has been found missing so a summary can be printed to the terminal.
     missing = False
@@ -144,15 +143,21 @@ def check_aip():
         aip.log(log_path, 'The AIP folder was not created.')
         missing = True
 
-    # Tests if each of the expected metadata reports is present. Skips FITS because the filename is formatted
-    # differently and it is checked in the next test.
-    # TODO: Is there a way to verify the number of crawl definition reports is correct?
+    # Tests if each of the expected metadata reports is present.
+    # Skips crawldef, crawljob, and FITS because the filenames are formatted
+    # differently and are checked in the next test.
     for end in expected_endings:
-        if end == "_fits.xml":
+        if end in ("crawldef.csv", "crawljob.csv", "fits.xml"):
             continue
         if not os.path.exists(f'{metadata}/{aip_id}_{end}'):
             aip.log(log_path, f'{end} was not created.')
             missing = True
+
+    # Saves the number of crawldef and crawljob reports to the log so staff can verify the count.
+    crawldef_count = len([file for file in os.listdir(metadata) if file.endswith('_crawldef.csv')])
+    aip.log(log_path, f'Number of crawl definitions: {crawldef_count}.')
+    crawljob_count = len([file for file in os.listdir(metadata) if file.endswith('_crawljob.csv')])
+    aip.log(log_path, f'Number of crawl jobs: {crawljob_count}.')
 
     # Tests if the number of FITS files is correct (one for each WARC).
     fits_count = len([file for file in os.listdir(metadata) if file.endswith("_fits.xml")])
@@ -214,6 +219,16 @@ except AttributeError:
     print("Exiting script: AIP id is not formatted correctly. Department could not be identified.")
     exit()
 
+# Tests the paths in the configuration file to verify they exist. Quits the script if any are incorrect.
+# It is common to get typos when setting up the configuration file on a new machine.
+valid_errors = aip.check_paths()
+if not valid_errors == "no errors":
+    print('The following path(s) in the configuration file are not correct:')
+    for error in valid_errors:
+        print(error)
+    print('Correct the configuration file and run the script again.')
+    sys.exit()
+
 print(f"Making AIP for {seed_id}.")
 
 # Makes a folder for aips within the script_output folder, a designated place on the local machine for web archiving
@@ -233,8 +248,9 @@ os.chdir(f"{c.script_output}/{aips_directory}")
 # it is run automatically with chronjob. The log is not started until after the current_download variable is set so that
 # can be included in the file name.
 log_path = f'../web_preservation_download_log_{aip_id}.txt'
-aip.log(log_path, f'Creating AIP {aip_id} (for seed {seed_id}) using the web_aip_single.py script.'
-                  f'\nScript started running at {datetime.datetime.today()}.\n')
+aip.log(log_path, f'Creating AIP {aip_id} (for seed {seed_id}) using the web_aip_single.py script. '
+                  f'Script started running at {datetime.datetime.today()}.\n')
+
 
 # PART ONE: DOWNLOAD WARCS AND METADATA INTO THE AIP DIRECTORY STRUCTURE.
 print("Downloading AIP content.")

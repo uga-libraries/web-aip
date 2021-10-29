@@ -38,6 +38,16 @@ try:
 except IndexError:
     last_download = datetime.date.today() - dateutil.relativedelta.relativedelta(months=3)
 
+# Tests the paths in the configuration file to verify they exist. Quits the script if any are incorrect.
+# It is common to get typos when setting up the configuration file on a new machine.
+valid_errors = aip.check_paths()
+if not valid_errors == "no errors":
+    print('The following path(s) in the configuration file are not correct:')
+    for error in valid_errors:
+        print(error)
+    print('Correct the configuration file and run the script again.')
+    sys.exit()
+
 # Makes a folder for AIPs within the script_output folder, a designated place on the local machine for web archiving
 # documents). The folder name includes today's date to keep it separate from previous downloads which may still be
 # saved on the same machine. current_download is a variable because it is also used as part of the quality_control
@@ -136,10 +146,8 @@ for warc in warc_metadata['files']:
     # Makes the AIP directory for the seed's AIP (AIP folder with metadata and objects subfolders).
     web.make_aip_directory(aip_id)
 
-    # Downloads the seed metadata from Archive-It into the seed's metadata folder if it is not already there (and so
-    # the folder is empty). A seed may have multiple WARCs and only want to download the seed's reports once.
-    if len(os.listdir(f'{aip_id}/metadata')) == 0:
-        web.download_metadata(aip_id, warc_collection, job_id, seed_id, current_download, log_path)
+    # Downloads the seed metadata from Archive-It into the seed's metadata folder.
+    web.download_metadata(aip_id, warc_collection, job_id, seed_id, current_download, log_path)
 
     # Downloads the WARC from Archive-It into the seed's objects folder.
     web.download_warc(aip_id, warc_filename, warc_url, warc_md5, current_download, log_path)
