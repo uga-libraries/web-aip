@@ -55,6 +55,7 @@ def check_aip():
     """Verifies a single AIP is complete, checking the contents of the metadata and objects folders. Prints any
     errors to the terminal. This is different from the check_aips() function used by web_aip_batch.py since it has to
     filter by seed id and is only checking one AIP. """
+    # TODO: this is outdated for how it expects fits and crawldef to be named.
 
     def aip_warcs_count():
         """Uses the Archive-It APIs and Python filters to determine how many warcs should be in the AIP. Using Python
@@ -92,10 +93,11 @@ def check_aip():
                 warcs_exclude += 1
                 continue
 
-            # Filter two: do not count the WARC if it was created before the last download. Simplifies the date format
-            # to YYYY-MM-DD by removing the time information before comparing it to the last download date.
+            # Filter two: do not count the WARC if it was created before the last download. Store time is used so
+            # test crawls are evaluated based on the date they were saved. Simplifies the date format to YYYY-MM-DD
+            # by removing the time information before comparing it to the last download date.
             try:
-                regex_crawl_date = re.match(r"(\d{4}-\d{2}-\d{2})T.*", warc_info['crawl-start'])
+                regex_crawl_date = re.match(r"(\d{4}-\d{2}-\d{2})T.*", warc_info['store-time'])
                 crawl_date = regex_crawl_date.group(1)
             except AttributeError:
                 aip.log(log_path, f"No date for {warc_info['warc_filename']}.")
@@ -132,7 +134,6 @@ def check_aip():
         warcs_expected = aip_warcs_count()
     except ValueError:
         aip.log(log_path, "Cannot check AIP for completeness. WARC count not calculated.")
-        return
 
     # Variable tracks if anything has been found missing so a summary can be printed to the terminal.
     missing = False
@@ -151,7 +152,6 @@ def check_aip():
         if not os.path.exists(f'{metadata}/{aip_id}_{end}'):
             aip.log(log_path, f'{end} was not created.')
             missing = True
-        print("Found", f'{metadata}/{aip_id}_{end}')
 
     # Saves the number of crawldef and crawljob reports to the log so staff can verify the count.
     crawldef_count = len([file for file in os.listdir(metadata) if file.endswith('_crawldef.csv')])
@@ -264,8 +264,7 @@ try:
     aip_title = get_title()
 except ValueError:
     aip.log(log_path, "Seed has no title.")
-    print("Exiting script: seed has no title.")
-    exit()
+    print('Exiting script: seed is missing metadata in Archive-It. See log for details.')
 
 # Makes the aip directory for the seed's aip (aip folder with metadata and objects subfolders). Unlike with the batch
 # script, the folder does not need to temporarily include the AIP title since the title is already stored in a variable.
@@ -312,7 +311,6 @@ for warc in warc_metadata['files']:
 
 # Checks for empty metadata or objects folders in the AIPs. These happens if there were uncaught download errors.
 web.find_empty_directory(log_path)
-
 
 # PART TWO: CREATE AIPS THAT ARE READY FOR INGEST INTO ARCHIVE
 print("Converting into an AIP.")
