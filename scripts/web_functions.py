@@ -435,9 +435,10 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
                 aip.log(log_path, f'No seed for {warc_info["warc_filename"]}.')
                 raise ValueError
 
-            # Filter one: only includes the WARC in the dictionary if it was created since the last download. Store
-            # time is used so test crawls are evaluated based on the date they were saved. Simplifies the date format
-            # to YYYY-MM-DD by removing the time information before comparing it to the last download date.
+            # Filter one: only includes the WARC in the dictionary if it was created since the last download and
+            # before the current download. Store time is used so test crawls are evaluated based on the date they
+            # were saved. Simplifies the date format to YYYY-MM-DD by removing the time information before comparing
+            # it to the last download date.
             try:
                 regex_crawl_date = re.match(r"(\d{4}-\d{2}-\d{2})T.*", warc_info['store-time'])
                 crawl_date = regex_crawl_date.group(1)
@@ -445,7 +446,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
                 aip.log(log_path, f'No date for {warc_info["warc_filename"]}.')
                 raise ValueError
 
-            if crawl_date < last_download:
+            if crawl_date < last_download or crawl_date > str(current_download):
                 warcs_exclude += 1
                 continue
 
