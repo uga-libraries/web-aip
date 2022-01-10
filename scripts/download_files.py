@@ -91,11 +91,13 @@ for seed in download_urls.keys():
     # Saves the PDF, with the desired file name, to the seed folder.
     for url in download_urls[seed]:
 
+
+
         # Makes the desired name for the file. Generally, this is the last part of the URL plus ".pdf".
         # If the last part of the URL is download, gets the previous part of the URL instead.
         # TODO there may be other generic naming conventions to address as well.
         if url.endswith("download"):
-            regex = re.match("(.*)/download", url)
+            regex = re.match(".*/(.*)/download", url)
             filename = regex.group(1) + ".pdf"
         else:
             regex = re.match(".*/(.*)", url)
@@ -118,4 +120,7 @@ for seed in download_urls.keys():
         #   wget non-clobber will not download if already present, rather than download with a rename.
         # TODO: prints a lot to the terminal. Make it quiet? Or like to see the script progress?
         # TODO: error handling
-        subprocess.run(f'wget -O "{filename}" "{archiveit_url}"', shell=True)
+        # subprocess.run(f'wget -O "{filename}" "{archiveit_url}"', shell=True)
+
+        # ALTERNATIVE: download from the live site again so don't have to save the crawl.
+        subprocess.run(f'wget -O "{filename}" "{url}"', shell=True)
