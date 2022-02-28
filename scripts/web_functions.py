@@ -184,7 +184,7 @@ def seed_data(py_warcs, current_download, log_path):
                 identifier = f'harg-{related_collection}-web-{download_date_code}-{sequential_number}'
 
             # Constructs a MAGIL AIP ID: magil-ggp-seed_id-download_month.
-            elif department_name.startswith('Richard B. Russell'):
+            elif department_name.startswith('Map'):
 
                 # Reformats the date of the current download to YYYY-MM.
                 download_date_code = str(current_download.year) + "-" + str(format(current_download.month, '02d'))
@@ -219,7 +219,7 @@ def seed_data(py_warcs, current_download, log_path):
             # but there could have been an error in making the collections list.
             else:
                 seeds_exclude.append(seed_info['id'])
-                aip.log(log_path, f'Seed {seed_info["id"]} is not Hargrett or Russell. '
+                aip.log(log_path, f'Seed {seed_info["id"]} is not Hargrett, MAGIL or Russell. '
                                   f'This WARC will not be downloaded.')
                 continue
 
