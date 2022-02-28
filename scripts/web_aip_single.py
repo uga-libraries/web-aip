@@ -213,7 +213,7 @@ except IndexError:
 
 # Extracts the department from the aip_id saves it to a variable. Quits the script if the AIP id is formatted wrong.
 try:
-    regex_dept = re.match('^(bmac|harg|rbrl).*', aip_id)
+    regex_dept = re.match('^(harg|magil|rbrl).*', aip_id)
     dept_code = regex_dept.group(1)
 except AttributeError:
     print("Exiting script: AIP id is not formatted correctly. Department could not be identified.")
@@ -325,7 +325,7 @@ if aip_id in os.listdir('.'):
 # Transforms the FITS metadata into the PREMIS preservation.xml file using saxon and xslt stylesheets. Determines the
 # third argument (ARCHive group name) from the department code parsed from the folder name.
 if aip_id in os.listdir('.'):
-    group = {"bmac": "bmac", "harg": "hargrett", "rbrl": "russell"}
+    group = {"harg": "hargrett", "magil": "magil", "rbrl": "russell"}
     department = group[dept_code]
     aip.make_preservationxml(aip_id, aip_title, department, "website", log_path)
 
