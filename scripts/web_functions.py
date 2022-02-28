@@ -109,9 +109,6 @@ def seed_data(py_warcs, current_download, log_path):
     # check them again. There are often multiple warcs per seed.
     seeds_exclude = []
 
-    # Reformats the date of the current download to YYYYMM, which is used in the AIP id.
-    download_date_code = str(current_download.year) + str(format(current_download.month, '02d'))
-
     # Iterates through data for each warc to get the seed ids which are included in this download. Those seed ids are
     # then used to look up information via the Partner API needed to generate the desired AIP information.
     for warc_info in py_warcs['files']:
@@ -164,43 +161,67 @@ def seed_data(py_warcs, current_download, log_path):
                 aip.log(log_path, f'Seed {seed_info["id"]} has no collector metadata. This WARC will not be downloaded.')
                 continue
 
-            # Assigns the Hargrett department code and collection number.
-            # A default collection number 0000 is used if there is no relation information.
+            # Constructs a Hargrett AIP ID: harg-collection-web-download_month-sequential_number.
             if department_name.startswith('Hargrett'):
-                department_code = 'harg'
+
+                # Gets the related archival collection from Archive-it metadata.
+                # If there is none, collection is '0000'.
                 try:
                     regex_collection = re.match('^Hargrett (.*):', seed_info['metadata']['Relation'][0]['value'])
                     related_collection = regex_collection.group(1)
                 except (KeyError, AttributeError):
                     related_collection = '0000'
 
-            # Assigns the Russell department code and collection number.
-            # A default collection number 000 if used if there is no relation information.
+                # Reformats the date of the current download to YYYYMM.
+                download_date_code = str(current_download.year) + str(format(current_download.month, '02d'))
+
+                # Adds or updates the count for the number of AIPs from this collection in the seed_count dictionary.
+                # Then gets the current count and formats it as a 4 digit number.
+                seed_count[related_collection] = seed_count.get(related_collection, 0) + 1
+                sequential_number = format(seed_count[related_collection], '04d')
+
+                # Constructs the AIP id for the seed.
+                identifier = f'harg-{related_collection}-web-{download_date_code}-{sequential_number}'
+
+            # Constructs a MAGIL AIP ID: magil-ggp-seed_id-download_month.
             elif department_name.startswith('Richard B. Russell'):
-                department_code = 'rbrl'
+
+                # Reformats the date of the current download to YYYY-MM.
+                download_date_code = str(current_download.year) + "-" + str(format(current_download.month, '02d'))
+
+                # Constructs the AIP id for the seed.
+                identifier = f'magil-ggp-{seed_info["id"]}-{download_date_code}'
+
+            # Constructs a Russell AIP ID: rbrl-collection-web-download_month-sequential_number.
+            elif department_name.startswith('Richard B. Russell'):
+
+                # Gets the related archival collection from Archive-it metadata.
+                # If there is none, collection is '000'.
                 try:
                     regex_collection = re.match(r'^RBRL/(\d{3})', seed_info['metadata']['Relation'][0]['value'])
                     related_collection = regex_collection.group(1)
                 except (KeyError, AttributeError):
                     related_collection = '000'
 
-            # Stops processing this seed if the department isn't Hargrett or Russell. This shouldn't happen since
-            # the script is only processing seeds from Hargrett or Russell collections, but there could have been an
-            # error in making the collections list.
+                # Reformats the date of the current download to YYYYMM.
+                download_date_code = str(current_download.year) + str(format(current_download.month, '02d'))
+
+                # Adds or updates the count for the number of AIPs from this collection in the seed_count dictionary.
+                # Then gets the current count and formats it as a 4 digit number.
+                seed_count[related_collection] = seed_count.get(related_collection, 0) + 1
+                sequential_number = format(seed_count[related_collection], '04d')
+
+                # Constructs the AIP id for the seed.
+                identifier = f'rbrl-{related_collection}-web-{download_date_code}-{sequential_number}'
+
+            # Stops processing this seed if the department isn't Hargrett, MAGIL, or Russell.
+            # This shouldn't happen since the script is only processing seeds from these,
+            # but there could have been an error in making the collections list.
             else:
                 seeds_exclude.append(seed_info['id'])
-                aip.log(log_path, f'Seed {seed_info["id"]} is not Hargrett or Russell. This WARC will not be downloaded.')
+                aip.log(log_path, f'Seed {seed_info["id"]} is not Hargrett or Russell. '
+                                  f'This WARC will not be downloaded.')
                 continue
-
-            # Updates the count for the number of seeds from this collection in the seed_count dictionary.
-            #   If the collection isn't there, adds it with a count of 0 and immediately adds 1.
-            #   If the collection is there, adds one to the current count.
-            # Then gets the current count and formats it as a 4 digit number.
-            seed_count[related_collection] = seed_count.get(related_collection, 0) + 1
-            sequential_number = format(seed_count[related_collection], '04d')
-
-            # Constructs the AIP id for the seed.
-            identifier = f'{department_code}-{related_collection}-web-{download_date_code}-{sequential_number}'
 
             # Saves AIP id and AIP title to the seeds_include dictionary.
             # This only contains information about seeds that had no errors and were fully processed.
@@ -477,7 +498,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
                     warcs_exclude += 1
                     continue
 
-                # Does not include the WARC in the dictionary if the repository is not Hargrett or Russell.
+                # Does not include the WARC in the dictionary if the repository is not Hargrett, MAGIL, or Russell.
                 if not repository.startswith('Hargrett') and not repository.startswith('Richard B. Russell'):
                     warcs_exclude += 1
                     continue
