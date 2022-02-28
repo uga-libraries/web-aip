@@ -181,6 +181,8 @@ for aip_folder in os.listdir('.'):
     # If it does not match the expected pattern, moves the AIP to an error folder and begins processing the next AIP.
     if aip_folder.startswith('harg'):
         department = 'hargrett'
+    elif aip_folder.startswith('magil'):
+        department = 'magil'
     elif aip_folder.startswith('rbrl'):
         department = 'russell'
     else:
