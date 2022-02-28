@@ -499,7 +499,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
                     continue
 
                 # Does not include the WARC in the dictionary if the repository is not Hargrett, MAGIL, or Russell.
-                if not repository.startswith('Hargrett') and not repository.startswith('Richard B. Russell'):
+                if not repository.startswith(('Hargrett', 'Map', 'Richard B. Russell')):
                     warcs_exclude += 1
                     continue
 
