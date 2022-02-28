@@ -61,9 +61,9 @@ def warc_data(last_download, current_download, log_path, collections=None):
                 collections_exclude.append(collection_id)
                 continue
 
-            # If the department is Brown, Hargrett or Russell, adds the collection id to the collections list.
+            # If the department is Hargrett, MAGIL, or Russell, adds the collection id to the collections list.
             # Otherwise, adds it to the excluded list.
-            if department_name.startswith('Hargrett') or department_name.startswith('Richard B. Russell') or department_name.startswith('The Walter J. Brown Media'):
+            if department_name.startswith(('Hargrett', 'Map', 'Richard B. Russell')):
                 collections_include.append(seed['collection'])
             else:
                 collections_exclude.append(collection_id)
