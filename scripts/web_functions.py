@@ -16,7 +16,7 @@ import aip_functions as aip
 import configuration as c
 
 
-def warc_data(last_download, current_download, log_path, collections=None):
+def warc_data(date_start, date_end, log_path, collections=None):
     """Gets data about WARCs to include in this download using WASAPI. A WARC is included if it was saved in the 3
     months since the last preservation download date and is part of a relevant collection. The relevant collection
     list is either provided as an argument or the function will calculate a list of departments who regularly use
@@ -78,7 +78,7 @@ def warc_data(last_download, current_download, log_path, collections=None):
     if not collections:
         collections = collection_list()
 
-    filters = {'store-time-after': last_download, 'store-time-before': current_download,
+    filters = {'store-time-after': date_start, 'store-time-before': date_end,
                'collection': collections, 'page_size': 1000}
     warcs = requests.get(c.wasapi, params=filters, auth=(c.username, c.password))
 
@@ -93,7 +93,7 @@ def warc_data(last_download, current_download, log_path, collections=None):
     return py_warcs
 
 
-def seed_data(py_warcs, current_download, log_path):
+def seed_data(py_warcs, date_end, log_path):
     """Extracts information from the warc and seed data to define the AIP id, AIP title, and crawl definition id.
     Returns this data in a dictionary with the seed id as the key."""
 
@@ -109,6 +109,10 @@ def seed_data(py_warcs, current_download, log_path):
     # Starts a list of seed ids for seeds that will not be included in this download so the script doesn't have to
     # check them again. There are often multiple warcs per seed.
     seeds_exclude = []
+
+    # Gets the year, month, and day of the date_end. Year and month are used as part of AIP IDs.
+    # date_end is the end of the preservation download period and formatted YYYY-MM-DD.
+    year, month, day = date_end.split("-")
 
     # Iterates through data for each warc to get the seed ids which are included in this download. Those seed ids are
     # then used to look up information via the Partner API needed to generate the desired AIP information.
@@ -162,7 +166,7 @@ def seed_data(py_warcs, current_download, log_path):
                 aip.log(log_path, f'Seed {seed_info["id"]} has no collector metadata. This WARC will not be downloaded.')
                 continue
 
-            # Constructs a Hargrett AIP ID: harg-collection-web-download_month-sequential_number.
+            # Constructs a Hargrett AIP ID: harg-collection-web-download_yearmonth-sequential_number.
             if department_name.startswith('Hargrett'):
 
                 # Gets the related archival collection from Archive-it metadata.
@@ -173,27 +177,19 @@ def seed_data(py_warcs, current_download, log_path):
                 except (KeyError, AttributeError):
                     related_collection = '0000'
 
-                # Reformats the date of the current download to YYYYMM.
-                download_date_code = str(current_download.year) + str(format(current_download.month, '02d'))
-
                 # Adds or updates the count for the number of AIPs from this collection in the seed_count dictionary.
                 # Then gets the current count and formats it as a 4 digit number.
                 seed_count[related_collection] = seed_count.get(related_collection, 0) + 1
                 sequential_number = format(seed_count[related_collection], '04d')
 
                 # Constructs the AIP id for the seed.
-                identifier = f'harg-{related_collection}-web-{download_date_code}-{sequential_number}'
+                identifier = f'harg-{related_collection}-web-{year}{month}-{sequential_number}'
 
-            # Constructs a MAGIL AIP ID: magil-ggp-seed_id-download_month.
+            # Constructs a MAGIL AIP ID: magil-ggp-seed_id-download_year-download_month.
             elif department_name.startswith('Map'):
+                identifier = f'magil-ggp-{seed_info["id"]}-{year}-{month}'
 
-                # Reformats the date of the current download to YYYY-MM.
-                download_date_code = str(current_download.year) + "-" + str(format(current_download.month, '02d'))
-
-                # Constructs the AIP id for the seed.
-                identifier = f'magil-ggp-{seed_info["id"]}-{download_date_code}'
-
-            # Constructs a Russell AIP ID: rbrl-collection-web-download_month-sequential_number.
+            # Constructs a Russell AIP ID: rbrl-collection-web-download_yearmonth-sequential_number.
             elif department_name.startswith('Richard B. Russell'):
 
                 # Gets the related archival collection from Archive-it metadata.
@@ -204,16 +200,13 @@ def seed_data(py_warcs, current_download, log_path):
                 except (KeyError, AttributeError):
                     related_collection = '000'
 
-                # Reformats the date of the current download to YYYYMM.
-                download_date_code = str(current_download.year) + str(format(current_download.month, '02d'))
-
                 # Adds or updates the count for the number of AIPs from this collection in the seed_count dictionary.
                 # Then gets the current count and formats it as a 4 digit number.
                 seed_count[related_collection] = seed_count.get(related_collection, 0) + 1
                 sequential_number = format(seed_count[related_collection], '04d')
 
                 # Constructs the AIP id for the seed.
-                identifier = f'rbrl-{related_collection}-web-{download_date_code}-{sequential_number}'
+                identifier = f'rbrl-{related_collection}-web-{year}{month}-{sequential_number}'
 
             # Stops processing this seed if the department isn't Hargrett, MAGIL, or Russell.
             # This shouldn't happen since the script is only processing seeds from these,
@@ -242,7 +235,7 @@ def make_aip_directory(aip_folder):
         os.makedirs(f'{aip_folder}/objects')
 
 
-def download_metadata(aip_id, warc_collection, job_id, seed_id, current_download, log_path):
+def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_path):
     """Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
     deletes any empty reports (meaning there was no data of that type for this seed), and redacts login information
     from the seed report. """
@@ -255,7 +248,7 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, current_download
 
         # Checks if the report has already been downloaded and ends the function if so.
         # If there is more than one WARC for a seed, reports may already be in the metadata folder.
-        report_path = f'{c.script_output}/aips_{current_download}/{aip_id}/metadata/{report_name}'
+        report_path = f'{c.script_output}/aips_{date_end}/{aip_id}/metadata/{report_name}'
         if os.path.exists(report_path):
             return
 
@@ -336,7 +329,7 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, current_download
     for report in os.listdir(f'{aip_id}/metadata'):
 
         # Saves the full file path of the report.
-        report_path = f'{c.script_output}/aips_{current_download}/{aip_id}/metadata/{report}'
+        report_path = f'{c.script_output}/aips_{date_end}/{aip_id}/metadata/{report}'
 
         # Deletes any empty metadata files (file size of 0) and begins processing the next file. A file is empty if
         # there is no metadata of that type, which is most common for collection and seed scope reports.
@@ -350,11 +343,11 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, current_download
             redact(report_path)
 
 
-def download_warc(aip_id, warc_filename, warc_url, warc_md5, current_download, log_path):
+def download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_path):
     """Downloads a warc file and verifies that fixity is unchanged after downloading."""
 
     # The path for where the warc will be saved on the local machine (it is long and used twice in this script).
-    warc_path = f'{c.script_output}/aips_{current_download}/{aip_id}/objects/{warc_filename}'
+    warc_path = f'{c.script_output}/aips_{date_end}/{aip_id}/objects/{warc_filename}'
 
     # Downloads the warc.
     warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
@@ -412,7 +405,7 @@ def find_empty_directory(log_path):
             aip.move_error('incomplete_directory', aip_path)
 
 
-def check_aips(current_download, last_download, seed_to_aip, log_path):
+def check_aips(date_end, date_start, seed_to_aip, log_path):
     """Verifies that all the expected AIPs for the download are complete and no unexpected AIPs were created.
     Produces a csv named completeness_check with the results in the AIPs directory. """
 
@@ -468,7 +461,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
                 aip.log(log_path, f'No date for {warc_info["warc_filename"]}.')
                 raise ValueError
 
-            if crawl_date < last_download or crawl_date > str(current_download):
+            if crawl_date < date_start or crawl_date > date_end:
                 warcs_exclude += 1
                 continue
 
@@ -530,15 +523,15 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
 
         # Tests if there is a folder for this AIP in the AIPs directory. If not, returns the result for this AIP and
         # does not run the rest of the function's tests since there is no directory to check for completeness.
-        if any(folder.startswith(aip_id) for folder in os.listdir(f'{c.script_output}/aips_{current_download}')):
+        if any(folder.startswith(aip_id) for folder in os.listdir(f'{c.script_output}/aips_{date_end}')):
             result.append(True)
         else:
             result.extend([False, 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a'])
             return result
 
         # Saves the file paths to the metadata and objects folders to variables, since they are long and reused.
-        objects = f'{c.script_output}/aips_{current_download}/{aip_id}_bag/data/objects'
-        metadata = f'{c.script_output}/aips_{current_download}/{aip_id}_bag/data/metadata'
+        objects = f'{c.script_output}/aips_{date_end}/{aip_id}_bag/data/objects'
+        metadata = f'{c.script_output}/aips_{date_end}/{aip_id}_bag/data/metadata'
 
         # Tests if each of the four Archive-It metadata reports that never repeat are present.
         # os.path.exists() returns True/False.
@@ -598,7 +591,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
         extras = []
 
         # Iterates through the folder with the AIPs.
-        for aip_directory in os.listdir(f'{c.script_output}/aips_{current_download}'):
+        for aip_directory in os.listdir(f'{c.script_output}/aips_{date_end}'):
 
             # Skips the csv made by the check_aips function.
             if aip_directory.startswith('completeness_check'):
@@ -628,7 +621,7 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
         return
 
     # Starts a csv for the results of the quality review.
-    csv_path = f'{c.script_output}/aips_{current_download}/completeness_check_{current_download}.csv'
+    csv_path = f'{c.script_output}/aips_{date_end}/completeness_check_{date_end}.csv'
     with open(csv_path, 'w', newline='') as complete_csv:
         complete_write = csv.writer(complete_csv)
 
