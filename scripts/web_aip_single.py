@@ -11,7 +11,7 @@ Ideas for improvement: make a log of completeness check instead of printing to t
 include time in log start date and calculate how long it took to run.
 """
 
-# Usage: python /path/web_aip_single.py seed_id aip_id collection_id [last_download_date]
+# Usage: python /path/web_aip_single.py seed_id aip_id collection_id date_start date_end
 
 import datetime
 import os
@@ -103,7 +103,7 @@ def check_aip():
                 aip.log(log_path, f"No date for {warc_info['warc_filename']}.")
                 raise ValueError
 
-            if crawl_date < last_download:
+            if crawl_date < date_start:
                 warcs_exclude += 1
                 continue
 
@@ -121,8 +121,8 @@ def check_aip():
     aip.log(log_path, '\nCompleteness check results:')
 
     # Saves the file paths to the metadata and objects folders to variables, since they are long and reused.
-    objects = f"{c.script_output}/aips_{current_download}/{aip_id}_bag/data/objects"
-    metadata = f"{c.script_output}/aips_{current_download}/{aip_id}_bag/data/metadata"
+    objects = f"{c.script_output}/aips_{date_end}/{aip_id}_bag/data/objects"
+    metadata = f"{c.script_output}/aips_{date_end}/{aip_id}_bag/data/metadata"
 
     # List of suffixes used for the expected metadata reports.
     expected_endings = ("coll.csv", "collscope.csv", "crawldef.csv", "crawljob.csv", "seed.csv",
@@ -139,7 +139,7 @@ def check_aip():
     missing = False
 
     # Tests if there is a folder for this AIP in the AIPs directory.
-    if not any(folder.startswith(aip_id) for folder in os.listdir(f'{c.script_output}/aips_{current_download}')):
+    if not any(folder.startswith(aip_id) for folder in os.listdir(f'{c.script_output}/aips_{date_end}')):
         aip.log(log_path, 'The AIP folder was not created.')
         missing = True
 
@@ -192,31 +192,30 @@ def check_aip():
     return missing
 
 
-# Tests required script arguments were provided and assigns to variables.
+# Tests required script arguments were provided and assigns to variables. If one isn't, ends the script.
+# Skips sys.argv[0] when assigning variables since that is the path to the script.
 try:
-    seed_id = sys.argv[1]
-    aip_id = sys.argv[2]
-    collection_id = sys.argv[3]
-except IndexError:
-    print("Exiting script: missing required argument(s). Must include seed id, AIP id, and collection id.")
+    seed_id, aip_id, collection_id, date_start, date_end = sys.argv[1:]
+except ValueError:
+    print("Exiting script: missing at least one required argument.")
+    print("Must include seed ID, AIP ID, collection ID, date start, and date end")
     exit()
 
-# Tests optional script argument was provided and assigns to variable. Must be formatted YYYY-MM-DD.
-# If no last download date is given, sets the date as when UGA Libraries' began web archiving.
-try:
-    last_download = sys.argv[4]
-    if not re.match(r"\d{4}-\d{2}-\d{2}", last_download):
-        print("Exiting script: date argument must be formatted YYYY-MM-DD.")
-        exit()
-except IndexError:
-    last_download = "2019-06-01"
+# Tests the formatting on the date start and end, which define the time frame the desired warcs were saved.
+# Must be formatted YYYY-MM-DD. If one isn't, ends the script.
+if not re.match(r"\d{4}-\d{2}-\d{2}", date_start):
+    print(f"Exiting script: start date '{date_start}' must be formatted YYYY-MM-DD.")
+    exit()
+if not re.match(r"\d{4}-\d{2}-\d{2}", date_end):
+    print(f"Exiting script: end date '{date_end}' must be formatted YYYY-MM-DD.")
+    exit()
 
 # Extracts the department from the aip_id saves it to a variable. Quits the script if the AIP id is formatted wrong.
 try:
     regex_dept = re.match('^(harg|magil|rbrl).*', aip_id)
     dept_code = regex_dept.group(1)
 except AttributeError:
-    print("Exiting script: AIP id is not formatted correctly. Department could not be identified.")
+    print(f"Exiting script: AIP id '{aip_id}' is not formatted correctly. Department could not be identified.")
     exit()
 
 # Tests the paths in the configuration file to verify they exist. Quits the script if any are incorrect.
@@ -235,8 +234,8 @@ print(f"Making AIP for {seed_id}.")
 # documents. The folder name includes today's date to keep it separate from previous downloads which may still be
 # saved on the same machine. current_download is a variable because it is also used as part of the quality_control
 # function, and depending on how long it takes to download WARCs, recalculating today() may give a different result.
-current_download = datetime.date.today()
-aips_directory = f"aips_{current_download}"
+
+aips_directory = f"aips_{date_end}"
 if not os.path.exists(f"{c.script_output}/{aips_directory}"):
     os.makedirs(f"{c.script_output}/{aips_directory}")
 
@@ -257,7 +256,7 @@ print("Downloading AIP content.")
 
 # Uses WASAPI to get information about the WARCs for this seed's collection. The WARC's seed id is checked before it
 # is downloaded to skip other seeds from this collection. It is not possible to filter by seed using WASAPI.
-warc_metadata = web.warc_data(last_download, current_download, log_path, collection_id)
+warc_metadata = web.warc_data(date_start, date_end, log_path, collection_id)
 
 # Uses the Archive-It Partner API to get the seed's title.
 try:
@@ -304,10 +303,10 @@ for warc in warc_metadata['files']:
 
     # Downloads the seed metadata from Archive-It into the seed's metadata folder.
     # While five of the reports are the same for each WARC, the crawl definition could be different.
-    web.download_metadata(aip_id, collection_id, job_id, seed_id, current_download, log_path)
+    web.download_metadata(aip_id, collection_id, job_id, seed_id, date_end, log_path)
 
     # Downloads the warc from Archive-It into the seed's objects folder.
-    web.download_warc(aip_id, warc_filename, warc_url, warc_md5, current_download, log_path)
+    web.download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_path)
 
 # Checks for empty metadata or objects folders in the AIPs. These happens if there were uncaught download errors.
 web.find_empty_directory(log_path)
