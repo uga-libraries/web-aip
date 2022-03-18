@@ -1,4 +1,4 @@
-"""Purpose: functions and constants used by preservation scripts for web content in Archive-It.
+"""Purpose: functions used by the preservation scripts for web content in Archive-It.
 
 Dependencies:
     * Python library: requests
@@ -11,27 +11,28 @@ import re
 import requests
 import subprocess
 
-# Import functions and constant variables from another UGA script.
+# Import constant variables and functions from another UGA preservation script.
 import aip_functions as aip
 import configuration as c
 
 
 def warc_data(last_download, current_download, log_path, collections=None):
-    """Gets data about WARCs to include in this download using WASAPI. A WARC is included if it was saved since the
-    last preservation download date and is part of a relevant collection. The relevant collection list is either
-    provided as an argument or the function will calculate a list of current Hargrett and Russell collections.
+    """Gets data about WARCs to include in this download using WASAPI. A WARC is included if it was saved in the 3
+    months since the last preservation download date and is part of a relevant collection. The relevant collection
+    list is either provided as an argument or the function will calculate a list of departments who regularly use
+    this script.
 
     Returns json converted to a Python object with all the WASAPI data on the included WARCs."""
 
     def collection_list():
-        """Makes a list of Hargrett and Russell Archive-It collections. Used to skip collections by other departments
-        (e.g. BMAC or DLG) or collections without metadata (test collections). """
+        """Makes a list of Hargrett, MAGIL, and Russell Archive-It collections. Skips test collections and
+        collections of other departments (e.g., BMA) who occasionally crawl but don't save to ARCHive."""
 
-        # Starts lists to store the collections to include (Hargrett and Russell) and exclude (everything else).
+        # Starts lists to store the collections to include and exclude, depending on the department.
         collections_include = []
         collections_exclude = []
 
-        # Uses the Partner API to get the data from the seed report, which has repository information.
+        # Uses the Partner API to get the data from the seed report, which has repository (department) information.
         # Limit of -1 means it will get data on all seeds, no matter how many there are.
         seed_reports = requests.get(f'{c.partner_api}/seed?limit=-1', auth=(c.username, c.password))
 
@@ -478,8 +479,8 @@ def check_aips(current_download, last_download, seed_to_aip, log_path):
                 aip_info[seed_identifier][1] += 1
                 warcs_include += 1
 
-            # Filter two: only includes the WARC in the dictionary if the repository is Hargrett or Russell. The
-            # repository is in the seed report.
+            # Filter two: only includes the WARC in the dictionary if the repository is Hargrett, MAGIL, or Russell.
+            # The repository is in the seed report.
             except (KeyError, IndexError):
 
                 # Gets the seed report for this seed.
