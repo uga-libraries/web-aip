@@ -12,31 +12,34 @@ Dependencies:
 Prior to the preservation download, all seed metadata should be entered into Archive-It. Use the metadata_check.py
 script to verify all required fields are present. """
 
-# Usage: python /path/web_aip_batch.py [last_download_date]
+# Usage: python /path/web_aip_batch.py date_start date_end
 
 import datetime
 import os
 import re
 import sys
 
-import dateutil.relativedelta
-
 # Import functions and constant variables from other UGA scripts.
 import aip_functions as aip
 import configuration as c
 import web_functions as web
 
-# The preservation download is limited to warcs created since the last download date. This can be calculated by the
-# script as 3 months ago for when the script is run on schedule (February 1, May 1, August 1, and November 1) or
-# another date may be supplied via a script argument. If supplied via argument, the format must be YYYY-MM-DD to be
-# able to compare it to WARC dates. If the date is not the expected format, quits the script.
+# The preservation download is limited to warcs created during a particular time frame.
+# UGA downloads every quarter (2/1-4/30, 5/1-7/31, 8/1-10/31, 11/1-1/31)
+# Tests that both dates are provided. If not, ends the script.
 try:
-    last_download = sys.argv[1]
-    if not re.match(r'\d{4}-\d{2}-\d{2}', last_download):
-        print('Date argument must be formatted YYYY-MM-DD. Please try the script again.')
-        exit()
+    date_start, date_end = sys.argv[1:]
 except IndexError:
-    last_download = datetime.date.today() - dateutil.relativedelta.relativedelta(months=3)
+    print("Exiting script: must provide exactly two arguments, the start and end date of the quarter.")
+    exit()
+
+# Tests that both dates are formatted correctly (YYYY-MM-DD). If not, ends the script.
+if not re.match(r"\d{4}-\d{2}-\d{2}", date_start):
+    print(f"Exiting script: start date '{date_start}' must be formatted YYYY-MM-DD.")
+    exit()
+if not re.match(r"\d{4}-\d{2}-\d{2}", date_end):
+    print(f"Exiting script: end date '{date_end}' must be formatted YYYY-MM-DD.")
+    exit()
 
 # Tests the paths in the configuration file to verify they exist. Quits the script if any are incorrect.
 # It is common to get typos when setting up the configuration file on a new machine.
@@ -49,22 +52,17 @@ if not valid_errors == "no errors":
     sys.exit()
 
 # Makes a folder for AIPs within the script_output folder, a designated place on the local machine for web archiving
-# documents). The folder name includes today's date to keep it separate from previous downloads which may still be
-# saved on the same machine. current_download is a variable because it is also used as part of the quality_control
-# function, and depending on how long it takes to download WARCs, recalculating today() may give a different result.
-current_download = datetime.date.today()
-aips_directory = f'aips_{current_download}'
+# documents). The folder name includes the end date for the download to keep it separate from previous downloads
+# which may still be saved on the same machine.
+aips_directory = f'aips_{date_end}'
 if not os.path.exists(f'{c.script_output}/{aips_directory}'):
     os.makedirs(f'{c.script_output}/{aips_directory}')
 
 # Changes current directory to the AIPs folder.
 os.chdir(f'{c.script_output}/{aips_directory}')
 
-# Starts a log for saving status information about the script. Saving to a document instead of printing to the screen
-# since it allows for a permanent record of the download and because the terminal closed at the end of a script when
-# it is run automatically with chronjob. The log is not started until after the current_download variable is set so that
-# can be included in the file name.
-log_path = f'../web_preservation_download_log_{current_download}.txt'
+# Starts a log for saving status information about the script.
+log_path = f'../web_preservation_download_log_{date_end}.txt'
 aip.log(log_path, f'Creating AIPs for a batch of seeds using the web_aip_batch.py script.\n'
                   f'Script started running at {datetime.datetime.today()}.')
 
@@ -72,8 +70,8 @@ aip.log(log_path, f'Creating AIPs for a batch of seeds using the web_aip_batch.p
 
 # Uses Archive-It APIs to get information about the WARCs and seeds in this download. If there is an API failure,
 # warc_data() and seed_data() quit the script.
-warc_metadata = web.warc_data(last_download, current_download, log_path)
-seed_metadata = web.seed_data(warc_metadata, current_download, log_path)
+warc_metadata = web.warc_data(date_start, date_end, log_path)
+seed_metadata = web.seed_data(warc_metadata, date_end, log_path)
 
 # Starts counts for tracking script progress. Some processes are slow, so this shows the script is still working.
 current_warc = 0
@@ -147,10 +145,10 @@ for warc in warc_metadata['files']:
     web.make_aip_directory(aip_id)
 
     # Downloads the seed metadata from Archive-It into the seed's metadata folder.
-    web.download_metadata(aip_id, warc_collection, job_id, seed_id, current_download, log_path)
+    web.download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_path)
 
     # Downloads the WARC from Archive-It into the seed's objects folder.
-    web.download_warc(aip_id, warc_filename, warc_url, warc_md5, current_download, log_path)
+    web.download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_path)
 
 # Checks for empty metadata or objects folders in the AIPs. These happens if there were uncaught download errors.
 web.find_empty_directory(log_path)
@@ -213,7 +211,7 @@ aip.make_manifest()
 # Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
 # errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
 print('\nStarting completeness check.')
-web.check_aips(current_download, last_download, seed_to_aip, log_path)
+web.check_aips(date_end, date_start, seed_to_aip, log_path)
 print('\nFinished completeness check. See completeness_check_YYYY-MM-DD.csv for details.')
 
 # Adds completion of the script to the log.
@@ -223,7 +221,7 @@ aip.log(log_path, f'\nScript finished running at {datetime.datetime.today()}.')
 # download to keep everything together if another set is downloaded before these are deleted.
 os.chdir(c.script_output)
 to_move = ['aips-to-ingest', 'errors', 'fits-xml', 'preservation-xml',
-           f'web_preservation_download_log_{current_download}.txt']
+           f'web_preservation_download_log_{date_end}.txt']
 for item in os.listdir('.'):
     if item in to_move:
         os.replace(item, f'{aips_directory}/{item}')
