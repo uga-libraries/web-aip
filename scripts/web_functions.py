@@ -93,12 +93,9 @@ def warc_data(date_start, date_end, collections=None):
     return py_warcs
 
 
-def seed_data(py_warcs, date_end, log_path):
+def seed_data(py_warcs, date_end):
     """Extracts information from the warc and seed data to define the AIP id, AIP title, and crawl definition id.
     Returns this data in a dictionary with the seed id as the key."""
-
-    # Adds name for the next section to the log.
-    aip.log(log_path, f'\n\nPROCESSING ARCHIVE-IT SEEDS')
 
     # Starts a dictionary for the number of seeds per collection, which is used in the AIP id.
     seed_count = {}
@@ -124,7 +121,6 @@ def seed_data(py_warcs, date_end, log_path):
             regex_seed = re.match(r'^.*-SEED(\d+)-', warc_info['filename'])
             seed_identifier = regex_seed.group(1)
         except AttributeError:
-            aip.log(log_path, f'Cannot calculate seed id for {warc_info["filename"]}. This WARC will not be downloaded.')
             continue
 
         # Stops processing this warc and starts the next one if the script has already assigned an AIP id to this seed.
@@ -137,8 +133,8 @@ def seed_data(py_warcs, date_end, log_path):
 
         # If there was an error with the API call, quits the script.
         if not seed_report.status_code == 200:
-            aip.log(log_path, f'\nAPI error {seed_report.status_code} for seed report. Script cannot complete.')
-            print("API error, ending script. See log for details.")
+            print(f"\nAPI error {seed_report.status_code} for seed report.")
+            print(f"Ending script (this information is required). Try script again later.")
             exit()
 
         # Converts the seed data from json to a Python object.
@@ -154,7 +150,6 @@ def seed_data(py_warcs, date_end, log_path):
                 title = seed_info['metadata']['Title'][0]['value']
             except (KeyError, IndexError):
                 seeds_exclude.append(seed_info['id'])
-                aip.log(log_path, f'Seed {seed_info["id"]} has no title. This WARC will not be downloaded.')
                 continue
 
             # Gets the department from the Collector field.
@@ -163,7 +158,6 @@ def seed_data(py_warcs, date_end, log_path):
                 department_name = seed_info['metadata']['Collector'][0]['value']
             except (KeyError, IndexError):
                 seeds_exclude.append(seed_info['id'])
-                aip.log(log_path, f'Seed {seed_info["id"]} has no collector metadata. This WARC will not be downloaded.')
                 continue
 
             # Constructs a Hargrett AIP ID: harg-collection-web-download_yearmonth-sequential_number.
@@ -213,8 +207,6 @@ def seed_data(py_warcs, date_end, log_path):
             # but there could have been an error in making the collections list.
             else:
                 seeds_exclude.append(seed_info['id'])
-                aip.log(log_path, f'Seed {seed_info["id"]} is not Hargrett, MAGIL or Russell. '
-                                  f'This WARC will not be downloaded.')
                 continue
 
             # Saves AIP id and AIP title to the seeds_include dictionary.
