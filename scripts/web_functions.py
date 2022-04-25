@@ -16,6 +16,31 @@ import aip_functions as aip
 import configuration as c
 
 
+def warc_log(log_data):
+    """Saves information about each step done on a WARC to a CSV file, warc_log.csv, in the script output folder.
+    Information is saved to a dictionary after each step and saved to the log after the end of WARC processing
+    or if there is an error. The AIP steps use a different log structure."""
+
+    # Formats the information from log_data as a list for adding to the CSV.
+    # If it is header, it uses default values. Otherwise, log_data is a dictionary with known keys.
+    if log_data == "header":
+        log_row = ["WARC Filename", "Seed ID Error", "WARC JSON Error", "JOB ID Error", "Seed Metadata Error",
+                   "Seed Report Error", "Seed Scope Report Error", "Collection Scope Report Error",
+                   "Collection Report Error", "Crawl Job Report Error", "Crawl Job Definition Error",
+                   "WARC Download API Error", "MD5Deep Error", "Fixity Error", "Processing Complete"]
+    else:
+        log_row = [log_data["filename"], log_data["seed_id"], log_data["warc_json"], log_data["job_id"],
+                   log_data["seed_metadata"], log_data["seed_report"], log_data["seedscope_report"],
+                   log_data["collscope_report"], log_data["coll_report"], log_data["crawljob_report"],
+                   log_data["crawldef_report"], log_data["warc_api"], log_data["md5deep"], log_data["fixity"],
+                   log_data["complete"]]
+
+    # Saves the log_row information to a row in the WARC log CSV.
+    with open("../warc_log.csv", "a", newline="") as log_file:
+        log_writer = csv.writer(log_file)
+        log_writer.writerow(log_row)
+
+
 def warc_data(date_start, date_end, collections=None):
     """Gets data about WARCs to include in this download using WASAPI. A WARC is included if it was saved in the 3
     months since the last preservation download date and is part of a relevant collection. The relevant collection
