@@ -16,7 +16,7 @@ import aip_functions as aip
 import configuration as c
 
 
-def warc_data(date_start, date_end, log_path, collections=None):
+def warc_data(date_start, date_end, collections=None):
     """Gets data about WARCs to include in this download using WASAPI. A WARC is included if it was saved in the 3
     months since the last preservation download date and is part of a relevant collection. The relevant collection
     list is either provided as an argument or the function will calculate a list of departments who regularly use
@@ -38,8 +38,8 @@ def warc_data(date_start, date_end, log_path, collections=None):
 
         # If there was an error with the API call, quits the script.
         if not seed_reports.status_code == 200:
-            aip.log(log_path, f'\nAPI error {seed_reports.status_code} for collection list. Script cannot complete.')
-            print("API error, ending script. See log for details.")
+            print(f"API error {seed_reports.status_code} when making collection list.")
+            print(f"Ending script (this information is required). Try script again later.")
             exit()
 
         # Converts the seed data from json to a Python object.
@@ -84,8 +84,8 @@ def warc_data(date_start, date_end, log_path, collections=None):
 
     # If there was an error with the API call, quits the script.
     if not warcs.status_code == 200:
-        aip.log(log_path, f'\nAPI error {warcs.status_code} when getting WARC data. Script cannot complete.')
-        print("API error, ending script. See log for details.")
+        print(f'\nAPI error {warcs.status_code} when getting WARC data.')
+        print(f"Ending script (this information is required). Try script again later.")
         exit()
 
     # Converts the WARC data from json to a Python object and returns that Python object.
