@@ -147,6 +147,51 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_da
             redact(report_path)
 
 
+def download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data, error_type):
+    """Downloads a warc file and verifies that fixity is unchanged after downloading.
+    Since downloading is slow and no tests require a complete WARC, replaces the download code with making a text file."""
+
+    # The path for where the warc will be saved on the local machine (it is long and used twice in this script).
+    warc_path = f'{c.script_output}/aips_{date_end}/{aip_id}/objects/{warc_filename}'
+
+    # For testing, makes a status code error. Usually, requests would generate a status code during downloading.
+    if error_type == "download":
+        status_code = 999
+    else:
+        status_code = 200
+
+    # If there was an error with the API call, quits the function.
+    if not status_code == 200:
+        log_data["warc_api"] = f'API error {status_code}'
+        return
+    else:
+        log_data["warc_api"] = "Successfully downloaded WARC."
+
+    # Saves the warc in the objects folder, keeping the original filename.
+    # For testing, writing generic text instead of having real data.
+    with open(warc_path, 'wb') as warc_file:
+        warc_file.write(b"Testing Text")
+
+    # Calculates the md5 for the downloaded WARC, using a regular expression to get the md5 from the md5deep output.
+    # If the output is not formatted as expected, quits the function.
+    # For testing, changes the md5deep output when needed.
+    md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
+    if error_type == "md5deep":
+        md5deep_output.stdout = b"error"
+    try:
+        regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
+        downloaded_warc_md5 = regex_md5.group(1)
+    except AttributeError:
+        log_data["warc_fixity"] = f"Fixity cannot be extracted from md5deep output: {md5deep_output.stdout}"
+        return
+
+    # Compares the md5 of the download warc to what Archive-It has for the warc (warc_md5). If the md5 has changed,
+    # deletes the WARC so the check for AIP completeness will catch that there was a problem.
+    if not warc_md5 == downloaded_warc_md5:
+        os.remove(warc_path)
+        log_data["warc_fixity"] = f"Fixity changed and WARC deleted. {warc_md5} before, {downloaded_warc_md5} after"
+
+
 # ----------------------------------------------------------------------------------------------------------------
 # THIS PART OF THE SCRIPT IS THE SAME AS web_aip_batch.py TO SET UP EVERYTHING CORRECTLY BEFORE THE DESIRED TESTS.
 # ERROR HANDLING FOR SCRIPT ARGUMENTS AND THE CONFIGURATION FILE ARE TESTED BY GIVING THE WRONG INPUTS INSTEAD.
@@ -200,7 +245,7 @@ for warc in warc_metadata['files']:
     # Starts a dictionary of information for the log.
     log_data = {"filename": "TBD", "warc_json": "n/a", "seed_id": "n/a", "job_id": "n/a",
                 "seed_metadata": "n/a", "report_download": "n/a", "report_info": "n/a", "warc_api": "n/a",
-                "md5deep": "n/a", "fixity": "n/a", "complete": "Errors during WARC processing."}
+                "warc_fixity": "n/a", "complete": "Errors during WARC processing."}
 
     # Updates the current WARC number and displays the script progress.
     current_warc += 1
@@ -415,4 +460,68 @@ for warc in warc_metadata['files']:
 
         # Downloads the seed metadata from Archive-It into the seed's metadata folder.
         download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
+
+        # Last step for this test, so saves the log.
+        web.warc_log(log_data)
+
+    # ERROR 8: API error downloading WARC.
+    if current_warc == 8:
+
+        # Previous steps.
+        warc_filename = warc['filename']
+        warc_url = warc['locations'][0]
+        warc_md5 = warc['checksums']['md5']
+        warc_collection = warc['collection']
+        log_data["filename"] = warc_filename
+        log_data["warc_json"] = "Successfully got WARC data."
+        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
+        seed_id = regex_seed_id.group(1)
+        log_data["seed_id"] = "Successfully calculated seed id."
+        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
+        job_id = regex_job_id.group(1)
+        log_data["job_id"] = "Successfully calculated job id."
+        aip_id = seed_metadata[seed_id][0]
+        aip_title = seed_metadata[seed_id][1]
+        log_data["seed_metadata"] = "Successfully got seed metadata."
+        seed_to_aip[seed_id] = aip_id
+        aip_to_title[aip_id] = aip_title
+        web.make_aip_directory(aip_id)
+        download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
+
+        # Downloads the WARC from Archive-It into the seed's objects folder.
+        # There are multiple errors for this function, so indicates the error type.
+        download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data, "download")
+
+        # Last step for this test, so saves the log.
+        web.warc_log(log_data)
+
+    # ERROR 9: Cannot extract fixity from MD5Deep output.
+    if current_warc == 9:
+
+        # Previous steps.
+        warc_filename = warc['filename']
+        warc_url = warc['locations'][0]
+        warc_md5 = warc['checksums']['md5']
+        warc_collection = warc['collection']
+        log_data["filename"] = warc_filename
+        log_data["warc_json"] = "Successfully got WARC data."
+        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
+        seed_id = regex_seed_id.group(1)
+        log_data["seed_id"] = "Successfully calculated seed id."
+        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
+        job_id = regex_job_id.group(1)
+        log_data["job_id"] = "Successfully calculated job id."
+        aip_id = seed_metadata[seed_id][0]
+        aip_title = seed_metadata[seed_id][1]
+        log_data["seed_metadata"] = "Successfully got seed metadata."
+        seed_to_aip[seed_id] = aip_id
+        aip_to_title[aip_id] = aip_title
+        web.make_aip_directory(aip_id)
+        download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
+
+        # Downloads the WARC from Archive-It into the seed's objects folder.
+        # There are multiple errors for this function, so indicates the error type.
+        download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data, "md5deep")
+
+        # Last step for this test, so saves the log.
         web.warc_log(log_data)
