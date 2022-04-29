@@ -134,16 +134,21 @@ for warc in warc_metadata['files']:
         log_data["job_id"] = "Could not calculate job id from the WARC filename."
         web.warc_log(log_data)
         continue
-#
-#     # Saves relevant information the WARC's seed in variables for future use.
-#     # Stops processing if the WARC does not the required metadata.
-#     try:
-#         aip_id = seed_metadata[seed_id][0]
-#         aip_title = seed_metadata[seed_id][1]
-#     except (KeyError, IndexError):
-#         aip.log(log_path, f"This WARC's seed is missing required metadata. JSON from API:\n {seed_metadata}\n"
-#                           f"This WARC will not be downloaded.")
-#         continue
+
+    # Saves relevant information the WARC's seed in variables for future use.
+    # Stops processing if the WARC does not the required metadata.
+    try:
+        aip_id = seed_metadata[seed_id][0]
+        aip_title = seed_metadata[seed_id][1]
+        log_data["seed_metadata"] = "Successfully got seed metadata."
+    except KeyError:
+        log_data["seed_metadata"] = "Seed id is not in seed JSON."
+        web.warc_log(log_data)
+        continue
+    except IndexError:
+        log_data["seed_metadata"] = f"At least one value missing from JSON for this seed: {seed_metadata[seed_id]}"
+        web.warc_log(log_data)
+        continue
 #
 #     # Adds the seed to the seed_to_aip dictionary. This is used for checking the downloaded AIPs for completeness.
 #     seed_to_aip[seed_id] = aip_id
