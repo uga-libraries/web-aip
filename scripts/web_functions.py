@@ -6,6 +6,7 @@ Dependencies:
 """
 
 import csv
+import datetime
 import os
 import re
 import requests
@@ -405,6 +406,8 @@ def download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data)
     if not warc_md5 == downloaded_warc_md5:
         os.remove(warc_path)
         log_data["warc_fixity"] = f"Fixity changed and WARC deleted. {warc_md5} before, {downloaded_warc_md5} after"
+    else:
+        log_data["warc_fixity"] = f"Successfully verified WARC fixity on {datetime.datetime.now()}"
 
 
 def find_empty_directory(log_path):
