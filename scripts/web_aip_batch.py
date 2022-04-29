@@ -170,78 +170,81 @@ for warc in warc_metadata['files']:
         log_data["complete"] = "Successfully processed WARC."
     web.warc_log(log_data)
 
+# Starts a log for AIP information.
+log_path = "../aip_log.txt"
+
 # Checks for empty metadata or objects folders in the AIPs. These happens if there were uncaught download errors.
-web.find_empty_directory()
+web.find_empty_directory(log_path)
 
 
-# # PART TWO: CREATE AIPS THAT ARE READY FOR INGEST INTO ARCHIVE
-#
-# # Makes directories used to store script outputs, if they aren't already there.
-# aip.make_output_directories()
-#
-# # Starts counts for tracking script progress. Some processes are slow, so this shows the script is still working.
-# current_aip = 0
-# total_aips = len(os.listdir('.'))
-#
-# # Adds name for the next section to the log.
-# aip.log(log_path, f'\n\nPROCESSING AIPS ({total_aips} TOTAL)')
-#
-# # Runs the scripts for each step of making an AIP, one folder at a time. Checks if the AIP is still present before
-# # running each script, in case it was moved due to an error in the previous script.
-# for aip_folder in os.listdir('.'):
-#
-#     # Updates the current AIP number and displays the script progress.
-#     current_aip += 1
-#     aip.log(log_path, f'\n{aip_folder}')
-#     print(f'\nProcessing {aip_folder} ({current_aip} of {total_aips}).')
-#
-#     # Calculates the department group name in ARCHive from the folder name (the AIP ID).
-#     # If it does not match the expected pattern, moves the AIP to an error folder and begins processing the next AIP.
-#     if aip_folder.startswith('harg'):
-#         department = 'hargrett'
-#     elif aip_folder.startswith('magil'):
-#         department = 'magil'
-#     elif aip_folder.startswith('rbrl'):
-#         department = 'russell'
-#     else:
-#         aip.log(log_path, f'AIP ID {aip_folder} does not start with an expected department prefix. '
-#                           f'AIP moved to error folder.')
-#         aip.move_error('department_prefix', aip_folder)
-#         continue
-#
-#     # Extracts technical metadata from the files using FITS.
-#     if aip_folder in os.listdir('.'):
-#         aip.extract_metadata(aip_folder, f'{c.script_output}/{aips_directory}', log_path)
-#
-#     # Transforms the FITS metadata into the PREMIS preservation.xml file using saxon and xslt stylesheets.
-#     if aip_folder in os.listdir('.'):
-#         aip.make_preservationxml(aip_folder, aip_to_title[aip_folder], department, 'website', log_path)
-#
-#     # Bags the aip.
-#     if aip_folder in os.listdir('.'):
-#         aip.bag(aip_folder, log_path)
-#
-#     # Tars, and zips the aip.
-#     if f'{aip_folder}_bag' in os.listdir('.'):
-#         aip.package(aip_folder, os.getcwd(), zip=True)
-#
-# # Makes MD5 manifests of all AIPs the in this download using md5deep, with one manifest per department.
-# aip.make_manifest()
-#
-# # Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
-# # errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
-# print('\nStarting completeness check.')
-# web.check_aips(date_end, date_start, seed_to_aip, log_path)
-# print('\nFinished completeness check. See completeness_check_YYYY-MM-DD.csv for details.')
-#
-# # Adds completion of the script to the log.
-# aip.log(log_path, f'\nScript finished running at {datetime.datetime.today()}.')
-#
-# # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) into the AIPs folder for this
-# # download to keep everything together if another set is downloaded before these are deleted.
-# os.chdir(c.script_output)
-# to_move = ['aips-to-ingest', 'errors', 'fits-xml', 'preservation-xml',
-#            f'web_preservation_download_log_{date_end}.txt']
-# for item in os.listdir('.'):
-#     if item in to_move:
-#         os.replace(item, f'{aips_directory}/{item}')
+# PART TWO: CREATE AIPS THAT ARE READY FOR INGEST INTO ARCHIVE
+
+# Makes directories used to store script outputs, if they aren't already there.
+aip.make_output_directories()
+
+# Starts counts for tracking script progress. Some processes are slow, so this shows the script is still working.
+current_aip = 0
+total_aips = len(os.listdir('.'))
+
+# Adds name for the next section to the log.
+aip.log(log_path, f'\n\nPROCESSING AIPS ({total_aips} TOTAL)')
+
+# Runs the scripts for each step of making an AIP, one folder at a time. Checks if the AIP is still present before
+# running each script, in case it was moved due to an error in the previous script.
+for aip_folder in os.listdir('.'):
+
+    # Updates the current AIP number and displays the script progress.
+    current_aip += 1
+    aip.log(log_path, f'\n{aip_folder}')
+    print(f'\nProcessing {aip_folder} ({current_aip} of {total_aips}).')
+
+    # Calculates the department group name in ARCHive from the folder name (the AIP ID).
+    # If it does not match the expected pattern, moves the AIP to an error folder and begins processing the next AIP.
+    if aip_folder.startswith('harg'):
+        department = 'hargrett'
+    elif aip_folder.startswith('magil'):
+        department = 'magil'
+    elif aip_folder.startswith('rbrl'):
+        department = 'russell'
+    else:
+        aip.log(log_path, f'AIP ID {aip_folder} does not start with an expected department prefix. '
+                          f'AIP moved to error folder.')
+        aip.move_error('department_prefix', aip_folder)
+        continue
+
+    # Extracts technical metadata from the files using FITS.
+    if aip_folder in os.listdir('.'):
+        aip.extract_metadata(aip_folder, f'{c.script_output}/{aips_directory}', log_path)
+
+    # Transforms the FITS metadata into the PREMIS preservation.xml file using saxon and xslt stylesheets.
+    if aip_folder in os.listdir('.'):
+        aip.make_preservationxml(aip_folder, aip_to_title[aip_folder], department, 'website', log_path)
+
+    # Bags the aip.
+    if aip_folder in os.listdir('.'):
+        aip.bag(aip_folder, log_path)
+
+    # Tars, and zips the aip.
+    if f'{aip_folder}_bag' in os.listdir('.'):
+        aip.package(aip_folder, os.getcwd(), zip=True)
+
+# Makes MD5 manifests of all AIPs the in this download using md5deep, with one manifest per department.
+aip.make_manifest()
+
+# Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
+# errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
+print('\nStarting completeness check.')
+web.check_aips(date_end, date_start, seed_to_aip, log_path)
+print('\nFinished completeness check. See completeness_check_YYYY-MM-DD.csv for details.')
+
+# Adds completion of the script to the log.
+aip.log(log_path, f'\nScript finished running at {datetime.datetime.today()}.')
+
+# Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) into the AIPs folder for this
+# download to keep everything together if another set is downloaded before these are deleted.
+os.chdir(c.script_output)
+to_move = ['aips-to-ingest', 'errors', 'fits-xml', 'preservation-xml',
+           f'web_preservation_download_log_{date_end}.txt']
+for item in os.listdir('.'):
+    if item in to_move:
+        os.replace(item, f'{aips_directory}/{item}')

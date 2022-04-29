@@ -572,5 +572,10 @@ with open("test-000-web-objects-empty/metadata/file.txt", "w") as new_file:
 
 # Checks for empty metadata or objects folders in the AIPs.
 # Should catch the two test AIPs just created.
-# Haven't worked out logging these yet, so it will print to the terminal.
-web.find_empty_directory()
+log_path = "../aip_log.txt"
+web.find_empty_directory(log_path)
+
+# ----------------------------------------------------------------------------------------------------------------
+# THIS REPLACES THE PART OF THE SCRIPT THAT MAKES THE AIPS.
+# INSTEAD, IT CREATES A SET OF TO USE FOR TESTING check_aips.
+# ----------------------------------------------------------------------------------------------------------------
