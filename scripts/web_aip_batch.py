@@ -86,26 +86,15 @@ web.warc_log("header")
 for warc in warc_metadata['files']:
 
     # Starts a dictionary of information for the log.
-    log_data = {"filename": warc['filename'], "seed_id": "n/a", "warc_json": "n/a", "job_id": "n/a",
+    log_data = {"filename": "TBD", "seed_id": "n/a", "warc_json": "n/a", "job_id": "n/a",
                 "seed_metadata": "n/a", "seed_report": "n/a", "seedscope_report": "n/a", "collscope_report": "n/a",
                 "coll_report": "n/a", "crawljob_report": "n/a", "crawldef_report": "n/a", "warc_api": "n/a",
                 "md5deep": "n/a", "fixity": "n/a", "complete": "Errors during WARC processing."}
 
     # Updates the current WARC number and displays the script progress.
     current_warc += 1
-    print(f"\nProcessing {warc['filename']} ({current_warc} of {total_warcs}).")
+    print(f"\nProcessing WARC {current_warc} of {total_warcs}.")
 
-    # Calculates seed id, which is a portion of the WARC filename between "-SEED" and "-".
-    # Stops processing this WARC and starts the next if the WARC filename doesn't match expected pattern.
-    try:
-        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc['filename'])
-        seed_id = regex_seed_id.group(1)
-        log_data["seed_id"] = "Successfully calculated seed id."
-    except AttributeError:
-        log_data["seed_id"] = "Could not calculate seed id from the WARC filename."
-        web.warc_log(log_data)
-        continue
-#
     # Saves relevant information about the WARC in variables for future use.
     # Stops processing if the WARC does not have the required metadata.
     try:
@@ -113,9 +102,21 @@ for warc in warc_metadata['files']:
         warc_url = warc['locations'][0]
         warc_md5 = warc['checksums']['md5']
         warc_collection = warc['collection']
+        log_data["filename"] = warc_filename
         log_data["warc_json"] = "Successfully got WARC data."
     except (KeyError, IndexError):
         log_data["warc_json"] = f"Could not find at least one expected value in JSON: {warc}"
+        web.warc_log(log_data)
+        continue
+
+    # Calculates seed id, which is a portion of the WARC filename between "-SEED" and "-".
+    # Stops processing this WARC and starts the next if the WARC filename doesn't match expected pattern.
+    try:
+        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
+        seed_id = regex_seed_id.group(1)
+        log_data["seed_id"] = "Successfully calculated seed id."
+    except AttributeError:
+        log_data["seed_id"] = "Could not calculate seed id from the WARC filename."
         web.warc_log(log_data)
         continue
 
