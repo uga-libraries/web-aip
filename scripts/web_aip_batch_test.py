@@ -5,14 +5,147 @@ To get 16 WARCs, for date_start use 2022-03-20 and for date_end use 2022-03-25
 
 """
 
+import csv
 import os
 import re
+import requests
+import subprocess
 import sys
 
 # Import functions and constant variables from other UGA scripts.
 import aip_functions as aip
 import configuration as c
 import web_functions as web
+
+
+# ----------------------------------------------------------------------------------------------------------------
+# ALTERNATIVE VERSIONS OF FUNCTIONS THAT GENERATE ERRORS.
+# IF THERE IS MORE THAN ONE ERROR NEEDED, ADDS AN ARGUMENT FOR ERROR_TYPE TO SPECIFY.
+# ----------------------------------------------------------------------------------------------------------------
+def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data):
+    """Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
+    deletes any empty reports (meaning there was no data of that type for this seed), and redacts login information
+    from the seed report. """
+
+    def get_report(filter_type, filter_value, report_type, report_name):
+        """Downloads a single metadata report and saves it as a csv in the AIP's metadata folder.
+            filter_type and filter_value are used to filter the API call to the right AIP's report
+            report_type is the Archive-It name for the report
+            report_name is the name for the report saved in the AIP, including the ARCHive metadata code """
+
+        # Checks if the report has already been downloaded and ends the function if so.
+        # If there is more than one WARC for a seed, reports may already be in the metadata folder.
+        report_path = f'{c.script_output}/aips_{date_end}/{aip_id}/metadata/{report_name}'
+        if os.path.exists(report_path):
+            return
+
+        # Builds the API call to get the report as a csv.
+        # Limit of -1 will return all matches. Default is only the first 100.
+        filters = {'limit': -1, filter_type: filter_value, 'format': 'csv'}
+        metadata_report = requests.get(f'{c.partner_api}/{report_type}', params=filters, auth=(c.username, c.password))
+
+        # Generates errors by changing the API status of collection and collection scope.
+        if "coll" in report_name:
+            metadata_report.status_code = 999
+
+        # Saves the metadata report if there were no errors with the API or logs the error.
+        if metadata_report.status_code == 200:
+            with open(f'{aip_id}/metadata/{report_name}', 'wb') as report_csv:
+                report_csv.write(metadata_report.content)
+        else:
+            if log_data['report_download'] == "n/a":
+                log_data['report_download'] = f'{report_type} API error {metadata_report.status_code}'
+            else:
+                log_data['report_download'] = log_data['report_download'] + f'; {report_type} API error {metadata_report.status_code}'
+
+    def redact(metadata_report_path):
+        """Replaces the seed report with a redacted version of the file, removing login information if those columns
+        are present. Even if the columns are blank, replaces it with REDACTED. Since not all login information is
+        meaningful (some is from staff web browsers autofill information while viewing the metadata), knowing if
+        there was login information or not is misleading. """
+
+        # Starts a list for storing the redacted rows that will be saved in the new version of the document.
+        redacted_rows = []
+
+        # Opens and reads the seed report.
+        with open(metadata_report_path) as seed_csv:
+            seed_read = csv.reader(seed_csv)
+
+            # Adds the header row to the redacted_rows list without altering it.
+            header = next(seed_read)
+            redacted_rows.append(header)
+
+            # Gets the index of the password and username columns. Since the report is inconsistent about if these
+            # are included at all, also want to catch if columns are in a different order. If the login columns are not
+            # present, exits the function and leaves the seed report as it was.
+            try:
+                password_index = header.index('login_password')
+                username_index = header.index('login_username')
+            except ValueError:
+                if log_data['report_info'] == "n/a":
+                    log_data['report_info'] = 'Seed report does not have login columns to redact.'
+                else:
+                    log_data['report_info'] = log_data['report_info'] + '; Seed report does not have login columns to redact.'
+                return
+
+            # Puts 'REDACTED' in the password and username columns for each non-header row and adds the updated
+            # rows to the redacted_rows list.
+            for row in seed_read:
+                row[password_index] = 'REDACTED'
+                row[username_index] = 'REDACTED'
+                redacted_rows.append(row)
+
+        # Opens the seed report again, but in write mode to replace the rows with the redacted rows.
+        # Gets each row from the redacted_rows list and saves it to the csv.
+        with open(metadata_report_path, 'w', newline='') as report_csv:
+            report_write = csv.writer(report_csv)
+            for row in redacted_rows:
+                report_write.writerow(row)
+
+    # Downloads five of the six metadata reports from Archive-It needed to understand the context of the WARC.
+    # These are reports where there is only one report per seed or collection.
+    get_report('id', seed_id, 'seed', f'{aip_id}_seed.csv')
+    get_report('seed', seed_id, 'scope_rule', f'{aip_id}_seedscope.csv')
+    get_report('collection', warc_collection, 'scope_rule', f'{aip_id}_collscope.csv')
+    get_report('id', warc_collection, 'collection', f'{aip_id}_coll.csv')
+    get_report('id', job_id, 'crawl_job', f'{aip_id}_{job_id}_crawljob.csv')
+
+    # Downloads the crawl definition report for the job this WARC was part of.
+    # The crawl definition id is obtained from the crawl job report using the job id.
+    # There may be more than one crawl definition report per AIP.
+    with open(f'{aip_id}/metadata/{aip_id}_{job_id}_crawljob.csv', 'r') as crawljob_csv:
+        crawljob_data = csv.DictReader(crawljob_csv)
+        for job in crawljob_data:
+            if job_id == job['id']:
+                crawl_def_id = job['crawl_definition']
+                get_report('id', crawl_def_id, 'crawl_definition', f'{aip_id}_{crawl_def_id}_crawldef.csv')
+                break
+
+    # If there were no download errors (the log still has the default value), updates the log to show success.
+    if log_data['report_download'] == "n/a":
+        log_data['report_download'] = "Successfully downloaded all metadata reports."
+
+    # Iterates over each report in the metadata folder to delete empty reports and redact login information from the
+    # seed report.
+    for report in os.listdir(f'{aip_id}/metadata'):
+
+        # Saves the full file path of the report.
+        report_path = f'{c.script_output}/aips_{date_end}/{aip_id}/metadata/{report}'
+
+        # Deletes any empty metadata files (file size of 0) and begins processing the next file. A file is empty if
+        # there is no metadata of that type, which is most common for collection and seed scope reports.
+        if os.path.getsize(report_path) == 0:
+            if log_data['report_info'] == "n/a":
+                log_data['report_info'] = f'Deleted empty report {report}'
+            else:
+                log_data['report_info'] = log_data['report_info'] + f'; Deleted empty report {report}'
+            os.remove(report_path)
+            continue
+
+        # Redacts login password and username from the seed report so we can share the seed report with researchers.
+        if report.endswith('_seed.csv'):
+            redact(report_path)
+
 
 # ----------------------------------------------------------------------------------------------------------------
 # THIS PART OF THE SCRIPT IS THE SAME AS web_aip_batch.py TO SET UP EVERYTHING CORRECTLY BEFORE THE DESIRED TESTS.
@@ -66,8 +199,7 @@ for warc in warc_metadata['files']:
 
     # Starts a dictionary of information for the log.
     log_data = {"filename": "TBD", "warc_json": "n/a", "seed_id": "n/a", "job_id": "n/a",
-                "seed_metadata": "n/a", "seed_report": "n/a", "seedscope_report": "n/a", "collscope_report": "n/a",
-                "coll_report": "n/a", "crawljob_report": "n/a", "crawldef_report": "n/a", "warc_api": "n/a",
+                "seed_metadata": "n/a", "report_download": "n/a", "report_info": "n/a", "warc_api": "n/a",
                 "md5deep": "n/a", "fixity": "n/a", "complete": "Errors during WARC processing."}
 
     # Updates the current WARC number and displays the script progress.
@@ -194,7 +326,8 @@ for warc in warc_metadata['files']:
         log_data["job_id"] = "Successfully calculated job id."
 
         # Generates error by removing an expected value.
-        seed_metadata.pop(seed_id)
+        # Saves the value so it can be put back after the error for testing future warcs from this seed.
+        seed_info = seed_metadata.pop(seed_id)
 
         # Saves relevant information the WARC's seed in variables for future use.
         try:
@@ -204,10 +337,12 @@ for warc in warc_metadata['files']:
         except KeyError:
             log_data["seed_metadata"] = "Seed id is not in seed JSON."
             web.warc_log(log_data)
+            seed_metadata[seed_id] = seed_info
             continue
         except IndexError:
             log_data["seed_metadata"] = f"At least one value missing from JSON for this seed: {seed_metadata[seed_id]}"
             web.warc_log(log_data)
+            seed_metadata[seed_id] = seed_info
             continue
 
         # Should catch the error in the previous step and this should not run.
@@ -232,7 +367,8 @@ for warc in warc_metadata['files']:
         log_data["job_id"] = "Successfully calculated job id."
 
         # Generates error by removing an expected value.
-        seed_metadata[seed_id].pop(1)
+        # Saves the value so it can be put back after the error for testing future warcs from this seed.
+        seed_info = seed_metadata[seed_id].pop(1)
 
         # Saves relevant information the WARC's seed in variables for future use.
         try:
@@ -242,12 +378,41 @@ for warc in warc_metadata['files']:
         except KeyError:
             log_data["seed_metadata"] = "Seed id is not in seed JSON."
             web.warc_log(log_data)
+            seed_metadata[seed_id].append(seed_info)
             continue
         except IndexError:
             log_data["seed_metadata"] = f"At least one value missing from JSON for this seed: {seed_metadata[seed_id]}"
             web.warc_log(log_data)
+            seed_metadata[seed_id].append(seed_info)
             continue
 
         # Should catch the error in the previous step and this should not run.
-        print("Test did not catch Error 5 correctly.")
+        print("Test did not catch Error 6 correctly.")
         continue
+
+    # ERROR 7: API error downloading metadata reports.
+    if current_warc == 7:
+
+        # Previous steps.
+        warc_filename = warc['filename']
+        warc_url = warc['locations'][0]
+        warc_md5 = warc['checksums']['md5']
+        warc_collection = warc['collection']
+        log_data["filename"] = warc_filename
+        log_data["warc_json"] = "Successfully got WARC data."
+        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
+        seed_id = regex_seed_id.group(1)
+        log_data["seed_id"] = "Successfully calculated seed id."
+        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
+        job_id = regex_job_id.group(1)
+        log_data["job_id"] = "Successfully calculated job id."
+        aip_id = seed_metadata[seed_id][0]
+        aip_title = seed_metadata[seed_id][1]
+        log_data["seed_metadata"] = "Successfully got seed metadata."
+        seed_to_aip[seed_id] = aip_id
+        aip_to_title[aip_id] = aip_title
+        web.make_aip_directory(aip_id)
+
+        # Downloads the seed metadata from Archive-It into the seed's metadata folder.
+        download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
+        web.warc_log(log_data)
