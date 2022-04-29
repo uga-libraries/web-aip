@@ -95,15 +95,16 @@ for warc in warc_metadata['files']:
     current_warc += 1
     print(f"\nProcessing {warc['filename']} ({current_warc} of {total_warcs}).")
 
-#     # Calculates seed id, which is a portion of the WARC filename between "-SEED" and "-".
-#     # Stops processing this WARC and starts the next if the WARC filename doesn't match expected pattern.
-#     try:
-#         regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc['filename'])
-#         seed_id = regex_seed_id.group(1)
-#     except AttributeError:
-#         aip.log(log_path, f"Cannot calculate seed id from the WARC filename: {warc['filename']}.\n"
-#                           f"This WARC and its metadata reports will not be downloaded.")
-#         continue
+    # Calculates seed id, which is a portion of the WARC filename between "-SEED" and "-".
+    # Stops processing this WARC and starts the next if the WARC filename doesn't match expected pattern.
+    try:
+        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc['filename'])
+        seed_id = regex_seed_id.group(1)
+        log_data["seed_id"] = "Successfully calculated seed id."
+    except AttributeError:
+        log_data["seed_id"] = "Could not calculate seed id from the WARC filename."
+        web.warc_log(log_data)
+        continue
 #
 #     # Saves relevant information about the WARC in variables for future use.
 #     # Stops processing if the WARC does not have the required metadata.
