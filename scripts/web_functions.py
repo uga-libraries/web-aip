@@ -410,7 +410,7 @@ def download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data)
         log_data["warc_fixity"] = f"Successfully verified WARC fixity on {datetime.datetime.now()}"
 
 
-def find_empty_directory(log_path):
+def find_empty_directory():
     """Identifies any AIPs with empty objects or metadata folders and moves them to an error folder."""
 
     # Iterates through the aips directory.
@@ -422,8 +422,9 @@ def find_empty_directory(log_path):
             # Calculates the path of the parent folder (the aip folder).
             aip_path = os.path.dirname(root)
 
-            # Saves the error to the log and moves the aip to an error folder.
-            aip.log(log_path, 'Stop processing. Empty metadata folder.')
+            # Prints the error and moves the aip to an error folder.
+            # TODO: log the error instead.
+            print(f'Moved {aip_path} to error folder: empty metadata folder.')
             aip.move_error('incomplete_directory', aip_path)
 
         # Looks for empty objects folders.
@@ -432,8 +433,9 @@ def find_empty_directory(log_path):
             # Calculates the path of the parent folder (the aip folder).
             aip_path = os.path.dirname(root)
 
-            # Saves the error to the log and moves the aip to an error folder.
-            aip.log(log_path, 'Stop processing. Empty objects folder.')
+            # Prints the error and moves the aip to an error folder.
+            # TODO: log the error instead.
+            print(f'Moved {aip_path} to error folder: empty objects folder.')
             aip.move_error('incomplete_directory', aip_path)
 
 

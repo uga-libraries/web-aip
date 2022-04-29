@@ -170,10 +170,10 @@ for warc in warc_metadata['files']:
         log_data["complete"] = "Successfully processed WARC."
     web.warc_log(log_data)
 
-# # Checks for empty metadata or objects folders in the AIPs. These happens if there were uncaught download errors.
-# web.find_empty_directory(log_path)
-#
-#
+# Checks for empty metadata or objects folders in the AIPs. These happens if there were uncaught download errors.
+web.find_empty_directory()
+
+
 # # PART TWO: CREATE AIPS THAT ARE READY FOR INGEST INTO ARCHIVE
 #
 # # Makes directories used to store script outputs, if they aren't already there.
