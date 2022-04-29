@@ -66,7 +66,7 @@ web.warc_log("header")
 for warc in warc_metadata['files']:
 
     # Starts a dictionary of information for the log.
-    log_data = {"filename": "TBD", "seed_id": "n/a", "warc_json": "n/a", "job_id": "n/a",
+    log_data = {"filename": "TBD", "warc_json": "n/a", "seed_id": "n/a", "job_id": "n/a",
                 "seed_metadata": "n/a", "seed_report": "n/a", "seedscope_report": "n/a", "collscope_report": "n/a",
                 "coll_report": "n/a", "crawljob_report": "n/a", "crawldef_report": "n/a", "warc_api": "n/a",
                 "md5deep": "n/a", "fixity": "n/a", "complete": "Errors during WARC processing."}
@@ -88,8 +88,12 @@ for warc in warc_metadata['files']:
             warc_url = warc['locations'][0]
             warc_md5 = warc['checksums']['md5']
             warc_collection = warc['collection']
-        except (KeyError, IndexError):
+        except KeyError:
             log_data["warc_json"] = f"Could not find at least one expected value in JSON: {warc}"
+            web.warc_log(log_data)
+            continue
+        except IndexError:
+            log_data["warc_json"] = f"Could not find URL in JSON: {warc}"
             web.warc_log(log_data)
             continue
 
@@ -97,8 +101,31 @@ for warc in warc_metadata['files']:
         print("Test did not catch Error 1 correctly.")
         continue
 
-    # ERROR 2: Cannot extract seed_id from the WARC filename.
+    # ERROR 2: Cannot find expected values in WARC JSON (IndexError).
     if current_warc == 2:
+
+        # Saves relevant information about the WARC in variables for future use.
+        # Generate error by using the wrong index number for warc_url
+        try:
+            warc_filename = warc['filename']
+            warc_url = warc['locations'][5]
+            warc_md5 = warc['checksums']['md5']
+            warc_collection = warc['collection']
+        except KeyError:
+            log_data["warc_json"] = f"Could not find at least one expected value in JSON: {warc}"
+            web.warc_log(log_data)
+            continue
+        except IndexError:
+            log_data["warc_json"] = f"Could not find URL in JSON: {warc}"
+            web.warc_log(log_data)
+            continue
+
+        # Should catch the error in the previous step and this should not run.
+        print("Test did not catch Error 2 correctly.")
+        continue
+
+    # ERROR 3: Cannot extract seed_id from the WARC filename.
+    if current_warc == 3:
 
         # Previous step. Generate the error by assigning the wrong value to warc_filename.
         warc_filename = "warc-name-error.warc.gz"
@@ -119,6 +146,6 @@ for warc in warc_metadata['files']:
             continue
 
         # Should catch the error in the previous step and this should not run.
-        print("Test did not catch Error 2 correctly.")
+        print("Test did not catch Error 3 correctly.")
         continue
 

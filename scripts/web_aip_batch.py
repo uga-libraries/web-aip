@@ -86,7 +86,7 @@ web.warc_log("header")
 for warc in warc_metadata['files']:
 
     # Starts a dictionary of information for the log.
-    log_data = {"filename": "TBD", "seed_id": "n/a", "warc_json": "n/a", "job_id": "n/a",
+    log_data = {"filename": "TBD", "warc_json": "n/a", "seed_id": "n/a", "job_id": "n/a",
                 "seed_metadata": "n/a", "seed_report": "n/a", "seedscope_report": "n/a", "collscope_report": "n/a",
                 "coll_report": "n/a", "crawljob_report": "n/a", "crawldef_report": "n/a", "warc_api": "n/a",
                 "md5deep": "n/a", "fixity": "n/a", "complete": "Errors during WARC processing."}
@@ -104,10 +104,15 @@ for warc in warc_metadata['files']:
         warc_collection = warc['collection']
         log_data["filename"] = warc_filename
         log_data["warc_json"] = "Successfully got WARC data."
-    except (KeyError, IndexError):
+    except KeyError:
         log_data["warc_json"] = f"Could not find at least one expected value in JSON: {warc}"
         web.warc_log(log_data)
         continue
+    except IndexError:
+        log_data["warc_json"] = f"Could not find URL in JSON: {warc}"
+        web.warc_log(log_data)
+        continue
+
 
     # Calculates seed id, which is a portion of the WARC filename between "-SEED" and "-".
     # Stops processing this WARC and starts the next if the WARC filename doesn't match expected pattern.
