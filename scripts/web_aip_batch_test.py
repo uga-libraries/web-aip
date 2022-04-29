@@ -1,8 +1,7 @@
 """Purpose: This script generates every known error to use for testing the error handling of web_aip_batch.py.
 
 Usage: python /path/web_aip_batch_test.py date_start date_end
-    for date_start, use ?????
-    for date_end, use ????
+To get 16 WARCs, for date_start use 2022-03-20 and for date_end use 2022-03-25
 
 """
 
@@ -175,4 +174,80 @@ for warc in warc_metadata['files']:
 
         # Should catch the error in the previous step and this should not run.
         print("Test did not catch Error 4 correctly.")
+        continue
+
+    # ERROR 5: Cannot find expected values in seed JSON (KeyError).
+    if current_warc == 5:
+
+        # Previous steps.
+        warc_filename = warc['filename']
+        warc_url = warc['locations'][0]
+        warc_md5 = warc['checksums']['md5']
+        warc_collection = warc['collection']
+        log_data["filename"] = warc_filename
+        log_data["warc_json"] = "Successfully got WARC data."
+        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
+        seed_id = regex_seed_id.group(1)
+        log_data["seed_id"] = "Successfully calculated seed id."
+        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
+        job_id = regex_job_id.group(1)
+        log_data["job_id"] = "Successfully calculated job id."
+
+        # Generates error by removing an expected value.
+        seed_metadata.pop(seed_id)
+
+        # Saves relevant information the WARC's seed in variables for future use.
+        try:
+            aip_id = seed_metadata[seed_id][0]
+            aip_title = seed_metadata[seed_id][1]
+            log_data["seed_metadata"] = "Successfully got seed metadata."
+        except KeyError:
+            log_data["seed_metadata"] = "Seed id is not in seed JSON."
+            web.warc_log(log_data)
+            continue
+        except IndexError:
+            log_data["seed_metadata"] = f"At least one value missing from JSON for this seed: {seed_metadata[seed_id]}"
+            web.warc_log(log_data)
+            continue
+
+        # Should catch the error in the previous step and this should not run.
+        print("Test did not catch Error 5 correctly.")
+        continue
+
+    # ERROR 6: Cannot find expected values in seed JSON (IndexError).
+    if current_warc == 6:
+
+        # Previous steps.
+        warc_filename = warc['filename']
+        warc_url = warc['locations'][0]
+        warc_md5 = warc['checksums']['md5']
+        warc_collection = warc['collection']
+        log_data["filename"] = warc_filename
+        log_data["warc_json"] = "Successfully got WARC data."
+        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
+        seed_id = regex_seed_id.group(1)
+        log_data["seed_id"] = "Successfully calculated seed id."
+        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
+        job_id = regex_job_id.group(1)
+        log_data["job_id"] = "Successfully calculated job id."
+
+        # Generates error by removing an expected value.
+        seed_metadata[seed_id].pop(1)
+
+        # Saves relevant information the WARC's seed in variables for future use.
+        try:
+            aip_id = seed_metadata[seed_id][0]
+            aip_title = seed_metadata[seed_id][1]
+            log_data["seed_metadata"] = "Successfully got seed metadata."
+        except KeyError:
+            log_data["seed_metadata"] = "Seed id is not in seed JSON."
+            web.warc_log(log_data)
+            continue
+        except IndexError:
+            log_data["seed_metadata"] = f"At least one value missing from JSON for this seed: {seed_metadata[seed_id]}"
+            web.warc_log(log_data)
+            continue
+
+        # Should catch the error in the previous step and this should not run.
+        print("Test did not catch Error 5 correctly.")
         continue
