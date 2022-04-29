@@ -149,7 +149,8 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_da
 
 def download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data, error_type):
     """Downloads a warc file and verifies that fixity is unchanged after downloading.
-    Since downloading is slow and no tests require a complete WARC, replaces the download code with making a text file."""
+    Since downloading is slow and no tests require a complete WARC, replaces the download code with making a text file.
+    When error_type is fixity, no additional changes are needed since the text file MD5 won't match the WARC."""
 
     # The path for where the warc will be saved on the local machine (it is long and used twice in this script).
     warc_path = f'{c.script_output}/aips_{date_end}/{aip_id}/objects/{warc_filename}'
@@ -486,7 +487,7 @@ for warc in warc_metadata['files']:
         seed_to_aip[seed_id] = aip_id
         aip_to_title[aip_id] = aip_title
         web.make_aip_directory(aip_id)
-        download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
+        web.download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
 
         # Downloads the WARC from Archive-It into the seed's objects folder.
         # There are multiple errors for this function, so indicates the error type.
@@ -517,11 +518,42 @@ for warc in warc_metadata['files']:
         seed_to_aip[seed_id] = aip_id
         aip_to_title[aip_id] = aip_title
         web.make_aip_directory(aip_id)
-        download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
+        web.download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
 
         # Downloads the WARC from Archive-It into the seed's objects folder.
         # There are multiple errors for this function, so indicates the error type.
         download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data, "md5deep")
+
+        # Last step for this test, so saves the log.
+        web.warc_log(log_data)
+
+    # ERROR 10: WARC fixity after download doesn't match Archive-It record.
+    if current_warc == 10:
+
+        # Previous steps.
+        warc_filename = warc['filename']
+        warc_url = warc['locations'][0]
+        warc_md5 = warc['checksums']['md5']
+        warc_collection = warc['collection']
+        log_data["filename"] = warc_filename
+        log_data["warc_json"] = "Successfully got WARC data."
+        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
+        seed_id = regex_seed_id.group(1)
+        log_data["seed_id"] = "Successfully calculated seed id."
+        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
+        job_id = regex_job_id.group(1)
+        log_data["job_id"] = "Successfully calculated job id."
+        aip_id = seed_metadata[seed_id][0]
+        aip_title = seed_metadata[seed_id][1]
+        log_data["seed_metadata"] = "Successfully got seed metadata."
+        seed_to_aip[seed_id] = aip_id
+        aip_to_title[aip_id] = aip_title
+        web.make_aip_directory(aip_id)
+        web.download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
+
+        # Downloads the WARC from Archive-It into the seed's objects folder.
+        # There are multiple errors for this function, so indicates the error type.
+        download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data, "fixity")
 
         # Last step for this test, so saves the log.
         web.warc_log(log_data)
