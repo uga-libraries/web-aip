@@ -25,15 +25,12 @@ def warc_log(log_data):
     # If it is header, it uses default values. Otherwise, log_data is a dictionary with known keys.
     if log_data == "header":
         log_row = ["WARC Filename", "WARC JSON Error", "Seed ID Error", "JOB ID Error", "Seed Metadata Error",
-                   "Seed Report Error", "Seed Scope Report Error", "Collection Scope Report Error",
-                   "Collection Report Error", "Crawl Job Report Error", "Crawl Job Definition Error",
-                   "WARC Download API Error", "MD5Deep Error", "Fixity Error", "Processing Complete"]
+                   "Metadata Report Errors", "Metadata Report Information", "WARC Download API Error",
+                   "MD5Deep Error", "Fixity Error", "Processing Complete"]
     else:
         log_row = [log_data["filename"], log_data["warc_json"], log_data["seed_id"], log_data["job_id"],
-                   log_data["seed_metadata"], log_data["seed_report"], log_data["seedscope_report"],
-                   log_data["collscope_report"], log_data["coll_report"], log_data["crawljob_report"],
-                   log_data["crawldef_report"], log_data["warc_api"], log_data["md5deep"], log_data["fixity"],
-                   log_data["complete"]]
+                   log_data["seed_metadata"], log_data["report_download"], log_data["report_info"],
+                   log_data["warc_api"], log_data["md5deep"], log_data["fixity"], log_data["complete"]]
 
     # Saves the log_row information to a row in the WARC log CSV.
     with open("../warc_log.csv", "a", newline="") as log_file:
@@ -252,7 +249,7 @@ def make_aip_directory(aip_folder):
         os.makedirs(f'{aip_folder}/objects')
 
 
-def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_path):
+def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data):
     """Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
     deletes any empty reports (meaning there was no data of that type for this seed), and redacts login information
     from the seed report. """
@@ -279,7 +276,10 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_pa
             with open(f'{aip_id}/metadata/{report_name}', 'wb') as report_csv:
                 report_csv.write(metadata_report.content)
         else:
-            aip.log(log_path, f'Could not download {report_type} report. Error: {metadata_report.status_code}')
+            if log_data['report_download'] == "n/a":
+                log_data['report_download'] = f'{report_type} API error {metadata_report.status_code}'
+            else:
+                log_data['report_download'] = log_data['report_download'] + f'; {report_type} API error {metadata_report.status_code}'
 
     def redact(metadata_report_path):
         """Replaces the seed report with a redacted version of the file, removing login information if those columns
@@ -305,7 +305,10 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_pa
                 password_index = header.index('login_password')
                 username_index = header.index('login_username')
             except ValueError:
-                aip.log(log_path, 'Seed report does not have login columns to redact.')
+                if log_data['report_info'] == "n/a":
+                    log_data['report_info'] = 'Seed report does not have login columns to redact.'
+                else:
+                    log_data['report_info'] = log_data['report_info'] + '; Seed report does not have login columns to redact.'
                 return
 
             # Puts 'REDACTED' in the password and username columns for each non-header row and adds the updated
@@ -341,6 +344,10 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_pa
                 get_report('id', crawl_def_id, 'crawl_definition', f'{aip_id}_{crawl_def_id}_crawldef.csv')
                 break
 
+    # If there were no download errors (the log still has the default value), updates the log to show success.
+    if log_data['report_download'] == "n/a":
+        log_data['report_download'] = "Successfully downloaded all metadata reports."
+
     # Iterates over each report in the metadata folder to delete empty reports and redact login information from the
     # seed report.
     for report in os.listdir(f'{aip_id}/metadata'):
@@ -351,7 +358,10 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_pa
         # Deletes any empty metadata files (file size of 0) and begins processing the next file. A file is empty if
         # there is no metadata of that type, which is most common for collection and seed scope reports.
         if os.path.getsize(report_path) == 0:
-            aip.log(log_path, f'Empty file deleted (seed has no metadata of this type): {report}')
+            if log_data['report_info'] == "n/a":
+                log_data['report_info'] = f'Deleted empty report {report}'
+            else:
+                log_data['report_info'] = log_data['report_info'] + f'; Deleted empty report {report}'
             os.remove(report_path)
             continue
 
