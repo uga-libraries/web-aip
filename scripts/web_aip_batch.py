@@ -113,7 +113,6 @@ for warc in warc_metadata['files']:
         web.warc_log(log_data)
         continue
 
-
     # Calculates seed id, which is a portion of the WARC filename between "-SEED" and "-".
     # Stops processing this WARC and starts the next if the WARC filename doesn't match expected pattern.
     try:
@@ -125,13 +124,16 @@ for warc in warc_metadata['files']:
         web.warc_log(log_data)
         continue
 
-#     # Calculates the job id from the WARC filename.
-#     try:
-#         regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
-#         job_id = regex_job_id.group(1)
-#     except AttributeError:
-#         aip.log(log_path, "Cannot calculate the WARC job id.")
-#         continue
+    # Calculates the job id from the WARC filename, which are the numbers after "-JOB".
+    # Stops processing this WARC and starts the next if the WARC filename doesn't match the expected pattern.
+    try:
+        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
+        job_id = regex_job_id.group(1)
+        log_data["job_id"] = "Successfully calculated job id."
+    except AttributeError:
+        log_data["job_id"] = "Could not calculate job id from the WARC filename."
+        web.warc_log(log_data)
+        continue
 #
 #     # Saves relevant information the WARC's seed in variables for future use.
 #     # Stops processing if the WARC does not the required metadata.
