@@ -60,6 +60,7 @@ web.warc_log("header")
 # ----------------------------------------------------------------------------------------------------------------
 # THIS PART OF THE SCRIPT MAKES A DIFFERENT ERROR EVERY TIME IT STARTS A NEW WARC.
 # FOR ERRORS GENERATING WITHIN FUNCTIONS, IT USES A DIFFERENT VERSION OF THE FUNCTION.
+# PRINTS AN ERROR TO THE TERMINAL IF THE ERROR IS NOT CAUGHT AND STARTS THE LOOP WITH THE NEXT WARC.
 # ----------------------------------------------------------------------------------------------------------------
 
 for warc in warc_metadata['files']:
@@ -77,7 +78,7 @@ for warc in warc_metadata['files']:
     # ERROR 1: Cannot extract seed_id from the WARC filename.
     if current_warc == 1:
 
-        # Generate error by updating the value of warc['filename'].
+        # Generate the error by updating the value of warc['filename'].
         warc["filename"] = "warc-name-error.warc.gz"
 
         # Calculates seed id, which is a portion of the WARC filename between "-SEED" and "-".
@@ -89,3 +90,35 @@ for warc in warc_metadata['files']:
             log_data["seed_id"] = "Could not calculate seed id from the WARC filename."
             web.warc_log(log_data)
             continue
+
+        # Should catch the error in the previous step and this should not run.
+        print("Did not catch error 1 correctly.")
+        continue
+
+    # ERROR 2: Cannot find expected values in WARC JSON (KeyError).
+    if current_warc == 2:
+
+        # Step before the error. Should work.
+        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc['filename'])
+        seed_id = regex_seed_id.group(1)
+        log_data["seed_id"] = "Successfully calculated seed id."
+
+        # Generate the error by removing two fields needed for variables.
+        warc["checksums"].pop("md5")
+        warc.pop("collection")
+
+        # Saves relevant information about the WARC in variables for future use.
+        # Stops processing if the WARC does not have the required metadata.
+        try:
+            warc_filename = warc['filename']
+            warc_url = warc['locations'][0]
+            warc_md5 = warc['checksums']['md5']
+            warc_collection = warc['collection']
+        except (KeyError, IndexError):
+            log_data["warc_json"] = f"Could not find at least one expected value in JSON: {warc}"
+            web.warc_log(log_data)
+            continue
+
+        # Should catch the error in the previous step and this should not run.
+        print("Did not catch error 2 correctly.")
+        continue
