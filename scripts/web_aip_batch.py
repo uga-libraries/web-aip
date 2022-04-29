@@ -164,7 +164,10 @@ for warc in warc_metadata['files']:
     # Downloads the WARC from Archive-It into the seed's objects folder.
     web.download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data)
 
-    # Saves log information for completed WARCs.
+    # If no errors were encountered (the last test was successful), updates the completion status.
+    # Saves the log information for all completed WARCs, even if there were errors.
+    if log_data["warc_fixity"].startswith("Successfully"):
+        log_data["complete"] = "Successfully processed WARC."
     web.warc_log(log_data)
 
 # # Checks for empty metadata or objects folders in the AIPs. These happens if there were uncaught download errors.
