@@ -24,12 +24,12 @@ def warc_log(log_data):
     # Formats the information from log_data as a list for adding to the CSV.
     # If it is header, it uses default values. Otherwise, log_data is a dictionary with known keys.
     if log_data == "header":
-        log_row = ["WARC Filename", "Seed ID Error", "WARC JSON Error", "JOB ID Error", "Seed Metadata Error",
+        log_row = ["WARC Filename", "WARC JSON Error", "Seed ID Error", "JOB ID Error", "Seed Metadata Error",
                    "Seed Report Error", "Seed Scope Report Error", "Collection Scope Report Error",
                    "Collection Report Error", "Crawl Job Report Error", "Crawl Job Definition Error",
                    "WARC Download API Error", "MD5Deep Error", "Fixity Error", "Processing Complete"]
     else:
-        log_row = [log_data["filename"], log_data["seed_id"], log_data["warc_json"], log_data["job_id"],
+        log_row = [log_data["filename"], log_data["warc_json"], log_data["seed_id"], log_data["job_id"],
                    log_data["seed_metadata"], log_data["seed_report"], log_data["seedscope_report"],
                    log_data["collscope_report"], log_data["coll_report"], log_data["crawljob_report"],
                    log_data["crawldef_report"], log_data["warc_api"], log_data["md5deep"], log_data["fixity"],
