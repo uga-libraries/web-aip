@@ -128,7 +128,7 @@ for warc in warc_metadata['files']:
     if current_warc == 3:
 
         # Previous step. Generate the error by assigning the wrong value to warc_filename.
-        warc_filename = "warc-name-error.warc.gz"
+        warc_filename = "warc-seed-error.warc.gz"
         warc_url = warc['locations'][0]
         warc_md5 = warc['checksums']['md5']
         warc_collection = warc['collection']
@@ -149,3 +149,30 @@ for warc in warc_metadata['files']:
         print("Test did not catch Error 3 correctly.")
         continue
 
+    # ERROR 4: Cannot extract job_id from the WARC filename.
+    if current_warc == 4:
+
+        # Previous steps. Generate the error by assigning the wrong value to warc_filename.
+        warc_filename = "warc-SEED123456-job-error.warc.gz"
+        warc_url = warc['locations'][0]
+        warc_md5 = warc['checksums']['md5']
+        warc_collection = warc['collection']
+        log_data["filename"] = warc_filename
+        log_data["warc_json"] = "Successfully got WARC data."
+        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
+        seed_id = regex_seed_id.group(1)
+        log_data["seed_id"] = "Successfully calculated seed id."
+
+        # Calculates the job id from the WARC filename, which are the numbers after "-JOB".
+        try:
+            regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
+            job_id = regex_job_id.group(1)
+            log_data["job_id"] = "Successfully calculated job id."
+        except AttributeError:
+            log_data["job_id"] = "Could not calculate job id from the WARC filename."
+            web.warc_log(log_data)
+            continue
+
+        # Should catch the error in the previous step and this should not run.
+        print("Test did not catch Error 4 correctly.")
+        continue
