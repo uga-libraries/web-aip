@@ -106,18 +106,19 @@ for warc in warc_metadata['files']:
         web.warc_log(log_data)
         continue
 #
-#     # Saves relevant information about the WARC in variables for future use.
-#     # Stops processing if the WARC does not have the required metadata.
-#     try:
-#         warc_filename = warc['filename']
-#         warc_url = warc['locations'][0]
-#         warc_md5 = warc['checksums']['md5']
-#         warc_collection = warc['collection']
-#     except (KeyError, IndexError):
-#         aip.log(log_path, f'WARC information is formatted wrong. JSON from API:\n {warc}\n '
-#                           f'This WARC and its metadata reports will not be downloaded.')
-#         continue
-#
+    # Saves relevant information about the WARC in variables for future use.
+    # Stops processing if the WARC does not have the required metadata.
+    try:
+        warc_filename = warc['filename']
+        warc_url = warc['locations'][0]
+        warc_md5 = warc['checksums']['md5']
+        warc_collection = warc['collection']
+        log_data["warc_json"] = "Successfully got WARC data."
+    except (KeyError, IndexError):
+        log_data["warc_json"] = f"Could not find at least one expected value in JSON: {warc}"
+        web.warc_log(log_data)
+        continue
+
 #     # Calculates the job id from the WARC filename.
 #     try:
 #         regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
