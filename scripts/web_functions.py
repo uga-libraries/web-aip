@@ -26,11 +26,11 @@ def warc_log(log_data):
     if log_data == "header":
         log_row = ["WARC Filename", "WARC JSON Error", "Seed ID Error", "JOB ID Error", "Seed Metadata Error",
                    "Metadata Report Errors", "Metadata Report Information", "WARC Download API Error",
-                   "MD5Deep Error", "Fixity Error", "Processing Complete"]
+                   "WARC Fixity Error", "Processing Complete"]
     else:
         log_row = [log_data["filename"], log_data["warc_json"], log_data["seed_id"], log_data["job_id"],
                    log_data["seed_metadata"], log_data["report_download"], log_data["report_info"],
-                   log_data["warc_api"], log_data["md5deep"], log_data["fixity"], log_data["complete"]]
+                   log_data["warc_api"], log_data["warc_fixity"], log_data["complete"]]
 
     # Saves the log_row information to a row in the WARC log CSV.
     with open("../warc_log.csv", "a", newline="") as log_file:
@@ -370,7 +370,7 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_da
             redact(report_path)
 
 
-def download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_path):
+def download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data):
     """Downloads a warc file and verifies that fixity is unchanged after downloading."""
 
     # The path for where the warc will be saved on the local machine (it is long and used twice in this script).
@@ -381,8 +381,10 @@ def download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_path)
 
     # If there was an error with the API call, quits the function.
     if not warc_download.status_code == 200:
-        aip.log(log_path, f'API error {warc_download.status_code}. Cannot download this WARC.')
+        log_data["warc_api"] = f'API error {warc_download.status_code}'
         return
+    else:
+        log_data["warc_api"] = "Successfully downloaded WARC."
 
     # Saves the warc in the objects folder, keeping the original filename.
     with open(warc_path, 'wb') as warc_file:
@@ -395,14 +397,14 @@ def download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_path)
         regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
         downloaded_warc_md5 = regex_md5.group(1)
     except AttributeError:
-        aip.log(log_path, f'Fixity cannot be extracted from md5deep output. \n{md5deep_output.stdout}')
+        log_data["warc_fixity"] = f"Fixity cannot be extracted from md5deep output: {md5deep_output.stdout}"
         return
 
     # Compares the md5 of the download warc to what Archive-It has for the warc (warc_md5). If the md5 has changed,
     # deletes the WARC so the check for AIP completeness will catch that there was a problem.
     if not warc_md5 == downloaded_warc_md5:
         os.remove(warc_path)
-        aip.log(log_path, f'Fixity changed on WARC after download. WARC was deleted. \n{md5deep_output.stdout}')
+        log_data["warc_fixity"] = f"Fixity changed and WARC deleted. {warc_md5} before, {downloaded_warc_md5} after"
 
 
 def find_empty_directory(log_path):

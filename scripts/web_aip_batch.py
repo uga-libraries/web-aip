@@ -88,7 +88,7 @@ for warc in warc_metadata['files']:
     # Starts a dictionary of information for the log.
     log_data = {"filename": "TBD", "warc_json": "n/a", "seed_id": "n/a", "job_id": "n/a",
                 "seed_metadata": "n/a", "report_download": "n/a", "report_info": "n/a", "warc_api": "n/a",
-                "md5deep": "n/a", "fixity": "n/a", "complete": "Errors during WARC processing."}
+                "warc_fixity": "n/a", "complete": "Errors during WARC processing."}
 
     # Updates the current WARC number and displays the script progress.
     current_warc += 1
@@ -160,11 +160,13 @@ for warc in warc_metadata['files']:
 
     # Downloads the seed metadata from Archive-It into the seed's metadata folder.
     web.download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
+
+    # Downloads the WARC from Archive-It into the seed's objects folder.
+    web.download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data)
+
+    # Saves log information for completed WARCs.
     web.warc_log(log_data)
 
-#     # Downloads the WARC from Archive-It into the seed's objects folder.
-#     web.download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_path)
-#
 # # Checks for empty metadata or objects folders in the AIPs. These happens if there were uncaught download errors.
 # web.find_empty_directory(log_path)
 #
