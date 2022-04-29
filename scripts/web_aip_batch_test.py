@@ -557,3 +557,20 @@ for warc in warc_metadata['files']:
 
         # Last step for this test, so saves the log.
         web.warc_log(log_data)
+
+# For testing, create two AIPs with empty directories.
+# Some of the previous tests also have empty objects folders and will be moved too.
+os.makedirs("test-999-web-metadata-empty/metadata")
+os.makedirs("test-999-web-metadata-empty/objects")
+with open("test-999-web-metadata-empty/objects/file.txt", "w") as new_file:
+    new_file.write("Sample text.")
+
+os.makedirs("test-000-web-objects-empty/metadata")
+os.makedirs("test-000-web-objects-empty/objects")
+with open("test-000-web-objects-empty/metadata/file.txt", "w") as new_file:
+    new_file.write("Sample text.")
+
+# Checks for empty metadata or objects folders in the AIPs.
+# Should catch the two test AIPs just created.
+# Haven't worked out logging these yet, so it will print to the terminal.
+web.find_empty_directory()
