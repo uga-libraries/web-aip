@@ -57,7 +57,7 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_da
             if log_data['report_download'] == "n/a":
                 log_data['report_download'] = f'{report_type} API error {metadata_report.status_code}'
             else:
-                log_data['report_download'] = log_data['report_download'] + f'; {report_type} API error {metadata_report.status_code}'
+                log_data['report_download'] += f'; {report_type} API error {metadata_report.status_code}'
 
     def redact(metadata_report_path):
         """Replaces the seed report with a redacted version of the file, removing login information if those columns
@@ -86,7 +86,7 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_da
                 if log_data['report_info'] == "n/a":
                     log_data['report_info'] = 'Seed report does not have login columns to redact.'
                 else:
-                    log_data['report_info'] = log_data['report_info'] + '; Seed report does not have login columns to redact.'
+                    log_data['report_info'] += '; Seed report does not have login columns to redact.'
                 return
 
             # Puts 'REDACTED' in the password and username columns for each non-header row and adds the updated
@@ -124,7 +124,7 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_da
                     get_report('id', crawl_def_id, 'crawl_definition', f'{aip_id}_{crawl_def_id}_crawldef.csv')
                     break
     except FileNotFoundError:
-        log_data['report_download'] = log_data['report_download'] + f'; Crawl Job was not downloaded so cannot get Crawl Definition'
+        log_data['report_download'] += f'; Crawl Job was not downloaded so cannot get Crawl Definition'
 
     # If there were no download errors (the log still has the default value), updates the log to show success.
     if log_data['report_download'] == "n/a":
@@ -143,7 +143,7 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_da
             if log_data['report_info'] == "n/a":
                 log_data['report_info'] = f'Deleted empty report {report}'
             else:
-                log_data['report_info'] = log_data['report_info'] + f'; Deleted empty report {report}'
+                log_data['report_info'] += f'; Deleted empty report {report}'
             os.remove(report_path)
             continue
 
