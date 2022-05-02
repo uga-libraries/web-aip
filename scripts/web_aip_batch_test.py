@@ -9,6 +9,7 @@ import csv
 import os
 import re
 import requests
+import shutil
 import subprocess
 import sys
 
@@ -44,8 +45,8 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_da
         filters = {'limit': -1, filter_type: filter_value, 'format': 'csv'}
         metadata_report = requests.get(f'{c.partner_api}/{report_type}', params=filters, auth=(c.username, c.password))
 
-        # Generates errors by changing the API status of collection and collection scope.
-        if "coll" in report_name:
+        # Generates errors by changing the API status of collection, collection scope, and crawl job.
+        if "coll" in report_name or report_name.endswith("_crawljob.csv"):
             metadata_report.status_code = 999
 
         # Saves the metadata report if there were no errors with the API or logs the error.
@@ -113,13 +114,17 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_da
     # Downloads the crawl definition report for the job this WARC was part of.
     # The crawl definition id is obtained from the crawl job report using the job id.
     # There may be more than one crawl definition report per AIP.
-    with open(f'{aip_id}/metadata/{aip_id}_{job_id}_crawljob.csv', 'r') as crawljob_csv:
-        crawljob_data = csv.DictReader(crawljob_csv)
-        for job in crawljob_data:
-            if job_id == job['id']:
-                crawl_def_id = job['crawl_definition']
-                get_report('id', crawl_def_id, 'crawl_definition', f'{aip_id}_{crawl_def_id}_crawldef.csv')
-                break
+    # Logs an error if there is no crawl job report to get the job id(s) from.
+    try:
+        with open(f'{aip_id}/metadata/{aip_id}_{job_id}_crawljob.csv', 'r') as crawljob_csv:
+            crawljob_data = csv.DictReader(crawljob_csv)
+            for job in crawljob_data:
+                if job_id == job['id']:
+                    crawl_def_id = job['crawl_definition']
+                    get_report('id', crawl_def_id, 'crawl_definition', f'{aip_id}_{crawl_def_id}_crawldef.csv')
+                    break
+    except FileNotFoundError:
+        log_data['report_download'] = log_data['report_download'] + f'; Crawl Job was not downloaded so cannot get Crawl Definition'
 
     # If there were no download errors (the log still has the default value), updates the log to show success.
     if log_data['report_download'] == "n/a":
@@ -586,7 +591,6 @@ aip.log(log_path, "\nStarting Completeness Tests")
 
 # 2529629 is already in the AIPs directory from earlier testing but not structured right for this test.
 # Delete what is there and make a new one.
-import shutil
 shutil.rmtree("magil-ggp-2529629-2022-03")
 
 # Seeds that are part of the download if use 2022-03-20 and 2022-03-25 as date boundaries.
