@@ -584,10 +584,10 @@ print("\nStarting completeness tests.")
 log_path = "../aip_log.txt"
 aip.log(log_path, "\nStarting Completeness Tests")
 
-# # 2529629 is already in the AIPs directory from earlier testing but not structured right for this test.
-# # Delete what is there and make a new one.
-# import shutil
-# shutil.rmtree("magil-ggp-2529629-2022-03")
+# 2529629 is already in the AIPs directory from earlier testing but not structured right for this test.
+# Delete what is there and make a new one.
+import shutil
+shutil.rmtree("magil-ggp-2529629-2022-03")
 
 # Seeds that are part of the download if use 2022-03-20 and 2022-03-25 as date boundaries.
 
@@ -615,24 +615,78 @@ for seed in seed_to_aip:
     aip_id = seed_to_aip[seed]
     aip_folder = aip_id + "_bag"
 
+    # Make error of missing AIP folder by skipping this AIP.
+    if seed == "2529627":
+        continue
+
     # Metadata folder and its contents.
     os.makedirs(f"{aip_folder}/data/metadata")
     metadata_ext = ["seed.csv", "seedscope.csv", "collscope.csv", "coll.csv", "crawljob.csv", "crawldef.csv",
                     "fits.xml", "preservation.xml"]
-    for ext in metadata_ext:
-        with open(f"{aip_folder}/data/metadata/{aip_id}_{ext}", "w") as new_file:
+
+    # Make error by not including the Archive-It metadata reports for this AIP.
+    if seed == "2529629":
+        with open(f"{aip_folder}/data/metadata/{aip_id}_fits.xml", "w") as new_file:
             new_file.write("Test")
-        if seed == "2529634":
-            with open(f"{aip_folder}/data/metadata/{aip_id}_2_fits.xml", "w") as new_file:
+        with open(f"{aip_folder}/data/metadata/{aip_id}_preservation.xml", "w") as new_file:
+            new_file.write("Test")
+
+    # Make error by not including the fits or preservation.xml files for this AIP.
+    elif seed == "2529642":
+        for ext in ("seed.csv", "seedscope.csv", "collscope.csv", "coll.csv", "crawljob.csv", "crawldef.csv"):
+            with open(f"{aip_folder}/data/metadata/{aip_id}_{ext}", "w") as new_file:
                 new_file.write("Test")
 
+    # For the rest of the AIPs, add all expected metadata files.
+    else:
+        for ext in metadata_ext:
+            # Add one each of all of the expected metadata files.
+            with open(f"{aip_folder}/data/metadata/{aip_id}_{ext}", "w") as new_file:
+                new_file.write("Test")
+
+    # Test counting by adding extra crawldef and crawljob to this AIP.
+    if seed == "2529631":
+        with open(f"{aip_folder}/data/metadata/{aip_id}_2_crawldef.csv", "w") as new_file:
+            new_file.write("Test")
+        with open(f"{aip_folder}/data/metadata/{aip_id}_2_crawljob.csv", "w") as new_file:
+            new_file.write("Test")
+        with open(f"{aip_folder}/data/metadata/{aip_id}_3_crawljob.csv", "w") as new_file:
+            new_file.write("Test")
+
+    # Test fits count by adding extra FITS for one AIP with 2 WARCs (correct) and one with 1 WARC (error).
+    if seed in ("2529634", "2529668"):
+        with open(f"{aip_folder}/data/metadata/{aip_id}_2_fits.xml", "w") as new_file:
+            new_file.write("Test")
+
+    # Make error by making a metadata file that isn't an expected type for this AIP.
+    if seed == "2529669":
+        with open(f"{aip_folder}/data/metadata/{aip_id}_error.txt", "w") as new_file:
+            new_file.write("Test")
+
     # Objects folder and its contents. All by one seed have 1 WARC.
+    # Making files with a WARC extension but they are not really WARCs.
     os.makedirs(f"{aip_folder}/data/objects")
-    with open(f"{aip_folder}/data/objects/test.warc.gz", "w") as new_file:
-        new_file.write("Test")
-    if seed == "2529634":
+
+    # Make error by not making a WARC for this AIP.
+    if seed == "2529660":
+        continue
+    # For all other AIPs, make one test WARC.
+    else:
+        with open(f"{aip_folder}/data/objects/test.warc.gz", "w") as new_file:
+            new_file.write("Test")
+
+    # Test WARC count by adding extra WARC for one AIP with 2 WARCs (correct) and one with 1 WARC (error).
+    if seed in ("2529634", "2529652"):
         with open(f"{aip_folder}/data/objects/test2.warc.gz", "w") as new_file:
             new_file.write("Test")
+
+    # Make error by adding something other than a WARC to the objects folder for this AIP.
+    if seed == "2529665":
+        with open(f"{aip_folder}/data/objects/error.txt", "w") as new_file:
+            new_file.write("Test")
+
+# Makes an error by adding an AIP to the AIPs directory that is not expected.
+os.makedirs("magil-error-000000-2022-03_bag")
 
 # Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
 # errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
