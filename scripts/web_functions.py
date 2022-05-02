@@ -118,7 +118,8 @@ def warc_data(date_start, date_end, collections=None):
 
 def seed_data(py_warcs, date_end):
     """Extracts information from the warc and seed data to define the AIP id, AIP title, and crawl definition id.
-    Returns this data in a dictionary with the seed id as the key."""
+    Returns this data in a dictionary with the seed id as the key and makes a metadata.csv file with seed metadata
+    needed for making AIPs later."""
 
     # Starts a dictionary for the number of seeds per collection, which is used in the AIP id.
     seed_count = {}
@@ -133,6 +134,11 @@ def seed_data(py_warcs, date_end):
     # Gets the year, month, and day of the date_end. Year and month are used as part of AIP IDs.
     # date_end is the end of the preservation download period and formatted YYYY-MM-DD.
     year, month, day = date_end.split("-")
+
+    # Makes a file named metadata.csv in the AIPs directory, with a header.
+    metadata_open = open("metadata.csv", "a", newline="")
+    metadata_csv = csv.writer(metadata_open)
+    metadata_csv.writerow(["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"])
 
     # Iterates through data for each warc to get the seed ids which are included in this download. Those seed ids are
     # then used to look up information via the Partner API needed to generate the desired AIP information.
@@ -235,6 +241,8 @@ def seed_data(py_warcs, date_end):
             # Saves AIP id and AIP title to the seeds_include dictionary.
             # This only contains information about seeds that had no errors and were fully processed.
             seeds_include[seed_identifier] = [identifier, title]
+
+    metadata_open.close()
 
     return seeds_include
 
