@@ -250,7 +250,7 @@ for warc in warc_metadata['files']:
 
     # Updates the current WARC number and displays the script progress.
     current_warc += 1
-    print(f"\nProcessing WARC {current_warc} of {total_warcs}.")
+    print(f"Processing WARC {current_warc} of {total_warcs}.")
 
     # ERROR 1: Cannot find expected values in WARC JSON (KeyError).
     if current_warc == 1:
@@ -558,6 +558,7 @@ for warc in warc_metadata['files']:
         # Last step for this test, so saves the log.
         web.warc_log(log_data)
 
+print("\nStarting empty directory tests.")
 # For testing, create two AIPs with empty directories.
 # Some of the previous tests also have empty objects folders and will be moved too.
 os.makedirs("test-999-web-metadata-empty/metadata")
@@ -579,3 +580,60 @@ web.find_empty_directory(log_path)
 # THIS REPLACES THE PART OF THE SCRIPT THAT MAKES THE AIPS.
 # INSTEAD, IT CREATES A SET OF TO USE FOR TESTING check_aips.
 # ----------------------------------------------------------------------------------------------------------------
+print("\nStarting completeness tests.")
+log_path = "../aip_log.txt"
+aip.log(log_path, "\nStarting Completeness Tests")
+
+# # 2529629 is already in the AIPs directory from earlier testing but not structured right for this test.
+# # Delete what is there and make a new one.
+# import shutil
+# shutil.rmtree("magil-ggp-2529629-2022-03")
+
+# Seeds that are part of the download if use 2022-03-20 and 2022-03-25 as date boundaries.
+
+seed_to_aip = {"2529671": "magil-ggp-2529671-2022-03", "2529669": "magil-ggp-2529669-2022-03",
+               "2529633": "magil-ggp-2529633-2022-03", "2529665": "magil-ggp-2529665-2022-03",
+               "2529634": "magil-ggp-2529634-2022-03", "2529660": "magil-ggp-2529660-2022-03",
+               "2529642": "magil-ggp-2529642-2022-03", "2529627": "magil-ggp-2529627-2022-03",
+               "2529652": "magil-ggp-2529652-2022-03", "2529631": "magil-ggp-2529631-2022-03",
+               "2529668": "magil-ggp-2529668-2022-03", "2529681": "magil-ggp-2529681-2022-03",
+               "2529676": "magil-ggp-2529676-2022-03", "2529629": "magil-ggp-2529629-2022-03"}
+
+aip_to_title = {"magil-ggp-2529671-2022-03": "Title", "magil-ggp-2529669-2022-03": "Title",
+               "magil-ggp-2529633-2022-03": "Title", "magil-ggp-2529665-2022-03": "Title",
+               "magil-ggp-2529634-2022-03": "Title", "magil-ggp-2529660-2022-03": "Title",
+               "magil-ggp-2529642-2022-03": "Title", "magil-ggp-2529627-2022-03": "Title",
+               "magil-ggp-2529652-2022-03": "Title", "magil-ggp-2529631-2022-03": "Title",
+               "magil-ggp-2529668-2022-03": "Title", "magil-ggp-2529681-2022-03": "Title",
+               "magil-ggp-2529676-2022-03": "Title", "magil-ggp-2529629-2022-03": "Title"}
+
+
+# # Make one AIP folder for each of the seeds with fake metadata files, warcs, and bagging.
+# # Just has to have everything that the completeness check looks for.
+for seed in seed_to_aip:
+
+    aip_id = seed_to_aip[seed]
+    aip_folder = aip_id + "_bag"
+
+    # Metadata folder and its contents.
+    os.makedirs(f"{aip_folder}/data/metadata")
+    metadata_ext = ["seed.csv", "seedscope.csv", "collscope.csv", "coll.csv", "crawljob.csv", "crawldef.csv",
+                    "fits.xml", "preservation.xml"]
+    for ext in metadata_ext:
+        with open(f"{aip_folder}/data/metadata/{aip_id}_{ext}", "w") as new_file:
+            new_file.write("Test")
+        if seed == "2529634":
+            with open(f"{aip_folder}/data/metadata/{aip_id}_2_fits.xml", "w") as new_file:
+                new_file.write("Test")
+
+    # Objects folder and its contents. All by one seed have 1 WARC.
+    os.makedirs(f"{aip_folder}/data/objects")
+    with open(f"{aip_folder}/data/objects/test.warc.gz", "w") as new_file:
+        new_file.write("Test")
+    if seed == "2529634":
+        with open(f"{aip_folder}/data/objects/test2.warc.gz", "w") as new_file:
+            new_file.write("Test")
+
+# Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
+# errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
+web.check_aips(date_end, date_start, seed_to_aip, log_path)
