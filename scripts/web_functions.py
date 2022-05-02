@@ -533,9 +533,9 @@ def check_aips(date_end, date_start, seed_to_aip, log_path):
                 # seed_to_aip, it is an unexpected seed and cannot be added to the dictionary.
                 try:
                     aip_info[seed_identifier] = [seed_to_aip[seed_identifier], 1, json_seed[0]['url']]
+                #TODO: do something with the errors.
                 except (KeyError, IndexError):
-                    aip.log(log_path, f'Unexpected seed: {seed_identifier}.')
-                    raise ValueError
+                    pass
 
                 warcs_include += 1
 
