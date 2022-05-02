@@ -653,7 +653,7 @@ def check_aips(date_end, date_start, seed_to_aip, log_path):
         return
 
     # Starts a csv for the results of the quality review.
-    csv_path = f'{c.script_output}/aips_{date_end}/completeness_check_{date_end}.csv'
+    csv_path = f'{c.script_output}/completeness_check_{date_end}.csv'
     with open(csv_path, 'w', newline='') as complete_csv:
         complete_write = csv.writer(complete_csv)
 
