@@ -603,15 +603,6 @@ seed_to_aip = {"2529671": "magil-ggp-2529671-2022-03", "2529669": "magil-ggp-252
                "2529668": "magil-ggp-2529668-2022-03", "2529681": "magil-ggp-2529681-2022-03",
                "2529676": "magil-ggp-2529676-2022-03", "2529629": "magil-ggp-2529629-2022-03"}
 
-aip_to_title = {"magil-ggp-2529671-2022-03": "Title", "magil-ggp-2529669-2022-03": "Title",
-               "magil-ggp-2529633-2022-03": "Title", "magil-ggp-2529665-2022-03": "Title",
-               "magil-ggp-2529634-2022-03": "Title", "magil-ggp-2529660-2022-03": "Title",
-               "magil-ggp-2529642-2022-03": "Title", "magil-ggp-2529627-2022-03": "Title",
-               "magil-ggp-2529652-2022-03": "Title", "magil-ggp-2529631-2022-03": "Title",
-               "magil-ggp-2529668-2022-03": "Title", "magil-ggp-2529681-2022-03": "Title",
-               "magil-ggp-2529676-2022-03": "Title", "magil-ggp-2529629-2022-03": "Title"}
-
-
 # # Make one AIP folder for each of the seeds with fake metadata files, warcs, and bagging.
 # # Just has to have everything that the completeness check looks for.
 for seed in seed_to_aip:
