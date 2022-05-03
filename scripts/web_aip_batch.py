@@ -14,6 +14,7 @@ script to verify all required fields are present. """
 
 # Usage: python /path/web_aip_batch.py date_start date_end
 
+import csv
 import datetime
 import os
 import re
@@ -43,12 +44,12 @@ if not re.match(r"\d{4}-\d{2}-\d{2}", date_end):
 
 # Tests the paths in the configuration file to verify they exist. Quits the script if any are incorrect.
 # It is common to get typos when setting up the configuration file on a new machine.
-valid_errors = aip.check_configuration()
-if not valid_errors == "no errors":
-    print('The following path(s) in the configuration file are not correct:')
-    for error in valid_errors:
+configuration_errors = aip.check_configuration()
+if len(configuration_errors) > 0:
+    print("/nProblems detected with configuration.py:")
+    for error in configuration_errors:
         print(error)
-    print('Correct the configuration file and run the script again.')
+    print("Correct the configuration file and run the script again.")
     sys.exit()
 
 # Makes a folder for AIPs within the script_output folder, a designated place on the local machine for web archiving
@@ -178,6 +179,23 @@ web.find_empty_directory(log_path)
 
 
 # PART TWO: CREATE AIPS THAT ARE READY FOR INGEST INTO ARCHIVE
+
+# Verifies the metadata.csv file was made earlier in the script by seed_data().
+aip_metadata_csv = "metadata.csv"
+if not os.path.exists(aip_metadata_csv):
+    print("Cannot make AIPs from the downloaded content because metadata.csv was not made by the script.")
+    sys.exit()
+
+# Reads the metadata.csv and verifies that the contents are formatted correctly.
+open_metadata = open(aip_metadata_csv)
+read_metadata = csv.reader(open_metadata)
+metadata_errors = aip.check_metadata_csv(read_metadata)
+if len(metadata_errors) > 0:
+    print('\nProblems detected with metadata.csv:')
+    for error in metadata_errors:
+        print("   * " + error)
+    print('\nCannot make AIPs from the downloaded content.')
+    sys.exit()
 
 # Makes directories used to store script outputs, if they aren't already there.
 aip.make_output_directories()
