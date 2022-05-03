@@ -220,23 +220,23 @@ for aip_row in read_metadata:
 
     # Updates the current AIP number and displays the script progress.
     current_aip += 1
-    print(f'\nProcessing {aip_folder} ({current_aip} of {total_aips}).')
+    print(f"\nProcessing {aip_folder} ({current_aip} of {total_aips}).")
 
     # Extracts technical metadata from the files using FITS.
-    if aip_folder in os.listdir('.'):
-        a.extract_metadata(aip_folder, f'{c.script_output}/{aips_directory}', log_path)
+    if aip_folder in os.listdir("."):
+        a.extract_metadata(aip)
 
     # Transforms the FITS metadata into the PREMIS preservation.xml file using saxon and xslt stylesheets.
-    if aip_folder in os.listdir('.'):
-        a.make_preservationxml(aip_folder, aip_to_title[aip_folder], department, 'website', log_path)
+    if aip_folder in os.listdir("."):
+        a.make_preservationxml(aip, "website")
 
     # Bags the aip.
-    if aip_folder in os.listdir('.'):
-        a.bag(aip_folder, log_path)
+    if aip_folder in os.listdir("."):
+        a.bag(aip)
 
-    # Tars, and zips the aip.
-    if f'{aip_folder}_bag' in os.listdir('.'):
-        a.package(aip_folder, os.getcwd(), zip=True)
+    # Tars and zips the aip.
+    if f"{aip_folder}_bag" in os.listdir('.'):
+        a.package(aip)
 
 # Makes MD5 manifests of all AIPs the in this download using md5deep, with one manifest per department.
 a.make_manifest()
