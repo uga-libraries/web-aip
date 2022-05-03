@@ -43,7 +43,7 @@ if not re.match(r"\d{4}-\d{2}-\d{2}", date_end):
 
 # Tests the paths in the configuration file to verify they exist. Quits the script if any are incorrect.
 # It is common to get typos when setting up the configuration file on a new machine.
-valid_errors = aip.check_paths()
+valid_errors = aip.check_configuration()
 if not valid_errors == "no errors":
     print('The following path(s) in the configuration file are not correct:')
     for error in valid_errors:
