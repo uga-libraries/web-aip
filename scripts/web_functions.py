@@ -243,11 +243,16 @@ def seed_data(py_warcs, date_end):
             # This only contains information about seeds that had no errors and were fully processed.
             seeds_include[seed_identifier] = [identifier, title]
 
-            # Gets the ARCHive group for the department and saves AIp information to the metadata.csv
+            # Gets the ARCHive group for the department,
+            # adds the department prefix to the related collection number if necessary,
+            # and saves all the AIP information to the metadata.csv
             dept_to_group = {"Hargrett Rare Book & Manuscript Library": "hargrett",
                              "Map and Government Information Library": "magil",
                              "Richard B. Russell Library for Political Research and Studies": "russell"}
             group = dept_to_group[department_name]
+            if group == "russell":
+                related_collection = "rbrl-" + related_collection
+
             metadata_csv.writerow([group, related_collection, identifier, identifier, title, 1])
 
     # Closes the metadata file and returns the dictionary with AIP ID and title.
