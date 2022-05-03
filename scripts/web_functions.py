@@ -457,7 +457,7 @@ def find_empty_directory():
             a.move_error('incomplete_directory', aip_path)
 
 
-def check_aips(date_end, date_start, seed_to_aip, log_path):
+def check_aips(date_end, date_start, seed_to_aip):
     """Verifies that all the expected AIPs for the download are complete and no unexpected AIPs were created.
     Produces a csv named completeness_check with the results in the AIPs directory. """
 
@@ -474,7 +474,6 @@ def check_aips(date_end, date_start, seed_to_aip, log_path):
 
         # If there was an API error, ends the function.
         if warcs.status_code != 200:
-            a.log(log_path, f'WASAPI error: {warcs.status_code}.')
             print("WASAPI Status code:", warcs.status_code)
             raise ValueError
 
@@ -499,7 +498,6 @@ def check_aips(date_end, date_start, seed_to_aip, log_path):
                 regex_seed = re.match(r".*-SEED(\d+)-.*", warc_info['filename'])
                 seed_identifier = regex_seed.group(1)
             except AttributeError:
-                a.log(log_path, f'No seed for {warc_info["warc_filename"]}.')
                 raise ValueError
 
             # Filter one: only includes the WARC in the dictionary if it was created since the last download and
@@ -510,7 +508,6 @@ def check_aips(date_end, date_start, seed_to_aip, log_path):
                 regex_crawl_date = re.match(r"(\d{4}-\d{2}-\d{2})T.*", warc_info['store-time'])
                 crawl_date = regex_crawl_date.group(1)
             except AttributeError:
-                a.log(log_path, f'No date for {warc_info["warc_filename"]}.')
                 raise ValueError
 
             if crawl_date < date_start or crawl_date > date_end:
@@ -534,7 +531,7 @@ def check_aips(date_end, date_start, seed_to_aip, log_path):
 
                 # If there was an API error, ends the function.
                 if seed_report.status_code != 200:
-                    a.log(log_path, f'API error: {seed_report.status_code}.')
+                    print(f'API error {seed_report.status_code} getting seed report for seed {seed_identifier}.')
                     raise ValueError
 
                 # Gets the repository from the seed report, if present. If not, this WARC is not included.
@@ -561,7 +558,7 @@ def check_aips(date_end, date_start, seed_to_aip, log_path):
 
         # Checks that the right number of WARCs were evaluated.
         if warcs_expected != warcs_include + warcs_exclude:
-            a.log(log_path, 'Script did not review expected number of WARCs.')
+            print('Check AIPs did not review the expected number of WARCs.')
             raise ValueError
 
         return aip_info
@@ -669,7 +666,7 @@ def check_aips(date_end, date_start, seed_to_aip, log_path):
     try:
         aips_metadata = aip_dictionary()
     except ValueError:
-        a.log(log_path, '\nUnable to check AIPs for completeness. AIP dictionary not generated.')
+        print('\nUnable to check AIPs for completeness. AIP dictionary not generated.')
         return
 
     # Starts a csv for the results of the quality review.
