@@ -216,7 +216,7 @@ for aip_row in read_metadata:
 
     # Makes an instance of the AIP class using metadata from the CSV and global variables.
     department, collection_id, aip_folder, aip_id, title, version = aip_row
-    aip = a.AIP(aips_directory, department, collection_id, aip_folder, aip_id, title, version, ZIP)
+    aip = a.AIP(aips_directory, department, collection_id, aip_folder, aip_id, title, version, True)
 
     # Updates the current AIP number and displays the script progress.
     current_aip += 1
@@ -248,11 +248,8 @@ open_metadata.close()
 # Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
 # errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
 print('\nStarting completeness check.')
-web.check_aips(date_end, date_start, seed_to_aip, log_path)
+web.check_aips(date_end, date_start, seed_to_aip)
 print('\nFinished completeness check. See completeness_check_YYYY-MM-DD.csv for details.')
-
-# Adds completion of the script to the log.
-a.log(log_path, f'\nScript finished running at {datetime.datetime.today()}.')
 
 # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) into the AIPs folder for this
 # download to keep everything together if another set is downloaded before these are deleted.
