@@ -1,7 +1,8 @@
 """Purpose: This script generates every known error to use for testing the error handling of web_aip_batch.py.
 
-Usage: python /path/web_aip_batch_test.py date_start date_end
-To get 16 WARCs, for date_start use 2022-03-20 and for date_end use 2022-03-25
+Usage: python /path/web_aip_batch_test.py
+Date values need to be 2022-03-20 and 2022-03-25 to test for predictable results,
+so included in this script and not as arguments.
 
 """
 
@@ -203,18 +204,10 @@ def download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data,
 # ERROR HANDLING FOR SCRIPT ARGUMENTS AND THE CONFIGURATION FILE ARE TESTED BY GIVING THE WRONG INPUTS INSTEAD.
 # ----------------------------------------------------------------------------------------------------------------
 
-# Gets the start and end dates from script arguments and verify their formatting.
-try:
-    date_start, date_end = sys.argv[1:]
-except IndexError:
-    print("Exiting script: must provide exactly two arguments, the start and end date of the quarter.")
-    exit()
-if not re.match(r"\d{4}-\d{2}-\d{2}", date_start):
-    print(f"Exiting script: start date '{date_start}' must be formatted YYYY-MM-DD.")
-    exit()
-if not re.match(r"\d{4}-\d{2}-\d{2}", date_end):
-    print(f"Exiting script: end date '{date_end}' must be formatted YYYY-MM-DD.")
-    exit()
+# The start and end dates that the test script requires to give predictable results.
+# In the actual script, these are arguments.
+date_start = "2022-03-20"
+date_end = "2022-03-25"
 
 # Tests the paths in the configuration file.
 valid_errors = aip.check_paths()
