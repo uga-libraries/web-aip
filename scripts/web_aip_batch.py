@@ -15,7 +15,6 @@ script to verify all required fields are present. """
 # Usage: python /path/web_aip_batch.py date_start date_end
 
 import csv
-import datetime
 import os
 import re
 import sys
@@ -55,12 +54,12 @@ if len(configuration_errors) > 0:
 # Makes a folder for AIPs within the script_output folder, a designated place on the local machine for web archiving
 # documents). The folder name includes the end date for the download to keep it separate from previous downloads
 # which may still be saved on the same machine.
-aips_directory = f'aips_{date_end}'
-if not os.path.exists(f'{c.script_output}/{aips_directory}'):
-    os.makedirs(f'{c.script_output}/{aips_directory}')
+aips_directory = os.path.join(c.script_output, f"aips_{date_end}")
+if not os.path.exists(aips_directory):
+    os.makedirs(aips_directory)
 
 # Changes current directory to the AIPs folder.
-os.chdir(f'{c.script_output}/{aips_directory}')
+os.chdir(aips_directory)
 
 # PART ONE: DOWNLOAD WARCS AND METADATA INTO AIP DIRECTORY STRUCTURE.
 
