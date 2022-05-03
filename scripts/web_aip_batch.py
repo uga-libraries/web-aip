@@ -221,6 +221,9 @@ for aip_row in read_metadata:
     current_aip += 1
     print(f"\nProcessing {aip_folder} ({current_aip} of {total_aips}).")
 
+    # Deletes any temporary files and makes a log of each deleted file.
+    a.delete_temp(aip)
+
     # Extracts technical metadata from the files using FITS.
     if aip_folder in os.listdir("."):
         a.extract_metadata(aip)

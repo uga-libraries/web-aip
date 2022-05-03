@@ -630,7 +630,7 @@ def check_aips(date_end, date_start, seed_to_aip):
         # there is a file of a different type, based on the end of the filename, it updates the value to False.
         result.append(True)
         expected_endings = ('_coll.csv', '_collscope.csv', '_crawldef.csv', '_crawljob.csv', '_seed.csv',
-                            '_seedscope.csv', '_preservation.xml', '_fits.xml')
+                            '_seedscope.csv', '_preservation.xml', '_fits.xml', '_del.csv')
         for file in os.listdir(metadata):
             if not file.endswith(expected_endings):
                 result[-1] = False
