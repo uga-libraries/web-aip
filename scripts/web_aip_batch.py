@@ -201,34 +201,26 @@ a.log("header")
 a.make_output_directories()
 
 # Starts counts for tracking script progress. Some processes are slow, so this shows the script is still working.
+# Subtracts one from the count for the metadata file.
 current_aip = 0
-total_aips = len(os.listdir('.'))
+total_aips = len(os.listdir('.')) - 1
 
-# Adds name for the next section to the log.
-a.log(log_path, f'\n\nPROCESSING AIPS ({total_aips} TOTAL)')
+# Returns to the beginning of the CSV (the script is at the end because of checking it for errors) and skips the header.
+open_metadata.seek(0)
+next(read_metadata)
 
-# Runs the scripts for each step of making an AIP, one folder at a time. Checks if the AIP is still present before
-# running each script, in case it was moved due to an error in the previous script.
-for aip_folder in os.listdir('.'):
+# Uses the AIP functions to create an AIP for each folder in the metadata CSV.
+# Checks if the AIP folder is still present before calling the function for the next step
+# in case it was moved due to an error in the previous step.
+for aip_row in read_metadata:
+
+    # Makes an instance of the AIP class using metadata from the CSV and global variables.
+    department, collection_id, aip_folder, aip_id, title, version = aip_row
+    aip = a.AIP(aips_directory, department, collection_id, aip_folder, aip_id, title, version, ZIP)
 
     # Updates the current AIP number and displays the script progress.
     current_aip += 1
-    a.log(log_path, f'\n{aip_folder}')
     print(f'\nProcessing {aip_folder} ({current_aip} of {total_aips}).')
-
-    # Calculates the department group name in ARCHive from the folder name (the AIP ID).
-    # If it does not match the expected pattern, moves the AIP to an error folder and begins processing the next AIP.
-    if aip_folder.startswith('harg'):
-        department = 'hargrett'
-    elif aip_folder.startswith('magil'):
-        department = 'magil'
-    elif aip_folder.startswith('rbrl'):
-        department = 'russell'
-    else:
-        a.log(log_path, f'AIP ID {aip_folder} does not start with an expected department prefix. '
-                          f'AIP moved to error folder.')
-        a.move_error('department_prefix', aip_folder)
-        continue
 
     # Extracts technical metadata from the files using FITS.
     if aip_folder in os.listdir('.'):
