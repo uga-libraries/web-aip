@@ -238,8 +238,12 @@ for aip_row in read_metadata:
     if f"{aip_folder}_bag" in os.listdir('.'):
         a.package(aip)
 
-# Makes MD5 manifests of all AIPs the in this download using md5deep, with one manifest per department.
-a.make_manifest()
+    # Adds the packaged AIP to the MD5 manifest in the aips-to-ingest folder.
+    if f'{aip.id}_bag' in os.listdir('.'):
+        a.manifest(aip)
+
+# Closes the metadata CSV.
+open_metadata.close()
 
 # Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
 # errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
