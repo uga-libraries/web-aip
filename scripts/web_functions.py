@@ -211,6 +211,7 @@ def seed_data(py_warcs, date_end):
             # Constructs a MAGIL AIP ID: magil-ggp-seed_id-download_year-download_month.
             elif department_name.startswith('Map'):
                 identifier = f'magil-ggp-{seed_info["id"]}-{year}-{month}'
+                related_collection = "0000"
 
             # Constructs a Russell AIP ID: rbrl-collection-web-download_yearmonth-sequential_number.
             elif department_name.startswith('Richard B. Russell'):
@@ -242,8 +243,15 @@ def seed_data(py_warcs, date_end):
             # This only contains information about seeds that had no errors and were fully processed.
             seeds_include[seed_identifier] = [identifier, title]
 
-    metadata_open.close()
+            # Gets the ARCHive group for the department and saves AIp information to the metadata.csv
+            dept_to_group = {"Hargrett Rare Book & Manuscript Library": "hargrett",
+                             "Map and Government Information Library": "magil",
+                             "Richard B. Russell Library for Political Research and Studies": "russell"}
+            group = dept_to_group[department_name]
+            metadata_csv.writerow([group, related_collection, identifier, identifier, title, 1])
 
+    # Closes the metadata file and returns the dictionary with AIP ID and title.
+    metadata_open.close()
     return seeds_include
 
 
