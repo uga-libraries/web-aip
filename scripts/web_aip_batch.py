@@ -171,11 +171,8 @@ for warc in warc_metadata['files']:
         log_data["complete"] = "Successfully processed WARC."
     web.warc_log(log_data)
 
-# Starts a log for AIP information.
-log_path = "../aip_log.txt"
-
 # Checks for empty metadata or objects folders in the AIPs. These happens if there were uncaught download errors.
-web.find_empty_directory(log_path)
+web.find_empty_directory()
 
 
 # PART TWO: CREATE AIPS THAT ARE READY FOR INGEST INTO ARCHIVE
@@ -196,6 +193,9 @@ if len(metadata_errors) > 0:
         print("   * " + error)
     print('\nCannot make AIPs from the downloaded content.')
     sys.exit()
+
+# Starts a log for AIP information.
+aip.log("header")
 
 # Makes directories used to store script outputs, if they aren't already there.
 aip.make_output_directories()
