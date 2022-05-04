@@ -647,8 +647,8 @@ def check_aips(date_end, date_start, seed_to_aip):
         # Iterates through the folder with the AIPs.
         for aip_directory in os.listdir(f'{c.script_output}/aips_{date_end}'):
 
-            # Skips the csv made by the check_aips function.
-            if aip_directory.startswith('completeness_check'):
+            # Skips the metadata.csv used to make the AIPs.
+            if aip_directory == "metadata.csv":
                 continue
 
             # Creates a tuple of the expected AIPs, which are the values in the seed_to_aip dictionary generated
