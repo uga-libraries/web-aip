@@ -644,6 +644,12 @@ for seed in seed_to_aip:
         with open(f"{aip_folder}/data/metadata/{aip_id}_2_fits.xml", "w") as new_file:
             new_file.write("Test")
 
+    # Test deletion log (permitted) by creating one in one AIP.
+    if seed == "2529681":
+        with open(f"{aip_folder}/data/metadata/{aip_id}_files-deleted_{datetime.datetime.today().date()}_del.csv",
+                  "w") as new_file:
+            new_file.write("Test")
+
     # Make error by making a metadata file that isn't an expected type for this AIP.
     if seed == "2529669":
         with open(f"{aip_folder}/data/metadata/{aip_id}_error.txt", "w") as new_file:
