@@ -7,6 +7,7 @@ so included in this script and not as arguments.
 """
 
 import csv
+import datetime
 import os
 import re
 import requests
@@ -15,7 +16,7 @@ import subprocess
 import sys
 
 # Import functions and constant variables from other UGA scripts.
-import aip_functions as aip
+import aip_functions as a
 import configuration as c
 import web_functions as web
 
@@ -210,12 +211,12 @@ date_start = "2022-03-20"
 date_end = "2022-03-25"
 
 # Tests the paths in the configuration file.
-valid_errors = aip.check_paths()
-if not valid_errors == "no errors":
-    print('The following path(s) in the configuration file are not correct:')
-    for error in valid_errors:
+configuration_errors = a.check_configuration()
+if len(configuration_errors) > 0:
+    print("/nProblems detected with configuration.py:")
+    for error in configuration_errors:
         print(error)
-    print('Correct the configuration file and run the script again.')
+    print("Correct the configuration file and run the script again.")
     sys.exit()
 
 # Makes a folder for AIPs within the script_output folder and makes it the current directory.
@@ -571,16 +572,13 @@ with open("test-000-web-objects-empty/metadata/file.txt", "w") as new_file:
 
 # Checks for empty metadata or objects folders in the AIPs.
 # Should catch the two test AIPs just created.
-log_path = "../aip_log.txt"
-web.find_empty_directory(log_path)
+web.find_empty_directory()
 
 # ----------------------------------------------------------------------------------------------------------------
 # THIS REPLACES THE PART OF THE SCRIPT THAT MAKES THE AIPS.
 # INSTEAD, IT CREATES A SET OF TO USE FOR TESTING check_aips.
 # ----------------------------------------------------------------------------------------------------------------
 print("\nStarting completeness tests.")
-log_path = "../aip_log.txt"
-aip.log(log_path, "\nStarting Completeness Tests")
 
 # 2529629 is already in the AIPs directory from earlier testing but not structured right for this test.
 # Delete what is there and make a new one.
@@ -678,4 +676,4 @@ os.makedirs("magil-error-000000-2022-03_bag")
 
 # Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
 # errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
-web.check_aips(date_end, date_start, seed_to_aip, log_path)
+web.check_aips(date_end, date_start, seed_to_aip)
