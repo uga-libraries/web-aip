@@ -257,7 +257,8 @@ print('\nFinished completeness check. See completeness_check_YYYY-MM-DD.csv for 
 # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) and logs into the AIPs folder
 # to keep everything together if another set is downloaded before these are deleted.
 os.chdir(c.script_output)
-to_move = ("aips-to-ingest", "errors", "fits-xml", "preservation-xml", "warc_log.csv", "aip_log.csv")
+to_move = ("aips-to-ingest", "errors", "fits-xml", "preservation-xml",
+           "warc_log.csv", "aip_log.csv", "completeness_check.csv")
 for item in os.listdir("."):
     if item in to_move:
         os.replace(item, f"{aips_directory}/{item}")
