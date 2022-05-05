@@ -71,6 +71,7 @@ seed_metadata = web.seed_data(warc_metadata, date_end)
 # Starts counts for tracking script progress. Some processes are slow, so this shows the script is still working.
 current_warc = 0
 total_warcs = warc_metadata['count']
+print(f"\nProcessing {total_warcs} warcs.")
 
 # Starts a dictionary to store a mapping of seed id to AIP id, used for checking the downloaded AIPs for completeness.
 seed_to_aip = {}
@@ -92,7 +93,7 @@ for warc in warc_metadata['files']:
 
     # Updates the current WARC number and displays the script progress.
     current_warc += 1
-    print(f"\nProcessing WARC {current_warc} of {total_warcs}.")
+    print(f"\tStarting WARC {current_warc} of {total_warcs}.")
 
     # Saves relevant information about the WARC in variables for future use.
     # Stops processing if the WARC does not have the required metadata.
@@ -200,6 +201,7 @@ a.make_output_directories()
 # Subtracts one from the count for the metadata file.
 current_aip = 0
 total_aips = len(os.listdir('.')) - 1
+print(f"\nProcessing {total_aips} AIPs.")
 
 # Returns to the beginning of the CSV (the script is at the end because of checking it for errors) and skips the header.
 open_metadata.seek(0)
@@ -216,7 +218,7 @@ for aip_row in read_metadata:
 
     # Updates the current AIP number and displays the script progress.
     current_aip += 1
-    print(f"\nProcessing {aip_folder} ({current_aip} of {total_aips}).")
+    print(f"\tStarting AIP {current_aip} of {total_aips}.")
 
     # Verifies the metadata and objects folders exist and have content.
     # This is unlikely but could happen if there were uncaught download errors.
@@ -252,7 +254,6 @@ open_metadata.close()
 # errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
 print('\nStarting completeness check.')
 web.check_aips(date_end, date_start, seed_to_aip)
-print('\nFinished completeness check. See completeness_check_YYYY-MM-DD.csv for details.')
 
 # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) and logs into the AIPs folder
 # to keep everything together if another set is downloaded before these are deleted.
@@ -262,3 +263,5 @@ to_move = ("aips-to-ingest", "errors", "fits-xml", "preservation-xml",
 for item in os.listdir("."):
     if item in to_move:
         os.replace(item, f"{aips_directory}/{item}")
+
+print('\nScript is complete.')
