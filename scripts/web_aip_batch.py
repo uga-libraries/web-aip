@@ -254,11 +254,10 @@ print('\nStarting completeness check.')
 web.check_aips(date_end, date_start, seed_to_aip)
 print('\nFinished completeness check. See completeness_check_YYYY-MM-DD.csv for details.')
 
-# Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) into the AIPs folder for this
-# download to keep everything together if another set is downloaded before these are deleted.
+# Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) and logs into the AIPs folder
+# to keep everything together if another set is downloaded before these are deleted.
 os.chdir(c.script_output)
-to_move = ['aips-to-ingest', 'errors', 'fits-xml', 'preservation-xml',
-           f'web_preservation_download_log_{date_end}.txt']
-for item in os.listdir('.'):
+to_move = ("aips-to-ingest", "errors", "fits-xml", "preservation-xml", "warc_log.csv", "aip_log.csv")
+for item in os.listdir("."):
     if item in to_move:
-        os.replace(item, f'{aips_directory}/{item}')
+        os.replace(item, f"{aips_directory}/{item}")
