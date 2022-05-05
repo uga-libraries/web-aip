@@ -435,31 +435,38 @@ def download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data)
         log_data["warc_fixity"] = f"Successfully verified WARC fixity on {datetime.datetime.now()}"
 
 
-def find_empty_directory():
-    """Identifies any AIPs with empty objects or metadata folders and moves them to an error folder."""
+def check_directory(aip):
+    """Identifies any AIPs with missing or empty objects or metadata folders and moves them to an error folder."""
 
-    # Iterates through the aips directory.
-    for root, folders, files in os.walk('.'):
+    # Checks if the objects folder doesn't exist or is empty.
+    # Moves to an error folder if either issue is detected and logs the result.
+    if not os.path.exists(f"{aip.directory}/{aip.id}/objects"):
+        aip.log["ObjectsError"] = "Objects folder is missing."
+        a.log(aip.log)
+        a.move_error('incomplete_directory', aip.id)
+        return
+    elif len(os.listdir(f"{aip.directory}/{aip.id}/objects")) == 0:
+        aip.log["ObjectsError"] = "Objects folder is empty."
+        a.log(aip.log)
+        a.move_error('incomplete_directory', aip.id)
+        return
+    else:
+        aip.log["ObjectsError"] = "Successfully created objects folder"
 
-        # Looks for empty metadata folders.
-        if root.endswith('metadata') and len(os.listdir(root)) == 0:
-
-            # Calculates the path of the parent folder (the aip folder).
-            aip_path = os.path.dirname(root)
-
-            # Prints the error and moves the aip to an error folder.
-            print(f"\n{aip_path} metadata folder is empty. Moved to incomplete_directory error folder.")
-            a.move_error('incomplete_directory', aip_path)
-
-        # Looks for empty objects folders.
-        if root.endswith('objects') and len(os.listdir(root)) == 0:
-
-            # Calculates the path of the parent folder (the aip folder).
-            aip_path = os.path.dirname(root)
-
-            # Prints the error and moves the aip to an error folder.
-            print(f"\n{aip_path} objects folder is empty. Moved to incomplete_directory error folder.")
-            a.move_error('incomplete_directory', aip_path)
+    # Checks if the metadata folder doesn't exist or is empty.
+    # Moves to an error folder if either issue is detected and logs the result.
+    if not os.path.exists(f"{aip.directory}/{aip.id}/metadata"):
+        aip.log["MetadataError"] = "Metadata folder is missing."
+        a.log(aip.log)
+        a.move_error('incomplete_directory', aip.id)
+        return
+    elif len(os.listdir(f"{aip.directory}/{aip.id}/metadata")) == 0:
+        aip.log["MetadataError"] = "Metadata folder is empty."
+        a.log(aip.log)
+        a.move_error('incomplete_directory', aip.id)
+        return
+    else:
+        aip.log["MetadataError"] = "Successfully created metadata folder"
 
 
 def check_aips(date_end, date_start, seed_to_aip):

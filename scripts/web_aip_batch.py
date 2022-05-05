@@ -170,9 +170,6 @@ for warc in warc_metadata['files']:
         log_data["complete"] = "Successfully processed WARC."
     web.warc_log(log_data)
 
-# Checks for empty metadata or objects folders in the AIPs. These happens if there were uncaught download errors.
-web.find_empty_directory()
-
 
 # PART TWO: CREATE AIPS THAT ARE READY FOR INGEST INTO ARCHIVE
 
@@ -220,6 +217,10 @@ for aip_row in read_metadata:
     # Updates the current AIP number and displays the script progress.
     current_aip += 1
     print(f"\nProcessing {aip_folder} ({current_aip} of {total_aips}).")
+
+    # Verifies the metadata and objects folders exist and have content.
+    # This is unlikely but could happen if there were uncaught download errors.
+    web.check_directory(aip)
 
     # Deletes any temporary files and makes a log of each deleted file.
     a.delete_temp(aip)
