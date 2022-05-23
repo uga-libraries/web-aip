@@ -105,6 +105,7 @@ for aip_row in read_metadata:
     except AttributeError:
         print("Can't extract seed id from: ", first_warc)
         continue
+    seed_to_aip[seed_id] = aip.id
 
     # Extracts technical metadata from the files using FITS.
     if aip_folder in os.listdir('.'):
