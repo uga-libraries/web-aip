@@ -117,7 +117,7 @@ for aip_row in read_metadata:
 
     # Bags the aip.
     if aip_folder in os.listdir('.'):
-        aip.bag(aip)
+        a.bag(aip)
 
     # Tars, and zips the aip.
     if f'{aip_folder}_bag' in os.listdir('.'):
