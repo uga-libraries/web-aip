@@ -469,7 +469,7 @@ def check_directory(aip):
         aip.log["MetadataError"] = "Successfully created metadata folder"
 
 
-def check_aips(date_end, date_start, seed_to_aip):
+def check_aips(date_end, date_start, seed_to_aip, aips_directory):
     """Verifies that all the expected AIPs for the download are complete and no unexpected AIPs were created.
     Produces a csv named completeness_check with the results in the AIPs directory. """
 
@@ -584,15 +584,15 @@ def check_aips(date_end, date_start, seed_to_aip):
 
         # Tests if there is a folder for this AIP in the AIPs directory. If not, returns the result for this AIP and
         # does not run the rest of the function's tests since there is no directory to check for completeness.
-        if any(folder.startswith(aip_id) for folder in os.listdir(f'{c.script_output}/aips_{date_end}')):
+        if any(folder.startswith(aip_id) for folder in os.listdir(aips_directory)):
             result.append(True)
         else:
             result.extend([False, 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a'])
             return result
 
         # Saves the file paths to the metadata and objects folders to variables, since they are long and reused.
-        objects = f'{c.script_output}/aips_{date_end}/{aip_id}_bag/data/objects'
-        metadata = f'{c.script_output}/aips_{date_end}/{aip_id}_bag/data/metadata'
+        objects = f'{aips_directory}/{aip_id}_bag/data/objects'
+        metadata = f'{aips_directory}/{aip_id}_bag/data/metadata'
 
         # Tests if each of the four Archive-It metadata reports that never repeat are present.
         # os.path.exists() returns True/False.
@@ -652,7 +652,7 @@ def check_aips(date_end, date_start, seed_to_aip):
         extras = []
 
         # Iterates through the folder with the AIPs.
-        for aip_directory in os.listdir(f'{c.script_output}/aips_{date_end}'):
+        for aip_directory in os.listdir(aips_directory):
 
             # Skips the metadata.csv used to make the AIPs.
             if aip_directory == "metadata.csv":
