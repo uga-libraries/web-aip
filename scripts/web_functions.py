@@ -8,6 +8,7 @@ Dependencies:
 import csv
 import datetime
 import os
+import pandas as pd
 import re
 import requests
 import subprocess
@@ -266,13 +267,31 @@ def seed_csv(date_start, date_end):
     after the script breaks. Will require some additional API calls in other functions to get WARC metadata."""
 
     # Starts a dataframe for storing seed level data about the WARCs in this download.
+    seed_df = pd.DataFrame(columns=["Seed ID", "WARC Filenames"])
 
     # Uses WASAPI to get information about all WARCs in this batch, using the date limits.
-    # WASAPI (WARC metadata) must be used because it is the only API with store dates.
+    filters = {'store-time-after': date_start, 'store-time-before': date_end, 'page_size': 1000}
+    warcs = requests.get(c.wasapi, params=filters, auth=(c.username, c.password))
+
+    # If there was an error with the API call, quits the script.
+    if not warcs.status_code == 200:
+        print(f'\nAPI error {warcs.status_code} when getting WARC data.')
+        print(f"Ending script (this information is required). Try script again later.")
+        exit()
+
+    # Converts the WARC data from json to a Python object and returns that Python object.
+    py_warcs = warcs.json()
 
     # Iterates on the WARC data.
+    for warc_info in py_warcs['files']:
 
-        # Calculates the seed id for the WARC from the filename.
+        # Calculates the seed id, which is a portion of the warc filename.
+        # Stops processing this warc and starts the next one if the filename doesn't match the expected pattern.
+        try:
+            regex_seed = re.match(r'^.*-SEED(\d+)-', warc_info['filename'])
+            seed_identifier = regex_seed.group(1)
+        except AttributeError:
+            continue
 
         # If the seed is already in the dataframe, add the WARC to the WARC name list.
         # If the seed is new, gets the data needed about the seed and adds it to the dataframe.
@@ -280,6 +299,7 @@ def seed_csv(date_start, date_end):
     # Adds a column to the dataframe with the AIP ID, calculated from the other information.
 
     # Saves the dataframe as a CSV in the script output folder.
+    seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"))
 
 
 def make_aip_directory(aip_folder):
