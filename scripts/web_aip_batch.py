@@ -253,7 +253,7 @@ open_metadata.close()
 # Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
 # errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
 print('\nStarting completeness check.')
-web.check_aips(date_end, date_start, seed_to_aip)
+web.check_aips(date_end, date_start, seed_to_aip, aips_directory)
 
 # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) and logs into the AIPs folder
 # to keep everything together if another set is downloaded before these are deleted.
