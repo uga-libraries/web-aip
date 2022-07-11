@@ -260,6 +260,28 @@ def seed_data(py_warcs, date_end):
     return seeds_include
 
 
+def seed_csv(date_start, date_end):
+    """Experiment to replace warc_data and seed_data by generating a single CSV with seed-level metadata,
+    including a warc file list, which will then be used to split big downloads or restart jobs
+    after the script breaks. Will require some additional API calls in other functions to get WARC metadata."""
+
+    # Starts a dataframe for storing seed level data about the WARCs in this download.
+
+    # Uses WASAPI to get information about all WARCs in this batch, using the date limits.
+    # WASAPI (WARC metadata) must be used because it is the only API with store dates.
+
+    # Iterates on the WARC data.
+
+        # Calculates the seed id for the WARC from the filename.
+
+        # If the seed is already in the dataframe, add the WARC to the WARC name list.
+        # If the seed is new, gets the data needed about the seed and adds it to the dataframe.
+
+    # Adds a column to the dataframe with the AIP ID, calculated from the other information.
+
+    # Saves the dataframe as a CSV in the script output folder.
+
+
 def make_aip_directory(aip_folder):
     """Makes the AIP directory structure: a folder named with the AIP ID that contains folders named "metadata" and
     "objects", provided they are not already present from processing a previous WARC. """
