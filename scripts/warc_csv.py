@@ -103,9 +103,6 @@ for warc in PY_WARC_DATA["files"]:
     job_id = warc["crawl"]
     store_time = warc["store-time"]
 
-    # Adds a space before the date to keep the original formatting if the file is opened in Excel.
-    store_time = " " + store_time
-
     # Gets the seed id from the WARC filename.
     try:
         regex = re.match(r'^.*?SEED(\d+)-', filename)
