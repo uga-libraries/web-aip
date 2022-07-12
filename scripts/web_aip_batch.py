@@ -96,10 +96,10 @@ for seed in seed_df.itertuples():
 
     # Downloads the seed metadata from Archive-It into the seed's metadata folder.
     web.download_metadata(seed, date_end)
-#
-#     # Downloads the WARC from Archive-It into the seed's objects folder.
-#     web.download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data)
-#
+
+    # Downloads the WARCs from Archive-It into the seed's objects folder.
+    web.download_warcs(seed, date_end)
+
 #     # If no errors were encountered (the last test was successful), updates the completion status.
 #     # Saves the log information for all completed WARCs, even if there were errors.
 #     if log_data["warc_fixity"].startswith("Successfully"):
