@@ -61,8 +61,6 @@ if not os.path.exists(aips_directory):
 # Changes current directory to the AIPs folder.
 os.chdir(aips_directory)
 
-# PART ONE: DOWNLOAD WARCS AND METADATA INTO AIP DIRECTORY STRUCTURE.
-
 # Uses Archive-IT WASAPI to get information about seeds in this download.
 # The information is also saved as a CSV (seeds.csv) in the script output folder.
 seed_df = web.seed_data(date_start, date_end)
@@ -75,8 +73,9 @@ total_seeds = len(seed_df)
 # # Starts a log in the script output folder to use for recording errors related to the warcs.
 # web.warc_log("header")
 
-# Iterates through information about each WARC.
-for seed_row in seed_df.itertuples():
+# Iterates through information about each seed, downloading metadata and WARC files from Archive-It
+# and creating AIPs ready for ingest into the digital preservation system.
+for seed in seed_df.itertuples():
 
 #     # Starts a dictionary of information for the log.
 #     log_data = {"filename": "TBD", "warc_json": "n/a", "seed_id": "n/a", "job_id": "n/a",
@@ -85,13 +84,18 @@ for seed_row in seed_df.itertuples():
 
     # Updates the current seed number and displays the script progress.
     current_seed += 1
-    print(f"\tStarting seed {current_seed} of {total_seeds}.")
+    print(f"Starting seed {current_seed} of {total_seeds}.")
 
-#     # Makes the AIP directory for the seed's AIP (AIP folder with metadata and objects subfolders).
-#     web.make_aip_directory(aip_id)
-#
-#     # Downloads the seed metadata from Archive-It into the seed's metadata folder.
-#     web.download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
+    # Makes the AIP directory for the seed (AIP folder with metadata and objects subfolders).
+    try:
+        os.makedirs(os.path.join(seed.Seed_ID, "metadata"))
+        os.makedirs(os.path.join(seed.Seed_ID, "objects"))
+    except FileExistsError:
+        print(f"\nCannot make AIP for seed {seed.Seed_ID}. Directory for seed already exists.")
+        continue
+
+    # Downloads the seed metadata from Archive-It into the seed's metadata folder.
+    web.download_metadata(seed, date_end)
 #
 #     # Downloads the WARC from Archive-It into the seed's objects folder.
 #     web.download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data)

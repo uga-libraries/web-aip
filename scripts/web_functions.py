@@ -322,22 +322,16 @@ def make_aip_directory(aip_folder):
         os.makedirs(f'{aip_folder}/objects')
 
 
-def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data):
+def download_metadata(seed, date_end):
     """Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
-    deletes any empty reports (meaning there was no data of that type for this seed), and redacts login information
-    from the seed report. """
+    deletes any empty reports (meaning there was no data of that type for this seed),
+    and redacts login information from the seed report. """
 
     def get_report(filter_type, filter_value, report_type, report_name):
         """Downloads a single metadata report and saves it as a csv in the AIP's metadata folder.
             filter_type and filter_value are used to filter the API call to the right AIP's report
             report_type is the Archive-It name for the report
             report_name is the name for the report saved in the AIP, including the ARCHive metadata code """
-
-        # Checks if the report has already been downloaded and ends the function if so.
-        # If there is more than one WARC for a seed, reports may already be in the metadata folder.
-        report_path = f'{c.script_output}/aips_{date_end}/{aip_id}/metadata/{report_name}'
-        if os.path.exists(report_path):
-            return
 
         # Builds the API call to get the report as a csv.
         # Limit of -1 will return all matches. Default is only the first 100.
@@ -346,13 +340,14 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_da
 
         # Saves the metadata report if there were no errors with the API or logs the error.
         if metadata_report.status_code == 200:
-            with open(f'{aip_id}/metadata/{report_name}', 'wb') as report_csv:
+            with open(f'{seed.Seed_ID}/metadata/{report_name}', 'wb') as report_csv:
                 report_csv.write(metadata_report.content)
         else:
-            if log_data['report_download'] == "n/a":
-                log_data['report_download'] = f'{report_type} API error {metadata_report.status_code}'
-            else:
-                log_data['report_download'] += f'; {report_type} API error {metadata_report.status_code}'
+            print("API error:", report_type, metadata_report.status_code)
+            # if log_data['report_download'] == "n/a":
+            #     log_data['report_download'] = f'{report_type} API error {metadata_report.status_code}'
+            # else:
+            #     log_data['report_download'] += f'; {report_type} API error {metadata_report.status_code}'
 
     def redact(metadata_report_path):
         """Replaces the seed report with a redacted version of the file, removing login information if those columns
@@ -378,11 +373,12 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_da
                 password_index = header.index('login_password')
                 username_index = header.index('login_username')
             except ValueError:
-                if log_data['report_info'] == "n/a":
-                    log_data['report_info'] = 'Seed report does not have login columns to redact.'
-                else:
-                    log_data['report_info'] += '; Seed report does not have login columns to redact.'
-                return
+                print("Seed report does not have login columns to redact.")
+                # if log_data['report_info'] == "n/a":
+                #     log_data['report_info'] = 'Seed report does not have login columns to redact.'
+                # else:
+                #     log_data['report_info'] += '; Seed report does not have login columns to redact.'
+                # return
 
             # Puts 'REDACTED' in the password and username columns for each non-header row and adds the updated
             # rows to the redacted_rows list.
@@ -400,45 +396,47 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_da
 
     # Downloads five of the six metadata reports from Archive-It needed to understand the context of the WARC.
     # These are reports where there is only one report per seed or collection.
-    get_report('id', seed_id, 'seed', f'{aip_id}_seed.csv')
-    get_report('seed', seed_id, 'scope_rule', f'{aip_id}_seedscope.csv')
-    get_report('collection', warc_collection, 'scope_rule', f'{aip_id}_collscope.csv')
-    get_report('id', warc_collection, 'collection', f'{aip_id}_coll.csv')
-    get_report('id', job_id, 'crawl_job', f'{aip_id}_{job_id}_crawljob.csv')
+    get_report('id', seed.Seed_ID, 'seed', f'{seed.Seed_ID}_seed.csv')
+    get_report('seed', seed.Seed_ID, 'scope_rule', f'{seed.Seed_ID}_seedscope.csv')
+    get_report('collection', seed.AIT_Collection, 'scope_rule', f'{seed.Seed_ID}_collscope.csv')
+    get_report('id', seed.AIT_Collection, 'collection', f'{seed.Seed_ID}_coll.csv')
+    get_report('id', seed.Job_ID, 'crawl_job', f'{seed.Seed_ID}_{seed.Job_ID}_crawljob.csv')
 
     # Downloads the crawl definition report for the job this WARC was part of.
     # The crawl definition id is obtained from the crawl job report using the job id.
     # There may be more than one crawl definition report per AIP.
     # Logs an error if there is no crawl job report to get the job id(s) from.
     try:
-        with open(f'{aip_id}/metadata/{aip_id}_{job_id}_crawljob.csv', 'r') as crawljob_csv:
+        with open(f'{seed.Seed_ID}/metadata/{seed.Seed_ID}_{seed.Job_ID}_crawljob.csv', 'r') as crawljob_csv:
             crawljob_data = csv.DictReader(crawljob_csv)
             for job in crawljob_data:
-                if job_id == job['id']:
+                if str(seed.Job_ID) == job['id']:
                     crawl_def_id = job['crawl_definition']
-                    get_report('id', crawl_def_id, 'crawl_definition', f'{aip_id}_{crawl_def_id}_crawldef.csv')
+                    get_report('id', crawl_def_id, 'crawl_definition', f'{seed.Seed_ID}_{crawl_def_id}_crawldef.csv')
                     break
     except FileNotFoundError:
-        log_data['report_download'] += f'; Crawl Job was not downloaded so cannot get Crawl Definition'
+        print("Crawl job not downloaded so cannot get crawl definition.")
+        # log_data['report_download'] += f'; Crawl Job was not downloaded so cannot get Crawl Definition'
 
-    # If there were no download errors (the log still has the default value), updates the log to show success.
-    if log_data['report_download'] == "n/a":
-        log_data['report_download'] = "Successfully downloaded all metadata reports."
+    # # If there were no download errors (the log still has the default value), updates the log to show success.
+    # if log_data['report_download'] == "n/a":
+    #     log_data['report_download'] = "Successfully downloaded all metadata reports."
 
     # Iterates over each report in the metadata folder to delete empty reports and redact login information from the
     # seed report.
-    for report in os.listdir(f'{aip_id}/metadata'):
+    for report in os.listdir(f'{seed.Seed_ID}/metadata'):
 
         # Saves the full file path of the report.
-        report_path = f'{c.script_output}/aips_{date_end}/{aip_id}/metadata/{report}'
+        report_path = f'{c.script_output}/aips_{date_end}/{seed.Seed_ID}/metadata/{report}'
 
         # Deletes any empty metadata files (file size of 0) and begins processing the next file. A file is empty if
         # there is no metadata of that type, which is most common for collection and seed scope reports.
         if os.path.getsize(report_path) == 0:
-            if log_data['report_info'] == "n/a":
-                log_data['report_info'] = f'Deleted empty report {report}'
-            else:
-                log_data['report_info'] += f'; Deleted empty report {report}'
+            print("Deleting empty report: ", report_path)
+            # if log_data['report_info'] == "n/a":
+            #     log_data['report_info'] = f'Deleted empty report {report}'
+            # else:
+            #     log_data['report_info'] += f'; Deleted empty report {report}'
             os.remove(report_path)
             continue
 
