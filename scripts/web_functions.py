@@ -40,7 +40,7 @@ def warc_log(log_data):
         log_writer.writerow(log_row)
 
 
-def warc_data(date_start, date_end, collections=None):
+def warc_data_replacing(date_start, date_end, collections=None):
     """Gets data about WARCs to include in this download using WASAPI. A WARC is included if it was saved in the 3
     months since the last preservation download date and is part of a relevant collection. The relevant collection
     list is either provided as an argument or the function will calculate a list of departments who regularly use
@@ -117,7 +117,7 @@ def warc_data(date_start, date_end, collections=None):
     return py_warcs
 
 
-def seed_data(py_warcs, date_end):
+def seed_data_replacing(py_warcs, date_end):
     """Extracts information from the warc and seed data to define the AIP id, AIP title, and crawl definition id.
     Returns this data in a dictionary with the seed id as the key and makes a metadata.csv file with seed metadata
     needed for making AIPs later."""
@@ -267,7 +267,7 @@ def seed_csv(date_start, date_end):
     after the script breaks. Will require some additional API calls in other functions to get WARC metadata."""
 
     # Starts a dataframe for storing seed level data about the WARCs in this download.
-    seed_df = pd.DataFrame(columns=["Seed ID", "WARC Filenames"])
+    seed_df = pd.DataFrame(columns=["Seed_ID", "WARC_Filenames"])
 
     # Uses WASAPI to get information about all WARCs in this batch, using the date limits.
     filters = {'store-time-after': date_start, 'store-time-before': date_end, 'page_size': 1000}
@@ -290,12 +290,16 @@ def seed_csv(date_start, date_end):
         try:
             regex_seed = re.match(r'^.*-SEED(\d+)-', warc_info['filename'])
             seed_identifier = regex_seed.group(1)
-            print(seed_identifier)
         except AttributeError:
             continue
 
         # If the seed is already in the dataframe, add the WARC to the WARC name list.
         # If the seed is new, gets the data needed about the seed and adds it to the dataframe.
+        if seed_identifier in seed_df.Seed_ID.values:
+            seed_df.loc[seed_df.Seed_ID == seed_identifier, "WARC_Filenames"] += f',{warc_info["filename"]}'
+        else:
+            seed_data = {"Seed_ID": seed_identifier, "WARC_Filenames": warc_info["filename"]}
+            seed_df = seed_df.append(seed_data, ignore_index=True)
 
     # Adds a column to the dataframe with the AIP ID, calculated from the other information.
 
