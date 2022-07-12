@@ -290,6 +290,7 @@ def seed_csv(date_start, date_end):
         try:
             regex_seed = re.match(r'^.*-SEED(\d+)-', warc_info['filename'])
             seed_identifier = regex_seed.group(1)
+            print(seed_identifier)
         except AttributeError:
             continue
 
@@ -299,7 +300,7 @@ def seed_csv(date_start, date_end):
     # Adds a column to the dataframe with the AIP ID, calculated from the other information.
 
     # Saves the dataframe as a CSV in the script output folder.
-    seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"))
+    seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
 
 
 def make_aip_directory(aip_folder):
