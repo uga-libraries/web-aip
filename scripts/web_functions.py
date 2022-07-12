@@ -267,7 +267,7 @@ def seed_csv(date_start, date_end):
     after the script breaks. Will require some additional API calls in other functions to get WARC metadata."""
 
     # Starts a dataframe for storing seed level data about the WARCs in this download.
-    seed_df = pd.DataFrame(columns=["Seed_ID", "WARC_Filenames"])
+    seed_df = pd.DataFrame(columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames"])
 
     # Uses WASAPI to get information about all WARCs in this batch, using the date limits.
     filters = {'store-time-after': date_start, 'store-time-before': date_end, 'page_size': 1000}
@@ -293,18 +293,24 @@ def seed_csv(date_start, date_end):
         except AttributeError:
             continue
 
-        # If the seed is already in the dataframe, add the WARC to the WARC name list.
+        # If the seed is already in the dataframe, adds to the size, WARC count, and WARC filenames.
         # If the seed is new, gets the data needed about the seed and adds it to the dataframe.
         if seed_identifier in seed_df.Seed_ID.values:
+            seed_df.loc[seed_df.Seed_ID == seed_identifier, "Size_GB"] += round(warc_info["size"]/1000000000, 2)
+            seed_df.loc[seed_df.Seed_ID == seed_identifier, "WARCs"] += 1
             seed_df.loc[seed_df.Seed_ID == seed_identifier, "WARC_Filenames"] += f',{warc_info["filename"]}'
         else:
-            seed_data = {"Seed_ID": seed_identifier, "WARC_Filenames": warc_info["filename"]}
+            seed_data = {"Seed_ID": seed_identifier, "AIT_Collection": warc_info["collection"],
+                         "Job_ID": warc_info["crawl"], "Size_GB": round(warc_info["size"]/1000000000, 2),
+                         "WARCs": 1, "WARC_Filenames": warc_info["filename"]}
             seed_df = seed_df.append(seed_data, ignore_index=True)
 
     # Adds a column to the dataframe with the AIP ID, calculated from the other information.
 
-    # Saves the dataframe as a CSV in the script output folder.
+    # Saves the dataframe as a CSV in the script output folder for splitting or restarting a batch.
+    # Returns the dataframe for when the entire group will be downloaded as one batch.
     seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+    return seed_df
 
 
 def make_aip_directory(aip_folder):
