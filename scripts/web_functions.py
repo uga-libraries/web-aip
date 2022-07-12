@@ -261,36 +261,36 @@ def seed_data_replacing(py_warcs, date_end):
     return seeds_include
 
 
-def seed_csv(date_start, date_end):
-    """Experiment to replace warc_data and seed_data by generating a single CSV with seed-level metadata,
-    including a warc file list, which will then be used to split big downloads or restart jobs
-    after the script breaks. Will require some additional API calls in other functions to get WARC metadata."""
+def seed_data(date_start, date_end):
+    """Uses WASAPI to get information about each seed to include in the download.
+    Returns the data as a dataframe and saves it to a CSV in the script output folder t
+    o use for splitting big downloads or restarting jobs if the script breaks."""
 
     # Starts a dataframe for storing seed level data about the WARCs in this download.
     seed_df = pd.DataFrame(columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames"])
 
-    # Uses WASAPI to get information about all WARCs in this batch, using the date limits.
-    filters = {'store-time-after': date_start, 'store-time-before': date_end, 'page_size': 1000}
+    # Uses WASAPI to get information about all WARCs in this download, using the date limits.
+    # Must use the WARC API to be able to limit the information by date.
+    filters = {"store-time-after": date_start, "store-time-before": date_end, "page_size": 1000}
     warcs = requests.get(c.wasapi, params=filters, auth=(c.username, c.password))
 
     # If there was an error with the API call, quits the script.
     if not warcs.status_code == 200:
-        print(f'\nAPI error {warcs.status_code} when getting WARC data.')
+        print(f"\nAPI error {warcs.status_code} when getting WARC data.")
         print(f"Ending script (this information is required). Try script again later.")
         exit()
 
-    # Converts the WARC data from json to a Python object and returns that Python object.
+    # Converts the WARC data from json to a Python object and iterates over the data.
     py_warcs = warcs.json()
+    for warc_info in py_warcs["files"]:
 
-    # Iterates on the WARC data.
-    for warc_info in py_warcs['files']:
-
-        # Calculates the seed id, which is a portion of the warc filename.
-        # Stops processing this warc and starts the next one if the filename doesn't match the expected pattern.
+        # Calculates the seed id, which is a portion of the WARC filename.
+        # Stops processing this WARC and starts the next one if the filename doesn't match the expected pattern.
         try:
-            regex_seed = re.match(r'^.*-SEED(\d+)-', warc_info['filename'])
+            regex_seed = re.match(r"^.*-SEED(\d+)-", warc_info["filename"])
             seed_identifier = regex_seed.group(1)
         except AttributeError:
+            print("Skipping this WARC because the seed ID cannot be calculated:", warc_info["filename"])
             continue
 
         # If the seed is already in the dataframe, adds to the size, WARC count, and WARC filenames.
@@ -300,12 +300,10 @@ def seed_csv(date_start, date_end):
             seed_df.loc[seed_df.Seed_ID == seed_identifier, "WARCs"] += 1
             seed_df.loc[seed_df.Seed_ID == seed_identifier, "WARC_Filenames"] += f',{warc_info["filename"]}'
         else:
-            seed_data = {"Seed_ID": seed_identifier, "AIT_Collection": warc_info["collection"],
+            seed_info = {"Seed_ID": seed_identifier, "AIT_Collection": warc_info["collection"],
                          "Job_ID": warc_info["crawl"], "Size_GB": round(warc_info["size"]/1000000000, 2),
                          "WARCs": 1, "WARC_Filenames": warc_info["filename"]}
-            seed_df = seed_df.append(seed_data, ignore_index=True)
-
-    # Adds a column to the dataframe with the AIP ID, calculated from the other information.
+            seed_df = seed_df.append(seed_info, ignore_index=True)
 
     # Saves the dataframe as a CSV in the script output folder for splitting or restarting a batch.
     # Returns the dataframe for when the entire group will be downloaded as one batch.
