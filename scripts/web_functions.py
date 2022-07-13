@@ -6,6 +6,7 @@ Dependencies:
 """
 
 import csv
+import datetime
 import os
 import pandas as pd
 import re
@@ -192,8 +193,11 @@ def download_metadata(seed, date_end, seed_df):
     seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
 
 
-def download_warcs(seed, date_end):
+def download_warcs(seed, date_end, seed_df):
     """Downloads every WARC file and verifies that fixity is unchanged after downloading."""
+
+    # Row index for the seed being processed in the dataframe, to use for adding logging information.
+    row_index = seed_df.index[seed_df["Seed_ID"] == seed.Seed_ID].tolist()[0]
 
     # Makes a list of the filenames for all WARCs for this seed.
     warc_names = seed.WARC_Filenames.split(",")
@@ -204,8 +208,12 @@ def download_warcs(seed, date_end):
         # Gets URL for downloading the WARC and WARC MD5 from Archive-It using WASAPI.
         warc_data = requests.get(f'{c.wasapi}?filename={warc}', auth=(c.username, c.password))
         if not warc_data.status_code == 200:
-            print(f"\nAPI error {warc_data.status_code} for warc {warc}.")
-            print(f"This WARC cannot be downloaded.")
+            error_msg = f"API error {warc_data.status_code}: can't get info about warc {warc}."
+            if pd.isnull(seed_df.at[row_index, "WARC_API_Errors"]):
+                seed_df.loc[row_index, "WARC_API_Errors"] = error_msg
+            else:
+                seed_df.loc[row_index, "WARC_API_Errors"] += "; " + error_msg
+            seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
             return
         py_warc = warc_data.json()
         warc_url = py_warc["files"][0]["locations"][0]
@@ -214,43 +222,67 @@ def download_warcs(seed, date_end):
         # The path for where the warc will be saved on the local machine (it is long and used twice in this script).
         warc_path = f'{c.script_output}/aips_{date_end}/{seed.Seed_ID}/objects/{warc}'
 
-        # TEMPORARY CODE TO SPEED UP TESTING
-        # This will make a file of the correct name in the objects folder instead of downloading.
-        with open(warc_path, "w") as file:
-            file.write("Text")
+        # # TEMPORARY CODE TO SPEED UP TESTING
+        # # This will make a file of the correct name in the objects folder instead of downloading.
+        # with open(warc_path, "w") as file:
+        #     file.write("Text")
 
-        # # Downloads the warc.
-        # warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
-        #
-        # # # If there was an error with the API call, quits the function.
-        # if not warc_download.status_code == 200:
-        #     # log_data["warc_api"] = f'API error {warc_download.status_code}'
-        #     return
-        # # else:
-        # #     log_data["warc_api"] = "Successfully downloaded WARC."
-        #
-        # # Saves the warc in the objects folder, keeping the original filename.
-        # with open(warc_path, 'wb') as warc_file:
-        #     warc_file.write(warc_download.content)
-        #
-        # # Calculates the md5 for the downloaded WARC, using a regular expression to get the md5 from the md5deep output.
-        # # If the output is not formatted as expected, quits the function.
-        # md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
-        # try:
-        #     regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
-        #     downloaded_warc_md5 = regex_md5.group(1)
-        # except AttributeError:
-        #     # log_data["warc_fixity"] = f"Fixity cannot be extracted from md5deep output: {md5deep_output.stdout}"
-        #     return
-        #
-        # # Compares the md5 of the download warc to what Archive-It has for the warc (warc_md5). If the md5 has changed,
-        # # deletes the WARC so the check for AIP completeness will catch that there was a problem.
-        # if not warc_md5 == downloaded_warc_md5:
-        #     os.remove(warc_path)
-        #     # log_data["warc_fixity"] = f"Fixity changed and WARC deleted. {warc_md5} before, {downloaded_warc_md5} after"
-        # else:
-        #     print("Fixity is unchanged")
-        #     # log_data["warc_fixity"] = f"Successfully verified WARC fixity on {datetime.datetime.now()}"
+        # Downloads the warc.
+        warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
+
+        # If there was an error with the API call, quits the function.
+        if not warc_download.status_code == 200:
+            error_msg = f"API error {warc_download.status_code}: can't download warc {warc}"
+            if pd.isnull(seed_df.at[row_index, "WARC_API_Errors"]):
+                seed_df.loc[row_index, "WARC_API_Errors"] = error_msg
+            else:
+                seed_df.loc[row_index, "WARC_API_Errors"] += "; " + error_msg
+            seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+            return
+        else:
+            msg = f"WARC {warc} successfully downloaded"
+            if pd.isnull(seed_df.at[row_index, "WARC_API_Errors"]):
+                seed_df.loc[row_index, "WARC_API_Errors"] = msg
+            else:
+                seed_df.loc[row_index, "WARC_API_Errors"] += "; " + msg
+
+        # Saves the warc in the objects folder, keeping the original filename.
+        with open(warc_path, 'wb') as warc_file:
+            warc_file.write(warc_download.content)
+
+        # Calculates the md5 for the downloaded WARC, using a regular expression to get the md5 from the md5deep output.
+        # If the output is not formatted as expected, quits the function.
+        md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
+        try:
+            regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
+            downloaded_warc_md5 = regex_md5.group(1)
+        except AttributeError:
+            error_msg = f"Fixity for {warc} cannot be extracted from md5deep output: {md5deep_output.stdout}"
+            if pd.isnull(seed_df.at[row_index, "WARC_Fixity_Errors"]):
+                seed_df.loc[row_index, "WARC_Fixity_Errors"] = error_msg
+            else:
+                seed_df.loc[row_index, "WARC_Fixity_Errors"] += "; " + error_msg
+            seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+            return
+
+        # Compares the md5 of the download warc to what Archive-It has for the warc (warc_md5). If the md5 has changed,
+        # deletes the WARC so the check for AIP completeness will catch that there was a problem.
+        if not warc_md5 == downloaded_warc_md5:
+            os.remove(warc_path)
+            error_msg = f"Fixity for WARC {warc} changed and it deleted: {warc_md5} before, {downloaded_warc_md5} after"
+            if pd.isnull(seed_df.at[row_index, "WARC_Fixity_Errors"]):
+                seed_df.loc[row_index, "WARC_Fixity_Errors"] = error_msg
+            else:
+                seed_df.loc[row_index, "WARC_Fixity_Errors"] += "; " + error_msg
+        else:
+            msg = f"Successfully verified WARC {warc} fixity on {datetime.datetime.now()}"
+            if pd.isnull(seed_df.at[row_index, "WARC_Fixity_Errors"]):
+                seed_df.loc[row_index, "WARC_Fixity_Errors"] = msg
+            else:
+                seed_df.loc[row_index, "WARC_Fixity_Errors"] += "; " + msg
+
+        # Updates the log.
+        seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
 
 
 def make_aip_instance(seed, date_end):

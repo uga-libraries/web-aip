@@ -96,7 +96,7 @@ for seed in seed_df.itertuples():
     web.download_metadata(seed, date_end, seed_df)
 
     # Downloads the WARCs from Archive-It into the seed's objects folder.
-    web.download_warcs(seed, date_end)
+    web.download_warcs(seed, date_end, seed_df)
 
     # Makes an instance of the AIP class, using seed dataframe and calculating additional values.
     # If there was an error when making the instance, starts the next AIP.
