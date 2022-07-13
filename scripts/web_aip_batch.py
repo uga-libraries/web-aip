@@ -103,19 +103,13 @@ for seed in seed_df.itertuples():
     # Downloads the WARCs from Archive-It into the seed's objects folder.
     web.download_warcs(seed, date_end)
 
-# # Uses the AIP functions to create an AIP for each folder in the metadata CSV.
-# # Checks if the AIP folder is still present before calling the function for the next step
-# # in case it was moved due to an error in the previous step.
-# for aip_row in read_metadata:
-#
-#     # Makes an instance of the AIP class using metadata from the CSV and global variables.
-#     department, collection_id, aip_folder, aip_id, title, version = aip_row
-#     aip = a.AIP(aips_directory, department, collection_id, aip_folder, aip_id, title, version, True)
-#
-#     # Updates the current AIP number and displays the script progress.
-#     current_aip += 1
-#     print(f"\tStarting AIP {current_aip} of {total_aips}.")
-#
+    # Makes an instance of the AIP class, using seed dataframe and calculating additional values.
+    # If there was an error when making the instance, starts the next AIP.
+    aip = web.make_aip_instance(seed, date_end)
+    if aip == "API error for seed report":
+        print("Unable to make an AIP for this seed due to an API error.")
+        continue
+
 #     # Verifies the metadata and objects folders exist and have content.
 #     # This is unlikely but could happen if there were uncaught download errors.
 #     web.check_directory(aip)

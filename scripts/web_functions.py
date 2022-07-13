@@ -378,7 +378,7 @@ def download_metadata(seed, date_end):
                 #     log_data['report_info'] = 'Seed report does not have login columns to redact.'
                 # else:
                 #     log_data['report_info'] += '; Seed report does not have login columns to redact.'
-                # return
+                return
 
             # Puts 'REDACTED' in the password and username columns for each non-header row and adds the updated
             # rows to the redacted_rows list.
@@ -461,53 +461,72 @@ def download_warcs(seed, date_end):
             print(f"This WARC cannot be downloaded.")
             return
         py_warc = warc_data.json()
-        warc_url = py_warc["files"][0]["locations"][0]
-        warc_md5 = py_warc["files"][0]["checksums"]["md5"]
+        # warc_url = py_warc["files"][0]["locations"][0]
+        # warc_md5 = py_warc["files"][0]["checksums"]["md5"]
 
         # The path for where the warc will be saved on the local machine (it is long and used twice in this script).
         warc_path = f'{c.script_output}/aips_{date_end}/{seed.Seed_ID}/objects/{warc}'
 
-        # # Temporary code to speed up testing:
-        # # this will make a file of the correct name in the objects folder instead of downloading.
-        # with open(warc_path, "w") as file:
-        #     file.write("Text")
+        # TODO: Temporary code to speed up testing:
+        # This will make a file of the correct name in the objects folder instead of downloading.
+        with open(warc_path, "w") as file:
+            file.write("Text")
 
-        # Downloads the warc.
-        print("Downloading warc data for ", warc_url)
-        warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
-        print("Download is complete")
-
-        # # If there was an error with the API call, quits the function.
+        # # Downloads the warc.
+        # warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
+        #
+        # # # If there was an error with the API call, quits the function.
         # if not warc_download.status_code == 200:
         #     log_data["warc_api"] = f'API error {warc_download.status_code}'
         #     return
         # else:
         #     log_data["warc_api"] = "Successfully downloaded WARC."
+        #
+        # # Saves the warc in the objects folder, keeping the original filename.
+        # with open(warc_path, 'wb') as warc_file:
+        #     warc_file.write(warc_download.content)
+        #
+        # # Calculates the md5 for the downloaded WARC, using a regular expression to get the md5 from the md5deep output.
+        # # If the output is not formatted as expected, quits the function.
+        # md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
+        # try:
+        #     regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
+        #     downloaded_warc_md5 = regex_md5.group(1)
+        # except AttributeError:
+        #     # log_data["warc_fixity"] = f"Fixity cannot be extracted from md5deep output: {md5deep_output.stdout}"
+        #     return
+        #
+        # # Compares the md5 of the download warc to what Archive-It has for the warc (warc_md5). If the md5 has changed,
+        # # deletes the WARC so the check for AIP completeness will catch that there was a problem.
+        # if not warc_md5 == downloaded_warc_md5:
+        #     os.remove(warc_path)
+        #     # log_data["warc_fixity"] = f"Fixity changed and WARC deleted. {warc_md5} before, {downloaded_warc_md5} after"
+        # else:
+        #     print("Fixity is unchanged")
+        #     # log_data["warc_fixity"] = f"Successfully verified WARC fixity on {datetime.datetime.now()}"
 
-        # Saves the warc in the objects folder, keeping the original filename.
-        print("Saving the warc file")
-        with open(warc_path, 'wb') as warc_file:
-            warc_file.write(warc_download.content)
 
-        # Calculates the md5 for the downloaded WARC, using a regular expression to get the md5 from the md5deep output.
-        # If the output is not formatted as expected, quits the function.
-        print('Checking fixity')
-        md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
-        try:
-            regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
-            downloaded_warc_md5 = regex_md5.group(1)
-        except AttributeError:
-            # log_data["warc_fixity"] = f"Fixity cannot be extracted from md5deep output: {md5deep_output.stdout}"
-            return
+def make_aip_instance(seed, date_end):
+    """Make an AIP class instance using information from seed dataframe
+    and calculating additional values (department, AIP ID, AIP title).
+    Returns the instance."""
 
-        # Compares the md5 of the download warc to what Archive-It has for the warc (warc_md5). If the md5 has changed,
-        # deletes the WARC so the check for AIP completeness will catch that there was a problem.
-        if not warc_md5 == downloaded_warc_md5:
-            os.remove(warc_path)
-            # log_data["warc_fixity"] = f"Fixity changed and WARC deleted. {warc_md5} before, {downloaded_warc_md5} after"
-        else:
-            print("Fixity is unchanged")
-            # log_data["warc_fixity"] = f"Successfully verified WARC fixity on {datetime.datetime.now()}"
+    # Gets the metadata for this seed from the Archive-It Partner API.
+    seed_report = requests.get(f'{c.partner_api}/seed?id={seed.Seed_ID}', auth=(c.username, c.password))
+    if not seed_report.status_code == 200:
+        return "API error for seed report"
+    py_seed_report = seed_report.json()
+
+    # Gets the title from the seed metadata.
+    title = py_seed_report[0]["metadata"]["Title"][0]["value"]
+
+    # Calculates the AIP ID using MAGIL formatting.
+    year, month, day = date_end.split("-")
+    aip_id = f'magil-ggp-{seed.Seed_ID}-{year}-{month}'
+
+    # Creates the AIP instance and returns it.
+    aip_instance = a.AIP(os.getcwd(), "magil", "0000", seed.Seed_ID, aip_id, title, 1, True)
+    return aip_instance
 
 
 def check_directory(aip):
