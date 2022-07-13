@@ -276,31 +276,31 @@ def check_directory(aip):
     # Moves to an error folder if either issue is detected and logs the result.
     if not os.path.exists(f"{aip.directory}/{aip.id}/objects"):
         aip.log["ObjectsError"] = "Objects folder is missing."
-        #a.log(aip.log)
+        a.log(aip.log)
         a.move_error('incomplete_directory', aip.id)
         return
     elif len(os.listdir(f"{aip.directory}/{aip.id}/objects")) == 0:
         aip.log["ObjectsError"] = "Objects folder is empty."
-        #a.log(aip.log)
+        a.log(aip.log)
         a.move_error('incomplete_directory', aip.id)
         return
-    #else:
-        #aip.log["ObjectsError"] = "Successfully created objects folder"
+    else:
+        aip.log["ObjectsError"] = "Successfully created objects folder"
 
     # Checks if the metadata folder doesn't exist or is empty.
     # Moves to an error folder if either issue is detected and logs the result.
     if not os.path.exists(f"{aip.directory}/{aip.id}/metadata"):
-        #aip.log["MetadataError"] = "Metadata folder is missing."
-        #a.log(aip.log)
+        aip.log["MetadataError"] = "Metadata folder is missing."
+        a.log(aip.log)
         a.move_error('incomplete_directory', aip.id)
         return
     elif len(os.listdir(f"{aip.directory}/{aip.id}/metadata")) == 0:
-        #aip.log["MetadataError"] = "Metadata folder is empty."
-        #a.log(aip.log)
+        aip.log["MetadataError"] = "Metadata folder is empty."
+        a.log(aip.log)
         a.move_error('incomplete_directory', aip.id)
         return
-    #else:
-        #aip.log["MetadataError"] = "Successfully created metadata folder"
+    else:
+        aip.log["MetadataError"] = "Successfully created metadata folder"
 
 
 def check_aips(date_end, date_start, seed_to_aip, aips_directory):
