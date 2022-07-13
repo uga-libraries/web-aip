@@ -14,7 +14,6 @@ script to verify all required fields are present. """
 
 # Usage: python /path/web_aip_batch.py date_start date_end
 
-import csv
 import os
 import re
 import sys
@@ -73,21 +72,16 @@ total_seeds = len(seed_df)
 # Makes directories used to store script outputs, if they aren't already there.
 a.make_output_directories()
 
-# # Starts a log in the script output folder to use for recording errors related to the warcs.
-# web.warc_log("header")
+# Makes a dictionary for mapping seed ids to AIP ids, which is needed at the end to test the script.
+seed_to_aip = {}
 
 # Iterates through information about each seed, downloading metadata and WARC files from Archive-It
 # and creating AIPs ready for ingest into the digital preservation system.
 for seed in seed_df.itertuples():
 
-#     # Starts a dictionary of information for the log.
-#     log_data = {"filename": "TBD", "warc_json": "n/a", "seed_id": "n/a", "job_id": "n/a",
-#                 "seed_metadata": "n/a", "report_download": "n/a", "report_info": "n/a", "warc_api": "n/a",
-#                 "warc_fixity": "n/a", "complete": "Errors during WARC processing."}
-
     # Updates the current seed number and displays the script progress.
     current_seed += 1
-    print(f"Starting seed {current_seed} of {total_seeds}.")
+    print(f"\nStarting seed {current_seed} of {total_seeds}.")
 
     # Makes the AIP directory for the seed (AIP folder with metadata and objects subfolders).
     try:
@@ -110,48 +104,57 @@ for seed in seed_df.itertuples():
         print("Unable to make an AIP for this seed due to an API error.")
         continue
 
-#     # Verifies the metadata and objects folders exist and have content.
-#     # This is unlikely but could happen if there were uncaught download errors.
-#     web.check_directory(aip)
-#
-#     # Deletes any temporary files and makes a log of each deleted file.
-#     a.delete_temp(aip)
-#
-#     # Extracts technical metadata from the files using FITS.
-#     if aip_folder in os.listdir("."):
-#         a.extract_metadata(aip)
-#
-#     # Transforms the FITS metadata into the PREMIS preservation.xml file using saxon and xslt stylesheets.
-#     if aip_folder in os.listdir("."):
-#         a.make_preservationxml(aip, "website")
-#
-#     # Bags the aip.
-#     if aip_folder in os.listdir("."):
-#         a.bag(aip)
-#
-#     # Tars and zips the aip.
-#     if f"{aip_folder}_bag" in os.listdir('.'):
-#         a.package(aip)
-#
-#     # Adds the packaged AIP to the MD5 manifest in the aips-to-ingest folder.
-#     if f'{aip.id}_bag' in os.listdir('.'):
-#         a.manifest(aip)
-#
-# # Closes the metadata CSV.
-# open_metadata.close()
-#
-# # Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
-# # errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
-# print('\nStarting completeness check.')
-# web.check_aips(date_end, date_start, seed_to_aip, aips_directory)
-#
-# # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) and logs into the AIPs folder
-# # to keep everything together if another set is downloaded before these are deleted.
-# os.chdir(c.script_output)
-# to_move = ("aips-to-ingest", "errors", "fits-xml", "preservation-xml",
-#            "warc_log.csv", "aip_log.csv", "completeness_check.csv")
-# for item in os.listdir("."):
-#     if item in to_move:
-#         os.replace(item, f"{aips_directory}/{item}")
-#
-# print('\nScript is complete.')
+    # Updates the seed_to_aip dictionary with this seed.
+    seed_to_aip[seed.Seed_ID] = aip.id
+
+    # Renames the seed folder to the AIP ID.
+    os.replace(seed.Seed_ID, aip.id)
+
+    # Replaces the seed ID prefixes for the metadata files with the AIP ID.
+    for file in os.listdir(os.path.join(aip.id, "metadata")):
+        if file.startswith(seed.Seed_ID):
+            new_filename = file.replace(seed.Seed_ID, aip.id)
+            os.replace(os.path.join(aip.id, "metadata", file), os.path.join(aip.id, "metadata", new_filename))
+
+    # Verifies the metadata and objects folders exist and have content.
+    # This is unlikely but could happen if there were uncaught download errors.
+    web.check_directory(aip)
+
+    # Deletes any temporary files and makes a log of each deleted file.
+    a.delete_temp(aip)
+
+    # Extracts technical metadata from the files using FITS.
+    if aip.id in os.listdir("."):
+        a.extract_metadata(aip)
+
+    # Transforms the FITS metadata into the PREMIS preservation.xml file using saxon and xslt stylesheets.
+    if aip.id in os.listdir("."):
+        a.make_preservationxml(aip, "website")
+
+    # Bags the aip.
+    if aip.id in os.listdir("."):
+        a.bag(aip)
+
+    # Tars and zips the aip.
+    if f"{aip.id}_bag" in os.listdir('.'):
+        a.package(aip)
+
+    # Adds the packaged AIP to the MD5 manifest in the aips-to-ingest folder.
+    if f'{aip.id}_bag' in os.listdir('.'):
+        a.manifest(aip)
+
+# Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
+# errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
+print('\nStarting completeness check.')
+web.check_aips(date_end, date_start, seed_to_aip, aips_directory)
+
+# Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) and logs into the AIPs folder
+# to keep everything together if another set is downloaded before these are deleted.
+os.chdir(c.script_output)
+to_move = ("aips-to-ingest", "errors", "fits-xml", "preservation-xml",
+           "seeds.csv", "completeness_check.csv")
+for item in os.listdir("."):
+    if item in to_move:
+        os.replace(item, f"{aips_directory}/{item}")
+
+print('\nScript is complete.')
