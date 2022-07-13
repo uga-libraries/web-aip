@@ -69,8 +69,9 @@ seed_df = web.seed_data(date_start, date_end)
 current_seed = 0
 total_seeds = len(seed_df)
 
-# Makes directories used to store script outputs, if they aren't already there.
+# Makes directories used to store script outputs and AIP log.
 a.make_output_directories()
+a.log("header")
 
 # Makes a dictionary for mapping seed ids to AIP ids, which is needed at the end to test the script.
 seed_to_aip = {}
@@ -152,7 +153,7 @@ web.check_aips(date_end, date_start, seed_to_aip, aips_directory)
 # to keep everything together if another set is downloaded before these are deleted.
 os.chdir(c.script_output)
 to_move = ("aips-to-ingest", "errors", "fits-xml", "preservation-xml",
-           "seeds.csv", "completeness_check.csv")
+           "seeds.csv", "aip_log.csv", "completeness_check.csv")
 for item in os.listdir("."):
     if item in to_move:
         os.replace(item, f"{aips_directory}/{item}")

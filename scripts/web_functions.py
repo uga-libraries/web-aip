@@ -466,43 +466,43 @@ def download_warcs(seed, date_end):
         # The path for where the warc will be saved on the local machine (it is long and used twice in this script).
         warc_path = f'{c.script_output}/aips_{date_end}/{seed.Seed_ID}/objects/{warc}'
 
-        # # TEMPORARY CODE TO SPEED UP TESTING
-        # # This will make a file of the correct name in the objects folder instead of downloading.
-        # with open(warc_path, "w") as file:
-        #     file.write("Text")
+        # TEMPORARY CODE TO SPEED UP TESTING
+        # This will make a file of the correct name in the objects folder instead of downloading.
+        with open(warc_path, "w") as file:
+            file.write("Text")
 
-        # Downloads the warc.
-        warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
-
-        # # If there was an error with the API call, quits the function.
-        if not warc_download.status_code == 200:
-            # log_data["warc_api"] = f'API error {warc_download.status_code}'
-            return
+        # # Downloads the warc.
+        # warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
+        #
+        # # # If there was an error with the API call, quits the function.
+        # if not warc_download.status_code == 200:
+        #     # log_data["warc_api"] = f'API error {warc_download.status_code}'
+        #     return
+        # # else:
+        # #     log_data["warc_api"] = "Successfully downloaded WARC."
+        #
+        # # Saves the warc in the objects folder, keeping the original filename.
+        # with open(warc_path, 'wb') as warc_file:
+        #     warc_file.write(warc_download.content)
+        #
+        # # Calculates the md5 for the downloaded WARC, using a regular expression to get the md5 from the md5deep output.
+        # # If the output is not formatted as expected, quits the function.
+        # md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
+        # try:
+        #     regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
+        #     downloaded_warc_md5 = regex_md5.group(1)
+        # except AttributeError:
+        #     # log_data["warc_fixity"] = f"Fixity cannot be extracted from md5deep output: {md5deep_output.stdout}"
+        #     return
+        #
+        # # Compares the md5 of the download warc to what Archive-It has for the warc (warc_md5). If the md5 has changed,
+        # # deletes the WARC so the check for AIP completeness will catch that there was a problem.
+        # if not warc_md5 == downloaded_warc_md5:
+        #     os.remove(warc_path)
+        #     # log_data["warc_fixity"] = f"Fixity changed and WARC deleted. {warc_md5} before, {downloaded_warc_md5} after"
         # else:
-        #     log_data["warc_api"] = "Successfully downloaded WARC."
-
-        # Saves the warc in the objects folder, keeping the original filename.
-        with open(warc_path, 'wb') as warc_file:
-            warc_file.write(warc_download.content)
-
-        # Calculates the md5 for the downloaded WARC, using a regular expression to get the md5 from the md5deep output.
-        # If the output is not formatted as expected, quits the function.
-        md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
-        try:
-            regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
-            downloaded_warc_md5 = regex_md5.group(1)
-        except AttributeError:
-            # log_data["warc_fixity"] = f"Fixity cannot be extracted from md5deep output: {md5deep_output.stdout}"
-            return
-
-        # Compares the md5 of the download warc to what Archive-It has for the warc (warc_md5). If the md5 has changed,
-        # deletes the WARC so the check for AIP completeness will catch that there was a problem.
-        if not warc_md5 == downloaded_warc_md5:
-            os.remove(warc_path)
-            # log_data["warc_fixity"] = f"Fixity changed and WARC deleted. {warc_md5} before, {downloaded_warc_md5} after"
-        else:
-            print("Fixity is unchanged")
-            # log_data["warc_fixity"] = f"Successfully verified WARC fixity on {datetime.datetime.now()}"
+        #     print("Fixity is unchanged")
+        #     # log_data["warc_fixity"] = f"Successfully verified WARC fixity on {datetime.datetime.now()}"
 
 
 def make_aip_instance(seed, date_end):
