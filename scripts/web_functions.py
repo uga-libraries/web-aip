@@ -265,7 +265,7 @@ def make_aip_instance(seed, date_end, seed_df):
 
     # Gets the metadata for this seed from the Archive-It Partner API.
     seed_report = requests.get(f'{c.partner_api}/seed?id={seed.Seed_ID}', auth=(c.username, c.password))
-    if not seed_report.status_code == 2001:
+    if not seed_report.status_code == 200:
         row_index = seed_df.index[seed_df["Seed_ID"] == seed.Seed_ID].tolist()[0]
         log(f"API error {seed_report.status_code}: can't get info about seed to make AIP class instance.",
             seed_df, row_index, "AIP_Instance_Errors")
@@ -275,12 +275,19 @@ def make_aip_instance(seed, date_end, seed_df):
     # Gets the title from the seed metadata.
     title = py_seed_report[0]["metadata"]["Title"][0]["value"]
 
+    # Gets the department from the seed metadata and translates to match the ARCHive group.
+    department = py_seed_report[0]['metadata']['Collector'][0]['value']
+    dept_to_group = {"Hargrett Rare Book & Manuscript Library": "hargrett",
+                     "Map and Government Information Library": "magil",
+                     "Richard B. Russell Library for Political Research and Studies": "russell"}
+    department = dept_to_group[department]
+
     # Calculates the AIP ID using MAGIL formatting.
     year, month, day = date_end.split("-")
     aip_id = f'magil-ggp-{seed.Seed_ID}-{year}-{month}'
 
     # Creates the AIP instance and returns it.
-    aip_instance = a.AIP(os.getcwd(), "magil", "0000", seed.Seed_ID, aip_id, title, 1, True)
+    aip_instance = a.AIP(os.getcwd(), department, "0000", seed.Seed_ID, aip_id, title, 1, True)
     return aip_instance
 
 
