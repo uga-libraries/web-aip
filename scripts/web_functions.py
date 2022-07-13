@@ -65,6 +65,20 @@ def seed_data(date_start, date_end):
     return seed_df
 
 
+def log(message, df, row, column):
+    """Adds log information to the seeds dataframe and saves an updated version of seeds.csv."""
+
+    # Updates the dataframe. Separates messages with a a semicolon if there is more than one.
+    if pd.isnull(df.at[row, column]):
+        df.loc[row, column] = message
+    else:
+        df.loc[row, column] += "; " + message
+
+    # Saves a new version of seeds.csv with the updated information.
+    # The previous version of the file is overwritten.
+    df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+
+
 def download_metadata(seed, date_end, seed_df):
     """Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
     deletes any empty reports (meaning there was no data of that type for this seed),
@@ -87,11 +101,7 @@ def download_metadata(seed, date_end, seed_df):
             with open(f'{seed.Seed_ID}/metadata/{report_name}', 'wb') as report_csv:
                 report_csv.write(metadata_report.content)
         else:
-            error_msg = f"{report_type} API error {metadata_report.status_code}"
-            if pd.isnull(seed_df.at[row_index, "Metadata_Report_Errors"]):
-                seed_df.loc[row_index, "Metadata_Report_Errors"] = error_msg
-            else:
-                seed_df.loc[row_index, "Metadata_Report_Errors"] += "; " + error_msg
+            log(f"{report_type} API error {metadata_report.status_code}", seed_df, row_index, "Metadata_Report_Errors")
 
     def redact(metadata_report_path):
         """Replaces the seed report with a redacted version of the file, removing login information if those columns
@@ -117,11 +127,7 @@ def download_metadata(seed, date_end, seed_df):
                 password_index = header.index('login_password')
                 username_index = header.index('login_username')
             except ValueError:
-                error_msg = "Seed report does not have login columns to redact."
-                if pd.isnull(seed_df.at[row_index, "Metadata_Report_Info"]):
-                    seed_df.loc[row_index, "Metadata_Report_Info"] = error_msg
-                else:
-                    seed_df.loc[row_index, "Metadata_Report_Info"] += "; " + error_msg
+                log("Seed report does not have login columns to redact.", seed_df, row_index, "Metadata_Report_Info")
                 return
 
             # Puts 'REDACTED' in the password and username columns for each non-header row and adds the updated
@@ -162,11 +168,12 @@ def download_metadata(seed, date_end, seed_df):
                     get_report('id', crawl_def_id, 'crawl_definition', f'{seed.Seed_ID}_{crawl_def_id}_crawldef.csv')
                     break
     except FileNotFoundError:
-        seed_df.loc[row_index, "Metadata_Report_Errors"] += "; Crawl Job was not downloaded so cannot get Crawl Definition"
+        log("Crawl Job was not downloaded so cannot get Crawl Definition.", seed_df, row_index, "Metadata_Report_Errors")
 
     # If there were no download errors (the dataframe still has no value in that cell), updates the log to show success.
     if pd.isnull(seed_df.at[row_index, "Metadata_Report_Errors"]):
         seed_df.loc[row_index, "Metadata_Report_Errors"] = "Successfully downloaded all metadata reports."
+        seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
 
     # Iterates over each report in the metadata folder to delete empty reports and redact login information from the
     # seed report.
@@ -179,18 +186,12 @@ def download_metadata(seed, date_end, seed_df):
         # there is no metadata of that type, which is most common for collection and seed scope reports.
         if os.path.getsize(report_path) == 0:
             os.remove(report_path)
-            if pd.isnull(seed_df.at[row_index, "Metadata_Report_Info"]):
-                seed_df.loc[row_index, "Metadata_Report_Info"] = f"Deleted empty report {report}"
-            else:
-                seed_df.loc[row_index, "Metadata_Report_Info"] += f"; Deleted empty report {report}"
+            log(f"Deleted empty report {report}", seed_df, row_index, "Metadata_Report_Info")
             continue
 
         # Redacts login password and username from the seed report so we can share the seed report with researchers.
         if report.endswith('_seed.csv'):
             redact(report_path)
-
-    # Updates the log.
-    seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
 
 
 def download_warcs(seed, date_end, seed_df):
@@ -208,12 +209,7 @@ def download_warcs(seed, date_end, seed_df):
         # Gets URL for downloading the WARC and WARC MD5 from Archive-It using WASAPI.
         warc_data = requests.get(f'{c.wasapi}?filename={warc}', auth=(c.username, c.password))
         if not warc_data.status_code == 200:
-            error_msg = f"API error {warc_data.status_code}: can't get info about warc {warc}."
-            if pd.isnull(seed_df.at[row_index, "WARC_API_Errors"]):
-                seed_df.loc[row_index, "WARC_API_Errors"] = error_msg
-            else:
-                seed_df.loc[row_index, "WARC_API_Errors"] += "; " + error_msg
-            seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+            log(f"API error {warc_data.status_code}: can't get info about warc {warc}.", seed_df, row_index, "WARC_API_Errors")
             return
         py_warc = warc_data.json()
         warc_url = py_warc["files"][0]["locations"][0]
@@ -232,19 +228,10 @@ def download_warcs(seed, date_end, seed_df):
 
         # If there was an error with the API call, quits the function.
         if not warc_download.status_code == 200:
-            error_msg = f"API error {warc_download.status_code}: can't download warc {warc}"
-            if pd.isnull(seed_df.at[row_index, "WARC_API_Errors"]):
-                seed_df.loc[row_index, "WARC_API_Errors"] = error_msg
-            else:
-                seed_df.loc[row_index, "WARC_API_Errors"] += "; " + error_msg
-            seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+            log(f"API error {warc_download.status_code}: can't download warc {warc}", seed_df, row_index, "WARC_API_Errors")
             return
         else:
-            msg = f"WARC {warc} successfully downloaded"
-            if pd.isnull(seed_df.at[row_index, "WARC_API_Errors"]):
-                seed_df.loc[row_index, "WARC_API_Errors"] = msg
-            else:
-                seed_df.loc[row_index, "WARC_API_Errors"] += "; " + msg
+            log(f"WARC {warc} successfully downloaded", seed_df, row_index, "WARC_API_Errors")
 
         # Saves the warc in the objects folder, keeping the original filename.
         with open(warc_path, 'wb') as warc_file:
@@ -257,32 +244,18 @@ def download_warcs(seed, date_end, seed_df):
             regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
             downloaded_warc_md5 = regex_md5.group(1)
         except AttributeError:
-            error_msg = f"Fixity for {warc} cannot be extracted from md5deep output: {md5deep_output.stdout}"
-            if pd.isnull(seed_df.at[row_index, "WARC_Fixity_Errors"]):
-                seed_df.loc[row_index, "WARC_Fixity_Errors"] = error_msg
-            else:
-                seed_df.loc[row_index, "WARC_Fixity_Errors"] += "; " + error_msg
-            seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+            log(f"Fixity for {warc} cannot be extracted from md5deep output: {md5deep_output.stdout}",
+                seed_df, row_index, "WARC_Fixity_Errors")
             return
 
         # Compares the md5 of the download warc to what Archive-It has for the warc (warc_md5). If the md5 has changed,
         # deletes the WARC so the check for AIP completeness will catch that there was a problem.
         if not warc_md5 == downloaded_warc_md5:
             os.remove(warc_path)
-            error_msg = f"Fixity for WARC {warc} changed and it deleted: {warc_md5} before, {downloaded_warc_md5} after"
-            if pd.isnull(seed_df.at[row_index, "WARC_Fixity_Errors"]):
-                seed_df.loc[row_index, "WARC_Fixity_Errors"] = error_msg
-            else:
-                seed_df.loc[row_index, "WARC_Fixity_Errors"] += "; " + error_msg
+            log(f"Fixity for WARC {warc} changed and it deleted: {warc_md5} before, {downloaded_warc_md5} after",
+                seed_df, row_index, "WARC_Fixity_Errors")
         else:
-            msg = f"Successfully verified WARC {warc} fixity on {datetime.datetime.now()}"
-            if pd.isnull(seed_df.at[row_index, "WARC_Fixity_Errors"]):
-                seed_df.loc[row_index, "WARC_Fixity_Errors"] = msg
-            else:
-                seed_df.loc[row_index, "WARC_Fixity_Errors"] += "; " + msg
-
-        # Updates the log.
-        seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+            log(f"Successfully verified WARC {warc} fixity on {datetime.datetime.now()}", seed_df, row_index, "WARC_Fixity_Errors")
 
 
 def make_aip_instance(seed, date_end):
