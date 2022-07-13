@@ -284,13 +284,8 @@ def seed_data(date_start, date_end):
     for warc_info in py_warcs["files"]:
 
         # Calculates the seed id, which is a portion of the WARC filename.
-        # Stops processing this WARC and starts the next one if the filename doesn't match the expected pattern.
-        try:
-            regex_seed = re.match(r"^.*-SEED(\d+)-", warc_info["filename"])
-            seed_identifier = regex_seed.group(1)
-        except AttributeError:
-            print("Skipping this WARC because the seed ID cannot be calculated:", warc_info["filename"])
-            continue
+        regex_seed = re.match(r"^.*-SEED(\d+)-", warc_info["filename"])
+        seed_identifier = regex_seed.group(1)
 
         # If the seed is already in the dataframe, adds to the size, WARC count, and WARC filenames.
         # If the seed is new, gets the data needed about the seed and adds it to the dataframe.
