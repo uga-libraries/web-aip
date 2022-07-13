@@ -70,6 +70,9 @@ seed_df = web.seed_data(date_start, date_end)
 current_seed = 0
 total_seeds = len(seed_df)
 
+# Makes directories used to store script outputs, if they aren't already there.
+a.make_output_directories()
+
 # # Starts a log in the script output folder to use for recording errors related to the warcs.
 # web.warc_log("header")
 
@@ -100,48 +103,6 @@ for seed in seed_df.itertuples():
     # Downloads the WARCs from Archive-It into the seed's objects folder.
     web.download_warcs(seed, date_end)
 
-#     # If no errors were encountered (the last test was successful), updates the completion status.
-#     # Saves the log information for all completed WARCs, even if there were errors.
-#     if log_data["warc_fixity"].startswith("Successfully"):
-#         log_data["complete"] = "Successfully processed WARC."
-#     web.warc_log(log_data)
-#
-#
-# # PART TWO: CREATE AIPS THAT ARE READY FOR INGEST INTO ARCHIVE
-#
-# # Verifies the metadata.csv file was made earlier in the script by seed_data().
-# aip_metadata_csv = "metadata.csv"
-# if not os.path.exists(aip_metadata_csv):
-#     print("Cannot make AIPs from the downloaded content because metadata.csv was not made by the script.")
-#     sys.exit()
-#
-# # Reads the metadata.csv and verifies that the contents are formatted correctly.
-# open_metadata = open(aip_metadata_csv)
-# read_metadata = csv.reader(open_metadata)
-# metadata_errors = a.check_metadata_csv(read_metadata)
-# if len(metadata_errors) > 0:
-#     print('\nProblems detected with metadata.csv:')
-#     for error in metadata_errors:
-#         print("   * " + error)
-#     print('\nCannot make AIPs from the downloaded content.')
-#     sys.exit()
-#
-# # Starts a log for AIP information.
-# a.log("header")
-#
-# # Makes directories used to store script outputs, if they aren't already there.
-# a.make_output_directories()
-#
-# # Starts counts for tracking script progress. Some processes are slow, so this shows the script is still working.
-# # Subtracts one from the count for the metadata file.
-# current_aip = 0
-# total_aips = len(os.listdir('.')) - 1
-# print(f"\nProcessing {total_aips} AIPs.")
-#
-# # Returns to the beginning of the CSV (the script is at the end because of checking it for errors) and skips the header.
-# open_metadata.seek(0)
-# next(read_metadata)
-#
 # # Uses the AIP functions to create an AIP for each folder in the metadata CSV.
 # # Checks if the AIP folder is still present before calling the function for the next step
 # # in case it was moved due to an error in the previous step.
