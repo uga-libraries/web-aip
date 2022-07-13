@@ -23,7 +23,9 @@ def seed_data(date_start, date_end):
     o use for splitting big downloads or restarting jobs if the script breaks."""
 
     # Starts a dataframe for storing seed level data about the WARCs in this download.
-    seed_df = pd.DataFrame(columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames"])
+    seed_df = pd.DataFrame(columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                                    "Make_AIP_Error", "Metadata_Report_Errors", "Metadata_Report_Info",
+                                    "WARC_API_Errors", "WARC_Fixity_Errors"])
 
     # Uses WASAPI to get information about all WARCs in this download, using the date limits.
     # Must use the WARC API to be able to limit the information by date.
@@ -62,10 +64,11 @@ def seed_data(date_start, date_end):
     return seed_df
 
 
-def download_metadata(seed, date_end):
+def download_metadata(seed, date_end, seed_df):
     """Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
     deletes any empty reports (meaning there was no data of that type for this seed),
-    and redacts login information from the seed report. """
+    and redacts login information from the seed report.
+    Any errors are added to the seed dataframe and saved to the script log at the end of the function."""
 
     def get_report(filter_type, filter_value, report_type, report_name):
         """Downloads a single metadata report and saves it as a csv in the AIP's metadata folder.
@@ -83,11 +86,11 @@ def download_metadata(seed, date_end):
             with open(f'{seed.Seed_ID}/metadata/{report_name}', 'wb') as report_csv:
                 report_csv.write(metadata_report.content)
         else:
-            print("API error:", report_type, metadata_report.status_code)
-            # if log_data['report_download'] == "n/a":
-            #     log_data['report_download'] = f'{report_type} API error {metadata_report.status_code}'
-            # else:
-            #     log_data['report_download'] += f'; {report_type} API error {metadata_report.status_code}'
+            error_msg = f"{report_type} API error {metadata_report.status_code}"
+            if pd.isnull(seed_df.at[row_index, "Metadata_Report_Errors"]):
+                seed_df.loc[row_index, "Metadata_Report_Errors"] = error_msg
+            else:
+                seed_df.loc[row_index, "Metadata_Report_Errors"] += "; " + error_msg
 
     def redact(metadata_report_path):
         """Replaces the seed report with a redacted version of the file, removing login information if those columns
@@ -113,11 +116,11 @@ def download_metadata(seed, date_end):
                 password_index = header.index('login_password')
                 username_index = header.index('login_username')
             except ValueError:
-                print("Seed report does not have login columns to redact.")
-                # if log_data['report_info'] == "n/a":
-                #     log_data['report_info'] = 'Seed report does not have login columns to redact.'
-                # else:
-                #     log_data['report_info'] += '; Seed report does not have login columns to redact.'
+                error_msg = "Seed report does not have login columns to redact."
+                if pd.isnull(seed_df.at[row_index, "Metadata_Report_Info"]):
+                    seed_df.loc[row_index, "Metadata_Report_Info"] = error_msg
+                else:
+                    seed_df.loc[row_index, "Metadata_Report_Info"] += "; " + error_msg
                 return
 
             # Puts 'REDACTED' in the password and username columns for each non-header row and adds the updated
@@ -133,6 +136,9 @@ def download_metadata(seed, date_end):
             report_write = csv.writer(report_csv)
             for row in redacted_rows:
                 report_write.writerow(row)
+
+    # Row index for the seed being processed in the dataframe, to use for adding logging information.
+    row_index = seed_df.index[seed_df["Seed_ID"] == seed.Seed_ID].tolist()[0]
 
     # Downloads five of the six metadata reports from Archive-It needed to understand the context of the WARC.
     # These are reports where there is only one report per seed or collection.
@@ -155,12 +161,11 @@ def download_metadata(seed, date_end):
                     get_report('id', crawl_def_id, 'crawl_definition', f'{seed.Seed_ID}_{crawl_def_id}_crawldef.csv')
                     break
     except FileNotFoundError:
-        print("Crawl job not downloaded so cannot get crawl definition.")
-        # log_data['report_download'] += f'; Crawl Job was not downloaded so cannot get Crawl Definition'
+        seed_df.loc[row_index, "Metadata_Report_Errors"] += "; Crawl Job was not downloaded so cannot get Crawl Definition"
 
-    # # If there were no download errors (the log still has the default value), updates the log to show success.
-    # if log_data['report_download'] == "n/a":
-    #     log_data['report_download'] = "Successfully downloaded all metadata reports."
+    # If there were no download errors (the dataframe still has no value in that cell), updates the log to show success.
+    if pd.isnull(seed_df.at[row_index, "Metadata_Report_Errors"]):
+        seed_df.loc[row_index, "Metadata_Report_Errors"] = "Successfully downloaded all metadata reports."
 
     # Iterates over each report in the metadata folder to delete empty reports and redact login information from the
     # seed report.
@@ -172,17 +177,19 @@ def download_metadata(seed, date_end):
         # Deletes any empty metadata files (file size of 0) and begins processing the next file. A file is empty if
         # there is no metadata of that type, which is most common for collection and seed scope reports.
         if os.path.getsize(report_path) == 0:
-            print("Deleting empty report: ", report_path)
-            # if log_data['report_info'] == "n/a":
-            #     log_data['report_info'] = f'Deleted empty report {report}'
-            # else:
-            #     log_data['report_info'] += f'; Deleted empty report {report}'
             os.remove(report_path)
+            if pd.isnull(seed_df.at[row_index, "Metadata_Report_Info"]):
+                seed_df.loc[row_index, "Metadata_Report_Info"] = f"Deleted empty report {report}"
+            else:
+                seed_df.loc[row_index, "Metadata_Report_Info"] += f"; Deleted empty report {report}"
             continue
 
         # Redacts login password and username from the seed report so we can share the seed report with researchers.
         if report.endswith('_seed.csv'):
             redact(report_path)
+
+    # Updates the log.
+    seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
 
 
 def download_warcs(seed, date_end):

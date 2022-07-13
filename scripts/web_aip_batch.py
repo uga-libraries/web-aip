@@ -93,7 +93,7 @@ for seed in seed_df.itertuples():
         continue
 
     # Downloads the seed metadata from Archive-It into the seed's metadata folder.
-    web.download_metadata(seed, date_end)
+    web.download_metadata(seed, date_end, seed_df)
 
     # Downloads the WARCs from Archive-It into the seed's objects folder.
     web.download_warcs(seed, date_end)
