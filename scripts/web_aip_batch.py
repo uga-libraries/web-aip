@@ -100,9 +100,9 @@ for seed in seed_df.itertuples():
 
     # Makes an instance of the AIP class, using seed dataframe and calculating additional values.
     # If there was an error when making the instance, starts the next AIP.
-    aip = web.make_aip_instance(seed, date_end)
-    if aip == "API error for seed report":
-        print("Unable to make an AIP for this seed due to an API error.")
+    try:
+        aip = web.make_aip_instance(seed, date_end, seed_df)
+    except ValueError:
         continue
 
     # Updates the seed_to_aip dictionary with this seed.

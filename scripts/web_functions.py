@@ -26,7 +26,7 @@ def seed_data(date_start, date_end):
     # Starts a dataframe for storing seed level data about the WARCs in this download.
     seed_df = pd.DataFrame(columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                     "Make_AIP_Error", "Metadata_Report_Errors", "Metadata_Report_Info",
-                                    "WARC_API_Errors", "WARC_Fixity_Errors"])
+                                    "WARC_API_Errors", "WARC_Fixity_Errors", "AIP_Instance_Errors"])
 
     # Uses WASAPI to get information about all WARCs in this download, using the date limits.
     # Must use the WARC API to be able to limit the information by date.
@@ -218,55 +218,58 @@ def download_warcs(seed, date_end, seed_df):
         # The path for where the warc will be saved on the local machine (it is long and used twice in this script).
         warc_path = f'{c.script_output}/aips_{date_end}/{seed.Seed_ID}/objects/{warc}'
 
-        # # TEMPORARY CODE TO SPEED UP TESTING
-        # # This will make a file of the correct name in the objects folder instead of downloading.
-        # with open(warc_path, "w") as file:
-        #     file.write("Text")
+        # TEMPORARY CODE TO SPEED UP TESTING
+        # This will make a file of the correct name in the objects folder instead of downloading.
+        with open(warc_path, "w") as file:
+            file.write("Text")
 
-        # Downloads the warc.
-        warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
+        # # Downloads the warc.
+        # warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
+        #
+        # # If there was an error with the API call, quits the function.
+        # if not warc_download.status_code == 200:
+        #     log(f"API error {warc_download.status_code}: can't download warc {warc}", seed_df, row_index, "WARC_API_Errors")
+        #     return
+        # else:
+        #     log(f"WARC {warc} successfully downloaded", seed_df, row_index, "WARC_API_Errors")
+        #
+        # # Saves the warc in the objects folder, keeping the original filename.
+        # with open(warc_path, 'wb') as warc_file:
+        #     warc_file.write(warc_download.content)
+        #
+        # # Calculates the md5 for the downloaded WARC, using a regular expression to get the md5 from the md5deep output.
+        # # If the output is not formatted as expected, quits the function.
+        # md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
+        # try:
+        #     regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
+        #     downloaded_warc_md5 = regex_md5.group(1)
+        # except AttributeError:
+        #     log(f"Fixity for {warc} cannot be extracted from md5deep output: {md5deep_output.stdout}",
+        #         seed_df, row_index, "WARC_Fixity_Errors")
+        #     return
+        #
+        # # Compares the md5 of the download warc to what Archive-It has for the warc (warc_md5). If the md5 has changed,
+        # # deletes the WARC so the check for AIP completeness will catch that there was a problem.
+        # if not warc_md5 == downloaded_warc_md5:
+        #     os.remove(warc_path)
+        #     log(f"Fixity for WARC {warc} changed and it deleted: {warc_md5} before, {downloaded_warc_md5} after",
+        #         seed_df, row_index, "WARC_Fixity_Errors")
+        # else:
+        #     log(f"Successfully verified WARC {warc} fixity on {datetime.datetime.now()}", seed_df, row_index, "WARC_Fixity_Errors")
 
-        # If there was an error with the API call, quits the function.
-        if not warc_download.status_code == 200:
-            log(f"API error {warc_download.status_code}: can't download warc {warc}", seed_df, row_index, "WARC_API_Errors")
-            return
-        else:
-            log(f"WARC {warc} successfully downloaded", seed_df, row_index, "WARC_API_Errors")
 
-        # Saves the warc in the objects folder, keeping the original filename.
-        with open(warc_path, 'wb') as warc_file:
-            warc_file.write(warc_download.content)
-
-        # Calculates the md5 for the downloaded WARC, using a regular expression to get the md5 from the md5deep output.
-        # If the output is not formatted as expected, quits the function.
-        md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
-        try:
-            regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
-            downloaded_warc_md5 = regex_md5.group(1)
-        except AttributeError:
-            log(f"Fixity for {warc} cannot be extracted from md5deep output: {md5deep_output.stdout}",
-                seed_df, row_index, "WARC_Fixity_Errors")
-            return
-
-        # Compares the md5 of the download warc to what Archive-It has for the warc (warc_md5). If the md5 has changed,
-        # deletes the WARC so the check for AIP completeness will catch that there was a problem.
-        if not warc_md5 == downloaded_warc_md5:
-            os.remove(warc_path)
-            log(f"Fixity for WARC {warc} changed and it deleted: {warc_md5} before, {downloaded_warc_md5} after",
-                seed_df, row_index, "WARC_Fixity_Errors")
-        else:
-            log(f"Successfully verified WARC {warc} fixity on {datetime.datetime.now()}", seed_df, row_index, "WARC_Fixity_Errors")
-
-
-def make_aip_instance(seed, date_end):
+def make_aip_instance(seed, date_end, seed_df):
     """Make an AIP class instance using information from seed dataframe
     and calculating additional values (department, AIP ID, AIP title).
     Returns the instance."""
 
     # Gets the metadata for this seed from the Archive-It Partner API.
     seed_report = requests.get(f'{c.partner_api}/seed?id={seed.Seed_ID}', auth=(c.username, c.password))
-    if not seed_report.status_code == 200:
-        return "API error for seed report"
+    if not seed_report.status_code == 2001:
+        row_index = seed_df.index[seed_df["Seed_ID"] == seed.Seed_ID].tolist()[0]
+        log(f"API error {seed_report.status_code}: can't get info about seed to make AIP class instance.",
+            seed_df, row_index, "AIP_Instance_Errors")
+        raise ValueError
     py_seed_report = seed_report.json()
 
     # Gets the title from the seed metadata.
