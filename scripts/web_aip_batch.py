@@ -98,7 +98,7 @@ for seed in seed_df.itertuples():
     # Makes an instance of the AIP class, using seed dataframe and calculating additional values.
     # If there was an error when making the instance, starts the next AIP.
     # Creates the AIP instance and returns it.
-    aip = a.AIP(os.getcwd(), seed.Department, seed.AIT_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, version=1, to_zip=True)
+    aip = a.AIP(os.getcwd(), seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, version=1, to_zip=True)
 
     # Verifies the metadata and objects folders exist and have content.
     # This is unlikely but could happen if there were uncaught download errors.
