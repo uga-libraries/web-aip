@@ -12,6 +12,7 @@ import pandas as pd
 import re
 import requests
 import subprocess
+import time
 
 # Import constant variables and functions from another UGA preservation script.
 import aip_functions as a
@@ -276,47 +277,50 @@ def download_warcs(seed, date_end, seed_df):
         # The path for where the warc will be saved on the local machine (it is long and used twice in this script).
         warc_path = f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/objects/{warc}'
 
-        # TEMPORARY CODE TO SPEED UP TESTING
-        # This will make a file of the correct name in the objects folder instead of downloading.
-        # and log as if it was successful.
-        with open(warc_path, "w") as file:
-            file.write("Text")
+        # # TEMPORARY CODE TO SPEED UP TESTING
+        # # This will make a file of the correct name in the objects folder instead of downloading.
+        # # and log as if it was successful.
+        # with open(warc_path, "w") as file:
+        #     file.write("Text")
+        #     log(f"Successfully downloaded {warc}", seed_df, row_index, "WARC_API_Errors")
+        #     log(f"Successfully verified {warc} fixity on {datetime.datetime.now()}", seed_df, row_index, "WARC_Fixity_Errors")
+
+        # Downloads the warc.
+        warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
+
+        # If there was an error with the API call, quits the function.
+        if not warc_download.status_code == 200:
+            log(f"API error {warc_download.status_code}: can't download {warc}", seed_df, row_index, "WARC_API_Errors")
+            return
+        else:
             log(f"Successfully downloaded {warc}", seed_df, row_index, "WARC_API_Errors")
+
+        # Saves the warc in the objects folder, keeping the original filename.
+        with open(warc_path, 'wb') as warc_file:
+            warc_file.write(warc_download.content)
+
+        # Calculates the md5 for the downloaded WARC, using a regular expression to get the md5 from the md5deep output.
+        # If the output is not formatted as expected, quits the function.
+        md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
+        try:
+            regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
+            downloaded_warc_md5 = regex_md5.group(1)
+        except AttributeError:
+            log(f"Fixity for {warc} cannot be extracted from md5deep output: {md5deep_output.stdout}",
+                seed_df, row_index, "WARC_Fixity_Errors")
+            return
+
+        # Compares the md5 of the download warc to what Archive-It has for the warc (warc_md5). If the md5 has changed,
+        # deletes the WARC so the check for AIP completeness will catch that there was a problem.
+        if not warc_md5 == downloaded_warc_md5:
+            os.remove(warc_path)
+            log(f"Fixity for {warc} changed and it was deleted: {warc_md5} before, {downloaded_warc_md5} after",
+                seed_df, row_index, "WARC_Fixity_Errors")
+        else:
             log(f"Successfully verified {warc} fixity on {datetime.datetime.now()}", seed_df, row_index, "WARC_Fixity_Errors")
 
-        # # Downloads the warc.
-        # warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
-        #
-        # # If there was an error with the API call, quits the function.
-        # if not warc_download.status_code == 200:
-        #     log(f"API error {warc_download.status_code}: can't download {warc}", seed_df, row_index, "WARC_API_Errors")
-        #     return
-        # else:
-        #     log(f"Successfully downloaded {warc}", seed_df, row_index, "WARC_API_Errors")
-        #
-        # # Saves the warc in the objects folder, keeping the original filename.
-        # with open(warc_path, 'wb') as warc_file:
-        #     warc_file.write(warc_download.content)
-        #
-        # # Calculates the md5 for the downloaded WARC, using a regular expression to get the md5 from the md5deep output.
-        # # If the output is not formatted as expected, quits the function.
-        # md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
-        # try:
-        #     regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
-        #     downloaded_warc_md5 = regex_md5.group(1)
-        # except AttributeError:
-        #     log(f"Fixity for {warc} cannot be extracted from md5deep output: {md5deep_output.stdout}",
-        #         seed_df, row_index, "WARC_Fixity_Errors")
-        #     return
-        #
-        # # Compares the md5 of the download warc to what Archive-It has for the warc (warc_md5). If the md5 has changed,
-        # # deletes the WARC so the check for AIP completeness will catch that there was a problem.
-        # if not warc_md5 == downloaded_warc_md5:
-        #     os.remove(warc_path)
-        #     log(f"Fixity for {warc} changed and it was deleted: {warc_md5} before, {downloaded_warc_md5} after",
-        #         seed_df, row_index, "WARC_Fixity_Errors")
-        # else:
-        #     log(f"Successfully verified {warc} fixity on {datetime.datetime.now()}", seed_df, row_index, "WARC_Fixity_Errors")
+        # Wait 15 second to give the API a rest.
+        time.sleep(15)
 
 
 def check_directory(aip):
