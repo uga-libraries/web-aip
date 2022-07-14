@@ -73,9 +73,6 @@ total_seeds = len(seed_df)
 a.make_output_directories()
 a.log("header")
 
-# Makes a dictionary for mapping seed ids to AIP ids, which is needed at the end to test the script.
-seed_to_aip = {}
-
 # Iterates through information about each seed, downloading metadata and WARC files from Archive-It
 # and creating AIPs ready for ingest into the digital preservation system.
 for seed in seed_df.itertuples():
@@ -86,10 +83,10 @@ for seed in seed_df.itertuples():
 
     # Makes the AIP directory for the seed (AIP folder with metadata and objects subfolders).
     try:
-        os.makedirs(os.path.join(seed.Seed_ID, "metadata"))
-        os.makedirs(os.path.join(seed.Seed_ID, "objects"))
+        os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
+        os.makedirs(os.path.join(seed.AIP_ID, "objects"))
     except FileExistsError:
-        print(f"\nCannot make AIP for seed {seed.Seed_ID}. Directory for seed already exists.")
+        print(f"\nCannot make AIP for {seed.AIP_ID}. Directory for seed already exists.")
         continue
 
     # Downloads the seed metadata from Archive-It into the seed's metadata folder.
@@ -101,19 +98,7 @@ for seed in seed_df.itertuples():
     # Makes an instance of the AIP class, using seed dataframe and calculating additional values.
     # If there was an error when making the instance, starts the next AIP.
     # Creates the AIP instance and returns it.
-    aip = a.AIP(os.getcwd(), seed.Department, seed.AIT_Collection, seed.Seed_ID, seed.AIP_ID, seed.Title, 1, True)
-
-    # Updates the seed_to_aip dictionary with this seed.
-    seed_to_aip[seed.Seed_ID] = aip.id
-
-    # Renames the seed folder to the AIP ID.
-    os.replace(seed.Seed_ID, aip.id)
-
-    # Replaces the seed ID prefixes for the metadata files with the AIP ID.
-    for file in os.listdir(os.path.join(aip.id, "metadata")):
-        if file.startswith(seed.Seed_ID):
-            new_filename = file.replace(seed.Seed_ID, aip.id)
-            os.replace(os.path.join(aip.id, "metadata", file), os.path.join(aip.id, "metadata", new_filename))
+    aip = a.AIP(os.getcwd(), seed.Department, seed.AIT_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, version=1, to_zip=True)
 
     # Verifies the metadata and objects folders exist and have content.
     # This is unlikely but could happen if there were uncaught download errors.

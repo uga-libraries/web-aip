@@ -156,7 +156,7 @@ def download_metadata(seed, date_end, seed_df):
 
         # Saves the metadata report if there were no errors with the API or logs the error.
         if metadata_report.status_code == 200:
-            with open(f'{seed.Seed_ID}/metadata/{report_name}', 'wb') as report_csv:
+            with open(f'{seed.AIP_ID}/metadata/{report_name}', 'wb') as report_csv:
                 report_csv.write(metadata_report.content)
         else:
             log(f"{report_type} API error {metadata_report.status_code}", seed_df, row_index, "Metadata_Report_Errors")
@@ -207,18 +207,18 @@ def download_metadata(seed, date_end, seed_df):
 
     # Downloads five of the six metadata reports from Archive-It needed to understand the context of the WARC.
     # These are reports where there is only one report per seed or collection.
-    get_report('id', seed.Seed_ID, 'seed', f'{seed.Seed_ID}_seed.csv')
-    get_report('seed', seed.Seed_ID, 'scope_rule', f'{seed.Seed_ID}_seedscope.csv')
-    get_report('collection', seed.AIT_Collection, 'scope_rule', f'{seed.Seed_ID}_collscope.csv')
-    get_report('id', seed.AIT_Collection, 'collection', f'{seed.Seed_ID}_coll.csv')
-    get_report('id', seed.Job_ID, 'crawl_job', f'{seed.Seed_ID}_{seed.Job_ID}_crawljob.csv')
+    get_report('id', seed.Seed_ID, 'seed', f'{seed.AIP_ID}_seed.csv')
+    get_report('seed', seed.Seed_ID, 'scope_rule', f'{seed.AIP_ID}_seedscope.csv')
+    get_report('collection', seed.AIT_Collection, 'scope_rule', f'{seed.AIP_ID}_collscope.csv')
+    get_report('id', seed.AIT_Collection, 'collection', f'{seed.AIP_ID}_coll.csv')
+    get_report('id', seed.Job_ID, 'crawl_job', f'{seed.AIP_ID}_{seed.Job_ID}_crawljob.csv')
 
     # Downloads the crawl definition report for the job this WARC was part of.
     # The crawl definition id is obtained from the crawl job report using the job id.
     # There may be more than one crawl definition report per AIP.
     # Logs an error if there is no crawl job report to get the job id(s) from.
     try:
-        with open(f'{seed.Seed_ID}/metadata/{seed.Seed_ID}_{seed.Job_ID}_crawljob.csv', 'r') as crawljob_csv:
+        with open(f'{seed.AIP_ID}/metadata/{seed.AIP_ID}_{seed.Job_ID}_crawljob.csv', 'r') as crawljob_csv:
             crawljob_data = csv.DictReader(crawljob_csv)
             for job in crawljob_data:
                 if str(seed.Job_ID) == job['id']:
@@ -235,10 +235,10 @@ def download_metadata(seed, date_end, seed_df):
 
     # Iterates over each report in the metadata folder to delete empty reports and redact login information from the
     # seed report.
-    for report in os.listdir(f'{seed.Seed_ID}/metadata'):
+    for report in os.listdir(f'{seed.AIP_ID}/metadata'):
 
         # Saves the full file path of the report.
-        report_path = f'{c.script_output}/aips_{date_end}/{seed.Seed_ID}/metadata/{report}'
+        report_path = f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/metadata/{report}'
 
         # Deletes any empty metadata files (file size of 0) and begins processing the next file. A file is empty if
         # there is no metadata of that type, which is most common for collection and seed scope reports.
@@ -274,7 +274,7 @@ def download_warcs(seed, date_end, seed_df):
         warc_md5 = py_warc["files"][0]["checksums"]["md5"]
 
         # The path for where the warc will be saved on the local machine (it is long and used twice in this script).
-        warc_path = f'{c.script_output}/aips_{date_end}/{seed.Seed_ID}/objects/{warc}'
+        warc_path = f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/objects/{warc}'
 
         # TEMPORARY CODE TO SPEED UP TESTING
         # This will make a file of the correct name in the objects folder instead of downloading.
