@@ -52,32 +52,35 @@ if len(configuration_errors) > 0:
     print("Correct the configuration file and run the script again.")
     sys.exit()
 
-# Makes a folder for AIPs within the script_output folder, a designated place on the local machine for web archiving
-# documents). The folder name includes the end date for the download to keep it separate from previous downloads
-# which may still be saved on the same machine.
+# Path to the folder in the script output directory (defined in the configuration file)
+# where everything related to this download will be saved.
 aips_directory = os.path.join(c.script_output, f"aips_{date_end}")
-if not os.path.exists(aips_directory):
+
+# The script may be run repeatedly if there are interruptions, such as due to API connections.
+# If the AIPs directory is already present, that means the script has run before.
+# It will use the seeds.csv, aip_log.csv, and output folders already there and skip seeds that were already done.
+if os.path.exists(aips_directory):
+    os.chdir(aips_directory)
+    seed_df = pd.read_csv(os.path.join(c.script_output, "seeds.csv"))
+# If the AIPs directory is not there, this is the first time the script is being run.
+# It will make the AIPs directory, a new seeds.csv, the output folders needed, and start the aip_log.csv.
+else:
     os.makedirs(aips_directory)
-
-# Changes current directory to the AIPs folder.
-os.chdir(aips_directory)
-
-# Uses Archive-IT WASAPI to get information about seeds in this download.
-# The information is also saved as a CSV (seeds.csv) in the script output folder.
-seed_df = web.seed_data(date_start, date_end)
+    os.chdir(aips_directory)
+    seed_df = web.seed_data(date_start, date_end)
+    a.make_output_directories()
+    a.log("header")
 
 # Starts counter for tracking script progress.
 # Some processes are slow, so this shows the script is still working and how much remains.
+# Filtered for no data in the WARC_Fixity_Errors column to skip seeds done earlier if this is a script restart.
 current_seed = 0
-total_seeds = len(seed_df)
-
-# Makes directories used to store script outputs and AIP log.
-a.make_output_directories()
-a.log("header")
+total_seeds = len(seed_df[seed_df["WARC_Fixity_Errors"].isnull()])
 
 # Iterates through information about each seed, downloading metadata and WARC files from Archive-It
 # and creating AIPs ready for ingest into the digital preservation system.
-for seed in seed_df.itertuples():
+# Filtered for no data in the WARC_Fixity_Errors column to skip seeds done earlier if this is a restart.
+for seed in seed_df[seed_df["WARC_Fixity_Errors"].isnull()].itertuples():
 
     # Updates the current seed number and displays the script progress.
     current_seed += 1
