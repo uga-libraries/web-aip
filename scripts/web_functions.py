@@ -350,7 +350,7 @@ def check_directory(aip):
         aip.log["MetadataError"] = "Successfully created metadata folder"
 
 
-def check_aips(date_end, date_start, seed_to_aip, aips_directory):
+def check_aips(date_end, date_start, seed_df, aips_directory):
     """Verifies that all the expected AIPs for the download are complete and no unexpected AIPs were created.
     Produces a csv named completeness_check with the results in the AIPs directory. """
 
@@ -440,9 +440,10 @@ def check_aips(date_end, date_start, seed_to_aip, aips_directory):
                     continue
 
                 # Saves data about the WARC to the dictionary (AIP id, WARC count, URL). If the seed is not in
-                # seed_to_aip, it is an unexpected seed and cannot be added to the dictionary.
+                # seed_df, it is an unexpected seed and cannot be added to the dictionary.
                 try:
-                    aip_info[seed_identifier] = [seed_to_aip[seed_identifier], 1, json_seed[0]['url']]
+                    aip_info[seed_identifier] = [seed_df.loc[seed_df["Seed_ID"] == seed_identifier]["AIP_ID"].item(),
+                                                 1, json_seed[0]['url']]
                 #TODO: do something with the errors.
                 except (KeyError, IndexError):
                     pass
@@ -539,9 +540,8 @@ def check_aips(date_end, date_start, seed_to_aip, aips_directory):
             if aip_directory == "metadata.csv":
                 continue
 
-            # Creates a tuple of the expected AIPs, which are the values in the seed_to_aip dictionary generated
-            # earlier in the script.
-            expected_aip_ids = tuple(seed_to_aip.values())
+            # Creates a tuple of the expected AIPs, which are the values in the AIP_ID row in the seed dataframe.
+            expected_aip_ids = tuple(seed_df["AIP_ID"].to_list())
 
             # If there is an AIP that does not start with one of the expected AIP ids, adds a list with the values
             # for that AIP's row in the completeness check csv to the extras list.
