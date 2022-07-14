@@ -276,44 +276,47 @@ def download_warcs(seed, date_end, seed_df):
         # The path for where the warc will be saved on the local machine (it is long and used twice in this script).
         warc_path = f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/objects/{warc}'
 
-        # # TEMPORARY CODE TO SPEED UP TESTING
-        # # This will make a file of the correct name in the objects folder instead of downloading.
-        # with open(warc_path, "w") as file:
-        #     file.write("Text")
-
-        # Downloads the warc.
-        warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
-
-        # If there was an error with the API call, quits the function.
-        if not warc_download.status_code == 200:
-            log(f"API error {warc_download.status_code}: can't download {warc}", seed_df, row_index, "WARC_API_Errors")
-            return
-        else:
+        # TEMPORARY CODE TO SPEED UP TESTING
+        # This will make a file of the correct name in the objects folder instead of downloading.
+        # and log as if it was successful.
+        with open(warc_path, "w") as file:
+            file.write("Text")
             log(f"Successfully downloaded {warc}", seed_df, row_index, "WARC_API_Errors")
-
-        # Saves the warc in the objects folder, keeping the original filename.
-        with open(warc_path, 'wb') as warc_file:
-            warc_file.write(warc_download.content)
-
-        # Calculates the md5 for the downloaded WARC, using a regular expression to get the md5 from the md5deep output.
-        # If the output is not formatted as expected, quits the function.
-        md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
-        try:
-            regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
-            downloaded_warc_md5 = regex_md5.group(1)
-        except AttributeError:
-            log(f"Fixity for {warc} cannot be extracted from md5deep output: {md5deep_output.stdout}",
-                seed_df, row_index, "WARC_Fixity_Errors")
-            return
-
-        # Compares the md5 of the download warc to what Archive-It has for the warc (warc_md5). If the md5 has changed,
-        # deletes the WARC so the check for AIP completeness will catch that there was a problem.
-        if not warc_md5 == downloaded_warc_md5:
-            os.remove(warc_path)
-            log(f"Fixity for {warc} changed and it was deleted: {warc_md5} before, {downloaded_warc_md5} after",
-                seed_df, row_index, "WARC_Fixity_Errors")
-        else:
             log(f"Successfully verified {warc} fixity on {datetime.datetime.now()}", seed_df, row_index, "WARC_Fixity_Errors")
+
+        # # Downloads the warc.
+        # warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
+        #
+        # # If there was an error with the API call, quits the function.
+        # if not warc_download.status_code == 200:
+        #     log(f"API error {warc_download.status_code}: can't download {warc}", seed_df, row_index, "WARC_API_Errors")
+        #     return
+        # else:
+        #     log(f"Successfully downloaded {warc}", seed_df, row_index, "WARC_API_Errors")
+        #
+        # # Saves the warc in the objects folder, keeping the original filename.
+        # with open(warc_path, 'wb') as warc_file:
+        #     warc_file.write(warc_download.content)
+        #
+        # # Calculates the md5 for the downloaded WARC, using a regular expression to get the md5 from the md5deep output.
+        # # If the output is not formatted as expected, quits the function.
+        # md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
+        # try:
+        #     regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
+        #     downloaded_warc_md5 = regex_md5.group(1)
+        # except AttributeError:
+        #     log(f"Fixity for {warc} cannot be extracted from md5deep output: {md5deep_output.stdout}",
+        #         seed_df, row_index, "WARC_Fixity_Errors")
+        #     return
+        #
+        # # Compares the md5 of the download warc to what Archive-It has for the warc (warc_md5). If the md5 has changed,
+        # # deletes the WARC so the check for AIP completeness will catch that there was a problem.
+        # if not warc_md5 == downloaded_warc_md5:
+        #     os.remove(warc_path)
+        #     log(f"Fixity for {warc} changed and it was deleted: {warc_md5} before, {downloaded_warc_md5} after",
+        #         seed_df, row_index, "WARC_Fixity_Errors")
+        # else:
+        #     log(f"Successfully verified {warc} fixity on {datetime.datetime.now()}", seed_df, row_index, "WARC_Fixity_Errors")
 
 
 def check_directory(aip):
@@ -367,7 +370,7 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
 
         # If there was an API error, ends the function.
         if warcs.status_code != 200:
-            print("WASAPI Status code:", warcs.status_code)
+            print("WASAPI error, status code: ", warcs.status_code)
             raise ValueError
 
         # Converts json from API to a python object.
@@ -391,6 +394,7 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
                 regex_seed = re.match(r".*-SEED(\d+)-.*", warc_info['filename'])
                 seed_identifier = regex_seed.group(1)
             except AttributeError:
+                print(f"Unable to get seed ID for {warc_info['filename']}")
                 raise ValueError
 
             # Filter one: only includes the WARC in the dictionary if it was created since the last download and
@@ -401,6 +405,7 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
                 regex_crawl_date = re.match(r"(\d{4}-\d{2}-\d{2})T.*", warc_info['store-time'])
                 crawl_date = regex_crawl_date.group(1)
             except AttributeError:
+                print(f"Unable to reformat date {warc_info['store-time']} for {warc_info['filename']}")
                 raise ValueError
 
             if crawl_date < date_start or crawl_date > date_end:
@@ -424,7 +429,7 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
 
                 # If there was an API error, ends the function.
                 if seed_report.status_code != 200:
-                    print(f'API error {seed_report.status_code} getting seed report for seed {seed_identifier}.')
+                    print(f"Unable to get seed report for seed {seed_identifier}. Status {seed_report.status_code}.")
                     raise ValueError
 
                 # Gets the repository from the seed report, if present. If not, this WARC is not included.
@@ -446,13 +451,14 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
                                                  1, json_seed[0]['url']]
                 #TODO: do something with the errors.
                 except (KeyError, IndexError):
+                    print("Could not save seed information to the aip_info dictionary.")
                     pass
 
                 warcs_include += 1
 
         # Checks that the right number of WARCs were evaluated.
         if warcs_expected != warcs_include + warcs_exclude:
-            print('Check AIPs did not review the expected number of WARCs.')
+            print("Check AIPs did not review the expected number of WARCs.")
             raise ValueError
 
         return aip_info
@@ -559,7 +565,7 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
     try:
         aips_metadata = aip_dictionary()
     except ValueError:
-        print('\nUnable to check AIPs for completeness. AIP dictionary not generated.')
+        print("Unable to check AIPs for completeness. AIP dictionary not generated.")
         return
 
     # Starts a csv for the results of the quality review.
