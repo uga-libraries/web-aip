@@ -19,6 +19,8 @@ import re
 import sys
 
 # Import functions and constant variables from other UGA scripts.
+import pandas as pd
+
 import aip_functions as a
 import configuration as c
 import web_functions as web
@@ -132,11 +134,19 @@ for seed in seed_df.itertuples():
 print('\nStarting completeness check.')
 web.check_aips(date_end, date_start, seed_df, aips_directory)
 
+# Adds the information from aip_log.csv to seeds.csv and deletes aip_log.csv
+# to have one spreadsheet the documents the entire process.
+os.chdir(c.script_output)
+aip_df = pd.read_csv("aip_log.csv")
+seed_df = pd.merge(seed_df, aip_df, left_on="AIP_ID", right_on="AIP ID", how="left")
+seed_df.drop(["Time Started", "AIP ID"], axis=1, inplace=True)
+seed_df.to_csv("seeds.csv", index=False)
+os.remove("aip_log.csv")
+
 # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) and logs into the AIPs folder
 # to keep everything together if another set is downloaded before these are deleted.
-os.chdir(c.script_output)
 to_move = ("aips-to-ingest", "errors", "fits-xml", "preservation-xml",
-           "seeds.csv", "aip_log.csv", "completeness_check.csv")
+           "seeds.csv", "completeness_check.csv")
 for item in os.listdir("."):
     if item in to_move:
         os.replace(item, f"{aips_directory}/{item}")
