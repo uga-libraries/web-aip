@@ -19,17 +19,19 @@ import configuration as c
 
 
 def seed_data(date_start, date_end):
-    """Uses WASAPI to get information about each seed to include in the download.
-    Returns the data as a dataframe and saves it to a CSV in the script output folder t
-    o use for splitting big downloads or restarting jobs if the script breaks."""
+    """Uses WASAPI and the Partner API to get information about each seed to include in the download.
+    Returns the data as a dataframe and also saves it to a CSV in the script output folder to use for the log
+    and for splitting big downloads or restarting jobs if the script breaks."""
 
     # Starts a dataframe for storing seed level data about the WARCs in this download.
-    seed_df = pd.DataFrame(columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                                    "Make_AIP_Error", "Metadata_Report_Errors", "Metadata_Report_Info",
-                                    "WARC_API_Errors", "WARC_Fixity_Errors", "AIP_Instance_Errors"])
+    # Includes columns that will be used for logging steps prior to using the general-aip script functions.
+    seed_df = pd.DataFrame(columns=["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection", "AIT_Collection",
+                                    "Job_ID", "Size_GB", "WARCs", "WARC_Filenames", "Seed_Metadata_Errors",
+                                    "Metadata_Report_Errors", "Metadata_Report_Info",
+                                    "WARC_API_Errors", "WARC_Fixity_Errors"])
 
-    # Uses WASAPI to get information about all WARCs in this download, using the date limits.
-    # Must use the WARC API to be able to limit the information by date.
+    # Uses WASAPI to get information about all WARCs in this download, based on the date limits.
+    # WASAPI is the only API that allows limiting by date.
     filters = {"store-time-after": date_start, "store-time-before": date_end, "page_size": 1000}
     warcs = requests.get(c.wasapi, params=filters, auth=(c.username, c.password))
 
@@ -39,7 +41,8 @@ def seed_data(date_start, date_end):
         print(f"Ending script (this information is required). Try script again later.")
         exit()
 
-    # Converts the WARC data from json to a Python object and iterates over the data.
+    # Converts the WARC data from json to a Python object and organizes it in the dataframe by seed.
+    # Includes seed, Archive-It collection, job, size in GB, number of WARCs, and list of WARC filenames.
     py_warcs = warcs.json()
     for warc_info in py_warcs["files"]:
 
@@ -58,6 +61,61 @@ def seed_data(date_start, date_end):
                          "Job_ID": warc_info["crawl"], "Size_GB": round(warc_info["size"]/1000000000, 2),
                          "WARCs": 1, "WARC_Filenames": warc_info["filename"]}
             seed_df = seed_df.append(seed_info, ignore_index=True)
+
+    # Gets a list of the seeds and uses the Partner API (seed report) to get additional information.
+    # Includes: seed title, related archival collection, and department (all part of the metadata)
+    # and constructs the AIP ID. Adds these fields to the dataframe.
+    seed_list = seed_df["Seed_ID"].to_list()
+    for seed in seed_list:
+
+        # Row index is used to save the data to the correct row in the dataframe.
+        row_index = seed_df.index[seed_df["Seed_ID"] == seed].tolist()[0]
+
+        # Gets the seed metadata from the Archive-It Partner API and logs an error if the connection fails.
+        seed_report = requests.get(f"{c.partner_api}/seed?id={seed}", auth=(c.username, c.password))
+        if not seed_report.status_code == 200:
+            log(f"API error {seed_report.status_code}", seed_df, row_index, "Seed_Metadata_Errors")
+            continue
+        py_seed_report = seed_report.json()
+
+        # Gets the AIP title from the seed metadata.
+        seed_df.loc[row_index, "Title"] = py_seed_report[0]["metadata"]["Title"][0]["value"]
+
+        # Gets the department name from the seed metadata and translates it to the ARCHive group code.
+        dept_to_group = {"Hargrett Rare Book & Manuscript Library": "hargrett",
+                         "Map and Government Information Library": "magil",
+                         "Richard B. Russell Library for Political Research and Studies": "russell"}
+        department = dept_to_group[py_seed_report[0]["metadata"]["Collector"][0]["value"]]
+        seed_df.loc[row_index, "Department"] = department
+
+        # Gets the related archival collection from the seed metadata, reformatting if necessary.
+        if department == "hargrett":
+            try:
+                regex_collection = re.match("^Hargrett (.*):", py_seed_report[0]["metadata"]["Relation"][0]["value"])
+                seed_df.loc[row_index, "UGA_Collection"] = regex_collection.group(1)
+            except (KeyError, AttributeError):
+                seed_df.loc[row_index, "UGA_Collection"] = "0000"
+        elif department == "magil":
+            seed_df.loc[row_index, "UGA_Collection"] = "0000"
+        elif department == "russell":
+            try:
+                regex_collection = re.match(r"^RBRL/(\d{3})", py_seed_report[0]["metadata"]["Relation"][0]["value"])
+                seed_df.loc[row_index, "UGA_Collection"] = "rbrl-" + regex_collection.group(1)
+            except (KeyError, AttributeError):
+                seed_df.loc[row_index, "UGA_Collection"] = "rbrl-000"
+
+        # Constructs the AIP ID according to department specifications.
+        # Also temporarily adds a column to the dataframe which counts the number of seeds per collection,
+        # and calculates the year and month of the download, both of which are needed for AIP IDs.
+        seed_df["coll_sequence"] = seed_df.groupby(["UGA_Collection"]).cumcount() + 1
+        year, month, day = date_end.split("-")
+        if department == "hargrett":
+            seed_df.loc[row_index, "AIP_ID"] = f'harg-{seed_df.at[row_index, "UGA_Collection"]}-web-{year}{month}-{format(seed_df.at[row_index, "coll_sequence"], "04d")}'
+        elif department == "magil":
+            seed_df.loc[row_index, "AIP_ID"] = f"magil-ggp-{seed}-{year}-{month}"
+        elif department == "russell":
+            seed_df.loc[row_index, "AIP_ID"] = f'{seed_df.at[row_index, "UGA_Collection"]}-web-{year}{month}-{format(seed_df.at[row_index, "coll_sequence"], "04d")}'
+        seed_df.drop(["coll_sequence"], axis=1, inplace=True)
 
     # Saves the dataframe as a CSV in the script output folder for splitting or restarting a batch.
     # Returns the dataframe for when the entire group will be downloaded as one batch.
@@ -256,39 +314,6 @@ def download_warcs(seed, date_end, seed_df):
         #         seed_df, row_index, "WARC_Fixity_Errors")
         # else:
         #     log(f"Successfully verified WARC {warc} fixity on {datetime.datetime.now()}", seed_df, row_index, "WARC_Fixity_Errors")
-
-
-def make_aip_instance(seed, date_end, seed_df):
-    """Make an AIP class instance using information from seed dataframe
-    and calculating additional values (department, AIP ID, AIP title).
-    Returns the instance."""
-
-    # Gets the metadata for this seed from the Archive-It Partner API.
-    seed_report = requests.get(f'{c.partner_api}/seed?id={seed.Seed_ID}', auth=(c.username, c.password))
-    if not seed_report.status_code == 200:
-        row_index = seed_df.index[seed_df["Seed_ID"] == seed.Seed_ID].tolist()[0]
-        log(f"API error {seed_report.status_code}: can't get info about seed to make AIP class instance.",
-            seed_df, row_index, "AIP_Instance_Errors")
-        raise ValueError
-    py_seed_report = seed_report.json()
-
-    # Gets the title from the seed metadata.
-    title = py_seed_report[0]["metadata"]["Title"][0]["value"]
-
-    # Gets the department from the seed metadata and translates to match the ARCHive group.
-    department = py_seed_report[0]['metadata']['Collector'][0]['value']
-    dept_to_group = {"Hargrett Rare Book & Manuscript Library": "hargrett",
-                     "Map and Government Information Library": "magil",
-                     "Richard B. Russell Library for Political Research and Studies": "russell"}
-    department = dept_to_group[department]
-
-    # Calculates the AIP ID using MAGIL formatting.
-    year, month, day = date_end.split("-")
-    aip_id = f'magil-ggp-{seed.Seed_ID}-{year}-{month}'
-
-    # Creates the AIP instance and returns it.
-    aip_instance = a.AIP(os.getcwd(), department, "0000", seed.Seed_ID, aip_id, title, 1, True)
-    return aip_instance
 
 
 def check_directory(aip):

@@ -100,10 +100,8 @@ for seed in seed_df.itertuples():
 
     # Makes an instance of the AIP class, using seed dataframe and calculating additional values.
     # If there was an error when making the instance, starts the next AIP.
-    try:
-        aip = web.make_aip_instance(seed, date_end, seed_df)
-    except ValueError:
-        continue
+    # Creates the AIP instance and returns it.
+    aip = a.AIP(os.getcwd(), seed.Department, seed.AIT_Collection, seed.Seed_ID, seed.AIP_ID, seed.Title, 1, True)
 
     # Updates the seed_to_aip dictionary with this seed.
     seed_to_aip[seed.Seed_ID] = aip.id
