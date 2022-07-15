@@ -416,7 +416,8 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
                 print(f"Unable to reformat date {warc_info['store-time']} for {warc_info['filename']}")
                 raise ValueError
 
-            if crawl_date < date_start or crawl_date > date_end:
+            # With WASAPI the start date is inclusive but the end date is not.
+            if crawl_date < date_start or crawl_date >= date_end:
                 warcs_exclude += 1
                 continue
 
@@ -457,10 +458,9 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
                 try:
                     aip_info[seed_identifier] = [seed_df.loc[seed_df["Seed_ID"] == seed_identifier]["AIP_ID"].item(),
                                                  1, json_seed[0]['url']]
-                #TODO: do something with the errors.
                 except (KeyError, ValueError, IndexError):
-                    print("Could not save seed information to the aip_info dictionary.")
-                    pass
+                    warcs_exclude += 1
+                    continue
 
                 warcs_include += 1
 
