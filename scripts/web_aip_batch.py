@@ -132,11 +132,6 @@ for seed in seed_df[(seed_df["Seed_Metadata_Errors"].isnull()) & (seed_df["WARC_
     if f'{aip.id}_bag' in os.listdir('.'):
         a.manifest(aip)
 
-# Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
-# errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
-print('\nStarting completeness check.')
-web.check_aips(date_end, date_start, seed_df, aips_directory)
-
 # Adds the information from aip_log.csv to seeds.csv and deletes aip_log.csv
 # to have one spreadsheet the documents the entire process.
 os.chdir(c.script_output)
@@ -145,6 +140,11 @@ seed_df = pd.merge(seed_df, aip_df, left_on="AIP_ID", right_on="AIP ID", how="le
 seed_df.drop(["Time Started", "AIP ID"], axis=1, inplace=True)
 seed_df.to_csv("seeds.csv", index=False)
 os.remove("aip_log.csv")
+
+# Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
+# errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
+print('\nStarting completeness check.')
+web.check_aips(date_end, date_start, seed_df, aips_directory)
 
 # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) and logs into the AIPs folder
 # to keep everything together if another set is downloaded before these are deleted.
