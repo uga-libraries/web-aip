@@ -555,7 +555,8 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
                 continue
 
             # Creates a tuple of the expected AIPs, which are the values in the AIP_ID row in the seed dataframe.
-            expected_aip_ids = tuple(seed_df["AIP_ID"].to_list())
+            # Does not include blanks from any seeds where the AIP ID was not calculated.
+            expected_aip_ids = tuple(seed_df[seed_df["AIP_ID"].notnull()]["AIP_ID"].to_list())
 
             # If there is an AIP that does not start with one of the expected AIP ids, adds a list with the values
             # for that AIP's row in the completeness check csv to the extras list.
@@ -567,14 +568,6 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
         if len(extras) > 0:
             return extras
 
-    # Makes a dictionary with information about expected AIPs for this download. The key is the seed id,
-    # and the value is a list with the AIP id, WARC count, and URL. If there were errors when calculating the
-    # dictionary, ends the function.
-    # try:
-    #     aips_metadata = aip_dictionary()
-    # except ValueError:
-    #     print("Unable to check AIPs for completeness. AIP dictionary not generated.")
-    #     return
     aips_metadata = aip_dictionary()
 
     # Starts a csv for the results of the quality review.
