@@ -69,54 +69,58 @@ def seed_data(date_start, date_end):
     seed_list = seed_df["Seed_ID"].to_list()
     for seed in seed_list:
 
-        # Row index is used to save the data to the correct row in the dataframe.
-        row_index = seed_df.index[seed_df["Seed_ID"] == seed].tolist()[0]
+        # If any data is missing, the try/except notes the error and the seed will be skipped when making AIPs.
+        try:
+            # Row index is used to save the data to the correct row in the dataframe.
+            row_index = seed_df.index[seed_df["Seed_ID"] == seed].tolist()[0]
 
-        # Gets the seed metadata from the Archive-It Partner API and logs an error if the connection fails.
-        seed_report = requests.get(f"{c.partner_api}/seed?id={seed}", auth=(c.username, c.password))
-        if not seed_report.status_code == 200:
-            log(f"API error {seed_report.status_code}: can't make this AIP", seed_df, row_index, "Seed_Metadata_Errors")
-            continue
-        py_seed_report = seed_report.json()
+            # Gets the seed metadata from the Archive-It Partner API and logs an error if the connection fails.
+            seed_report = requests.get(f"{c.partner_api}/seed?id={seed}", auth=(c.username, c.password))
+            if not seed_report.status_code == 200:
+                log(f"API error {seed_report.status_code}: can't make this AIP", seed_df, row_index, "Seed_Metadata_Errors")
+                continue
+            py_seed_report = seed_report.json()
 
-        # Gets the AIP title from the seed metadata.
-        seed_df.loc[row_index, "Title"] = py_seed_report[0]["metadata"]["Title"][0]["value"]
+            # Gets the AIP title from the seed metadata.
+            seed_df.loc[row_index, "Title"] = py_seed_report[0]["metadata"]["Title"][0]["value"]
 
-        # Gets the department name from the seed metadata and translates it to the ARCHive group code.
-        dept_to_group = {"Hargrett Rare Book & Manuscript Library": "hargrett",
-                         "Map and Government Information Library": "magil",
-                         "Richard B. Russell Library for Political Research and Studies": "russell"}
-        department = dept_to_group[py_seed_report[0]["metadata"]["Collector"][0]["value"]]
-        seed_df.loc[row_index, "Department"] = department
+            # Gets the department name from the seed metadata and translates it to the ARCHive group code.
+            dept_to_group = {"Hargrett Rare Book & Manuscript Library": "hargrett",
+                             "Map and Government Information Library": "magil",
+                             "Richard B. Russell Library for Political Research and Studies": "russell"}
+            department = dept_to_group[py_seed_report[0]["metadata"]["Collector"][0]["value"]]
+            seed_df.loc[row_index, "Department"] = department
 
-        # Gets the related archival collection from the seed metadata, reformatting if necessary.
-        if department == "hargrett":
-            try:
-                regex_collection = re.match("^Hargrett (.*):", py_seed_report[0]["metadata"]["Relation"][0]["value"])
-                seed_df.loc[row_index, "UGA_Collection"] = regex_collection.group(1)
-            except (KeyError, AttributeError):
+            # Gets the related archival collection from the seed metadata, reformatting if necessary.
+            if department == "hargrett":
+                try:
+                    regex_collection = re.match("^Hargrett (.*):", py_seed_report[0]["metadata"]["Relation"][0]["value"])
+                    seed_df.loc[row_index, "UGA_Collection"] = regex_collection.group(1)
+                except (KeyError, AttributeError):
+                    seed_df.loc[row_index, "UGA_Collection"] = "0000"
+            elif department == "magil":
                 seed_df.loc[row_index, "UGA_Collection"] = "0000"
-        elif department == "magil":
-            seed_df.loc[row_index, "UGA_Collection"] = "0000"
-        elif department == "russell":
-            try:
-                regex_collection = re.match(r"^RBRL/(\d{3})", py_seed_report[0]["metadata"]["Relation"][0]["value"])
-                seed_df.loc[row_index, "UGA_Collection"] = "rbrl-" + regex_collection.group(1)
-            except (KeyError, AttributeError):
-                seed_df.loc[row_index, "UGA_Collection"] = "rbrl-000"
+            elif department == "russell":
+                try:
+                    regex_collection = re.match(r"^RBRL/(\d{3})", py_seed_report[0]["metadata"]["Relation"][0]["value"])
+                    seed_df.loc[row_index, "UGA_Collection"] = "rbrl-" + regex_collection.group(1)
+                except (KeyError, AttributeError):
+                    seed_df.loc[row_index, "UGA_Collection"] = "rbrl-000"
 
-        # Constructs the AIP ID according to department specifications.
-        # Also temporarily adds a column to the dataframe which counts the number of seeds per collection,
-        # and calculates the year and month of the download, both of which are needed for AIP IDs.
-        seed_df["coll_sequence"] = seed_df.groupby(["UGA_Collection"]).cumcount() + 1
-        year, month, day = date_end.split("-")
-        if department == "hargrett":
-            seed_df.loc[row_index, "AIP_ID"] = f'harg-{seed_df.at[row_index, "UGA_Collection"]}-web-{year}{month}-{format(seed_df.at[row_index, "coll_sequence"], "04d")}'
-        elif department == "magil":
-            seed_df.loc[row_index, "AIP_ID"] = f"magil-ggp-{seed}-{year}-{month}"
-        elif department == "russell":
-            seed_df.loc[row_index, "AIP_ID"] = f'{seed_df.at[row_index, "UGA_Collection"]}-web-{year}{month}-{format(seed_df.at[row_index, "coll_sequence"], "04d")}'
-        seed_df.drop(["coll_sequence"], axis=1, inplace=True)
+            # Constructs the AIP ID according to department specifications.
+            # Also temporarily adds a column to the dataframe which counts the number of seeds per collection,
+            # and calculates the year and month of the download, both of which are needed for AIP IDs.
+            seed_df["coll_sequence"] = seed_df.groupby(["UGA_Collection"]).cumcount() + 1
+            year, month, day = date_end.split("-")
+            if department == "hargrett":
+                seed_df.loc[row_index, "AIP_ID"] = f'harg-{seed_df.at[row_index, "UGA_Collection"]}-web-{year}{month}-{format(seed_df.at[row_index, "coll_sequence"], "04d")}'
+            elif department == "magil":
+                seed_df.loc[row_index, "AIP_ID"] = f"magil-ggp-{seed}-{year}-{month}"
+            elif department == "russell":
+                seed_df.loc[row_index, "AIP_ID"] = f'{seed_df.at[row_index, "UGA_Collection"]}-web-{year}{month}-{format(seed_df.at[row_index, "coll_sequence"], "04d")}'
+            seed_df.drop(["coll_sequence"], axis=1, inplace=True)
+        except:
+            seed_df.loc[row_index, "Seed_Metadata_Errors"] = "Couldn't get all required metadata values from the seed report. Will not download files or make AIP."
 
     # Saves the dataframe as a CSV in the script output folder for splitting or restarting a batch.
     # Returns the dataframe for when the entire group will be downloaded as one batch.

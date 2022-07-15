@@ -73,14 +73,14 @@ else:
 
 # Starts counter for tracking script progress.
 # Some processes are slow, so this shows the script is still working and how much remains.
-# Filtered for no data in the WARC_Fixity_Errors column to skip seeds done earlier if this is a script restart.
 current_seed = 0
-total_seeds = len(seed_df[seed_df["WARC_Fixity_Errors"].isnull()])
+total_seeds = len(seed_df[(seed_df["Seed_Metadata_Errors"].isnull()) & (seed_df["WARC_Fixity_Errors"].isnull())])
 
 # Iterates through information about each seed, downloading metadata and WARC files from Archive-It
 # and creating AIPs ready for ingest into the digital preservation system.
+# Filtered for no data in the Seed_Metadata_Errors to skip seeds without the required metadata in Archive-It.
 # Filtered for no data in the WARC_Fixity_Errors column to skip seeds done earlier if this is a restart.
-for seed in seed_df[seed_df["WARC_Fixity_Errors"].isnull()].itertuples():
+for seed in seed_df[(seed_df["Seed_Metadata_Errors"].isnull()) & (seed_df["WARC_Fixity_Errors"].isnull())].itertuples():
 
     # Updates the current seed number and displays the script progress.
     current_seed += 1
