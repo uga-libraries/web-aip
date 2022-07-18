@@ -211,6 +211,8 @@ date_start = "2022-03-20"
 date_end = "2022-03-25"
 
 # Tests the paths in the configuration file.
+# In this case, making sure there are not unexpected errors which will impact these tests.
+# Error handling for the configuration file isn't part of this script.
 configuration_errors = a.check_configuration()
 if len(configuration_errors) > 0:
     print("/nProblems detected with configuration.py:")
@@ -220,36 +222,36 @@ if len(configuration_errors) > 0:
     sys.exit()
 
 # Makes a folder for AIPs within the script_output folder and makes it the current directory.
-aips_directory = f'aips_{date_end}'
-if not os.path.exists(f'{c.script_output}/{aips_directory}'):
-    os.makedirs(f'{c.script_output}/{aips_directory}')
-os.chdir(f'{c.script_output}/{aips_directory}')
+# (Removed code that lets the script restart.)
+aips_directory = os.path.join(c.script_output, f"aips_{date_end}")
+os.makedirs(aips_directory)
+os.chdir(aips_directory)
 
-# Downloads information from APIs, starts variables for tracking information, and starts the warc log.
-warc_metadata = web.warc_data(date_start, date_end)
-seed_metadata = web.seed_data(warc_metadata, date_end)
-current_warc = 0
-total_warcs = warc_metadata['count']
-seed_to_aip = {}
-aip_to_title = {}
-web.warc_log("header")
+# Gets the metadata about the seeds in the batch.
+# Still thinking about how to test it.
+seed_df = web.seed_data(date_start, date_end)
+
+# Makes the output directories and log for the AIP part of the script.
+a.make_output_directories()
+a.log("header")
+
+# Starts counters for tracking script progress.
+# (Removed code that lets the script restart.)
+current_seed = 0
+total_seeds = len(seed_df)
 
 # ----------------------------------------------------------------------------------------------------------------
-# THIS PART OF THE SCRIPT MAKES A DIFFERENT ERROR EVERY TIME IT STARTS A NEW WARC.
+# THIS PART OF THE SCRIPT MAKES A DIFFERENT ERROR EVERY TIME IT STARTS A NEW SEED.
 # FOR ERRORS GENERATING WITHIN FUNCTIONS, IT USES A DIFFERENT VERSION OF THE FUNCTION.
 # PRINTS AN ERROR TO THE TERMINAL IF THE ERROR IS NOT CAUGHT AND STARTS THE LOOP WITH THE NEXT WARC.
 # ----------------------------------------------------------------------------------------------------------------
 
-for warc in warc_metadata['files']:
-
-    # Starts a dictionary of information for the log.
-    log_data = {"filename": "TBD", "warc_json": "n/a", "seed_id": "n/a", "job_id": "n/a",
-                "seed_metadata": "n/a", "report_download": "n/a", "report_info": "n/a", "warc_api": "n/a",
-                "warc_fixity": "n/a", "complete": "Errors during WARC processing."}
+# (Removed code that lets the script restart.)
+for seed in seed_df.itertuples():
 
     # Updates the current WARC number and displays the script progress.
-    current_warc += 1
-    print(f"Processing WARC {current_warc} of {total_warcs}.")
+    current_seed += 1
+    print(f"Processing seed {current_seed} of {total_seeds}.")
 
     # ERROR 1: Cannot find expected values in WARC JSON (KeyError).
     if current_warc == 1:
