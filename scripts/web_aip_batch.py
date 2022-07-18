@@ -118,7 +118,7 @@ for seed in seed_df[(seed_df["Seed_Metadata_Errors"].isnull()) & (seed_df["WARC_
 
     # Transforms the FITS metadata into the PREMIS preservation.xml file using saxon and xslt stylesheets.
     if aip.id in os.listdir("."):
-        a.make_preservationxml(aip, "website")
+        a.make_preservationxml(aip)
 
     # Bags the aip.
     if aip.id in os.listdir("."):
