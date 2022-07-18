@@ -122,6 +122,10 @@ def seed_data(date_start, date_end):
         except:
             seed_df.loc[row_index, "Seed_Metadata_Errors"] = "Couldn't get all required metadata values from the seed report. Will not download files or make AIP."
 
+    # If there were no errors (the row has no value in the Seed_Metadata_Errors column),
+    # updates the dataframe to show success.
+    seed_df["Seed_Metadata_Errors"] = seed_df["Seed_Metadata_Errors"].fillna("Successfully calculated seed metadata")
+
     # Saves the dataframe as a CSV in the script output folder for splitting or restarting a batch.
     # Returns the dataframe for when the entire group will be downloaded as one batch.
     seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
@@ -235,7 +239,7 @@ def download_metadata(seed, date_end, seed_df):
 
     # If there were no download errors (the dataframe still has no value in that cell), updates the log to show success.
     if pd.isnull(seed_df.at[row_index, "Metadata_Report_Errors"]):
-        seed_df.loc[row_index, "Metadata_Report_Errors"] = "Successfully downloaded all metadata reports."
+        seed_df.loc[row_index, "Metadata_Report_Errors"] = "Successfully downloaded all metadata reports"
         seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
 
     # Iterates over each report in the metadata folder to delete empty reports and redact login information from the
@@ -255,6 +259,11 @@ def download_metadata(seed, date_end, seed_df):
         # Redacts login password and username from the seed report so we can share the seed report with researchers.
         if report.endswith('_seed.csv'):
             redact(report_path)
+
+    # If there is nothing in the report info field, updates the log with default text.
+    if pd.isnull(seed_df.at[row_index, "Metadata_Report_Info"]):
+        seed_df.loc[row_index, "Metadata_Report_Info"] = "Successfully redacted seed report; No empty reports to delete"
+        seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
 
 
 def download_warcs(seed, date_end, seed_df):
@@ -289,6 +298,9 @@ def download_warcs(seed, date_end, seed_df):
         #     file.write("Text")
         #     log(f"Successfully downloaded {warc}", seed_df, row_index, "WARC_API_Errors")
         #     log(f"Successfully verified {warc} fixity on {datetime.datetime.now()}", seed_df, row_index, "WARC_Fixity_Errors")
+        # warc_path_unzip = warc_path.replace(".warc.gz", ".warc")
+        # os.rename(warc_path, warc_path_unzip)
+        # log(f"Successfully unzipped {warc}", seed_df, row_index, "WARC_Unzip_Errors")
 
         # Downloads the WARC, which will be zipped.
         warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
