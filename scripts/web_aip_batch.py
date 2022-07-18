@@ -61,7 +61,7 @@ aips_directory = os.path.join(c.script_output, f"aips_{date_end}")
 # It will use the seeds.csv, aip_log.csv, and output folders already there and skip seeds that were already done.
 if os.path.exists(aips_directory):
     os.chdir(aips_directory)
-    seed_df = pd.read_csv(os.path.join(c.script_output, "seeds.csv"))
+    seed_df = pd.read_csv(os.path.join(c.script_output, "seeds.csv"), dtype="object")
 # If the AIPs directory is not there, this is the first time the script is being run.
 # It will make the AIPs directory, a new seeds.csv, the output folders needed, and start the aip_log.csv.
 else:
@@ -75,26 +75,26 @@ else:
 # Some processes are slow, so this shows the script is still working and how much remains.
 current_seed = 0
 total_seeds = len(seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfully"))
-                          & (seed_df["WARC_Fixity_Errors"].isnull())])
+                          & (seed_df["WARC_Unzip_Errors"].isnull())])
 
 # Iterates through information about each seed, downloading metadata and WARC files from Archive-It
 # and creating AIPs ready for ingest into the digital preservation system.
 # Filtered for no data in the Seed_Metadata_Errors to skip seeds without the required metadata in Archive-It.
 # Filtered for no data in the WARC_Fixity_Errors column to skip seeds done earlier if this is a restart.
 for seed in seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfully"))
-                    & (seed_df["WARC_Fixity_Errors"].isnull())].itertuples():
+                    & (seed_df["WARC_Unzip_Errors"].isnull())].itertuples():
 
     # Updates the current seed number and displays the script progress.
     current_seed += 1
     print(f"\nStarting seed {current_seed} of {total_seeds}.")
 
     # Makes the AIP directory for the seed (AIP folder with metadata and objects subfolders).
-    try:
-        os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
-        os.makedirs(os.path.join(seed.AIP_ID, "objects"))
-    except FileExistsError:
-        print(f"\nCannot make AIP for {seed.AIP_ID}. Directory for seed already exists.")
-        continue
+    # If the seed already has an AIP directory from an error in a previous iteration of the script,
+    # deletes the contents and anything in the seeds.csv from the previous step so it can be remade.
+    if os.path.exists(seed.AIP_ID):
+        web.reset_aip(seed.AIP_ID, seed_df)
+    os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
+    os.makedirs(os.path.join(seed.AIP_ID, "objects"))
 
     # Downloads the seed metadata from Archive-It into the seed's metadata folder.
     web.download_metadata(seed, date_end, seed_df)
@@ -105,7 +105,7 @@ for seed in seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfull
     # Makes an instance of the AIP class, using seed dataframe and calculating additional values.
     # If there was an error when making the instance, starts the next AIP.
     # Creates the AIP instance and returns it.
-    aip = a.AIP(os.getcwd(), seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, version=1, to_zip=True)
+    aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, version=1, to_zip=True)
 
     # Verifies the metadata and objects folders exist and have content.
     # This is unlikely but could happen if there were uncaught download errors.

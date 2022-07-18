@@ -11,6 +11,7 @@ import os
 import pandas as pd
 import re
 import requests
+import shutil
 import subprocess
 import time
 
@@ -140,6 +141,27 @@ def log(message, df, row, column):
         df.loc[row, column] = message
     else:
         df.loc[row, column] += "; " + message
+
+    # Saves a new version of seeds.csv with the updated information.
+    # The previous version of the file is overwritten.
+    df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+
+
+def reset_aip(aip_id, df):
+    """Deletes the directories and log information for a seed
+    that was partially completed when the script broke so it can be remade."""
+
+    # Deletes the AIP directory and all its contents.
+    shutil.rmtree(aip_id)
+
+    # Clears data in the seed dataframe related to successfully completing metadata and WARC downloading
+    # from the failed attempt.
+    row_index = df.index[df["AIP_ID"] == aip_id].tolist()[0]
+    df.loc[row_index, "Metadata_Report_Errors"] = None
+    df.loc[row_index, "Metadata_Report_Info"] = None
+    df.loc[row_index, "WARC_API_Errors"] = None
+    df.loc[row_index, "WARC_Fixity_Errors"] = None
+    df.loc[row_index, "WARC_Unzip_Errors"] = None
 
     # Saves a new version of seeds.csv with the updated information.
     # The previous version of the file is overwritten.
@@ -482,6 +504,7 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
                     aip_info[seed_identifier] = [seed_df.loc[seed_df["Seed_ID"] == seed_identifier]["AIP_ID"].item(),
                                                  1, json_seed[0]['url']]
                 except (KeyError, ValueError, IndexError):
+                    print("Seed is not in seeds.csv")
                     warcs_exclude += 1
                     continue
 
@@ -573,10 +596,6 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
         # Iterates through the folder with the AIPs.
         for aip_directory in os.listdir(aips_directory):
 
-            # Skips the metadata.csv used to make the AIPs.
-            if aip_directory == "metadata.csv":
-                continue
-
             # Creates a tuple of the expected AIPs, which are the values in the AIP_ID row in the seed dataframe.
             # Does not include blanks from any seeds where the AIP ID was not calculated.
             expected_aip_ids = tuple(seed_df[seed_df["AIP_ID"].notnull()]["AIP_ID"].to_list())
@@ -591,7 +610,11 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
         if len(extras) > 0:
             return extras
 
-    aips_metadata = aip_dictionary()
+    try:
+        aips_metadata = aip_dictionary()
+    except (ValueError, IndexError, KeyError):
+        print("Unable to make aip dictionary and cannot check for completeness.")
+        return
 
     # Starts a csv for the results of the quality review.
     csv_path = f'{c.script_output}/completeness_check.csv'
