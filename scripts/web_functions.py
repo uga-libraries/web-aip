@@ -168,7 +168,7 @@ def reset_aip(aip_id, df):
     df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
 
 
-def download_metadata(seed, date_end, seed_df):
+def download_metadata(seed, seed_df):
     """Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
     deletes any empty reports (meaning there was no data of that type for this seed),
     and redacts login information from the seed report.
@@ -176,63 +176,56 @@ def download_metadata(seed, date_end, seed_df):
 
     def get_report(filter_type, filter_value, report_type, report_name):
         """Downloads a single metadata report and saves it as a csv in the AIP's metadata folder.
+            Only saves if there is data of that type and also redacts the login info from the seed report.
             filter_type and filter_value are used to filter the API call to the right AIP's report
             report_type is the Archive-It name for the report
             report_name is the name for the report saved in the AIP, including the ARCHive metadata code """
 
         # Builds the API call to get the report as a csv.
         # Limit of -1 will return all matches. Default is only the first 100.
-        filters = {'limit': -1, filter_type: filter_value, 'format': 'csv'}
-        metadata_report = requests.get(f'{c.partner_api}/{report_type}', params=filters, auth=(c.username, c.password))
+        filters = {"limit": -1, filter_type: filter_value, "format": "csv"}
+        metadata_report = requests.get(f"{c.partner_api}/{report_type}", params=filters, auth=(c.username, c.password))
 
-        # Saves the metadata report if there were no errors with the API or logs the error.
+        # Saves the metadata report if there were no API errors and there was data of this type (content isn't empty).
+        # For scope rules, it is common for one or both to not have data since these aren't required.
         if metadata_report.status_code == 200:
-            with open(f'{seed.AIP_ID}/metadata/{report_name}', 'wb') as report_csv:
-                report_csv.write(metadata_report.content)
+            if metadata_report.content == b"":
+                log(f"Empty report {report_name} not saved", seed_df, row_index, "Metadata_Report_Info")
+            else:
+                with open(f"{seed.AIP_ID}/metadata/{report_name}", "wb") as report_csv:
+                    report_csv.write(metadata_report.content)
         else:
             log(f"{report_type} API error {metadata_report.status_code}", seed_df, row_index, "Metadata_Report_Errors")
 
-    def redact(metadata_report_path):
-        """Replaces the seed report with a redacted version of the file, removing login information if those columns
-           are present. Even if the columns are blank, replaces it with REDACTED. Since not all login information is
-           meaningful (some is from staff web browsers autofill information while viewing the metadata), knowing if
-           there was login information or not is misleading. """
-
-        # Reads the data from the CSV.
-        report_df = pd.read_csv(metadata_report_path)
-
-        # If the login columns are included, fills any row with data with "REDACTED" and saves the updated file.
-        # If the columns are not included (unclear why this happens), adds that infoto the log.
-        if "login_password" in report_df.columns:
-            report_df["login_username"] = "REDACTED"
-            report_df["login_password"] = "REDACTED"
-            report_df.to_csv(metadata_report_path)
-        else:
-            log("Seed report does not have login columns to redact", seed_df, row_index, "Metadata_Report_Info")
+        # Replaces the seed report with a redacted version of the file, removing login information if those columns
+        # are present. Even if the columns are blank, replaces it with REDACTED. Since not all login information is
+        # meaningful (some is from staff web browsers autofill information while viewing the metadata), knowing if
+        # there was login information or not is misleading. """
+        if report_type == "seed":
+            report_df = pd.read_csv(f"{seed.AIP_ID}/metadata/{report_name}")
+            if "login_password" in report_df.columns:
+                report_df["login_username"] = "REDACTED"
+                report_df["login_password"] = "REDACTED"
+                report_df.to_csv(f"{seed.AIP_ID}/metadata/{report_name}")
+            else:
+                log("Seed report does not have login columns to redact", seed_df, row_index, "Metadata_Report_Info")
 
     # Row index for the seed being processed in the dataframe, to use for adding logging information.
     row_index = seed_df.index[seed_df["Seed_ID"] == seed.Seed_ID].tolist()[0]
 
     # Downloads five of the six metadata reports from Archive-It needed to understand the context of the WARC.
     # These are reports where there is only one report per seed or collection.
-    get_report('id', seed.Seed_ID, 'seed', f'{seed.AIP_ID}_seed.csv')
-    get_report('seed', seed.Seed_ID, 'scope_rule', f'{seed.AIP_ID}_seedscope.csv')
-    get_report('collection', seed.AIT_Collection, 'scope_rule', f'{seed.AIP_ID}_collscope.csv')
-    get_report('id', seed.AIT_Collection, 'collection', f'{seed.AIP_ID}_coll.csv')
-    get_report('id', seed.Job_ID, 'crawl_job', f'{seed.AIP_ID}_{seed.Job_ID}_crawljob.csv')
+    get_report("id", seed.Seed_ID, "seed", f"{seed.AIP_ID}_seed.csv")
+    get_report("seed", seed.Seed_ID, "scope_rule", f"{seed.AIP_ID}_seedscope.csv")
+    get_report("collection", seed.AIT_Collection, "scope_rule", f"{seed.AIP_ID}_collscope.csv")
+    get_report("id", seed.AIT_Collection, "collection", f"{seed.AIP_ID}_coll.csv")
+    get_report("id", seed.Job_ID, "crawl_job", f"{seed.AIP_ID}_{seed.Job_ID}_crawljob.csv")
 
-    # Downloads the crawl definition report for the job this WARC was part of.
-    # The crawl definition id is obtained from the crawl job report using the job id.
-    # There may be more than one crawl definition report per AIP.
-    # Logs an error if there is no crawl job report to get the job id(s) from.
+    # Gets the crawl definition id from the crawl job report and downloads it.
     try:
-        with open(f'{seed.AIP_ID}/metadata/{seed.AIP_ID}_{seed.Job_ID}_crawljob.csv', 'r') as crawljob_csv:
-            crawljob_data = csv.DictReader(crawljob_csv)
-            for job in crawljob_data:
-                if str(seed.Job_ID) == job['id']:
-                    crawl_def_id = job['crawl_definition']
-                    get_report('id', crawl_def_id, 'crawl_definition', f'{seed.Seed_ID}_{crawl_def_id}_crawldef.csv')
-                    break
+        report_df = pd.read_csv(f"{seed.AIP_ID}/metadata/{seed.AIP_ID}_{seed.Job_ID}_crawljob.csv", dtype="object")
+        crawl_def_id = report_df.loc[0, "crawl_definition"]
+        get_report("id", crawl_def_id, "crawl_definition", f"{seed.Seed_ID}_{crawl_def_id}_crawldef.csv")
     except FileNotFoundError:
         log("Crawl job was not downloaded so can't get crawl definition id", seed_df, row_index, "Metadata_Report_Errors")
 
@@ -241,27 +234,9 @@ def download_metadata(seed, date_end, seed_df):
         seed_df.loc[row_index, "Metadata_Report_Errors"] = "Successfully downloaded all metadata reports"
         seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
 
-    # Iterates over each report in the metadata folder to delete empty reports and redact login information from the
-    # seed report.
-    for report in os.listdir(f'{seed.AIP_ID}/metadata'):
-
-        # Saves the full file path of the report.
-        report_path = f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/metadata/{report}'
-
-        # Deletes any empty metadata files (file size of 0) and begins processing the next file. A file is empty if
-        # there is no metadata of that type, which is most common for collection and seed scope reports.
-        if os.path.getsize(report_path) == 0:
-            os.remove(report_path)
-            log(f"Deleted empty report {report}", seed_df, row_index, "Metadata_Report_Info")
-            continue
-
-        # Redacts login password and username from the seed report so we can share the seed report with researchers.
-        if report.endswith('_seed.csv'):
-            redact(report_path)
-
     # If there is nothing in the report info field, updates the log with default text.
     if pd.isnull(seed_df.at[row_index, "Metadata_Report_Info"]):
-        seed_df.loc[row_index, "Metadata_Report_Info"] = "Successfully redacted seed report; No empty reports to delete"
+        seed_df.loc[row_index, "Metadata_Report_Info"] = "Successfully redacted seed report; No empty reports"
         seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
 
 

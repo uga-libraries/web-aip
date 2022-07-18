@@ -97,7 +97,7 @@ for seed in seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfull
     os.makedirs(os.path.join(seed.AIP_ID, "objects"))
 
     # Downloads the seed metadata from Archive-It into the seed's metadata folder.
-    web.download_metadata(seed, date_end, seed_df)
+    web.download_metadata(seed, seed_df)
 
     # Downloads the WARCs from Archive-It into the seed's objects folder.
     web.download_warcs(seed, date_end, seed_df)
