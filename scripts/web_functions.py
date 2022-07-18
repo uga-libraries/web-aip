@@ -194,44 +194,21 @@ def download_metadata(seed, date_end, seed_df):
 
     def redact(metadata_report_path):
         """Replaces the seed report with a redacted version of the file, removing login information if those columns
-        are present. Even if the columns are blank, replaces it with REDACTED. Since not all login information is
-        meaningful (some is from staff web browsers autofill information while viewing the metadata), knowing if
-        there was login information or not is misleading. """
+           are present. Even if the columns are blank, replaces it with REDACTED. Since not all login information is
+           meaningful (some is from staff web browsers autofill information while viewing the metadata), knowing if
+           there was login information or not is misleading. """
 
-        # Starts a list for storing the redacted rows that will be saved in the new version of the document.
-        redacted_rows = []
+        # Reads the data from the CSV.
+        report_df = pd.read_csv(metadata_report_path)
 
-        # Opens and reads the seed report.
-        with open(metadata_report_path) as seed_csv:
-            seed_read = csv.reader(seed_csv)
-
-            # Adds the header row to the redacted_rows list without altering it.
-            header = next(seed_read)
-            redacted_rows.append(header)
-
-            # Gets the index of the password and username columns. Since the report is inconsistent about if these
-            # are included at all, also want to catch if columns are in a different order. If the login columns are not
-            # present, exits the function and leaves the seed report as it was.
-            try:
-                password_index = header.index('login_password')
-                username_index = header.index('login_username')
-            except ValueError:
-                log("Seed report does not have login columns to redact", seed_df, row_index, "Metadata_Report_Info")
-                return
-
-            # Puts 'REDACTED' in the password and username columns for each non-header row and adds the updated
-            # rows to the redacted_rows list.
-            for row in seed_read:
-                row[password_index] = 'REDACTED'
-                row[username_index] = 'REDACTED'
-                redacted_rows.append(row)
-
-        # Opens the seed report again, but in write mode to replace the rows with the redacted rows.
-        # Gets each row from the redacted_rows list and saves it to the csv.
-        with open(metadata_report_path, 'w', newline='') as report_csv:
-            report_write = csv.writer(report_csv)
-            for row in redacted_rows:
-                report_write.writerow(row)
+        # If the login columns are included, fills any row with data with "REDACTED" and saves the updated file.
+        # If the columns are not included (unclear why this happens), adds that infoto the log.
+        if "login_password" in report_df.columns:
+            report_df["login_username"] = "REDACTED"
+            report_df["login_password"] = "REDACTED"
+            report_df.to_csv(metadata_report_path)
+        else:
+            log("Seed report does not have login columns to redact", seed_df, row_index, "Metadata_Report_Info")
 
     # Row index for the seed being processed in the dataframe, to use for adding logging information.
     row_index = seed_df.index[seed_df["Seed_ID"] == seed.Seed_ID].tolist()[0]
