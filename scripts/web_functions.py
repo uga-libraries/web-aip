@@ -518,7 +518,7 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
 
         # Tests if the number of WARCs is correct. Compares the number of WARCs in the objects folder, calculated
         # with len(), to the number of WARCs expected from the API (warc_count).
-        warcs = len([file for file in os.listdir(objects) if file.endswith('.warc.gz')])
+        warcs = len([file for file in os.listdir(objects) if file.endswith('.warc')])
         if warcs == warc_total:
             result.append(True)
         else:
@@ -528,7 +528,7 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
         # of a different format, based on the file extension, it updates the value to False.
         result.append(True)
         for file in os.listdir(objects):
-            if not file.endswith('.warc.gz'):
+            if not file.endswith('.warc'):
                 result[-1] = False
 
         # Tests if the number of FITS files is correct (one for each WARC). Compares the number of FITS files in the
