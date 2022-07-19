@@ -7,11 +7,21 @@ Usage: python path/test_check_aips.py
 
 import datetime
 import os
+import configuration as c
 import web_functions as web
 
+# The start and end dates that the test script requires to give predictable results.
+# In the actual script, these are arguments.
+date_start = "2022-03-20"
+date_end = "2022-03-25"
 
-# Make one AIP folder for each of the seeds with fake metadata files, WARC, and bagging to be faster.
-# Just has to have everything that the completeness check looks for.
+# Makes a folder for AIPs within the script_output folder and makes it the current directory.
+aips_directory = os.path.join(c.script_output, f"aips_{date_end}")
+os.makedirs(aips_directory)
+os.chdir(aips_directory)
+
+# Seed and AIP ids to use for making the test AIPs.
+# TODO: this needs to be seed_df now
 seed_to_aip = {"2529671": "magil-ggp-2529671-2022-03", "2529669": "magil-ggp-2529669-2022-03",
                "2529633": "magil-ggp-2529633-2022-03", "2529665": "magil-ggp-2529665-2022-03",
                "2529634": "magil-ggp-2529634-2022-03", "2529660": "magil-ggp-2529660-2022-03",
@@ -20,6 +30,8 @@ seed_to_aip = {"2529671": "magil-ggp-2529671-2022-03", "2529669": "magil-ggp-252
                "2529668": "magil-ggp-2529668-2022-03", "2529681": "magil-ggp-2529681-2022-03",
                "2529676": "magil-ggp-2529676-2022-03", "2529629": "magil-ggp-2529629-2022-03"}
 
+# Make one AIP folder for each of the seeds with fake metadata files, WARC, and bagging to be faster.
+# Just has to have everything that the completeness check looks for.
 for seed in seed_to_aip:
 
     aip_id = seed_to_aip[seed]
@@ -106,4 +118,5 @@ os.makedirs("magil-error-000000-2022-03_bag")
 
 # Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
 # errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
-web.check_aips(date_end, date_start, seed_to_aip)
+# todo: seed_to_aip needs to be seed_df
+web.check_aips(date_end, date_start, seed_to_aip, aips_directory)
