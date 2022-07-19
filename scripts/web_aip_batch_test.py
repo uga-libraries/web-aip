@@ -253,191 +253,7 @@ for seed in seed_df.itertuples():
     current_seed += 1
     print(f"Processing seed {current_seed} of {total_seeds}.")
 
-    # ERROR 1: Cannot find expected values in WARC JSON (KeyError).
-    if current_warc == 1:
-
-        # Generate the error by removing two fields needed for variables.
-        warc["checksums"].pop("md5")
-        warc.pop("collection")
-
-        # Saves relevant information about the WARC in variables for future use.
-        try:
-            warc_filename = warc['filename']
-            warc_url = warc['locations'][0]
-            warc_md5 = warc['checksums']['md5']
-            warc_collection = warc['collection']
-        except KeyError:
-            log_data["warc_json"] = f"Could not find at least one expected value in JSON: {warc}"
-            web.warc_log(log_data)
-            continue
-        except IndexError:
-            log_data["warc_json"] = f"Could not find URL in JSON: {warc}"
-            web.warc_log(log_data)
-            continue
-
-        # Should catch the error in the previous step and this should not run.
-        print("Test did not catch Error 1 correctly.")
-        continue
-
-    # ERROR 2: Cannot find expected values in WARC JSON (IndexError).
-    if current_warc == 2:
-
-        # Saves relevant information about the WARC in variables for future use.
-        # Generate error by using the wrong index number for warc_url
-        try:
-            warc_filename = warc['filename']
-            warc_url = warc['locations'][5]
-            warc_md5 = warc['checksums']['md5']
-            warc_collection = warc['collection']
-        except KeyError:
-            log_data["warc_json"] = f"Could not find at least one expected value in JSON: {warc}"
-            web.warc_log(log_data)
-            continue
-        except IndexError:
-            log_data["warc_json"] = f"Could not find URL in JSON: {warc}"
-            web.warc_log(log_data)
-            continue
-
-        # Should catch the error in the previous step and this should not run.
-        print("Test did not catch Error 2 correctly.")
-        continue
-
-    # ERROR 3: Cannot extract seed_id from the WARC filename.
-    if current_warc == 3:
-
-        # Previous step. Generate the error by assigning the wrong value to warc_filename.
-        warc_filename = "warc-seed-error.warc.gz"
-        warc_url = warc['locations'][0]
-        warc_md5 = warc['checksums']['md5']
-        warc_collection = warc['collection']
-        log_data["filename"] = warc_filename
-        log_data["warc_json"] = "Successfully got WARC data."
-
-        # Calculates seed id, which is a portion of the WARC filename between "-SEED" and "-".
-        try:
-            regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
-            seed_id = regex_seed_id.group(1)
-            log_data["seed_id"] = "Successfully calculated seed id."
-        except AttributeError:
-            log_data["seed_id"] = "Could not calculate seed id from the WARC filename."
-            web.warc_log(log_data)
-            continue
-
-        # Should catch the error in the previous step and this should not run.
-        print("Test did not catch Error 3 correctly.")
-        continue
-
-    # ERROR 4: Cannot extract job_id from the WARC filename.
-    if current_warc == 4:
-
-        # Previous steps. Generate the error by assigning the wrong value to warc_filename.
-        warc_filename = "warc-SEED123456-job-error.warc.gz"
-        warc_url = warc['locations'][0]
-        warc_md5 = warc['checksums']['md5']
-        warc_collection = warc['collection']
-        log_data["filename"] = warc_filename
-        log_data["warc_json"] = "Successfully got WARC data."
-        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
-        seed_id = regex_seed_id.group(1)
-        log_data["seed_id"] = "Successfully calculated seed id."
-
-        # Calculates the job id from the WARC filename, which are the numbers after "-JOB".
-        try:
-            regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
-            job_id = regex_job_id.group(1)
-            log_data["job_id"] = "Successfully calculated job id."
-        except AttributeError:
-            log_data["job_id"] = "Could not calculate job id from the WARC filename."
-            web.warc_log(log_data)
-            continue
-
-        # Should catch the error in the previous step and this should not run.
-        print("Test did not catch Error 4 correctly.")
-        continue
-
-    # ERROR 5: Cannot find expected values in seed JSON (KeyError).
-    if current_warc == 5:
-
-        # Previous steps.
-        warc_filename = warc['filename']
-        warc_url = warc['locations'][0]
-        warc_md5 = warc['checksums']['md5']
-        warc_collection = warc['collection']
-        log_data["filename"] = warc_filename
-        log_data["warc_json"] = "Successfully got WARC data."
-        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
-        seed_id = regex_seed_id.group(1)
-        log_data["seed_id"] = "Successfully calculated seed id."
-        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
-        job_id = regex_job_id.group(1)
-        log_data["job_id"] = "Successfully calculated job id."
-
-        # Generates error by removing an expected value.
-        # Saves the value so it can be put back after the error for testing future warcs from this seed.
-        seed_info = seed_metadata.pop(seed_id)
-
-        # Saves relevant information the WARC's seed in variables for future use.
-        try:
-            aip_id = seed_metadata[seed_id][0]
-            aip_title = seed_metadata[seed_id][1]
-            log_data["seed_metadata"] = "Successfully got seed metadata."
-        except KeyError:
-            log_data["seed_metadata"] = "Seed id is not in seed JSON."
-            web.warc_log(log_data)
-            seed_metadata[seed_id] = seed_info
-            continue
-        except IndexError:
-            log_data["seed_metadata"] = f"At least one value missing from JSON for this seed: {seed_metadata[seed_id]}"
-            web.warc_log(log_data)
-            seed_metadata[seed_id] = seed_info
-            continue
-
-        # Should catch the error in the previous step and this should not run.
-        print("Test did not catch Error 5 correctly.")
-        continue
-
-    # ERROR 6: Cannot find expected values in seed JSON (IndexError).
-    if current_warc == 6:
-
-        # Previous steps.
-        warc_filename = warc['filename']
-        warc_url = warc['locations'][0]
-        warc_md5 = warc['checksums']['md5']
-        warc_collection = warc['collection']
-        log_data["filename"] = warc_filename
-        log_data["warc_json"] = "Successfully got WARC data."
-        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
-        seed_id = regex_seed_id.group(1)
-        log_data["seed_id"] = "Successfully calculated seed id."
-        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
-        job_id = regex_job_id.group(1)
-        log_data["job_id"] = "Successfully calculated job id."
-
-        # Generates error by removing an expected value.
-        # Saves the value so it can be put back after the error for testing future warcs from this seed.
-        seed_info = seed_metadata[seed_id].pop(1)
-
-        # Saves relevant information the WARC's seed in variables for future use.
-        try:
-            aip_id = seed_metadata[seed_id][0]
-            aip_title = seed_metadata[seed_id][1]
-            log_data["seed_metadata"] = "Successfully got seed metadata."
-        except KeyError:
-            log_data["seed_metadata"] = "Seed id is not in seed JSON."
-            web.warc_log(log_data)
-            seed_metadata[seed_id].append(seed_info)
-            continue
-        except IndexError:
-            log_data["seed_metadata"] = f"At least one value missing from JSON for this seed: {seed_metadata[seed_id]}"
-            web.warc_log(log_data)
-            seed_metadata[seed_id].append(seed_info)
-            continue
-
-        # Should catch the error in the previous step and this should not run.
-        print("Test did not catch Error 6 correctly.")
-        continue
-
-    # ERROR 7: API error downloading metadata reports.
+    # ERROR 1: API error downloading metadata reports.
     if current_warc == 7:
 
         # Previous steps.
@@ -466,7 +282,65 @@ for seed in seed_df.itertuples():
         # Last step for this test, so saves the log.
         web.warc_log(log_data)
 
-    # ERROR 8: API error downloading WARC.
+    # ERROR 2: No crawl_job so can't download crawl_definition.
+    if current_warc == 7:
+        # Previous steps.
+        warc_filename = warc['filename']
+        warc_url = warc['locations'][0]
+        warc_md5 = warc['checksums']['md5']
+        warc_collection = warc['collection']
+        log_data["filename"] = warc_filename
+        log_data["warc_json"] = "Successfully got WARC data."
+        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
+        seed_id = regex_seed_id.group(1)
+        log_data["seed_id"] = "Successfully calculated seed id."
+        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
+        job_id = regex_job_id.group(1)
+        log_data["job_id"] = "Successfully calculated job id."
+        aip_id = seed_metadata[seed_id][0]
+        aip_title = seed_metadata[seed_id][1]
+        log_data["seed_metadata"] = "Successfully got seed metadata."
+        seed_to_aip[seed_id] = aip_id
+        aip_to_title[aip_id] = aip_title
+        web.make_aip_directory(aip_id)
+
+        # Downloads the seed metadata from Archive-It into the seed's metadata folder.
+        download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
+
+        # Last step for this test, so saves the log.
+        web.warc_log(log_data)
+
+    # ERROR 3: API error downloading WARC metadata.
+    if current_warc == 8:
+        # Previous steps.
+        warc_filename = warc['filename']
+        warc_url = warc['locations'][0]
+        warc_md5 = warc['checksums']['md5']
+        warc_collection = warc['collection']
+        log_data["filename"] = warc_filename
+        log_data["warc_json"] = "Successfully got WARC data."
+        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
+        seed_id = regex_seed_id.group(1)
+        log_data["seed_id"] = "Successfully calculated seed id."
+        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
+        job_id = regex_job_id.group(1)
+        log_data["job_id"] = "Successfully calculated job id."
+        aip_id = seed_metadata[seed_id][0]
+        aip_title = seed_metadata[seed_id][1]
+        log_data["seed_metadata"] = "Successfully got seed metadata."
+        seed_to_aip[seed_id] = aip_id
+        aip_to_title[aip_id] = aip_title
+        web.make_aip_directory(aip_id)
+        web.download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
+
+        # Downloads the WARC from Archive-It into the seed's objects folder.
+        # There are multiple errors for this function, so indicates the error type.
+        download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data, "download")
+
+        # Last step for this test, so saves the log.
+        web.warc_log(log_data)
+
+    # ERROR 4: API error downloading WARC.
     if current_warc == 8:
 
         # Previous steps.
@@ -497,7 +371,7 @@ for seed in seed_df.itertuples():
         # Last step for this test, so saves the log.
         web.warc_log(log_data)
 
-    # ERROR 9: Cannot extract fixity from MD5Deep output.
+    # ERROR 5: Cannot extract fixity from MD5Deep output.
     if current_warc == 9:
 
         # Previous steps.
@@ -528,7 +402,38 @@ for seed in seed_df.itertuples():
         # Last step for this test, so saves the log.
         web.warc_log(log_data)
 
-    # ERROR 10: WARC fixity after download doesn't match Archive-It record.
+    # ERROR 6: WARC fixity after download doesn't match Archive-It record.
+    if current_warc == 10:
+
+        # Previous steps.
+        warc_filename = warc['filename']
+        warc_url = warc['locations'][0]
+        warc_md5 = warc['checksums']['md5']
+        warc_collection = warc['collection']
+        log_data["filename"] = warc_filename
+        log_data["warc_json"] = "Successfully got WARC data."
+        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
+        seed_id = regex_seed_id.group(1)
+        log_data["seed_id"] = "Successfully calculated seed id."
+        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
+        job_id = regex_job_id.group(1)
+        log_data["job_id"] = "Successfully calculated job id."
+        aip_id = seed_metadata[seed_id][0]
+        aip_title = seed_metadata[seed_id][1]
+        log_data["seed_metadata"] = "Successfully got seed metadata."
+        seed_to_aip[seed_id] = aip_id
+        aip_to_title[aip_id] = aip_title
+        web.make_aip_directory(aip_id)
+        web.download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
+
+        # Downloads the WARC from Archive-It into the seed's objects folder.
+        # There are multiple errors for this function, so indicates the error type.
+        download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data, "fixity")
+
+        # Last step for this test, so saves the log.
+        web.warc_log(log_data)
+
+    # ERROR 7: Error unzipping WARC
     if current_warc == 10:
 
         # Previous steps.
