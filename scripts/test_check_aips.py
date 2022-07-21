@@ -11,6 +11,13 @@ import pandas as pd
 import configuration as c
 import web_functions as web
 
+def make_file(path):
+    """Make a test file in the location and name indicated by the path.
+    This is used a lot of times in the script and makes it easier to read what files are being created."""
+    with open(path, "w") as new_file:
+        new_file.write("For Testing")
+
+
 # The start and end dates that the test script requires to give predictable results.
 # In the actual script, these are arguments.
 date_start = "2022-03-20"
@@ -35,24 +42,27 @@ seed_df = pd.DataFrame({"Seed_ID": ["2529671", "2529669", "2529633", "2529665", 
 # The folder is named _bag but is not a real bag and the files are plain text rather than actually downloaded.
 # It saves time and is enough to pass the tests, which are based on folder and file names.
 for aip in seed_df["AIP_ID"]:
-
-    # Make the metadata folder and files.
-    # There is one each of the 6 Archive-It metadata files, preservation.xml, and fits.xml
     metadata_folder = os.path.join(f"{aip}_bag", "data", "metadata")
     os.makedirs(metadata_folder)
-    metadata_ext = ["seed.csv", "seedscope.csv", "collscope.csv", "coll.csv", "crawljob.csv", "crawldef.csv", "preservation.xml"]
-    for ext in metadata_ext:
-        with open(f"{metadata_folder}/{aip}_{ext}", "w") as new_file:
-            new_file.write("Test")
-    with open(f"{metadata_folder}/test.warc_fits.xml", "w") as new_file:
-        new_file.write("Test")
-
-    # Make the objects folder and one file with a warc extension.
+    make_file(f"{metadata_folder}/{aip}_123456_crawldef")
+    make_file(f"{metadata_folder}/{aip}_789123_crawljob")
+    make_file(f"{metadata_folder}/{aip}_coll.csv")
+    make_file(f"{metadata_folder}/{aip}_collscope.csv")
+    make_file(f"{metadata_folder}/{aip}_preservation.xml")
+    make_file(f"{metadata_folder}/{aip}_seed.csv")
+    make_file(f"{metadata_folder}/{aip}_seedscope.csv")
+    make_file(f"{metadata_folder}/test.warc_fits.xml")
     objects_folder = os.path.join(f"{aip}_bag", "data", "objects")
     os.makedirs(objects_folder)
-    with open(f"{objects_folder}/test.warc", "w") as new_file:
-        new_file.write("Test")
+    make_file(f"{objects_folder}/test.warc")
 
+# Creates additional files for examples of any files that are allowed to repeat.
+# These AIPs, as well as the first AIP which is left as minimum correct, will pass the completeness check.
+
+# Add crawldef
+# Add crawljob
+# Add deletion
+# Add fits and warc
 
 # # Make error of missing AIP folder by skipping this AIP.
 # if seed == "2529627":
