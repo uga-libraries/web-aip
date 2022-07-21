@@ -8,6 +8,7 @@ Usage: python path/test_check_aips.py
 import datetime
 import os
 import pandas as pd
+import shutil
 import configuration as c
 import web_functions as web
 
@@ -65,51 +66,22 @@ make_file("magil-ggp-2529633-2022-03_bag/data/metadata/magil-ggp-2529633-2022-03
 make_file("magil-ggp-2529634-2022-03_bag/data/metadata/test2.warc_fits.xml")
 make_file("magil-ggp-2529634-2022-03_bag/data/objects/test2.warc")
 
-# # Make error of missing AIP folder by skipping this AIP.
-# if seed == "2529627":
-#     continue
-#
-# # Make error by not including the Archive-It metadata reports for this AIP.
-# if seed == "2529629":
-#     with open(f"{aip_folder}/data/metadata/{aip_id}_fits.xml", "w") as new_file:
-#         new_file.write("Test")
-#     with open(f"{aip_folder}/data/metadata/{aip_id}_preservation.xml", "w") as new_file:
-#         new_file.write("Test")
-#
-# # Make error by not including the fits or preservation.xml files for this AIP.
-# elif seed == "2529642":
-#     for ext in ("seed.csv", "seedscope.csv", "collscope.csv", "coll.csv", "crawljob.csv", "crawldef.csv"):
-#         with open(f"{aip_folder}/data/metadata/{aip_id}_{ext}", "w") as new_file:
-#             new_file.write("Test")
-#
-# # Test fits count by adding extra FITS for one AIP with 2 WARCs (correct) and one with 1 WARC (error).
-# if seed in ("2529634", "2529668"):
-#     with open(f"{aip_folder}/data/metadata/{aip_id}_2_fits.xml", "w") as new_file:
-#         new_file.write("Test")
-#
-# # Make error by making a metadata file that isn't an expected type for this AIP.
-# if seed == "2529669":
-#     with open(f"{aip_folder}/data/metadata/{aip_id}_error.txt", "w") as new_file:
-#         new_file.write("Test")
-#
-# # Make error by not making a WARC for this AIP.
-# if seed == "2529660":
-#     continue
-#
-#
-# # Test WARC count by adding extra WARC for one AIP with 2 WARCs (correct) and one with 1 WARC (error).
-# if seed in ("2529634", "2529652"):
-#     with open(f"{aip_folder}/data/objects/test2.warc.gz", "w") as new_file:
-#         new_file.write("Test")
-#
-# # Make error by adding something other than a WARC to the objects folder for this AIP.
-# if seed == "2529665":
-#     with open(f"{aip_folder}/data/objects/error.txt", "w") as new_file:
-#         new_file.write("Test")
-#
-# # Makes an error by adding an AIP to the AIPs directory that is not expected.
-# os.makedirs("magil-error-000000-2022-03_bag")
-#
+# Creates incorrect AIPs by adding or deleting files or folders.
+shutil.rmtree("magil-ggp-2529642-2022-03_bag")
+os.remove("magil-ggp-2529652-2022-03_bag/data/metadata/magil-ggp-2529652-2022-03_coll.csv")
+os.remove("magil-ggp-2529652-2022-03_bag/data/metadata/magil-ggp-2529652-2022-03_collscope.csv")
+os.remove("magil-ggp-2529660-2022-03_bag/data/metadata/magil-ggp-2529660-2022-03_seed.csv")
+os.remove("magil-ggp-2529660-2022-03_bag/data/metadata/magil-ggp-2529660-2022-03_seedscope.csv")
+os.remove("magil-ggp-2529665-2022-03_bag/data/metadata/magil-ggp-2529665-2022-03_123456_crawldef.csv")
+os.remove("magil-ggp-2529665-2022-03_bag/data/metadata/magil-ggp-2529665-2022-03_789123_crawljob.csv")
+os.remove("magil-ggp-2529668-2022-03_bag/data/metadata/magil-ggp-2529668-2022-03_preservation.xml")
+make_file("magil-ggp-2529669-2022-03_bag/data/metadata/extra.warc_fits.xml")
+make_file("magil-ggp-2529671-2022-03_bag/data/objects/extra.warc")
+make_file("magil-ggp-2529676-2022-03_bag/data/metadata/extra.txt")
+make_file("magil-ggp-2529681-2022-03_bag/data/objects/extra.txt")
+os.makedirs("magil-ggp-extra1-2022-03_bag")
+os.makedirs("magil-ggp-extra2-2022-03_bag")
+
 # # Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
 # # errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
 # # todo: seed_to_aip needs to be seed_df
