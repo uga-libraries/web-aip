@@ -456,7 +456,7 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
                     aip_info[seed_identifier] = [seed_df.loc[seed_df["Seed_ID"] == seed_identifier]["AIP_ID"].item(),
                                                  1, json_seed[0]['url']]
                 except (KeyError, ValueError, IndexError):
-                    print("Seed is not in seeds.csv")
+                    print(f"Seed {seed_identifier} is not in seeds_df")
                     warcs_exclude += 1
                     continue
 
