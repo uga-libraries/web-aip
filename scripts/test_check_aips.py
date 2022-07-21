@@ -44,8 +44,8 @@ seed_df = pd.DataFrame({"Seed_ID": ["2529671", "2529669", "2529633", "2529665", 
 for aip in seed_df["AIP_ID"]:
     metadata_folder = os.path.join(f"{aip}_bag", "data", "metadata")
     os.makedirs(metadata_folder)
-    make_file(f"{metadata_folder}/{aip}_123456_crawldef")
-    make_file(f"{metadata_folder}/{aip}_789123_crawljob")
+    make_file(f"{metadata_folder}/{aip}_123456_crawldef.csv")
+    make_file(f"{metadata_folder}/{aip}_789123_crawljob.csv")
     make_file(f"{metadata_folder}/{aip}_coll.csv")
     make_file(f"{metadata_folder}/{aip}_collscope.csv")
     make_file(f"{metadata_folder}/{aip}_preservation.xml")
@@ -58,11 +58,12 @@ for aip in seed_df["AIP_ID"]:
 
 # Creates additional files for examples of any files that are allowed to repeat.
 # These AIPs, as well as the first AIP which is left as minimum correct, will pass the completeness check.
-
-# Add crawldef
-# Add crawljob
-# Add deletion
-# Add fits and warc
+make_file("magil-ggp-2529629-2022-03_bag/data/metadata/magil-ggp-2529629-2022-03_456123_crawldef.csv")
+make_file("magil-ggp-2529631-2022-03_bag/data/metadata/magil-ggp-2529631-2022-03_123789_crawljob.csv")
+make_file("magil-ggp-2529631-2022-03_bag/data/metadata/magil-ggp-2529631-2022-03_378912_crawljob.csv")
+make_file("magil-ggp-2529633-2022-03_bag/data/metadata/magil-ggp-2529633-2022-03_files-deleted_2022-04-05_del.csv")
+make_file("magil-ggp-2529634-2022-03_bag/data/metadata/test2.warc_fits.xml")
+make_file("magil-ggp-2529634-2022-03_bag/data/objects/test2.warc")
 
 # # Make error of missing AIP folder by skipping this AIP.
 # if seed == "2529627":
@@ -81,24 +82,9 @@ for aip in seed_df["AIP_ID"]:
 #         with open(f"{aip_folder}/data/metadata/{aip_id}_{ext}", "w") as new_file:
 #             new_file.write("Test")
 #
-# # Test counting by adding extra crawldef and crawljob to this AIP.
-# if seed == "2529631":
-#     with open(f"{aip_folder}/data/metadata/{aip_id}_2_crawldef.csv", "w") as new_file:
-#         new_file.write("Test")
-#     with open(f"{aip_folder}/data/metadata/{aip_id}_2_crawljob.csv", "w") as new_file:
-#         new_file.write("Test")
-#     with open(f"{aip_folder}/data/metadata/{aip_id}_3_crawljob.csv", "w") as new_file:
-#         new_file.write("Test")
-#
 # # Test fits count by adding extra FITS for one AIP with 2 WARCs (correct) and one with 1 WARC (error).
 # if seed in ("2529634", "2529668"):
 #     with open(f"{aip_folder}/data/metadata/{aip_id}_2_fits.xml", "w") as new_file:
-#         new_file.write("Test")
-#
-# # Test deletion log (permitted) by creating one in one AIP.
-# if seed == "2529681":
-#     with open(f"{aip_folder}/data/metadata/{aip_id}_files-deleted_{datetime.datetime.today().date()}_del.csv",
-#               "w") as new_file:
 #         new_file.write("Test")
 #
 # # Make error by making a metadata file that isn't an expected type for this AIP.
