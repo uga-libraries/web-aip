@@ -62,15 +62,15 @@ for aip in seed_df["AIP_ID"]:
 
 # Creates additional files for examples of files that are allowed to repeat.
 # These AIPs, as well as the first AIP which is left as minimum correct, will pass the completeness check.
-make_file("magil-ggp-2529627-2022-03_bag/data/metadata/magil-ggp-2529629-2022-03_456123_crawldef.csv")
-make_file("magil-ggp-2529629-2022-03_bag/data/metadata/magil-ggp-2529631-2022-03_123789_crawljob.csv")
-make_file("magil-ggp-2529629-2022-03_bag/data/metadata/magil-ggp-2529631-2022-03_378912_crawljob.csv")
-make_file("magil-ggp-2529631-2022-03_bag/data/metadata/magil-ggp-2529633-2022-03_files-deleted_2022-04-05_del.csv")
+make_file("magil-ggp-2529629-2022-03_bag/data/metadata/magil-ggp-2529629-2022-03_456123_crawldef.csv")
+make_file("magil-ggp-2529631-2022-03_bag/data/metadata/magil-ggp-2529631-2022-03_123789_crawljob.csv")
+make_file("magil-ggp-2529631-2022-03_bag/data/metadata/magil-ggp-2529631-2022-03_378912_crawljob.csv")
+make_file("magil-ggp-2529633-2022-03_bag/data/metadata/magil-ggp-2529633-2022-03_files-deleted_2022-04-05_del.csv")
 make_file("magil-ggp-2529634-2022-03_bag/data/metadata/test2.warc_fits.xml")
 make_file("magil-ggp-2529634-2022-03_bag/data/objects/test2.warc")
 
 # Creates incorrect AIPs by adding or deleting files or folders.
-shutil.rmtree("magil-ggp-2529633-2022-03_bag")
+shutil.rmtree("magil-ggp-2472041-2022-03_bag")
 os.remove("magil-ggp-2529652-2022-03_bag/data/metadata/magil-ggp-2529652-2022-03_coll.csv")
 os.remove("magil-ggp-2529652-2022-03_bag/data/metadata/magil-ggp-2529652-2022-03_collscope.csv")
 os.remove("magil-ggp-2529660-2022-03_bag/data/metadata/magil-ggp-2529660-2022-03_seed.csv")
