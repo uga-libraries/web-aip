@@ -504,7 +504,7 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
         result.append(os.path.exists(f'{metadata}/{aip_id}_preservation.xml'))
 
         # Tests if the number of WARCs is correct. Compares the number of WARCs in the objects folder, calculated
-        # with len(), to the number of WARCs expected from the API (warc_count).
+        # with len(), to the number of WARCs expected from the API (warc_total).
         warcs = len([file for file in os.listdir(objects) if file.endswith('.warc')])
         if warcs == warc_total:
             result.append(True)
