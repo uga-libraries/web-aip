@@ -90,7 +90,7 @@ os.makedirs("magil-ggp-extra2-2022-03_bag")
 # Saves the result as a csv in the folder with the downloaded AIPs.
 web.check_aips(date_end, date_start, seed_df, aips_directory)
 
-# Makes a dataframe with the expected values for the check_aips() function output to use for comparison.
+# # Makes a dataframe with the expected values for the check_aips() function output to use for comparison.
 aips = ["magil-ggp-2472041-2022-03", "magil-ggp-2529671-2022-03", "magil-ggp-2529669-2022-03", "magil-ggp-2529633-2022-03",
         "magil-ggp-2529665-2022-03", "magil-ggp-2529634-2022-03", "magil-ggp-2529660-2022-03", "magil-ggp-2529629-2022-03",
         "magil-ggp-2529642-2022-03", "magil-ggp-2529627-2022-03", "magil-ggp-2529652-2022-03", "magil-ggp-2529631-2022-03",
@@ -100,18 +100,18 @@ urls = ["https://www.legis.ga.gov/", "https://grec.state.ga.us/", "https://oig.g
         "https://ltgov.georgia.gov/", "https://consumer.georgia.gov/", "https://dso.georgia.gov/", "https://gbp.georgia.gov/",
         "https://dcs.georgia.gov/", "https://gaa.georgia.gov/", "https://gdna.georgia.gov/", "https://gceo.georgia.gov/",
         "https://oca.georgia.gov/", "https://gspc.georgia.gov/", "https://gsba.georgia.gov/", np.nan, np.nan]
-folders_made = ["False", "True", "True", "True", "True", "True", "True", "True", "True", "True", "True", "True", "True", "True", "True", "Not expected", "Not expected"]
-colls = [np.nan, "True", "True", "True", "True", "True", "True", "True", "False", "True", "True", "True", "True", "True", "True", np.nan, np.nan]
-collscopes = [np.nan, "True", "True", "True", "True", "True", "True", "True", "True", "True", "False", "True", "True", "True", "True", np.nan, np.nan]
-seeds = [np.nan, "True", "True", "True", "True", "True", "False", "True", "True", "True", "True", "True", "True", "True", "True", np.nan, np.nan]
-seedscopes = [np.nan, "True", "True", "True", "True", "True", "False", "True", "True", "True", "True", "True", "True", "True", "True", np.nan, np.nan]
+folders_made = ["FALSE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "Not expected", "Not expected"]
+colls = [np.nan, True, True, True, True, True, True, True, False, True, True, True, True, True, True, np.nan, np.nan]
+collscopes = [np.nan, True, True, True, True, True, True, True, True, True, False, True, True, True, True, np.nan, np.nan]
+seeds = [np.nan, True, True, True, True, True, False, True, True, True, True, True, True, True, True, np.nan, np.nan]
+seedscopes = [np.nan, True, True, True, True, True, False, True, True, True, True, True, True, True, True, np.nan, np.nan]
 crawldefs = [np.nan, 1, 1, 1, 0, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, np.nan, np.nan]
 crawljobs = [np.nan, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, np.nan, np.nan]
-preservation_xmls = [np.nan, "True", "True", "True", "True", "True", "True", "True", "True", "True", "True", "True", "False", "True", "True", np.nan, np.nan]
-warcs = [np.nan, "False", "True", "True", "True", "True", "True", "True", "True", "True", "True", "True", "True", "True", "True", np.nan, np.nan]
-object_extras = [np.nan, "True", "True", "True", "True", "True", "True", "True", "True", "True", "True", "True", "True", "False", "True", np.nan, np.nan]
-fits = [np.nan, "False", "False", "True", "True", "True", "True", "True", "True", "True", "True", "True", "False", "True", "True", np.nan, np.nan]
-metadata_extras = [np.nan, "True", "True", "True", "True", "True", "True", "True", "True", "True", "True", "True", "True", "True", "False", np.nan, np.nan]
+preservation_xmls = [np.nan, True, True, True, True, True, True, True, True, True, True, True, False, True, True, np.nan, np.nan]
+warcs = [np.nan, False, True, True, True, True, True, True, True, True, True, True, True, True, True, np.nan, np.nan]
+object_extras = [np.nan, True, True, True, True, True, True, True, True, True, True, True, True, False, True, np.nan, np.nan]
+fits = [np.nan, False, False, True, True, True, True, True, True, True, True, True, False, True, True, np.nan, np.nan]
+metadata_extras = [np.nan, True, True, True, True, True, True, True, True, True, True, True, True, True, False, np.nan, np.nan]
 
 expected_df = pd.DataFrame({"AIP": aips, "URL": urls, "AIP Folder Made": folders_made, "coll.csv": colls,
                             "collscope.csv": collscopes, "seed.csv": seeds, "seedscope.csv": seedscopes,
@@ -119,3 +119,12 @@ expected_df = pd.DataFrame({"AIP": aips, "URL": urls, "AIP Folder Made": folders
                             "preservation.xml": preservation_xmls,	"WARC Count Correct": warcs,
                             "Objects is all WARCs": object_extras, "fits.xml Count Correct": fits,
                             "No Extra Metadata": metadata_extras})
+
+# Makes a dataframe with the output of the check_aips() function.
+actual_df = pd.read_csv(f"{c.script_output}/completeness_check.csv")
+
+# Compares the expected results to the actual results.
+# Indicator of both means the rows match.
+# TODO: something about the difference of read_csv vs pd.DataFrame means these look the same but mostly aren't matching.
+compare_df = actual_df.merge(expected_df, indicator=True, how="outer")
+compare_df.to_csv(f"{c.script_output}/compare.csv")
