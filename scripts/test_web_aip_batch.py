@@ -25,7 +25,7 @@ import web_functions as web
 # ALTERNATIVE VERSIONS OF FUNCTIONS THAT GENERATE ERRORS.
 # IF THERE IS MORE THAN ONE ERROR NEEDED, ADDS AN ARGUMENT FOR ERROR_TYPE TO SPECIFY.
 # ----------------------------------------------------------------------------------------------------------------
-def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data):
+def download_metadata(seed, seed_df, error_type):
     """Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
     deletes any empty reports (meaning there was no data of that type for this seed), and redacts login information
     from the seed report. """
@@ -154,7 +154,7 @@ def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_da
             redact(report_path)
 
 
-def download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data, error_type):
+def download_warcs(seed, date_end, seed_df, error_type):
     """Downloads a warc file and verifies that fixity is unchanged after downloading.
     Since downloading is slow and no tests require a complete WARC, replaces the download code with making a text file.
     When error_type is fixity, no additional changes are needed since the text file MD5 won't match the WARC."""
@@ -203,16 +203,17 @@ def download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data,
 # ----------------------------------------------------------------------------------------------------------------
 # THIS PART OF THE SCRIPT IS THE SAME AS web_aip_batch.py TO SET UP EVERYTHING CORRECTLY BEFORE THE DESIRED TESTS.
 # ERROR HANDLING FOR SCRIPT ARGUMENTS AND THE CONFIGURATION FILE ARE TESTED BY GIVING THE WRONG INPUTS INSTEAD.
+# Only difference is that I removed the code that lets the script keep restarting.
 # ----------------------------------------------------------------------------------------------------------------
 
 # The start and end dates that the test script requires to give predictable results.
 # In the actual script, these are arguments.
-date_start = "2022-03-20"
-date_end = "2022-03-25"
+date_start = "2021-10-17"
+date_end = "2022-03-24"
 
 # Tests the paths in the configuration file.
 # In this case, making sure there are not unexpected errors which will impact these tests.
-# Error handling for the configuration file isn't part of this script.
+# Verifying the error handling for the configuration file isn't part of this script.
 configuration_errors = a.check_configuration()
 if len(configuration_errors) > 0:
     print("/nProblems detected with configuration.py:")
@@ -222,13 +223,11 @@ if len(configuration_errors) > 0:
     sys.exit()
 
 # Makes a folder for AIPs within the script_output folder and makes it the current directory.
-# (Removed code that lets the script restart.)
 aips_directory = os.path.join(c.script_output, f"aips_{date_end}")
 os.makedirs(aips_directory)
 os.chdir(aips_directory)
 
 # Gets the metadata about the seeds in the batch.
-# Still thinking about how to test it.
 seed_df = web.seed_data(date_start, date_end)
 
 # Makes the output directories and log for the AIP part of the script.
@@ -236,7 +235,6 @@ a.make_output_directories()
 a.log("header")
 
 # Starts counters for tracking script progress.
-# (Removed code that lets the script restart.)
 current_seed = 0
 total_seeds = len(seed_df)
 
@@ -246,228 +244,74 @@ total_seeds = len(seed_df)
 # PRINTS AN ERROR TO THE TERMINAL IF THE ERROR IS NOT CAUGHT AND STARTS THE LOOP WITH THE NEXT WARC.
 # ----------------------------------------------------------------------------------------------------------------
 
-# (Removed code that lets the script restart.)
+# There should be 14 seeds total. Not all are needed for testing.
 for seed in seed_df.itertuples():
 
     # Updates the current WARC number and displays the script progress.
     current_seed += 1
     print(f"Processing seed {current_seed} of {total_seeds}.")
 
+    # Makes output directories
+    os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
+    os.makedirs(os.path.join(seed.AIP_ID, "objects"))
+
+    # Makes AIP instance. In production, this isn't done after downloading.
+    # For testing, do it here so don't have to repeat the code for every seed.
+    aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, version=1, to_zip=True)
+
     # ERROR 1: API error downloading metadata reports.
-    if current_warc == 7:
-
-        # Previous steps.
-        warc_filename = warc['filename']
-        warc_url = warc['locations'][0]
-        warc_md5 = warc['checksums']['md5']
-        warc_collection = warc['collection']
-        log_data["filename"] = warc_filename
-        log_data["warc_json"] = "Successfully got WARC data."
-        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
-        seed_id = regex_seed_id.group(1)
-        log_data["seed_id"] = "Successfully calculated seed id."
-        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
-        job_id = regex_job_id.group(1)
-        log_data["job_id"] = "Successfully calculated job id."
-        aip_id = seed_metadata[seed_id][0]
-        aip_title = seed_metadata[seed_id][1]
-        log_data["seed_metadata"] = "Successfully got seed metadata."
-        seed_to_aip[seed_id] = aip_id
-        aip_to_title[aip_id] = aip_title
-        web.make_aip_directory(aip_id)
-
-        # Downloads the seed metadata from Archive-It into the seed's metadata folder.
-        download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
-
-        # Last step for this test, so saves the log.
-        web.warc_log(log_data)
+    if current_seed == 1:
+        download_metadata(seed, seed_df, error_type="download")
 
     # ERROR 2: No crawl_job so can't download crawl_definition.
-    if current_warc == 7:
-        # Previous steps.
-        warc_filename = warc['filename']
-        warc_url = warc['locations'][0]
-        warc_md5 = warc['checksums']['md5']
-        warc_collection = warc['collection']
-        log_data["filename"] = warc_filename
-        log_data["warc_json"] = "Successfully got WARC data."
-        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
-        seed_id = regex_seed_id.group(1)
-        log_data["seed_id"] = "Successfully calculated seed id."
-        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
-        job_id = regex_job_id.group(1)
-        log_data["job_id"] = "Successfully calculated job id."
-        aip_id = seed_metadata[seed_id][0]
-        aip_title = seed_metadata[seed_id][1]
-        log_data["seed_metadata"] = "Successfully got seed metadata."
-        seed_to_aip[seed_id] = aip_id
-        aip_to_title[aip_id] = aip_title
-        web.make_aip_directory(aip_id)
-
-        # Downloads the seed metadata from Archive-It into the seed's metadata folder.
-        download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
-
-        # Last step for this test, so saves the log.
-        web.warc_log(log_data)
+    if current_seed == 2:
+        download_metadata(seed, seed_df, error_type="crawldef")
 
     # ERROR 3: API error downloading WARC metadata.
-    if current_warc == 8:
-        # Previous steps.
-        warc_filename = warc['filename']
-        warc_url = warc['locations'][0]
-        warc_md5 = warc['checksums']['md5']
-        warc_collection = warc['collection']
-        log_data["filename"] = warc_filename
-        log_data["warc_json"] = "Successfully got WARC data."
-        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
-        seed_id = regex_seed_id.group(1)
-        log_data["seed_id"] = "Successfully calculated seed id."
-        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
-        job_id = regex_job_id.group(1)
-        log_data["job_id"] = "Successfully calculated job id."
-        aip_id = seed_metadata[seed_id][0]
-        aip_title = seed_metadata[seed_id][1]
-        log_data["seed_metadata"] = "Successfully got seed metadata."
-        seed_to_aip[seed_id] = aip_id
-        aip_to_title[aip_id] = aip_title
-        web.make_aip_directory(aip_id)
-        web.download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
-
-        # Downloads the WARC from Archive-It into the seed's objects folder.
-        # There are multiple errors for this function, so indicates the error type.
-        download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data, "download")
-
-        # Last step for this test, so saves the log.
-        web.warc_log(log_data)
+    if current_seed == 3:
+        web.download_metadata(seed, seed_df)
+        download_warcs(seed, date_end, seed_df, error_type="metadata")
 
     # ERROR 4: API error downloading WARC.
-    if current_warc == 8:
-
-        # Previous steps.
-        warc_filename = warc['filename']
-        warc_url = warc['locations'][0]
-        warc_md5 = warc['checksums']['md5']
-        warc_collection = warc['collection']
-        log_data["filename"] = warc_filename
-        log_data["warc_json"] = "Successfully got WARC data."
-        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
-        seed_id = regex_seed_id.group(1)
-        log_data["seed_id"] = "Successfully calculated seed id."
-        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
-        job_id = regex_job_id.group(1)
-        log_data["job_id"] = "Successfully calculated job id."
-        aip_id = seed_metadata[seed_id][0]
-        aip_title = seed_metadata[seed_id][1]
-        log_data["seed_metadata"] = "Successfully got seed metadata."
-        seed_to_aip[seed_id] = aip_id
-        aip_to_title[aip_id] = aip_title
-        web.make_aip_directory(aip_id)
-        web.download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
-
-        # Downloads the WARC from Archive-It into the seed's objects folder.
-        # There are multiple errors for this function, so indicates the error type.
-        download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data, "download")
-
-        # Last step for this test, so saves the log.
-        web.warc_log(log_data)
+    if current_seed == 4:
+        web.download_metadata(seed, seed_df)
+        download_warcs(seed, date_end, seed_df, error_type="download")
 
     # ERROR 5: Cannot extract fixity from MD5Deep output.
-    if current_warc == 9:
-
-        # Previous steps.
-        warc_filename = warc['filename']
-        warc_url = warc['locations'][0]
-        warc_md5 = warc['checksums']['md5']
-        warc_collection = warc['collection']
-        log_data["filename"] = warc_filename
-        log_data["warc_json"] = "Successfully got WARC data."
-        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
-        seed_id = regex_seed_id.group(1)
-        log_data["seed_id"] = "Successfully calculated seed id."
-        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
-        job_id = regex_job_id.group(1)
-        log_data["job_id"] = "Successfully calculated job id."
-        aip_id = seed_metadata[seed_id][0]
-        aip_title = seed_metadata[seed_id][1]
-        log_data["seed_metadata"] = "Successfully got seed metadata."
-        seed_to_aip[seed_id] = aip_id
-        aip_to_title[aip_id] = aip_title
-        web.make_aip_directory(aip_id)
-        web.download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
-
-        # Downloads the WARC from Archive-It into the seed's objects folder.
-        # There are multiple errors for this function, so indicates the error type.
-        download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data, "md5deep")
-
-        # Last step for this test, so saves the log.
-        web.warc_log(log_data)
+    if current_seed == 5:
+        web.download_metadata(seed, seed_df)
+        download_warcs(seed, date_end, seed_df, error_type="md5deep")
 
     # ERROR 6: WARC fixity after download doesn't match Archive-It record.
-    if current_warc == 10:
-
-        # Previous steps.
-        warc_filename = warc['filename']
-        warc_url = warc['locations'][0]
-        warc_md5 = warc['checksums']['md5']
-        warc_collection = warc['collection']
-        log_data["filename"] = warc_filename
-        log_data["warc_json"] = "Successfully got WARC data."
-        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
-        seed_id = regex_seed_id.group(1)
-        log_data["seed_id"] = "Successfully calculated seed id."
-        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
-        job_id = regex_job_id.group(1)
-        log_data["job_id"] = "Successfully calculated job id."
-        aip_id = seed_metadata[seed_id][0]
-        aip_title = seed_metadata[seed_id][1]
-        log_data["seed_metadata"] = "Successfully got seed metadata."
-        seed_to_aip[seed_id] = aip_id
-        aip_to_title[aip_id] = aip_title
-        web.make_aip_directory(aip_id)
-        web.download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
-
-        # Downloads the WARC from Archive-It into the seed's objects folder.
-        # There are multiple errors for this function, so indicates the error type.
-        download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data, "fixity")
-
-        # Last step for this test, so saves the log.
-        web.warc_log(log_data)
+    if current_seed == 6:
+        web.download_metadata(seed, seed_df)
+        download_warcs(seed, date_end, seed_df, error_type="fixity")
 
     # ERROR 7: Error unzipping WARC
-    if current_warc == 10:
-
-        # Previous steps.
-        warc_filename = warc['filename']
-        warc_url = warc['locations'][0]
-        warc_md5 = warc['checksums']['md5']
-        warc_collection = warc['collection']
-        log_data["filename"] = warc_filename
-        log_data["warc_json"] = "Successfully got WARC data."
-        regex_seed_id = re.match(r'^.*-SEED(\d+)-', warc_filename)
-        seed_id = regex_seed_id.group(1)
-        log_data["seed_id"] = "Successfully calculated seed id."
-        regex_job_id = re.match(r"^.*-JOB(\d+)", warc_filename)
-        job_id = regex_job_id.group(1)
-        log_data["job_id"] = "Successfully calculated job id."
-        aip_id = seed_metadata[seed_id][0]
-        aip_title = seed_metadata[seed_id][1]
-        log_data["seed_metadata"] = "Successfully got seed metadata."
-        seed_to_aip[seed_id] = aip_id
-        aip_to_title[aip_id] = aip_title
-        web.make_aip_directory(aip_id)
-        web.download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data)
-
-        # Downloads the WARC from Archive-It into the seed's objects folder.
-        # There are multiple errors for this function, so indicates the error type.
-        download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data, "fixity")
-
-        # Last step for this test, so saves the log.
-        web.warc_log(log_data)
+    if current_seed == 7:
+        web.download_metadata(seed, seed_df)
+        download_warcs(seed, date_end, seed_df, error_type="unzip")
 
     # ERROR 8: No objects folder
+    if current_seed == 8:
+        web.download_metadata(seed, seed_df)
+        web.download_warcs(seed, date_end, seed_df)
+        web.check_directory(aip)
 
     # ERROR 9: Objects folder is empty
+    if current_seed == 9:
+        web.download_metadata(seed, seed_df)
+        web.download_warcs(seed, date_end, seed_df)
+        web.check_directory(aip)
 
     # ERROR 10: No metadata folder
+    if current_seed == 10:
+        web.download_metadata(seed, seed_df)
+        web.download_warcs(seed, date_end, seed_df)
+        web.check_directory(aip)
 
     # Error 11: Metadata folder is empty
+    if current_seed == 11:
+        web.download_metadata(seed, seed_df)
+        web.download_warcs(seed, date_end, seed_df)
+        web.check_directory(aip)
