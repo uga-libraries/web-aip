@@ -259,7 +259,8 @@ def download_warcs(seed, date_end, seed_df):
         # Gets URL for downloading the WARC and WARC MD5 from Archive-It using WASAPI.
         warc_data = requests.get(f'{c.wasapi}?filename={warc}', auth=(c.username, c.password))
         if not warc_data.status_code == 200:
-            log(f"API error {warc_data.status_code}: can't get info about {warc}", seed_df, row_index, "WARC_API_Errors")
+            log(f"API error {warc_data.status_code}: can't get info about {warc}",
+                seed_df, row_index, "WARC_API_Errors")
             continue
         py_warc = warc_data.json()
         warc_url = py_warc["files"][0]["locations"][0]
@@ -284,7 +285,8 @@ def download_warcs(seed, date_end, seed_df):
 
         # If there was an error with the API call, starts the next WARC.
         if not warc_download.status_code == 200:
-            log(f"API error {warc_download.status_code}: can't download {warc}", seed_df, row_index, "WARC_API_Errors")
+            log(f"API error {warc_download.status_code}: can't download {warc}",
+                seed_df, row_index, "WARC_API_Errors")
             continue
         else:
             log(f"Successfully downloaded {warc}", seed_df, row_index, "WARC_API_Errors")
@@ -311,7 +313,8 @@ def download_warcs(seed, date_end, seed_df):
                 seed_df, row_index, "WARC_Fixity_Errors")
             continue
         else:
-            log(f"Successfully verified {warc} fixity on {datetime.datetime.now()}", seed_df, row_index, "WARC_Fixity_Errors")
+            log(f"Successfully verified {warc} fixity on {datetime.datetime.now()}",
+                seed_df, row_index, "WARC_Fixity_Errors")
 
         # Extracts the WARC from the gzip file.
         # Deletes the gzip file, unless 7zip had an error during unzipping.
@@ -321,7 +324,8 @@ def download_warcs(seed, date_end, seed_df):
             os.remove(warc_path)
             log(f"Successfully unzipped {warc}", seed_df, row_index, "WARC_Unzip_Errors")
         else:
-            log(f"Error unzipping {warc}: {unzip_output.stderr.decode('utf-8')}", seed_df, row_index, "WARC_Unzip_Errors")
+            log(f"Error unzipping {warc}: {unzip_output.stderr.decode('utf-8')}",
+                seed_df, row_index, "WARC_Unzip_Errors")
 
         # Wait 15 second to give the API a rest.
         time.sleep(15)
