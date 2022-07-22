@@ -156,6 +156,7 @@ def download_warcs(seed, date_end, seed_df, error_type):
             warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
             status_code = warc_download.status_code
         else:
+            warc_md5 = "18c7f874cbf0b4de2dfb5dbeb46ac659"
             status_code = 200
 
         # GENERATE ERROR 4: API error when downloading WARC
@@ -195,6 +196,11 @@ def download_warcs(seed, date_end, seed_df, error_type):
                     seed_df, row_index, "WARC_Fixity_Errors")
             continue
 
+        # GENERATES ERROR 6: fixity in API is different from downloaded file.
+        if error_type == "fixity":
+            downloaded_warc_md5 = "abc123abc123abc123abc123"
+            print(f"Generated error with downloaded file MD5 for {warc}.")
+
         # Compares the md5 of the downloaded zipped WARC to Archive-It metadata.
         # If the md5 has changed, deletes the WARC.
         if not warc_md5 == downloaded_warc_md5:
@@ -207,9 +213,15 @@ def download_warcs(seed, date_end, seed_df, error_type):
                     seed_df, row_index, "WARC_Fixity_Errors")
 
         # Extracts the WARC from the gzip file.
-        # Deletes the gzip file, unless 7zip had an error during unzipping.
         unzip_output = subprocess.run(f'"C:/Program Files/7-Zip/7z.exe" x "{warc_path}" -o"{seed.AIP_ID}/objects"',
                                       stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
+
+        # GENERATES ERROR 7: Unable to unzip.
+        if error_type == "unzip":
+            unzip_output.stderr = b'Error message stand-in.'
+            print(f"Generated error with 7zip output for {warc}.")
+
+        # Deletes the gzip file, unless 7zip had an error during unzipping.
         if unzip_output.stderr == b'':
             os.remove(warc_path)
             web.log(f"Successfully unzipped {warc}", seed_df, row_index, "WARC_Unzip_Errors")
@@ -271,7 +283,7 @@ for seed in seed_df.itertuples():
     # Updates the current WARC number and displays the script progress.
     current_seed += 1
     # For building the tests: stop iterating once enough seeds have been used to do all the current tests.
-    if current_seed == 6:
+    if current_seed == 8:
         print("\nTests are done!")
         break
     print(f"\nProcessing seed {current_seed} of {total_seeds}.")
@@ -303,20 +315,20 @@ for seed in seed_df.itertuples():
         download_warcs(seed, date_end, seed_df, error_type="download")
 
     # ERROR 5: Cannot extract fixity from MD5Deep output.
-    if current_seed == 5:
+    if current_seed == 6:
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="md5deep")
 
-    # # ERROR 6: WARC fixity after download doesn't match Archive-It record.
-    # if current_seed == 6:
-    #     web.download_metadata(seed, seed_df)
-    #     download_warcs(seed, date_end, seed_df, error_type="fixity")
-    #
-    # # ERROR 7: Error unzipping WARC
-    # if current_seed == 7:
-    #     web.download_metadata(seed, seed_df)
-    #     download_warcs(seed, date_end, seed_df, error_type="unzip")
-    #
+    # ERROR 6: WARC fixity after download doesn't match Archive-It record.
+    if current_seed == 5:
+        web.download_metadata(seed, seed_df)
+        download_warcs(seed, date_end, seed_df, error_type="fixity")
+
+    # ERROR 7: Error unzipping WARC
+    if current_seed == 7:
+        web.download_metadata(seed, seed_df)
+        download_warcs(seed, date_end, seed_df, error_type="unzip")
+
     # # ERROR 8: No objects folder
     # if current_seed == 8:
     #     web.download_metadata(seed, seed_df)
