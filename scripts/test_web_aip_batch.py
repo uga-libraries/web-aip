@@ -131,7 +131,8 @@ def download_warcs(seed, date_end, seed_df, error_type):
         # Gets URL for downloading the WARC and WARC MD5 from Archive-It using WASAPI.
         warc_data = requests.get(f'{c.wasapi}?filename={warc}', auth=(c.username, c.password))
         if not warc_data.status_code == 200:
-            web.log(f"API error {warc_data.status_code}: can't get info about {warc}", seed_df, row_index, "WARC_API_Errors")
+            web.log(f"API error {warc_data.status_code}: can't get info about {warc}",
+                    seed_df, row_index, "WARC_API_Errors")
             continue
         py_warc = warc_data.json()
         warc_url = py_warc["files"][0]["locations"][0]
@@ -145,7 +146,8 @@ def download_warcs(seed, date_end, seed_df, error_type):
 
         # If there was an error with the API call, starts the next WARC.
         if not warc_download.status_code == 200:
-            web.log(f"API error {warc_download.status_code}: can't download {warc}", seed_df, row_index, "WARC_API_Errors")
+            web.log(f"API error {warc_download.status_code}: can't download {warc}",
+                    seed_df, row_index, "WARC_API_Errors")
             continue
         else:
             web.log(f"Successfully downloaded {warc}", seed_df, row_index, "WARC_API_Errors")
@@ -161,7 +163,7 @@ def download_warcs(seed, date_end, seed_df, error_type):
             downloaded_warc_md5 = regex_md5.group(1)
         except AttributeError:
             web.log(f"Fixity for {warc} cannot be extracted from md5deep output: {md5deep_output.stdout}",
-                seed_df, row_index, "WARC_Fixity_Errors")
+                    seed_df, row_index, "WARC_Fixity_Errors")
             continue
 
         # Compares the md5 of the downloaded zipped WARC to Archive-It metadata.
@@ -169,10 +171,11 @@ def download_warcs(seed, date_end, seed_df, error_type):
         if not warc_md5 == downloaded_warc_md5:
             os.remove(warc_path)
             web.log(f"Fixity for {warc} changed and it was deleted: {warc_md5} before, {downloaded_warc_md5} after",
-                seed_df, row_index, "WARC_Fixity_Errors")
+                    seed_df, row_index, "WARC_Fixity_Errors")
             continue
         else:
-            web.log(f"Successfully verified {warc} fixity on {datetime.datetime.now()}", seed_df, row_index, "WARC_Fixity_Errors")
+            web.log(f"Successfully verified {warc} fixity on {datetime.datetime.now()}",
+                    seed_df, row_index, "WARC_Fixity_Errors")
 
         # Extracts the WARC from the gzip file.
         # Deletes the gzip file, unless 7zip had an error during unzipping.
@@ -182,7 +185,8 @@ def download_warcs(seed, date_end, seed_df, error_type):
             os.remove(warc_path)
             web.log(f"Successfully unzipped {warc}", seed_df, row_index, "WARC_Unzip_Errors")
         else:
-            web.log(f"Error unzipping {warc}: {unzip_output.stderr.decode('utf-8')}", seed_df, row_index, "WARC_Unzip_Errors")
+            web.log(f"Error unzipping {warc}: {unzip_output.stderr.decode('utf-8')}",
+                    seed_df, row_index, "WARC_Unzip_Errors")
 
         # Wait 15 second to give the API a rest.
         time.sleep(15)
@@ -238,7 +242,7 @@ for seed in seed_df.itertuples():
     # Updates the current WARC number and displays the script progress.
     current_seed += 1
     # For building the tests: stop iterating once enough seeds have been used to do all the current tests.
-    if current_seed == 3:
+    if current_seed == 4:
         print("\nTests are done!")
         break
     print(f"\nProcessing seed {current_seed} of {total_seeds}.")
@@ -259,11 +263,11 @@ for seed in seed_df.itertuples():
     if current_seed == 2:
         download_metadata(seed, seed_df, error_type="crawl_job")
 
-    # # ERROR 3: API error downloading WARC metadata.
-    # if current_seed == 3:
-    #     web.download_metadata(seed, seed_df)
-    #     download_warcs(seed, date_end, seed_df, error_type="metadata")
-    #
+    # ERROR 3: API error downloading WARC metadata.
+    if current_seed == 3:
+        web.download_metadata(seed, seed_df)
+        download_warcs(seed, date_end, seed_df, error_type="metadata")
+
     # # ERROR 4: API error downloading WARC.
     # if current_seed == 4:
     #     web.download_metadata(seed, seed_df)
