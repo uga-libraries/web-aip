@@ -269,17 +269,6 @@ def download_warcs(seed, date_end, seed_df):
         # The path for where the WARC will be saved on the local machine (it is long and used twice in this script).
         warc_path = f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/objects/{warc}'
 
-        # # TEMPORARY CODE TO SPEED UP TESTING
-        # # This will make a file of the correct name in the objects folder instead of downloading.
-        # # and log as if it was successful.
-        # with open(warc_path, "w") as file:
-        #     file.write("Text")
-        #     log(f"Successfully downloaded {warc}", seed_df, row_index, "WARC_API_Errors")
-        #     log(f"Successfully verified {warc} fixity on {datetime.datetime.now()}", seed_df, row_index, "WARC_Fixity_Errors")
-        # warc_path_unzip = warc_path.replace(".warc.gz", ".warc")
-        # os.rename(warc_path, warc_path_unzip)
-        # log(f"Successfully unzipped {warc}", seed_df, row_index, "WARC_Unzip_Errors")
-
         # Downloads the WARC, which will be zipped.
         warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
 
