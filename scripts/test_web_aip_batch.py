@@ -180,6 +180,13 @@ def download_warcs(seed, date_end, seed_df, error_type):
 
         # Calculates the md5 for the downloaded zipped WARC with md5deep.
         md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
+
+        # GENERATES ERROR 5: regular expression doesn't work on md5deep output.
+        if error_type == "md5deep":
+            md5deep_output.stdout = b"@Something#Unexpected"
+            print(f"Generated error with MD5deep output format for {warc}.")
+
+        # Calculates the md5 for the downloaded zipped WARC with md5deep. (continued)
         try:
             regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
             downloaded_warc_md5 = regex_md5.group(1)
@@ -264,7 +271,7 @@ for seed in seed_df.itertuples():
     # Updates the current WARC number and displays the script progress.
     current_seed += 1
     # For building the tests: stop iterating once enough seeds have been used to do all the current tests.
-    if current_seed == 5:
+    if current_seed == 6:
         print("\nTests are done!")
         break
     print(f"\nProcessing seed {current_seed} of {total_seeds}.")
@@ -295,11 +302,11 @@ for seed in seed_df.itertuples():
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="download")
 
-    # # ERROR 5: Cannot extract fixity from MD5Deep output.
-    # if current_seed == 5:
-    #     web.download_metadata(seed, seed_df)
-    #     download_warcs(seed, date_end, seed_df, error_type="md5deep")
-    #
+    # ERROR 5: Cannot extract fixity from MD5Deep output.
+    if current_seed == 5:
+        web.download_metadata(seed, seed_df)
+        download_warcs(seed, date_end, seed_df, error_type="md5deep")
+
     # # ERROR 6: WARC fixity after download doesn't match Archive-It record.
     # if current_seed == 6:
     #     web.download_metadata(seed, seed_df)
