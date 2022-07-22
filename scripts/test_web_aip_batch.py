@@ -46,8 +46,15 @@ def download_metadata(seed, seed_df, error_type):
         metadata_report = requests.get(f"{c.partner_api}/{report_type}", params=filters, auth=(c.username, c.password))
 
         # GENERATE ERROR 1
-        # Changes the API status code for seed, seedscope, coll, and collscope
-        if error_type == "download" and report_type in ("seed", "scope_rule", "collection"):
+        # Changes the API status code for all metadata reports except crawl job.
+        if error_type == "download" and not(report_type == "crawl_job"):
+            metadata_report.status_code = 999
+            print(f"Generated error with API status code when downloading {report_name}.")
+
+        # GENERATE ERROR 2
+        # Changes the API status code for crawl job.
+        # Without that, crawl definition will also not download as part of standard error handling.
+        if error_type == "crawl_job" and report_type == "crawl_job":
             metadata_report.status_code = 999
             print(f"Generated error with API status code when downloading {report_name}.")
 
@@ -231,7 +238,7 @@ for seed in seed_df.itertuples():
     # Updates the current WARC number and displays the script progress.
     current_seed += 1
     # For building the tests: stop iterating once enough seeds have been used to do all the current tests.
-    if current_seed == 2:
+    if current_seed == 3:
         print("\nTests are done!")
         break
     print(f"\nProcessing seed {current_seed} of {total_seeds}.")
@@ -248,9 +255,9 @@ for seed in seed_df.itertuples():
     if current_seed == 1:
         download_metadata(seed, seed_df, error_type="download")
 
-    # # ERROR 2: No crawl_job so can't download crawl_definition.
-    # if current_seed == 2:
-    #     download_metadata(seed, seed_df, error_type="crawldef")
+    # ERROR 2: API error downloading crawl_job so can't download crawl_definition.
+    if current_seed == 2:
+        download_metadata(seed, seed_df, error_type="crawl_job")
 
     # # ERROR 3: API error downloading WARC metadata.
     # if current_seed == 3:
