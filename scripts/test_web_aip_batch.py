@@ -282,10 +282,6 @@ for seed in seed_df.itertuples():
 
     # Updates the current WARC number and displays the script progress.
     current_seed += 1
-    # For building the tests: stop iterating once enough seeds have been used to do all the current tests.
-    if current_seed == 8:
-        print("\nTests are done!")
-        break
     print(f"\nProcessing seed {current_seed} of {total_seeds}.")
 
     # Makes output directories.
@@ -329,29 +325,31 @@ for seed in seed_df.itertuples():
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="unzip")
 
-    # # ERROR 8: No objects folder
-    # if current_seed == 8:
-    #     web.download_metadata(seed, seed_df)
-    #     web.download_warcs(seed, date_end, seed_df)
-    #     web.check_directory(aip)
-    #
-    # # ERROR 9: Objects folder is empty
-    # if current_seed == 9:
-    #     web.download_metadata(seed, seed_df)
-    #     web.download_warcs(seed, date_end, seed_df)
-    #     web.check_directory(aip)
-    #
-    # # ERROR 10: No metadata folder
-    # if current_seed == 10:
-    #     web.download_metadata(seed, seed_df)
-    #     web.download_warcs(seed, date_end, seed_df)
-    #     web.check_directory(aip)
-    #
-    # # Error 11: Metadata folder is empty
-    # if current_seed == 11:
-    #     web.download_metadata(seed, seed_df)
-    #     web.download_warcs(seed, date_end, seed_df)
-    #     web.check_directory(aip)
+    # ERROR 8: No objects folder
+    if current_seed == 8:
+        web.download_metadata(seed, seed_df)
+        shutil.rmtree(f"{aip.directory}/{aip.id}/objects")
+        print("Generated error by deleting the objects folder.")
+        web.check_directory(aip)
+
+    # ERROR 9: Objects folder is empty
+    if current_seed == 9:
+        web.download_metadata(seed, seed_df)
+        print("Generated error by not downloading anything into the objects folder.")
+        web.check_directory(aip)
+
+    # ERROR 10: No metadata folder
+    if current_seed == 10:
+        web.download_warcs(seed, date_end, seed_df)
+        shutil.rmtree(f"{aip.directory}/{aip.id}/metadata")
+        print("Generated error by deleting the metadata folder.")
+        web.check_directory(aip)
+
+    # Error 11: Metadata folder is empty
+    if current_seed == 11:
+        web.download_warcs(seed, date_end, seed_df)
+        print("Generated error by not downloading anything into the metadata folder.")
+        web.check_directory(aip)
 
 # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) and logs into the AIPs folder
 # to keep everything together if another set is downloaded before these are deleted.
