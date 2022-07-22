@@ -45,16 +45,24 @@ def download_metadata(seed, seed_df, error_type):
         filters = {"limit": -1, filter_type: filter_value, "format": "csv"}
         metadata_report = requests.get(f"{c.partner_api}/{report_type}", params=filters, auth=(c.username, c.password))
 
+        # GENERATE ERROR 1
+        # Changes the API status code for seed, seedscope, coll, and collscope
+        if error_type == "download" and report_type in ("seed", "scope_rule", "collection"):
+            metadata_report.status_code = 999
+            print(f"Generated error with API status code when downloading {report_name}.")
+
         # Saves the metadata report if there were no API errors and there was data of this type (content isn't empty).
         # For scope rules, it is common for one or both to not have data since these aren't required.
         if metadata_report.status_code == 200:
             if metadata_report.content == b"":
                 web.log(f"Empty report {report_name} not saved", seed_df, row_index, "Metadata_Report_Info")
+                return
             else:
                 with open(f"{seed.AIP_ID}/metadata/{report_name}", "wb") as report_csv:
                     report_csv.write(metadata_report.content)
         else:
             web.log(f"{report_type} API error {metadata_report.status_code}", seed_df, row_index, "Metadata_Report_Errors")
+            return
 
         # Replaces the seed report with a redacted version of the file, removing login information if those columns
         # are present. Even if the columns are blank, replaces it with REDACTED. Since not all login information is
@@ -94,8 +102,9 @@ def download_metadata(seed, seed_df, error_type):
         seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
 
     # If there is nothing in the report info field, updates the log with default text.
+    # Can't assume that blank means success because it could mean API errors.
     if pd.isnull(seed_df.at[row_index, "Metadata_Report_Info"]):
-        seed_df.loc[row_index, "Metadata_Report_Info"] = "Successfully redacted seed report; No empty reports"
+        seed_df.loc[row_index, "Metadata_Report_Info"] = "No additional information"
         seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
 
 
@@ -221,9 +230,13 @@ for seed in seed_df.itertuples():
 
     # Updates the current WARC number and displays the script progress.
     current_seed += 1
-    print(f"Processing seed {current_seed} of {total_seeds}.")
+    # For building the tests: stop iterating once enough seeds have been used to do all the current tests.
+    if current_seed == 2:
+        print("\nTests are done!")
+        break
+    print(f"\nProcessing seed {current_seed} of {total_seeds}.")
 
-    # Makes output directories
+    # Makes output directories.
     os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
     os.makedirs(os.path.join(seed.AIP_ID, "objects"))
 
@@ -235,55 +248,64 @@ for seed in seed_df.itertuples():
     if current_seed == 1:
         download_metadata(seed, seed_df, error_type="download")
 
-    # ERROR 2: No crawl_job so can't download crawl_definition.
-    if current_seed == 2:
-        download_metadata(seed, seed_df, error_type="crawldef")
+    # # ERROR 2: No crawl_job so can't download crawl_definition.
+    # if current_seed == 2:
+    #     download_metadata(seed, seed_df, error_type="crawldef")
 
-    # ERROR 3: API error downloading WARC metadata.
-    if current_seed == 3:
-        web.download_metadata(seed, seed_df)
-        download_warcs(seed, date_end, seed_df, error_type="metadata")
+    # # ERROR 3: API error downloading WARC metadata.
+    # if current_seed == 3:
+    #     web.download_metadata(seed, seed_df)
+    #     download_warcs(seed, date_end, seed_df, error_type="metadata")
+    #
+    # # ERROR 4: API error downloading WARC.
+    # if current_seed == 4:
+    #     web.download_metadata(seed, seed_df)
+    #     download_warcs(seed, date_end, seed_df, error_type="download")
+    #
+    # # ERROR 5: Cannot extract fixity from MD5Deep output.
+    # if current_seed == 5:
+    #     web.download_metadata(seed, seed_df)
+    #     download_warcs(seed, date_end, seed_df, error_type="md5deep")
+    #
+    # # ERROR 6: WARC fixity after download doesn't match Archive-It record.
+    # if current_seed == 6:
+    #     web.download_metadata(seed, seed_df)
+    #     download_warcs(seed, date_end, seed_df, error_type="fixity")
+    #
+    # # ERROR 7: Error unzipping WARC
+    # if current_seed == 7:
+    #     web.download_metadata(seed, seed_df)
+    #     download_warcs(seed, date_end, seed_df, error_type="unzip")
+    #
+    # # ERROR 8: No objects folder
+    # if current_seed == 8:
+    #     web.download_metadata(seed, seed_df)
+    #     web.download_warcs(seed, date_end, seed_df)
+    #     web.check_directory(aip)
+    #
+    # # ERROR 9: Objects folder is empty
+    # if current_seed == 9:
+    #     web.download_metadata(seed, seed_df)
+    #     web.download_warcs(seed, date_end, seed_df)
+    #     web.check_directory(aip)
+    #
+    # # ERROR 10: No metadata folder
+    # if current_seed == 10:
+    #     web.download_metadata(seed, seed_df)
+    #     web.download_warcs(seed, date_end, seed_df)
+    #     web.check_directory(aip)
+    #
+    # # Error 11: Metadata folder is empty
+    # if current_seed == 11:
+    #     web.download_metadata(seed, seed_df)
+    #     web.download_warcs(seed, date_end, seed_df)
+    #     web.check_directory(aip)
 
-    # ERROR 4: API error downloading WARC.
-    if current_seed == 4:
-        web.download_metadata(seed, seed_df)
-        download_warcs(seed, date_end, seed_df, error_type="download")
-
-    # ERROR 5: Cannot extract fixity from MD5Deep output.
-    if current_seed == 5:
-        web.download_metadata(seed, seed_df)
-        download_warcs(seed, date_end, seed_df, error_type="md5deep")
-
-    # ERROR 6: WARC fixity after download doesn't match Archive-It record.
-    if current_seed == 6:
-        web.download_metadata(seed, seed_df)
-        download_warcs(seed, date_end, seed_df, error_type="fixity")
-
-    # ERROR 7: Error unzipping WARC
-    if current_seed == 7:
-        web.download_metadata(seed, seed_df)
-        download_warcs(seed, date_end, seed_df, error_type="unzip")
-
-    # ERROR 8: No objects folder
-    if current_seed == 8:
-        web.download_metadata(seed, seed_df)
-        web.download_warcs(seed, date_end, seed_df)
-        web.check_directory(aip)
-
-    # ERROR 9: Objects folder is empty
-    if current_seed == 9:
-        web.download_metadata(seed, seed_df)
-        web.download_warcs(seed, date_end, seed_df)
-        web.check_directory(aip)
-
-    # ERROR 10: No metadata folder
-    if current_seed == 10:
-        web.download_metadata(seed, seed_df)
-        web.download_warcs(seed, date_end, seed_df)
-        web.check_directory(aip)
-
-    # Error 11: Metadata folder is empty
-    if current_seed == 11:
-        web.download_metadata(seed, seed_df)
-        web.download_warcs(seed, date_end, seed_df)
-        web.check_directory(aip)
+# Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) and logs into the AIPs folder
+# to keep everything together if another set is downloaded before these are deleted.
+os.chdir(c.script_output)
+to_move = ("aips-to-ingest", "errors", "fits-xml", "preservation-xml",
+           "seeds.csv", "aip_log.csv", "completeness_check.csv")
+for item in os.listdir("."):
+    if item in to_move:
+        os.replace(item, f"{aips_directory}/{item}")
