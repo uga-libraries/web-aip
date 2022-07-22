@@ -130,6 +130,13 @@ def download_warcs(seed, date_end, seed_df, error_type):
 
         # Gets URL for downloading the WARC and WARC MD5 from Archive-It using WASAPI.
         warc_data = requests.get(f'{c.wasapi}?filename={warc}', auth=(c.username, c.password))
+
+        # GENERATE ERROR 3: API error when getting WARC metadata.
+        if error_type == "metadata":
+            warc_data.status_code = 999
+            print(f"Generated error with API status code when downloading metadata for {warc}.")
+
+        # Gets URL for downloading the WARC and WARC MD5 from Archive-It using WASAPI. (finishing)
         if not warc_data.status_code == 200:
             web.log(f"API error {warc_data.status_code}: can't get info about {warc}",
                     seed_df, row_index, "WARC_API_Errors")
