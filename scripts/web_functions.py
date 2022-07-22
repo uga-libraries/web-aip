@@ -191,11 +191,13 @@ def download_metadata(seed, seed_df):
         if metadata_report.status_code == 200:
             if metadata_report.content == b"":
                 log(f"Empty report {report_name} not saved", seed_df, row_index, "Metadata_Report_Info")
+                return
             else:
                 with open(f"{seed.AIP_ID}/metadata/{report_name}", "wb") as report_csv:
                     report_csv.write(metadata_report.content)
         else:
-            log(f"{report_type} API error {metadata_report.status_code}", seed_df, row_index, "Metadata_Report_Errors")
+            log(f"{report_name} API Error {metadata_report.status_code}", seed_df, row_index, "Metadata_Report_Errors")
+            return
 
         # Replaces the seed report with a redacted version of the file, removing login information if those columns
         # are present. Even if the columns are blank, replaces it with REDACTED. Since not all login information is
@@ -235,8 +237,9 @@ def download_metadata(seed, seed_df):
         seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
 
     # If there is nothing in the report info field, updates the log with default text.
+    # Can't assume that blank means success because it could mean API errors.
     if pd.isnull(seed_df.at[row_index, "Metadata_Report_Info"]):
-        seed_df.loc[row_index, "Metadata_Report_Info"] = "Successfully redacted seed report; No empty reports"
+        seed_df.loc[row_index, "Metadata_Report_Info"] = "No additional information"
         seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
 
 
