@@ -272,8 +272,7 @@ os.chdir(aips_directory)
 # Gets the metadata about the seeds in the batch.
 seed_df = web.seed_data(date_start, date_end)
 
-# Makes the output directories and log for the AIP part of the script.
-a.make_output_directories()
+# Makes the log for the AIP part of the script (used by check_directory).
 a.log("header")
 
 # Starts counters for tracking script progress.
