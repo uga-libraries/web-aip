@@ -45,15 +45,14 @@ def download_metadata(seed, seed_df, error_type):
         filters = {"limit": -1, filter_type: filter_value, "format": "csv"}
         metadata_report = requests.get(f"{c.partner_api}/{report_type}", params=filters, auth=(c.username, c.password))
 
-        # GENERATE ERROR 1
-        # Changes the API status code for all metadata reports except crawl job.
+        # GENERATE ERROR 1: API error downloading metadata reports.
+        # Doesn't make an error for crawl_job so that crawl_def error handling can be done separately.
         if error_type == "download" and not(report_type == "crawl_job"):
             metadata_report.status_code = 999
             print(f"Generated error with API status code when downloading {report_name}.")
 
-        # GENERATE ERROR 2
-        # Changes the API status code for crawl job.
-        # Without that, crawl definition will also not download as part of standard error handling.
+        # GENERATE ERROR 2: API error downloading crawl_job.
+        # Without crawl_job, crawl definition will also not download as part of standard error handling.
         if error_type == "crawl_job" and report_type == "crawl_job":
             metadata_report.status_code = 999
             print(f"Generated error with API status code when downloading {report_name}.")
@@ -134,7 +133,7 @@ def download_warcs(seed, date_end, seed_df, error_type):
         # Gets URL for downloading the WARC and WARC MD5 from Archive-It using WASAPI.
         warc_data = requests.get(f'{c.wasapi}?filename={warc}', auth=(c.username, c.password))
 
-        # GENERATE ERROR 3: API error when getting WARC metadata.
+        # GENERATE ERROR 4: API error downloading WARC metadata.
         if error_type == "metadata":
             warc_data.status_code = 999
             print(f"Generated error with API status code when downloading metadata for {warc}.")
@@ -159,7 +158,7 @@ def download_warcs(seed, date_end, seed_df, error_type):
             warc_md5 = "18c7f874cbf0b4de2dfb5dbeb46ac659"
             status_code = 200
 
-        # GENERATE ERROR 4: API error when downloading WARC
+        # GENERATE ERROR 5: API error downloading WARC.
         if error_type == "download":
             status_code = 999
             print(f"Generated error with API status code when downloading {warc}.")
@@ -182,7 +181,7 @@ def download_warcs(seed, date_end, seed_df, error_type):
         # Calculates the md5 for the downloaded zipped WARC with md5deep.
         md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
 
-        # GENERATES ERROR 5: regular expression doesn't work on md5deep output.
+        # GENERATES ERROR 7: Cannot extract fixity from MD5deep output (doesn't match regex pattern).
         if error_type == "md5deep":
             md5deep_output.stdout = b"@Something#Unexpected"
             print(f"Generated error with MD5deep output format for {warc}.")
@@ -196,7 +195,7 @@ def download_warcs(seed, date_end, seed_df, error_type):
                     seed_df, row_index, "WARC_Fixity_Errors")
             continue
 
-        # GENERATES ERROR 6: fixity in API is different from downloaded file.
+        # GENERATES ERROR 8: WARC fixity after download doesn't match Archive-It record.
         if error_type == "fixity":
             downloaded_warc_md5 = "abc123abc123abc123abc123"
             print(f"Generated error with downloaded file MD5 for {warc}.")
@@ -216,7 +215,7 @@ def download_warcs(seed, date_end, seed_df, error_type):
         unzip_output = subprocess.run(f'"C:/Program Files/7-Zip/7z.exe" x "{warc_path}" -o"{seed.AIP_ID}/objects"',
                                       stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
 
-        # GENERATES ERROR 7: Unable to unzip.
+        # GENERATES ERROR 9: Error unzipping WARC.
         if error_type == "unzip":
             unzip_output.stderr = b'Error message stand-in.'
             print(f"Generated error with 7zip output for {warc}.")
@@ -277,7 +276,9 @@ total_seeds = len(seed_df)
 # PRINTS AN ERROR TO THE TERMINAL IF THE ERROR IS NOT CAUGHT AND STARTS THE LOOP WITH THE NEXT WARC.
 # ----------------------------------------------------------------------------------------------------------------
 
-# There should be 14 seeds total. Not all are needed for testing.
+# There will be 14 seeds total.
+# Errors are listed in script order.
+# Seeds are processed out of order to get desired input for specific tests.
 for seed in seed_df.itertuples():
 
     # Updates the current WARC number and displays the script progress.
@@ -285,69 +286,84 @@ for seed in seed_df.itertuples():
     print(f"\nProcessing seed {current_seed} of {total_seeds}.")
 
     # Makes output directories.
+    # No error testing because in the script, it deletes pre-existing AIP folders before making directories.
     os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
     os.makedirs(os.path.join(seed.AIP_ID, "objects"))
 
-    # Makes AIP instance. In production, this isn't done after downloading.
+    # Makes AIP instance. In production, this isn't done until after downloading.
     # For testing, do it here so don't have to repeat the code for every seed.
     aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, version=1, to_zip=True)
 
     # ERROR 1: API error downloading metadata reports.
-    if current_seed == 1:
+    if seed.Seed_ID == "2529676":
         download_metadata(seed, seed_df, error_type="download")
 
     # ERROR 2: API error downloading crawl_job so can't download crawl_definition.
-    if current_seed == 2:
+    if seed.Seed_ID == "2529652":
         download_metadata(seed, seed_df, error_type="crawl_job")
 
-    # ERROR 3: API error downloading WARC metadata.
-    if current_seed == 3:
+    # ERROR 3: No login columns in seed to redact.
+    if seed.Seed_ID == "2529631":
+        print("Test TBD")
+
+    # ERROR 4: API error downloading WARC metadata. AIP has 1 WARC.
+    if seed.Seed_ID == "2529681":
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="metadata")
 
-    # ERROR 4: API error downloading WARC.
-    if current_seed == 4:
+    # ERROR 5: API error downloading WARC. AIP has 1 WARC.
+    if seed.Seed_ID == "2529668":
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="download")
 
-    # ERROR 5: Cannot extract fixity from MD5Deep output.
-    if current_seed == 6:
+    # ERROR 6: API error downloading one WARC. AIP has ? WARCs.
+    if seed.Seed_ID == "2529634":
+        print("Test TBD")
+
+    # ERROR 7: Cannot extract fixity from MD5deep output. AIP has 1 WARC.
+    if seed.Seed_ID == "2454507":
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="md5deep")
 
-    # ERROR 6: WARC fixity after download doesn't match Archive-It record.
-    if current_seed == 5:
+    # ERROR 8: WARC fixity after download doesn't match Archive-It record. AIP has 1 WARC.
+    if seed.Seed_ID == "2529627":
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="fixity")
 
-    # ERROR 7: Error unzipping WARC
-    if current_seed == 7:
+    # ERROR 9: Error unzipping WARC. AIP has 1 WARC.
+    if seed.Seed_ID == "2529660":
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="unzip")
 
-    # ERROR 8: No objects folder
-    if current_seed == 8:
+    # ERROR 10: All WARC errors happen to a single WARC and other WARCs have no errors.
+    if seed.Seed_ID == "2454506":
+        print("Test TBD")
+
+    # ERROR 11: No objects folder.
+    if seed.Seed_ID == "2184360":
         web.download_metadata(seed, seed_df)
         shutil.rmtree(f"{aip.directory}/{aip.id}/objects")
         print("Generated error by deleting the objects folder.")
         web.check_directory(aip)
 
-    # ERROR 9: Objects folder is empty
-    if current_seed == 9:
+    # ERROR 12: Objects folder is empty.
+    if seed.Seed_ID == "2529629":
         web.download_metadata(seed, seed_df)
         print("Generated error by not downloading anything into the objects folder.")
         web.check_directory(aip)
 
-    # ERROR 10: No metadata folder
-    if current_seed == 10:
-        web.download_warcs(seed, date_end, seed_df)
+    # ERROR 13: No metadata folder.
+    # Using the error version of download_warcs to speed up the test by not really downloading.
+    if seed.Seed_ID == "2529642":
+        download_warcs(seed, date_end, seed_df, error_type="none")
         shutil.rmtree(f"{aip.directory}/{aip.id}/metadata")
         print("Generated error by deleting the metadata folder.")
         web.check_directory(aip)
 
-    # Error 11: Metadata folder is empty
-    if current_seed == 11:
-        web.download_warcs(seed, date_end, seed_df)
+    # Error 14: Metadata folder is empty.
+    # Using the error version of download_warcs to speed up the test by not really downloading.
+    if seed.Seed_ID == "2739136":
+        download_warcs(seed, date_end, seed_df, error_type="none")
         print("Generated error by not downloading anything into the metadata folder.")
         web.check_directory(aip)
 
