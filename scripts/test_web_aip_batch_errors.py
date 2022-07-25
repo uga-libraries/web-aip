@@ -141,7 +141,7 @@ def download_warcs(seed, date_end, seed_df, error_type):
         warc_data = requests.get(f'{c.wasapi}?filename={warc}', auth=(c.username, c.password))
 
         # GENERATE ERROR 4: API error downloading WARC metadata.
-        if error_type == "metadata":
+        if error_type == "metadata" or (error_type == "everything" and warc_count == 1):
             warc_data.status_code = 999
 
         # Gets URL for downloading the WARC and WARC MD5 from Archive-It using WASAPI. (continued)
@@ -159,7 +159,7 @@ def download_warcs(seed, date_end, seed_df, error_type):
         # Downloads the WARC, which will be zipped.
         # Or if will later make text file for quicker testing, assign md5 and status code.
         # status_code variable is needed because anything that wasn't really downloaded doesn't have warc_download.status_code
-        if error_type in ("fixity", "unzip"):
+        if error_type in ("fixity", "unzip") or (error_type == "everything" and warc_count == 7):
             warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
             status_code = warc_download.status_code
         else:
@@ -167,7 +167,7 @@ def download_warcs(seed, date_end, seed_df, error_type):
             status_code = 200
 
         # GENERATE ERROR 5: API error downloading WARC.
-        if error_type == "download":
+        if error_type == "download" or (error_type == "everything" and warc_count == 2):
             status_code = 999
 
         # GENERATE ERROR 6: API error downloading the first WARC when seed has 2.
@@ -185,7 +185,7 @@ def download_warcs(seed, date_end, seed_df, error_type):
         # Saves the zipped WARC in the objects folder, keeping the original filename.
         # Saves a text file with the warc filename and extension for quicker tests if it isn't needed for the test.
         with open(warc_path, 'wb') as warc_file:
-            if error_type in ("fixity", "unzip"):
+            if error_type in ("fixity", "unzip") or (error_type == "everything" and warc_count == 7):
                 warc_file.write(warc_download.content)
             else:
                 warc_file.write(b"Testing Text")
@@ -194,7 +194,7 @@ def download_warcs(seed, date_end, seed_df, error_type):
         md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
 
         # GENERATES ERROR 7: Cannot extract fixity from MD5deep output (doesn't match regex pattern).
-        if error_type == "md5deep":
+        if error_type == "md5deep" or (error_type == "everything" and warc_count == 3):
             md5deep_output.stdout = b"@Something#Unexpected"
 
         # Calculates the md5 for the downloaded zipped WARC with md5deep. (continued)
@@ -207,7 +207,7 @@ def download_warcs(seed, date_end, seed_df, error_type):
             continue
 
         # GENERATES ERROR 8: WARC fixity after download doesn't match Archive-It record.
-        if error_type == "fixity":
+        if error_type == "fixity" or (error_type == "everything" and warc_count == 7):
             downloaded_warc_md5 = "abc123abc123abc123abc123"
 
         # Compares the md5 of the downloaded zipped WARC to Archive-It metadata.
@@ -223,13 +223,13 @@ def download_warcs(seed, date_end, seed_df, error_type):
 
         # PREVENTS ERROR: If text files are used in place of WARCs, rename to simulate unzipping.
         # Otherwise, the unzip steps give an error because the text files are no real zips.
-        if error_type in ("fixity", "unzip"):
+        if error_type in ("fixity", "unzip") or (error_type == "everything" and warc_count == 4):
             # Extracts the WARC from the gzip file.
             unzip_output = subprocess.run(f'"C:/Program Files/7-Zip/7z.exe" x "{warc_path}" -o"{seed.AIP_ID}/objects"',
                                           stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
 
             # GENERATES ERROR 9: Error unzipping WARC.
-            if error_type == "unzip":
+            if error_type == "unzip" or (error_type == "everything" and warc_count == 4):
                 unzip_output.stderr = b'Error message stand-in.'
 
             # Deletes the gzip file, unless 7zip had an error during unzipping.
@@ -374,11 +374,19 @@ for seed in seed_df.itertuples():
 
     # ERROR 10: All WARC errors happen to a single WARC and other WARCs have no errors.
     if seed.Seed_ID == "2454506":
-        print("Test TBD")
+        web.download_metadata(seed, seed_df)
+        download_warcs(seed, date_end, seed_df, error_type="everything")
+        web.check_directory(aip)
+        a.log(aip.log)
+
+    # The rest of the errors are for empty or missing objects and metadata folders.
+    # Still makes the folders and downloads everything so the seeds.csv has expected log values.
+    # Uses download_warcs with error_type of none to speed up the process by not really downloading.
 
     # ERROR 11: No objects folder.
     if seed.Seed_ID == "2184360":
         web.download_metadata(seed, seed_df)
+        download_warcs(seed, date_end, seed_df, error_type="none")
         shutil.rmtree(f"{aip.directory}/{aip.id}/objects")
         web.check_directory(aip)
         a.log(aip.log)
@@ -386,21 +394,26 @@ for seed in seed_df.itertuples():
     # ERROR 12: Objects folder is empty.
     if seed.Seed_ID == "2529629":
         web.download_metadata(seed, seed_df)
+        download_warcs(seed, date_end, seed_df, error_type="none")
+        shutil.rmtree(f"{aip.directory}/{aip.id}/objects")
+        os.makedirs(f"{aip.directory}/{aip.id}/objects")
         web.check_directory(aip)
         a.log(aip.log)
 
     # ERROR 13: No metadata folder.
-    # Using the error version of download_warcs to speed up the test by not really downloading.
     if seed.Seed_ID == "2529642":
+        web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="none")
         shutil.rmtree(f"{aip.directory}/{aip.id}/metadata")
         web.check_directory(aip)
         a.log(aip.log)
 
     # Error 14: Metadata folder is empty.
-    # Using the error version of download_warcs to speed up the test by not really downloading.
     if seed.Seed_ID == "2739136":
+        web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="none")
+        shutil.rmtree(f"{aip.directory}/{aip.id}/metadata")
+        os.makedirs(f"{aip.directory}/{aip.id}/metadata")
         web.check_directory(aip)
         a.log(aip.log)
 
