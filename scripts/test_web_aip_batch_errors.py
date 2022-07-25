@@ -65,7 +65,7 @@ def download_metadata(seed, seed_df, error_type):
                 with open(f"{seed.AIP_ID}/metadata/{report_name}", "wb") as report_csv:
                     report_csv.write(metadata_report.content)
         else:
-            web.log(f"{report_type} API error {metadata_report.status_code}", seed_df, row_index, "Metadata_Report_Errors")
+            web.log(f"{report_name} API error {metadata_report.status_code}", seed_df, row_index, "Metadata_Report_Errors")
             return
 
         # Replaces the seed report with a redacted version of the file, removing login information if those columns
@@ -78,6 +78,7 @@ def download_metadata(seed, seed_df, error_type):
             # GENERATE ERROR 3: No login columns in seed to redact.
             if error_type == "redact" and "login_password" in report_df.columns:
                 report_df.drop(["login_username", "login_password"], axis=1, inplace=True)
+                report_df.to_csv(f"{seed.AIP_ID}/metadata/{report_name}")
 
             if "login_password" in report_df.columns:
                 report_df["login_username"] = "REDACTED"
@@ -294,10 +295,6 @@ for seed in seed_df.itertuples():
     current_seed += 1
     print(f"Processing seed {current_seed} of {total_seeds}.")
 
-    # FOR TESTING: JUST DO THESE THREE FOR NOW.
-    if seed.Seed_ID not in ("2529676", "2529652", "2529631"):
-        continue
-
     # Makes output directories.
     # No error testing because in the script, it deletes pre-existing AIP folders before making directories.
     os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
@@ -332,30 +329,43 @@ for seed in seed_df.itertuples():
     if seed.Seed_ID == "2529681":
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="metadata")
+        web.check_directory(aip)
+        a.log(aip.log)
 
     # ERROR 5: API error downloading WARC. AIP has 1 WARC.
     if seed.Seed_ID == "2529668":
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="download")
+        web.check_directory(aip)
+        a.log(aip.log)
 
-    # ERROR 6: API error downloading one WARC. AIP has ? WARCs.
+    # ERROR 6: API error downloading first WARC. AIP has 2 WARCs.
     if seed.Seed_ID == "2529634":
-        print("Test TBD")
+        web.download_metadata(seed, seed_df)
+        download_warcs(seed, date_end, seed_df, error_type="download")
+        web.check_directory(aip)
+        a.log(aip.log)
 
     # ERROR 7: Cannot extract fixity from MD5deep output. AIP has 1 WARC.
     if seed.Seed_ID == "2454507":
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="md5deep")
+        web.check_directory(aip)
+        a.log(aip.log)
 
     # ERROR 8: WARC fixity after download doesn't match Archive-It record. AIP has 1 WARC.
     if seed.Seed_ID == "2529627":
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="fixity")
+        web.check_directory(aip)
+        a.log(aip.log)
 
     # ERROR 9: Error unzipping WARC. AIP has 1 WARC.
     if seed.Seed_ID == "2529660":
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="unzip")
+        web.check_directory(aip)
+        a.log(aip.log)
 
     # ERROR 10: All WARC errors happen to a single WARC and other WARCs have no errors.
     if seed.Seed_ID == "2454506":
