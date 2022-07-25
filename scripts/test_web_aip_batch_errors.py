@@ -157,7 +157,9 @@ def download_warcs(seed, date_end, seed_df, error_type):
         warc_path = f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/objects/{warc}'
 
         # Downloads the WARC, which will be zipped.
-        if error_type == "fixity":
+        # Or if will later make text file for quicker testing, assign md5 and status code.
+        # status_code variable is needed because anything that wasn't really downloaded doesn't have warc_download.status_code
+        if error_type in ("fixity", "unzip"):
             warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
             status_code = warc_download.status_code
         else:
@@ -181,8 +183,9 @@ def download_warcs(seed, date_end, seed_df, error_type):
             web.log(f"Successfully downloaded {warc}", seed_df, row_index, "WARC_API_Errors")
 
         # Saves the zipped WARC in the objects folder, keeping the original filename.
+        # Saves a text file with the warc filename and extension for quicker tests if it isn't needed for the test.
         with open(warc_path, 'wb') as warc_file:
-            if error_type == "fixity":
+            if error_type in ("fixity", "unzip"):
                 warc_file.write(warc_download.content)
             else:
                 warc_file.write(b"Testing Text")
@@ -349,7 +352,7 @@ for seed in seed_df.itertuples():
         a.log(aip.log)
 
     # ERROR 7: Cannot extract fixity from MD5deep output. AIP has 1 WARC.
-    if seed.Seed_ID == "2454507":
+    if seed.Seed_ID == "2529660":
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="md5deep")
         web.check_directory(aip)
@@ -363,7 +366,7 @@ for seed in seed_df.itertuples():
         a.log(aip.log)
 
     # ERROR 9: Error unzipping WARC. AIP has 1 WARC.
-    if seed.Seed_ID == "2529660":
+    if seed.Seed_ID == "2454507":
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="unzip")
         web.check_directory(aip)
