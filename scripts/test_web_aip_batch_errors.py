@@ -49,13 +49,11 @@ def download_metadata(seed, seed_df, error_type):
         # Doesn't make an error for crawl_job so that crawl_def error handling can be done separately.
         if error_type == "download" and not(report_type == "crawl_job"):
             metadata_report.status_code = 999
-            print(f"Generated error with API status code when downloading {report_name}.")
 
         # GENERATE ERROR 2: API error downloading crawl_job.
         # Without crawl_job, crawl definition will also not download as part of standard error handling.
         if error_type == "crawl_job" and report_type == "crawl_job":
             metadata_report.status_code = 999
-            print(f"Generated error with API status code when downloading {report_name}.")
 
         # Saves the metadata report if there were no API errors and there was data of this type (content isn't empty).
         # For scope rules, it is common for one or both to not have data since these aren't required.
@@ -76,6 +74,11 @@ def download_metadata(seed, seed_df, error_type):
         # there was login information or not is misleading. """
         if report_type == "seed":
             report_df = pd.read_csv(f"{seed.AIP_ID}/metadata/{report_name}")
+
+            # GENERATE ERROR 3: No login columns in seed to redact.
+            if error_type == "redact" and "login_password" in report_df.columns:
+                report_df.drop(["login_username", "login_password"], axis=1, inplace=True)
+
             if "login_password" in report_df.columns:
                 report_df["login_username"] = "REDACTED"
                 report_df["login_password"] = "REDACTED"
@@ -211,22 +214,29 @@ def download_warcs(seed, date_end, seed_df, error_type):
             web.log(f"Successfully verified {warc} fixity on {datetime.datetime.now()}",
                     seed_df, row_index, "WARC_Fixity_Errors")
 
-        # Extracts the WARC from the gzip file.
-        unzip_output = subprocess.run(f'"C:/Program Files/7-Zip/7z.exe" x "{warc_path}" -o"{seed.AIP_ID}/objects"',
-                                      stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
+        # PREVENTS ERROR: If text files are used in place of WARCs, rename to simulate unzipping.
+        # Otherwise, the unzip steps give an error because the text files are no real zips.
+        if error_type in ("fixity", "unzip"):
+            # Extracts the WARC from the gzip file.
+            unzip_output = subprocess.run(f'"C:/Program Files/7-Zip/7z.exe" x "{warc_path}" -o"{seed.AIP_ID}/objects"',
+                                          stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
 
-        # GENERATES ERROR 9: Error unzipping WARC.
-        if error_type == "unzip":
-            unzip_output.stderr = b'Error message stand-in.'
-            print(f"Generated error with 7zip output for {warc}.")
+            # GENERATES ERROR 9: Error unzipping WARC.
+            if error_type == "unzip":
+                unzip_output.stderr = b'Error message stand-in.'
+                print(f"Generated error with 7zip output for {warc}.")
 
-        # Deletes the gzip file, unless 7zip had an error during unzipping.
-        if unzip_output.stderr == b'':
-            os.remove(warc_path)
-            web.log(f"Successfully unzipped {warc}", seed_df, row_index, "WARC_Unzip_Errors")
+            # Deletes the gzip file, unless 7zip had an error during unzipping.
+            if unzip_output.stderr == b'':
+                os.remove(warc_path)
+                web.log(f"Successfully unzipped {warc}", seed_df, row_index, "WARC_Unzip_Errors")
+            else:
+                web.log(f"Error unzipping {warc}: {unzip_output.stderr.decode('utf-8')}",
+                        seed_df, row_index, "WARC_Unzip_Errors")
         else:
-            web.log(f"Error unzipping {warc}: {unzip_output.stderr.decode('utf-8')}",
-                    seed_df, row_index, "WARC_Unzip_Errors")
+            new_warc_path = warc_path.replace(".warc.gz", ".warc")
+            os.replace(warc_path, new_warc_path)
+            web.log(f"Successfully unzipped {warc}", seed_df, row_index, "WARC_Unzip_Errors")
 
         # Wait 15 second to give the API a rest.
         time.sleep(15)
@@ -277,13 +287,17 @@ total_seeds = len(seed_df)
 # ----------------------------------------------------------------------------------------------------------------
 
 # There will be 14 seeds total.
-# Errors are listed in script order.
-# Seeds are processed out of order to get desired input for specific tests.
+# Errors are listed in script order. Seeds are processed out of order to get desired input for specific tests.
+# Seeds are only processed through check_directory. After that, general aip functions take over.
 for seed in seed_df.itertuples():
 
     # Updates the current WARC number and displays the script progress.
     current_seed += 1
-    print(f"\nProcessing seed {current_seed} of {total_seeds}.")
+    print(f"Processing seed {current_seed} of {total_seeds}.")
+
+    # FOR TESTING: JUST DO THESE THREE FOR NOW.
+    if seed.Seed_ID not in ("2529676", "2529652", "2529631"):
+        continue
 
     # Makes output directories.
     # No error testing because in the script, it deletes pre-existing AIP folders before making directories.
@@ -297,14 +311,23 @@ for seed in seed_df.itertuples():
     # ERROR 1: API error downloading metadata reports.
     if seed.Seed_ID == "2529676":
         download_metadata(seed, seed_df, error_type="download")
+        download_warcs(seed, date_end, seed_df, error_type="none")
+        web.check_directory(aip)
+        a.log(aip.log)
 
     # ERROR 2: API error downloading crawl_job so can't download crawl_definition.
     if seed.Seed_ID == "2529652":
         download_metadata(seed, seed_df, error_type="crawl_job")
+        download_warcs(seed, date_end, seed_df, error_type="none")
+        web.check_directory(aip)
+        a.log(aip.log)
 
     # ERROR 3: No login columns in seed to redact.
     if seed.Seed_ID == "2529631":
-        print("Test TBD")
+        download_metadata(seed, seed_df, error_type="redact")
+        download_warcs(seed, date_end, seed_df, error_type="none")
+        web.check_directory(aip)
+        a.log(aip.log)
 
     # ERROR 4: API error downloading WARC metadata. AIP has 1 WARC.
     if seed.Seed_ID == "2529681":
@@ -375,3 +398,11 @@ to_move = ("aips-to-ingest", "errors", "fits-xml", "preservation-xml",
 for item in os.listdir("."):
     if item in to_move:
         os.replace(item, f"{aips_directory}/{item}")
+
+# ----------------------------------------------------------------------------------------------------------------
+# THIS PART OF THE SCRIPT TESTS THE ACTUAL RESULTS AGAINST THE EXPECTED RESULTS.
+# TESTS seeds.csv, aips.csv AND AIPS DIRECTORY STRUCTURE.
+# COMPARISONS ARE SAVED AS TABS ON A SPREADSHEET AND A SUMMARY IS PRINTED TO THE TERMINAL.
+# ----------------------------------------------------------------------------------------------------------------
+
+# Creates a dataframe with expected seed results to compare to seeds_df (which is saved as seeds.csv).
