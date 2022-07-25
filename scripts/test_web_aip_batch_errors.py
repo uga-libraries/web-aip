@@ -401,7 +401,7 @@ for item in os.listdir("."):
 # ----------------------------------------------------------------------------------------------------------------
 # THIS PART OF THE SCRIPT TESTS THE ACTUAL RESULTS AGAINST THE EXPECTED RESULTS.
 # TESTS seeds.csv, aips.csv AND AIPS DIRECTORY STRUCTURE.
-# COMPARISONS ARE SAVED AS TABS ON A SPREADSHEET AND A SUMMARY IS PRINTED TO THE TERMINAL.
+# COMPARISONS ARE SAVED AS TABS ON A SPREADSHEET IN THE SCRIPT OUTPUT FOLDER.
 # ----------------------------------------------------------------------------------------------------------------
 
 # Check values in seeds.csv.
@@ -412,14 +412,25 @@ actual_seeds = pd.read_csv(os.path.join(c.script_output, aips_directory, "seeds.
 actual_seeds["WARC_Fixity_Errors"] = actual_seeds["WARC_Fixity_Errors"].str.slice(0,-27)
 compare_seed_df = actual_seeds.merge(expected_seeds, indicator=True, how="outer")
 
-# Checks values in aip_log.csv
+# Checks values in aip_log.csv.
 # Removes Time Started in aip_log.csv so it can be compared.
 expected_aips = pd.read_csv(os.path.join(c.script_output, "expected_aip_log.csv"))
 actual_aips = pd.read_csv(os.path.join(c.script_output, aips_directory, "aip_log.csv"))
 actual_aips.drop(["Time Started"], axis=1, inplace=True)
 compare_aip_df = actual_aips.merge(expected_aips, indicator=True, how="outer")
 
+# Checks directory structure.
+# Creates a list with relative paths starting at the AIPs directory so paths are predictable.
+directory_list = []
+for root, dirs, files in os.walk(f"aips_{date_end}"):
+    for file in files:
+        directory_list.append(os.path.join(root, file))
+actual_dir = pd.DataFrame({"File_Path": directory_list})
+expected_dir = pd.read_csv(os.path.join(c.script_output, "expected_directory.txt"))
+compare_dir_df = actual_dir.merge(expected_dir, indicator=True, how="outer")
+
 # Saves the results to tabs on a spreadsheet (error_test_results.xlsx) in the script output folder.
 with pd.ExcelWriter(os.path.join(c.script_output, "error_test_results.xlsx")) as results:
     compare_seed_df.to_excel(results, sheet_name="Seeds_CSV", index=False)
     compare_aip_df.to_excel(results, sheet_name="AIP_CSV", index=False)
+    compare_dir_df.to_excel(results, sheet_name="Directory", index=False)
