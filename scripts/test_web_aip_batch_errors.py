@@ -405,14 +405,22 @@ for item in os.listdir("."):
 # COMPARISONS ARE SAVED AS TABS ON A SPREADSHEET AND A SUMMARY IS PRINTED TO THE TERMINAL.
 # ----------------------------------------------------------------------------------------------------------------
 
-# Reads a csv with expected values (manually put in the script output folder) and reads seeds.csv
-# to verify everything worked correctly. Read both from CSV to avoid formatting differences.
-# Remove time stamp (last 27 characters) from WARC fixity in seeds.csv so it can be compared.
+# Check values in seeds.csv.
+# Reads both from csv instead of using seeds_df to avoid formatting differences.
+# Removes time stamp (last 27 characters) from WARC fixity in seeds.csv so it can be compared.
 expected_seeds = pd.read_csv(os.path.join(c.script_output, "expected_seeds.csv"))
 actual_seeds = pd.read_csv(os.path.join(c.script_output, aips_directory, "seeds.csv"))
 actual_seeds["WARC_Fixity_Errors"] = actual_seeds["WARC_Fixity_Errors"].str.slice(0,-27)
 compare_seed_df = actual_seeds.merge(expected_seeds, indicator=True, how="outer")
 
+# Checks values in aip_log.csv
+# Removes Time Started in aip_log.csv so it can be compared.
+expected_aips = pd.read_csv(os.path.join(c.script_output, "expected_aip_log.csv"))
+actual_aips = pd.read_csv(os.path.join(c.script_output, aips_directory, "aip_log.csv"))
+actual_aips.drop(["Time Started"], axis=1, inplace=True)
+compare_aip_df = actual_aips.merge(expected_aips, indicator=True, how="outer")
+
 # Saves the results to tabs on a spreadsheet (error_test_results.xlsx) in the script output folder.
 with pd.ExcelWriter(os.path.join(c.script_output, "error_test_results.xlsx")) as results:
     compare_seed_df.to_excel(results, sheet_name="Seeds_CSV", index=False)
+    compare_aip_df.to_excel(results, sheet_name="AIP_CSV", index=False)
