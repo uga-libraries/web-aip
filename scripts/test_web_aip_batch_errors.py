@@ -1,6 +1,6 @@
 """Purpose: This script generates every known error to use for testing the error handling of web_aip_batch.py.
 
-Usage: python /path/test_web_aip_batch.py
+Usage: python /path/test_web_aip_batch_errors.py
 Date values need to be 2022-03-20 and 2022-03-25 to test for predictable results,
 so included in this script and not as arguments.
 
