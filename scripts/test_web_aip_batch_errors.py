@@ -132,7 +132,10 @@ def download_warcs(seed, date_end, seed_df, error_type):
 
     # Downloads and validates every WARC.
     # If an error is caught at any point, logs the error and starts the next WARC.
+    # FOR TESTING, ADD WARC COUNTER FOR WHEN DIFFERENT ERRORS HAPPEN TO DIFFERENT WARCS.
+    warc_count = 0
     for warc in warc_names:
+        warc_count += 1
 
         # Gets URL for downloading the WARC and WARC MD5 from Archive-It using WASAPI.
         warc_data = requests.get(f'{c.wasapi}?filename={warc}', auth=(c.username, c.password))
@@ -166,6 +169,10 @@ def download_warcs(seed, date_end, seed_df, error_type):
         if error_type == "download":
             status_code = 999
             print(f"Generated error with API status code when downloading {warc}.")
+
+        # GENERATE ERROR 6: API error downloading the first WARC when seed has 2.
+        if error_type == "download_partial" and warc_count == 1:
+            status_code = 999
 
         # If there was an error with the API call, starts the next WARC.
         if not status_code == 200:
@@ -342,7 +349,7 @@ for seed in seed_df.itertuples():
     # ERROR 6: API error downloading first WARC. AIP has 2 WARCs.
     if seed.Seed_ID == "2529634":
         web.download_metadata(seed, seed_df)
-        download_warcs(seed, date_end, seed_df, error_type="download")
+        download_warcs(seed, date_end, seed_df, error_type="download_partial")
         web.check_directory(aip)
         a.log(aip.log)
 
