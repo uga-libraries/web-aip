@@ -78,7 +78,7 @@ def download_metadata(seed, seed_df, error_type):
             # GENERATE ERROR 3: No login columns in seed to redact.
             if error_type == "redact" and "login_password" in report_df.columns:
                 report_df.drop(["login_username", "login_password"], axis=1, inplace=True)
-                report_df.to_csv(f"{seed.AIP_ID}/metadata/{report_name}")
+                report_df.to_csv(f"{seed.AIP_ID}/metadata/{report_name}", index=False)
 
             if "login_password" in report_df.columns:
                 report_df["login_username"] = "REDACTED"
@@ -293,7 +293,7 @@ a.log("header")
 for seed in seed_df.itertuples():
 
     # Displays the script progress.
-    print(f"Processing seed {seed.Seed_ID} (AIP {seed.AIP_ID}.")
+    print(f"Processing seed {seed.Seed_ID} (AIP {seed.AIP_ID}).")
 
     # ERROR 1: API error downloading metadata reports.
     if seed.Seed_ID == "2529676":
@@ -462,10 +462,10 @@ for item in os.listdir("."):
 
 # Check values in seeds.csv.
 # Reads both from csv instead of using seeds_df to avoid formatting differences.
-# Removes time stamp (last 27 characters) from WARC fixity in seeds.csv so it can be compared.
+# Removes time stamps from WARC fixity column in seeds.csv so it can be compared.
 expected_seeds = pd.read_csv(os.path.join(c.script_output, "expected_seeds.csv"))
 actual_seeds = pd.read_csv(os.path.join(c.script_output, aips_directory, "seeds.csv"))
-actual_seeds["WARC_Fixity_Errors"] = actual_seeds["WARC_Fixity_Errors"].str.slice(0,-27)
+actual_seeds["WARC_Fixity_Errors"] = actual_seeds["WARC_Fixity_Errors"].str.replace(" \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}", "")
 compare_seed_df = actual_seeds.merge(expected_seeds, indicator=True, how="outer")
 
 # Checks values in aip_log.csv.
@@ -490,3 +490,19 @@ with pd.ExcelWriter(os.path.join(c.script_output, "error_test_results.xlsx")) as
     compare_seed_df.to_excel(results, sheet_name="Seeds_CSV", index=False)
     compare_aip_df.to_excel(results, sheet_name="AIP_CSV", index=False)
     compare_dir_df.to_excel(results, sheet_name="Directory", index=False)
+
+# # Prints summary of results to the terminal.
+# # NOT WORKING: prints all three, even though seeds.csv is the only one with right_only or left_only.
+# print("\nComparisons with differences:")
+# differences = False
+# if "left_only" or "right_only" in compare_seed_df["_merge"].values():
+#     print("\t* seeds.csv")
+#     differences = True
+# if "left_only" or "right_only" in compare_aip_df["_merge"].values():
+#     print("\t* aip_log.csv")
+#     differences = True
+# if "left_only" or "right_only" in compare_dir_df["_merge"].values():
+#     print("\t* directory")
+#     differences = True
+# if differences is False:
+#     print("Everything matches perfectly.")
