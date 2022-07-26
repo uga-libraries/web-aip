@@ -281,10 +281,6 @@ seed_df = web.seed_data(date_start, date_end)
 # Makes the log for the AIP part of the script (used by check_directory).
 a.log("header")
 
-# Starts counters for tracking script progress.
-current_seed = 0
-total_seeds = len(seed_df)
-
 # ----------------------------------------------------------------------------------------------------------------
 # THIS PART OF THE SCRIPT MAKES A DIFFERENT ERROR EVERY TIME IT STARTS A NEW SEED.
 # FOR ERRORS GENERATING WITHIN FUNCTIONS, IT USES A DIFFERENT VERSION OF THE FUNCTION.
@@ -296,9 +292,8 @@ total_seeds = len(seed_df)
 # Seeds are only processed through check_directory. After that, general aip functions take over.
 for seed in seed_df.itertuples():
 
-    # Updates the current WARC number and displays the script progress.
-    current_seed += 1
-    print(f"Processing seed {current_seed} of {total_seeds}.")
+    # Displays the script progress.
+    print(f"Processing seed {seed.Seed_ID} (AIP {seed.AIP_ID}.")
 
     # Makes output directories.
     # No error testing because in the script, it deletes pre-existing AIP folders before making directories.
