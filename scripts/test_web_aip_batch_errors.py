@@ -295,82 +295,103 @@ for seed in seed_df.itertuples():
     # Displays the script progress.
     print(f"Processing seed {seed.Seed_ID} (AIP {seed.AIP_ID}.")
 
-    # Makes output directories.
-    # No error testing because in the script, it deletes pre-existing AIP folders before making directories.
-    os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
-    os.makedirs(os.path.join(seed.AIP_ID, "objects"))
-
-    # Makes AIP instance. In production, this isn't done until after downloading.
-    # For testing, do it here so don't have to repeat the code for every seed.
-    aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, version=1, to_zip=True)
-
     # ERROR 1: API error downloading metadata reports.
     if seed.Seed_ID == "2529676":
+        os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
+        os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         download_metadata(seed, seed_df, error_type="download")
         download_warcs(seed, date_end, seed_df, error_type="none")
+        aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
         a.log(aip.log)
 
     # ERROR 2: API error downloading crawl_job so can't download crawl_definition.
     if seed.Seed_ID == "2529652":
+        os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
+        os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         download_metadata(seed, seed_df, error_type="crawl_job")
         download_warcs(seed, date_end, seed_df, error_type="none")
+        aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
         a.log(aip.log)
 
     # ERROR 3: No login columns in seed to redact.
     if seed.Seed_ID == "2529631":
+        os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
+        os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         download_metadata(seed, seed_df, error_type="redact")
         download_warcs(seed, date_end, seed_df, error_type="none")
+        aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
         a.log(aip.log)
 
     # ERROR 4: API error downloading WARC metadata. AIP has 1 WARC.
     if seed.Seed_ID == "2529681":
+        os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
+        os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="metadata")
+        aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
         a.log(aip.log)
 
     # ERROR 5: API error downloading WARC. AIP has 1 WARC.
     if seed.Seed_ID == "2529668":
+        os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
+        os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="download")
+        aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
         a.log(aip.log)
 
     # ERROR 6: API error downloading first WARC. AIP has 2 WARCs.
     if seed.Seed_ID == "2529634":
+        os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
+        os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="download_partial")
+        aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
         a.log(aip.log)
 
     # ERROR 7: Cannot extract fixity from MD5deep output. AIP has 1 WARC.
     if seed.Seed_ID == "2529660":
+        os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
+        os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="md5deep")
+        aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
         a.log(aip.log)
 
     # ERROR 8: WARC fixity after download doesn't match Archive-It record. AIP has 1 WARC.
     if seed.Seed_ID == "2529627":
+        os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
+        os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="fixity")
+        aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
         a.log(aip.log)
 
     # ERROR 9: Error unzipping WARC. AIP has 1 WARC.
     if seed.Seed_ID == "2454507":
+        os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
+        os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="unzip")
+        aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
         a.log(aip.log)
 
     # ERROR 10: All WARC errors happen to a single WARC and other WARCs have no errors.
     if seed.Seed_ID == "2454506":
+        os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
+        os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="everything")
+        aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
         a.log(aip.log)
 
@@ -380,16 +401,22 @@ for seed in seed_df.itertuples():
 
     # ERROR 11: No objects folder.
     if seed.Seed_ID == "2184360":
+        os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
+        os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="none")
+        aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         shutil.rmtree(f"{aip.directory}/{aip.id}/objects")
         web.check_directory(aip)
         a.log(aip.log)
 
     # ERROR 12: Objects folder is empty.
     if seed.Seed_ID == "2529629":
+        os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
+        os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="none")
+        aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         shutil.rmtree(f"{aip.directory}/{aip.id}/objects")
         os.makedirs(f"{aip.directory}/{aip.id}/objects")
         web.check_directory(aip)
@@ -397,16 +424,22 @@ for seed in seed_df.itertuples():
 
     # ERROR 13: No metadata folder.
     if seed.Seed_ID == "2529642":
+        os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
+        os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="none")
+        aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         shutil.rmtree(f"{aip.directory}/{aip.id}/metadata")
         web.check_directory(aip)
         a.log(aip.log)
 
     # Error 14: Metadata folder is empty.
     if seed.Seed_ID == "2739136":
+        os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
+        os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         web.download_metadata(seed, seed_df)
         download_warcs(seed, date_end, seed_df, error_type="none")
+        aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         shutil.rmtree(f"{aip.directory}/{aip.id}/metadata")
         os.makedirs(f"{aip.directory}/{aip.id}/metadata")
         web.check_directory(aip)
