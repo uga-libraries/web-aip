@@ -30,16 +30,21 @@ import web_functions as web
 # Tests that both dates are provided. If not, ends the script.
 try:
     date_start, date_end = sys.argv[1:]
-except IndexError:
-    print("Exiting script: must provide exactly two arguments, the start and end date of the quarter.")
+except ValueError:
+    print("\nExiting script: must provide exactly two arguments, the start and end date of the download.")
     exit()
 
 # Tests that both dates are formatted correctly (YYYY-MM-DD). If not, ends the script.
 if not re.match(r"\d{4}-\d{2}-\d{2}", date_start):
-    print(f"Exiting script: start date '{date_start}' must be formatted YYYY-MM-DD.")
+    print(f"\nExiting script: start date '{date_start}' must be formatted YYYY-MM-DD.")
     exit()
 if not re.match(r"\d{4}-\d{2}-\d{2}", date_end):
-    print(f"Exiting script: end date '{date_end}' must be formatted YYYY-MM-DD.")
+    print(f"\nExiting script: end date '{date_end}' must be formatted YYYY-MM-DD.")
+    exit()
+
+# Tests that the first date is earlier than the second date. If not, ends the script.
+if date_start > date_end:
+    print(f"\nExisting script: start date '{date_start}' must be earlier than end date '{date_end}'.")
     exit()
 
 # Tests the paths in the configuration file to verify they exist. Quits the script if any are incorrect.
