@@ -15,7 +15,8 @@ import web_functions as web
 
 def make_file(path):
     """Make a test file in the location and name indicated by the path.
-    This is used a lot of times in the script and makes it easier to read what files are being created."""
+    This is a function, even though it is so small, because it is used a lot of times in the script
+    and having file creation be one line makes it easier to see in the script body what files are being created."""
     with open(path, "w") as new_file:
         new_file.write("For Testing")
 
@@ -31,7 +32,8 @@ os.makedirs(aips_directory)
 os.chdir(aips_directory)
 
 # Makes a dataframe with seed and AIP ids to use for making the test AIPs.
-# In the full script, there is a lot more in the seed dataframe, but this function only needs the ids.
+# In the full script, this is made using the seed_data() function and there is a lot more in the seed dataframe,
+# but the check_aip() function only needs the two ids columns.
 seed_df = pd.DataFrame({"Seed_ID": ["2472041", "2529627", "2529629", "2529631", "2529633", "2529634",
                                     "2529642", "2529652", "2529660", "2529665", "2529668", "2529669",
                                     "2529671", "2529676", "2529681"],
@@ -41,7 +43,7 @@ seed_df = pd.DataFrame({"Seed_ID": ["2472041", "2529627", "2529629", "2529631", 
                                    "magil-ggp-2529665-2022-03", "magil-ggp-2529668-2022-03", "magil-ggp-2529669-2022-03",
                                    "magil-ggp-2529671-2022-03", "magil-ggp-2529676-2022-03", "magil-ggp-2529681-2022-03"]})
 
-# Makes a minimum correct AIP for each of the seeds as a start for the test.
+# Makes a minimum correct AIP for each of the seeds.
 # The folder is named _bag but is not a real bag and the files are plain text rather than actually downloaded.
 # This saves time and is enough to pass the tests, which are based on folder and file names.
 for aip in seed_df["AIP_ID"]:
@@ -90,41 +92,43 @@ os.makedirs("magil-ggp-extra2-2022-03_bag")
 # Saves the result as a csv in the folder with the downloaded AIPs.
 web.check_aips(date_end, date_start, seed_df, aips_directory)
 
+# # TODO: have the script automatically compare the actual results with the expected results.
+# # The following looks like it should be matching but mostly isn't.
+
 # # Makes a dataframe with the expected values for the check_aips() function output to use for comparison.
-aips = ["magil-ggp-2472041-2022-03", "magil-ggp-2529671-2022-03", "magil-ggp-2529669-2022-03", "magil-ggp-2529633-2022-03",
-        "magil-ggp-2529665-2022-03", "magil-ggp-2529634-2022-03", "magil-ggp-2529660-2022-03", "magil-ggp-2529629-2022-03",
-        "magil-ggp-2529642-2022-03", "magil-ggp-2529627-2022-03", "magil-ggp-2529652-2022-03", "magil-ggp-2529631-2022-03",
-        "magil-ggp-2529668-2022-03", "magil-ggp-2529681-2022-03", "magil-ggp-2529676-2022-03",
-        "magil-ggp-extra1-2022-03_bag", "magil-ggp-extra2-2022-03_bag"]
-urls = ["https://www.legis.ga.gov/", "https://grec.state.ga.us/", "https://oig.georgia.gov/", "https://medicalboard.georgia.gov/",
-        "https://ltgov.georgia.gov/", "https://consumer.georgia.gov/", "https://dso.georgia.gov/", "https://gbp.georgia.gov/",
-        "https://dcs.georgia.gov/", "https://gaa.georgia.gov/", "https://gdna.georgia.gov/", "https://gceo.georgia.gov/",
-        "https://oca.georgia.gov/", "https://gspc.georgia.gov/", "https://gsba.georgia.gov/", np.nan, np.nan]
-folders_made = ["FALSE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "Not expected", "Not expected"]
-colls = [np.nan, True, True, True, True, True, True, True, False, True, True, True, True, True, True, np.nan, np.nan]
-collscopes = [np.nan, True, True, True, True, True, True, True, True, True, False, True, True, True, True, np.nan, np.nan]
-seeds = [np.nan, True, True, True, True, True, False, True, True, True, True, True, True, True, True, np.nan, np.nan]
-seedscopes = [np.nan, True, True, True, True, True, False, True, True, True, True, True, True, True, True, np.nan, np.nan]
-crawldefs = [np.nan, 1, 1, 1, 0, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, np.nan, np.nan]
-crawljobs = [np.nan, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, np.nan, np.nan]
-preservation_xmls = [np.nan, True, True, True, True, True, True, True, True, True, True, True, False, True, True, np.nan, np.nan]
-warcs = [np.nan, False, True, True, True, True, True, True, True, True, True, True, True, True, True, np.nan, np.nan]
-object_extras = [np.nan, True, True, True, True, True, True, True, True, True, True, True, True, False, True, np.nan, np.nan]
-fits = [np.nan, False, False, True, True, True, True, True, True, True, True, True, False, True, True, np.nan, np.nan]
-metadata_extras = [np.nan, True, True, True, True, True, True, True, True, True, True, True, True, True, False, np.nan, np.nan]
-
-expected_df = pd.DataFrame({"AIP": aips, "URL": urls, "AIP Folder Made": folders_made, "coll.csv": colls,
-                            "collscope.csv": collscopes, "seed.csv": seeds, "seedscope.csv": seedscopes,
-                            "crawldef.csv count": crawldefs, "crawljob.csv count": crawljobs,
-                            "preservation.xml": preservation_xmls,	"WARC Count Correct": warcs,
-                            "Objects is all WARCs": object_extras, "fits.xml Count Correct": fits,
-                            "No Extra Metadata": metadata_extras})
-
-# Makes a dataframe with the output of the check_aips() function.
-actual_df = pd.read_csv(f"{c.script_output}/completeness_check.csv")
-
-# Compares the expected results to the actual results.
-# Indicator of both means the rows match.
-# TODO: something about the difference of read_csv vs pd.DataFrame means these look the same but mostly aren't matching.
-compare_df = actual_df.merge(expected_df, indicator=True, how="outer")
-compare_df.to_csv(f"{c.script_output}/compare.csv")
+# aips = ["magil-ggp-2472041-2022-03", "magil-ggp-2529671-2022-03", "magil-ggp-2529669-2022-03", "magil-ggp-2529633-2022-03",
+#         "magil-ggp-2529665-2022-03", "magil-ggp-2529634-2022-03", "magil-ggp-2529660-2022-03", "magil-ggp-2529629-2022-03",
+#         "magil-ggp-2529642-2022-03", "magil-ggp-2529627-2022-03", "magil-ggp-2529652-2022-03", "magil-ggp-2529631-2022-03",
+#         "magil-ggp-2529668-2022-03", "magil-ggp-2529681-2022-03", "magil-ggp-2529676-2022-03",
+#         "magil-ggp-extra1-2022-03_bag", "magil-ggp-extra2-2022-03_bag"]
+# urls = ["https://www.legis.ga.gov/", "https://grec.state.ga.us/", "https://oig.georgia.gov/", "https://medicalboard.georgia.gov/",
+#         "https://ltgov.georgia.gov/", "https://consumer.georgia.gov/", "https://dso.georgia.gov/", "https://gbp.georgia.gov/",
+#         "https://dcs.georgia.gov/", "https://gaa.georgia.gov/", "https://gdna.georgia.gov/", "https://gceo.georgia.gov/",
+#         "https://oca.georgia.gov/", "https://gspc.georgia.gov/", "https://gsba.georgia.gov/", np.nan, np.nan]
+# folders_made = ["FALSE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "TRUE", "Not expected", "Not expected"]
+# colls = [np.nan, True, True, True, True, True, True, True, False, True, True, True, True, True, True, np.nan, np.nan]
+# collscopes = [np.nan, True, True, True, True, True, True, True, True, True, False, True, True, True, True, np.nan, np.nan]
+# seeds = [np.nan, True, True, True, True, True, False, True, True, True, True, True, True, True, True, np.nan, np.nan]
+# seedscopes = [np.nan, True, True, True, True, True, False, True, True, True, True, True, True, True, True, np.nan, np.nan]
+# crawldefs = [np.nan, 1, 1, 1, 0, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, np.nan, np.nan]
+# crawljobs = [np.nan, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 3, 1, 1, 1, np.nan, np.nan]
+# preservation_xmls = [np.nan, True, True, True, True, True, True, True, True, True, True, True, False, True, True, np.nan, np.nan]
+# warcs = [np.nan, False, True, True, True, True, True, True, True, True, True, True, True, True, True, np.nan, np.nan]
+# object_extras = [np.nan, True, True, True, True, True, True, True, True, True, True, True, True, False, True, np.nan, np.nan]
+# fits = [np.nan, False, False, True, True, True, True, True, True, True, True, True, False, True, True, np.nan, np.nan]
+# metadata_extras = [np.nan, True, True, True, True, True, True, True, True, True, True, True, True, True, False, np.nan, np.nan]
+#
+# expected_df = pd.DataFrame({"AIP": aips, "URL": urls, "AIP Folder Made": folders_made, "coll.csv": colls,
+#                             "collscope.csv": collscopes, "seed.csv": seeds, "seedscope.csv": seedscopes,
+#                             "crawldef.csv count": crawldefs, "crawljob.csv count": crawljobs,
+#                             "preservation.xml": preservation_xmls,	"WARC Count Correct": warcs,
+#                             "Objects is all WARCs": object_extras, "fits.xml Count Correct": fits,
+#                             "No Extra Metadata": metadata_extras})
+#
+# # Makes a dataframe with the output of the check_aips() function.
+# actual_df = pd.read_csv(f"{c.script_output}/completeness_check.csv")
+#
+# # Compares the expected results to the actual results.
+# # Indicator of both means the rows match.
+# compare_df = actual_df.merge(expected_df, indicator=True, how="outer")
+# compare_df.to_csv(f"{c.script_output}/compare.csv")
