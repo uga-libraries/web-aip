@@ -491,18 +491,19 @@ with pd.ExcelWriter(os.path.join(c.script_output, "error_test_results.xlsx")) as
     compare_aip_df.to_excel(results, sheet_name="AIP_CSV", index=False)
     compare_dir_df.to_excel(results, sheet_name="Directory", index=False)
 
-# # Prints summary of results to the terminal.
-# # NOT WORKING: prints all three, even though seeds.csv is the only one with right_only or left_only.
-# print("\nComparisons with differences:")
-# differences = False
-# if "left_only" or "right_only" in compare_seed_df["_merge"].values():
-#     print("\t* seeds.csv")
-#     differences = True
-# if "left_only" or "right_only" in compare_aip_df["_merge"].values():
-#     print("\t* aip_log.csv")
-#     differences = True
-# if "left_only" or "right_only" in compare_dir_df["_merge"].values():
-#     print("\t* directory")
-#     differences = True
-# if differences is False:
-#     print("Everything matches perfectly.")
+# Removes the rows that match from the dataframes and prints if there were mismatches or now.
+compare_seed_df = compare_seed_df[compare_seed_df["_merge"] != "both"]
+if len(compare_seed_df) is 0:
+    print("Tests passed for seeds.csv")
+else:
+    print("Possible errors with seeds.csv: check error_test_results.xslx")
+compare_aip_df = compare_aip_df[compare_aip_df["_merge"] != "both"]
+if len(compare_aip_df) is 0:
+    print("Tests passed for aip_log.csv")
+else:
+    print("Possible errors with aip_log: check error_test_results.xslx")
+compare_dir_df = compare_dir_df[compare_dir_df["_merge"] != "both"]
+if len(compare_dir_df) is 0:
+    print("Tests passed for directory structure.")
+else:
+    print("Possible errors with directory structure: check error_test_results.xslx")
