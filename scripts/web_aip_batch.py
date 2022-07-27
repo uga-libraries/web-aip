@@ -15,14 +15,19 @@ script to verify all required fields are present. """
 # Usage: python /path/web_aip_batch.py date_start date_end
 
 import os
+import pandas as pd
 import re
 import sys
 
 # Import functions and constant variables from other UGA scripts.
-import pandas as pd
-
+# Configuration is made by the user and could be forgotten. The others are in the script repo.
+try:
+    import configuration as c
+except ModuleNotFoundError:
+    print("\nScript cannot run without a configuration file in the local copy of the GitHub repo.")
+    print("Make a file named configuration.py using configuration_template.py and run the script again.")
+    sys.exit()
 import aip_functions as a
-import configuration as c
 import web_functions as web
 
 # The preservation download is limited to warcs created during a particular time frame.
@@ -48,13 +53,16 @@ if date_start > date_end:
     exit()
 
 # Tests the paths in the configuration file to verify they exist. Quits the script if any are incorrect.
+# Uses two check_configuration functions, one web specific and one AIP specific, for a complete test.
 # It is common to get typos when setting up the configuration file on a new machine.
-configuration_errors = a.check_configuration()
+configuration_web = web.check_configuration()
+configuration_aip = a.check_configuration()
+configuration_errors = configuration_web + configuration_aip
 if len(configuration_errors) > 0:
-    print("/nProblems detected with configuration.py:")
+    print("\nProblems detected with configuration.py:")
     for error in configuration_errors:
         print(error)
-    print("Correct the configuration file and run the script again.")
+    print("\nCorrect the configuration file and run the script again.")
     sys.exit()
 
 # Path to the folder in the script output directory (defined in the configuration file)

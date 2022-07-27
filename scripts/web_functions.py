@@ -20,6 +20,49 @@ import aip_functions as a
 import configuration as c
 
 
+def check_configuration():
+    """Verifies all the expected variables specific to the web workflow are in the configuration file
+    and paths are valid if they are a path. The check_configuration() function in aip_functions.py
+    does similar tests for general aip variables.
+    Returns a list of paths with errors or "no errors".
+    This avoids wasting processing time by doing earlier steps before the path error is encountered."""
+
+    errors = []
+
+    # The variable script_output is the only one with a path.
+    # Checks first for if it is present, and if it is checks if it is valid.
+    try:
+        if not os.path.exists(c.script_output):
+            errors.append(f"Script output path '{c.script_output}' is not correct.")
+    except AttributeError:
+        errors.append("script_output variable is missing from the configuration file.")
+
+    # For the other web variables, tests if they are present.
+    try:
+        c.partner_api
+    except AttributeError:
+        errors.append("partner_api variable is missing from the configuration file.")
+    try:
+        c.wasapi
+    except AttributeError:
+        errors.append("wasapi variable is missing from the configuration file.")
+    try:
+        c.inst_page
+    except AttributeError:
+        errors.append("inst_page variable is missing from the configuration file.")
+    try:
+        c.username
+    except AttributeError:
+        errors.append("username variable is missing from the configuration file.")
+    try:
+        c.password
+    except AttributeError:
+        errors.append("password variable is missing from the configuration file.")
+
+    # Returns the errors list. If there were no errors, it will be empty.
+    return errors
+
+
 def seed_data(date_start, date_end):
     """Uses WASAPI and the Partner API to get information about each seed to include in the download.
     Returns the data as a dataframe and also saves it to a CSV in the script output folder to use for the log
