@@ -9,10 +9,6 @@ Usage: python /path/test_web_aip_batch_iteration
 import datetime
 import os
 import pandas as pd
-import re
-import requests
-import subprocess
-import time
 import sys
 
 # Import functions and constant variables from other UGA scripts.
@@ -154,6 +150,11 @@ for seed in seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfull
     # Adds the packaged AIP to the MD5 manifest in the aips-to-ingest folder.
     if f'{aip.id}_bag' in os.listdir('.'):
         a.manifest(aip)
+
+    # TESTING ITERATION: SCRIPT BREAKS BETWEEN TWO SEEDS.
+    if seed.Seed_ID == "2084785":
+        print("Simulating script breaking between processing two seeds.")
+        sys.exit()
 
 # Adds the information from aip_log.csv to seeds.csv and deletes aip_log.csv
 # to have one spreadsheet the documents the entire process.
