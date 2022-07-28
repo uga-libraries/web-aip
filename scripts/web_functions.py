@@ -517,7 +517,7 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
 
         # Tests if there is a folder for this AIP in the AIPs directory. If not, returns the result for this AIP and
         # does not run the rest of the function's tests since there is no directory to check for completeness.
-        if any(folder.startswith(aip_id) for folder in os.listdir(aips_directory)):
+        if f"{aip_id}_bag" in os.listdir(aips_directory):
             result.append(True)
         else:
             result.extend([False, 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a'])
