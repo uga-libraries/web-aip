@@ -37,26 +37,50 @@ def compare_df(test, df_actual, df_expected):
 # Make the script output folder the current directory for easy saving of test results.
 os.chdir(c.script_output)
 
-# Test: 2 MAGIL seeds, including 1 and multiple WARCS.
-magil_df = web.seed_data("2022-04-11", "2022-04-13")
-magil_ex_df = pd.DataFrame({"Seed_ID": ["2529647", "2472043"],
-                           "AIP_ID": ["magil-ggp-2529647-2022-04", "magil-ggp-2472043-2022-04"],
-                           "Title": ["Georgia Department of Transportation", "Georgia Department of Audits and Accounts"],
-                           "Department": ["magil", "magil"],
-                           "UGA_Collection": ["0000", "0000"],
-                           "AIT_Collection": [15678, 15678],
-                           "Job_ID": [1583117, 1583270],
-                           "Size_GB": [12.87, .12],
-                           "WARCs": [13, 1],
-                           "WARC_Filenames": ["ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220331151300136-00000-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220331223248449-00001-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401021708141-00002-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401024320779-00003-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401042238966-00004-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401055943204-00005-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401141604806-00006-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402030302049-00007-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402081423469-00008-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402113301104-00009-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402141557823-00010-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402201602620-00011-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402230559530-00012-urcpzn95.warc.gz",
-                                              "ARCHIVEIT-15678-TEST-JOB1583270-0-SEED2472043-20220331170557241-00000-xzgq9wm8.warc.gz"],
-                           "Seed_Metadata_Errors": ["Successfully calculated seed metadata", "Successfully calculated seed metadata"],
-                           "Metadata_Report_Errors": ["BLANK", "BLANK"],
-                           "Metadata_Report_Info": ["BLANK", "BLANK"],
-                           "WARC_API_Errors": ["BLANK", "BLANK"],
-                           "WARC_Fixity_Errors": ["BLANK", "BLANK"],
-                           "WARC_Unzip_Errors": ["BLANK", "BLANK"]})
-compare_df("MAGIL", magil_df, magil_ex_df)
+# Test: 4 Hargrett seeds, including 1 and multiple WARCS. None have related collection.
+harg_df = web.seed_data("2020-06-08", "2020-06-09")
+harg_ex_df = pd.DataFrame({"Seed_ID": ["2187482", "2030942", "2084785", "2270486"],
+                           "AIP_ID": ["harg-0000-web-202006-0001", "harg-0000-web-202006-0002", "harg-0000-web-202006-0003", "harg-0000-web-202006-0004"],
+                           "Title": ["Student Government Association Facebook", "UGA NAACP Twitter", "Zeta Pi Chapter of Alpha Phi Alpha Twitter", "UGA Commencement"],
+                           "Department": ["hargrett", "hargrett", "hargrett", "hargrett"],
+                           "UGA_Collection": ["0000", "0000", "0000", "0000"],
+                           "AIT_Collection": [12181, 12181, 12181, 12912],
+                           "Job_ID": [1177700, 1177700, 1177700, 1176433],
+                           "Size_GB": [3.62, 0.05, 0.11, 0.06],
+                           "WARCs": [4, 1, 1, 1],
+                           "WARC_Filenames": ["ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601191649570-00000-h3.warc.gz,ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601195532797-00002-h3.warc.gz,ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601194617707-00001-h3.warc.gz,ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601200733748-00003-h3.warc.gz",
+                                              "ARCHIVEIT-12181-TEST-JOB1177700-SEED2030942-20200601191649636-00000-h3.warc.gz",
+                                              "ARCHIVEIT-12181-TEST-JOB1177700-SEED2084785-20200601191752355-00000-h3.warc.gz",
+                                              "ARCHIVEIT-12912-TEST-JOB1176433-SEED2270486-20200529202848582-00000-h3.warc.gz"],
+                           "Seed_Metadata_Errors": ["Successfully calculated seed metadata", "Successfully calculated seed metadata",
+                                                    "Successfully calculated seed metadata", "Successfully calculated seed metadata"],
+                           "Metadata_Report_Errors": ["BLANK", "BLANK", "BLANK", "BLANK"],
+                           "Metadata_Report_Info": ["BLANK", "BLANK", "BLANK", "BLANK"],
+                           "WARC_API_Errors": ["BLANK", "BLANK", "BLANK", "BLANK"],
+                           "WARC_Fixity_Errors": ["BLANK", "BLANK", "BLANK", "BLANK"],
+                           "WARC_Unzip_Errors": ["BLANK", "BLANK", "BLANK", "BLANK"]})
+compare_df("Hargrett", harg_df, harg_ex_df)
+#
+# # Test: 2 MAGIL seeds, including 1 and multiple WARCS.
+# magil_df = web.seed_data("2022-04-11", "2022-04-13")
+# magil_ex_df = pd.DataFrame({"Seed_ID": ["2529647", "2472043"],
+#                            "AIP_ID": ["magil-ggp-2529647-2022-04", "magil-ggp-2472043-2022-04"],
+#                            "Title": ["Georgia Department of Transportation", "Georgia Department of Audits and Accounts"],
+#                            "Department": ["magil", "magil"],
+#                            "UGA_Collection": ["0000", "0000"],
+#                            "AIT_Collection": [15678, 15678],
+#                            "Job_ID": [1583117, 1583270],
+#                            "Size_GB": [12.87, .12],
+#                            "WARCs": [13, 1],
+#                            "WARC_Filenames": ["ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220331151300136-00000-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220331223248449-00001-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401021708141-00002-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401024320779-00003-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401042238966-00004-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401055943204-00005-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401141604806-00006-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402030302049-00007-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402081423469-00008-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402113301104-00009-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402141557823-00010-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402201602620-00011-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402230559530-00012-urcpzn95.warc.gz",
+#                                               "ARCHIVEIT-15678-TEST-JOB1583270-0-SEED2472043-20220331170557241-00000-xzgq9wm8.warc.gz"],
+#                            "Seed_Metadata_Errors": ["Successfully calculated seed metadata", "Successfully calculated seed metadata"],
+#                            "Metadata_Report_Errors": ["BLANK", "BLANK"],
+#                            "Metadata_Report_Info": ["BLANK", "BLANK"],
+#                            "WARC_API_Errors": ["BLANK", "BLANK"],
+#                            "WARC_Fixity_Errors": ["BLANK", "BLANK"],
+#                            "WARC_Unzip_Errors": ["BLANK", "BLANK"]})
+# compare_df("MAGIL", magil_df, magil_ex_df)
 
 # # Test: BMA seed 2028986 has 2 WARCs.
 # # Has minimum metadata in Archive-It but is not a department that uses the script so can't calculate values.
