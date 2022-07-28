@@ -36,6 +36,12 @@ def download_warcs(seed, date_end, seed_df, stop=False):
     # Creates a text file with the name of every WARC.
     for warc in warc_names:
 
+        # TESTING ITERATION: SCRIPT BREAKS BEFORE DOWNLOADING ALL WARCS FOR A MULTI-WARC SEED.
+        if stop is True and warc in ("ARCHIVEIT-12263-TEST-JOB1010662-SEED2089428-20191023012315001-00008-h3.warc.gz",
+                                     "ARCHIVEIT-12265-TEST-JOB1046326-SEED2122426-20191219180253353-00000-h3.warc.gz"):
+            print("Simulating script breaking before all warcs are downloaded.")
+            sys.exit()
+
         # The path for where the WARC will be saved on the local machine (it is long and used twice in this script).
         # Removes ".gz" from the file extension to simulate the unzipping.
         warc_path = f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/objects/{warc}'
@@ -127,7 +133,11 @@ for seed in seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfull
 
     # Downloads the WARCs from Archive-It into the seed's objects folder.
     # FOR TESTING: uses local version of the function. Makes text file for warcs (faster) and errors when needed.
-    download_warcs(seed, date_end, seed_df)
+    # TESTING ITERATION: WILL STOP AFTER DOWNLOADING A WARC SPECIFIED BY NAME IN THE FUNCTION.
+    if seed.Seed_ID in ("2089428", "2122426") and reset is False:
+        download_warcs(seed, date_end, seed_df, stop=True)
+    else:
+        download_warcs(seed, date_end, seed_df)
 
     # Makes an instance of the AIP class, using seed dataframe and calculating additional values.
     # If there was an error when making the instance, starts the next AIP.
