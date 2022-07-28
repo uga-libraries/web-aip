@@ -37,26 +37,46 @@ def compare_df(test, df_actual, df_expected):
 # Make the script output folder the current directory for easy saving of test results.
 os.chdir(c.script_output)
 
-# Test: BMA seed 2028986 has 2 WARCs.
-# Has minimum metadata in Archive-It but is not a department that uses the script so can't calculate values.
-bma_df = web.seed_data("2020-02-18", "2020-02-19")
-warc_list = ["ARCHIVEIT-12470-TEST-JOB1085452-SEED2028986-20200129224159397-00001-h3.warc.gz,"
-             "ARCHIVEIT-12470-TEST-JOB1085452-SEED2028986-20200129213514425-00000-h3.warc.gz"]
-bma_ex_df = pd.DataFrame({"Seed_ID": ["2028986"],
-                          "AIP_ID": ["BLANK"],
-                          "Title": ["The Now Explosion Website"],
-                          "Department": ["BLANK"],
-                          "UGA_Collection": ["BLANK"],
-                          "AIT_Collection": [12470],
-                          "Job_ID": [1085452],
-                          "Size_GB": [1.3],
-                          "WARCs": [2],
-                          "WARC_Filenames": warc_list,
-                          "Seed_Metadata_Errors": ["Couldn't get all required metadata values from the seed report. "
-                                                   "Will not download files or make AIP."],
-                          "Metadata_Report_Errors": ["BLANK"],
-                          "Metadata_Report_Info": ["BLANK"],
-                          "WARC_API_Errors": ["BLANK"],
-                          "WARC_Fixity_Errors": ["BLANK"],
-                          "WARC_Unzip_Errors": ["BLANK"]})
-compare_df("BMA", bma_df, bma_ex_df)
+# Test: 2 MAGIL seeds, including 1 and multiple WARCS.
+magil_df = web.seed_data("2022-04-11", "2022-04-13")
+magil_ex_df = pd.DataFrame({"Seed_ID": ["2529647", "2472043"],
+                           "AIP_ID": ["magil-ggp-2529647-2022-04", "magil-ggp-2472043-2022-04"],
+                           "Title": ["Georgia Department of Transportation", "Georgia Department of Audits and Accounts"],
+                           "Department": ["magil", "magil"],
+                           "UGA_Collection": ["0000", "0000"],
+                           "AIT_Collection": [15678, 15678],
+                           "Job_ID": [1583117, 1583270],
+                           "Size_GB": [12.87, .12],
+                           "WARCs": [13, 1],
+                           "WARC_Filenames": ["ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220331151300136-00000-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220331223248449-00001-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401021708141-00002-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401024320779-00003-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401042238966-00004-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401055943204-00005-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401141604806-00006-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402030302049-00007-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402081423469-00008-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402113301104-00009-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402141557823-00010-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402201602620-00011-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402230559530-00012-urcpzn95.warc.gz",
+                                              "ARCHIVEIT-15678-TEST-JOB1583270-0-SEED2472043-20220331170557241-00000-xzgq9wm8.warc.gz"],
+                           "Seed_Metadata_Errors": ["Successfully calculated seed metadata", "Successfully calculated seed metadata"],
+                           "Metadata_Report_Errors": ["BLANK", "BLANK"],
+                           "Metadata_Report_Info": ["BLANK", "BLANK"],
+                           "WARC_API_Errors": ["BLANK", "BLANK"],
+                           "WARC_Fixity_Errors": ["BLANK", "BLANK"],
+                           "WARC_Unzip_Errors": ["BLANK", "BLANK"]})
+compare_df("MAGIL", magil_df, magil_ex_df)
+
+# # Test: BMA seed 2028986 has 2 WARCs.
+# # Has minimum metadata in Archive-It but is not a department that uses the script so can't calculate values.
+# bma_df = web.seed_data("2020-02-18", "2020-02-19")
+# bma_ex_df = pd.DataFrame({"Seed_ID": ["2028986"],
+#                           "AIP_ID": ["BLANK"],
+#                           "Title": ["The Now Explosion Website"],
+#                           "Department": ["BLANK"],
+#                           "UGA_Collection": ["BLANK"],
+#                           "AIT_Collection": [12470],
+#                           "Job_ID": [1085452],
+#                           "Size_GB": [1.3],
+#                           "WARCs": [2],
+#                           "WARC_Filenames": ["ARCHIVEIT-12470-TEST-JOB1085452-SEED2028986-20200129224159397-00001-h3.warc.gz,"
+#                                              "ARCHIVEIT-12470-TEST-JOB1085452-SEED2028986-20200129213514425-00000-h3.warc.gz"],
+#                           "Seed_Metadata_Errors": ["Couldn't get all required metadata values from the seed report. "
+#                                                    "Will not download files or make AIP."],
+#                           "Metadata_Report_Errors": ["BLANK"],
+#                           "Metadata_Report_Info": ["BLANK"],
+#                           "WARC_API_Errors": ["BLANK"],
+#                           "WARC_Fixity_Errors": ["BLANK"],
+#                           "WARC_Unzip_Errors": ["BLANK"]})
+# compare_df("BMA", bma_df, bma_ex_df)
