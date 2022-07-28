@@ -100,6 +100,10 @@ total_seeds = len(seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Succe
 for seed in seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfully"))
                     & (seed_df["WARC_Unzip_Errors"].isnull())].itertuples():
 
+    # TESTING ITERATION: TRACKS IF THE RESET FUNCTION IS CALLED THE SCRIPT ONLY BREAKS THE FIRST TIME.
+    # THIS LETS A SEED BE THE CAUSE OF A BREAK MID-PROCESSING AND THEN BE CORRECTLY DOWNLOADED THE NEXT TIME.
+    reset = False
+
     # Updates the current seed number and displays the script progress.
     current_seed += 1
     print(f"\nStarting seed {current_seed} of {total_seeds}.")
@@ -109,11 +113,17 @@ for seed in seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfull
     # deletes the contents and anything in the seeds.csv from the previous step so it can be remade.
     if os.path.exists(seed.AIP_ID):
         web.reset_aip(seed.AIP_ID, seed_df)
+        reset = True
     os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
     os.makedirs(os.path.join(seed.AIP_ID, "objects"))
 
     # Downloads the seed metadata from Archive-It into the seed's metadata folder.
     web.download_metadata(seed, seed_df)
+
+    # TESTING ITERATION: SCRIPT BREAKS BETWEEN WEB-SPECIFIC STEPS FOR A SEED.
+    if seed.Seed_ID == "2173769" and reset is False:
+        print("Simulating script breaking after metadata download.")
+        sys.exit()
 
     # Downloads the WARCs from Archive-It into the seed's objects folder.
     # FOR TESTING: uses local version of the function. Makes text file for warcs (faster) and errors when needed.
@@ -142,6 +152,11 @@ for seed in seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfull
     # Bags the aip.
     if aip.id in os.listdir("."):
         a.bag(aip)
+
+    # TESTING ITERATION: SCRIPT BREAKS BETWEEN GENERAL AIP STEPS FOR A SEED.
+    if seed.Seed_ID == "2202440" and reset is False:
+        print("Simulating script breaking after bagging.")
+        sys.exit()
 
     # Tars and zips the aip.
     if f"{aip.id}_bag" in os.listdir('.'):
