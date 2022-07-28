@@ -37,29 +37,29 @@ def compare_df(test, df_actual, df_expected):
 # Make the script output folder the current directory for easy saving of test results.
 os.chdir(c.script_output)
 
-# Test: 4 Hargrett seeds, including 1 and multiple WARCS. None have related collection.
-harg_df = web.seed_data("2020-06-08", "2020-06-09")
-harg_ex_df = pd.DataFrame({"Seed_ID": ["2187482", "2030942", "2084785", "2270486"],
-                           "AIP_ID": ["harg-0000-web-202006-0001", "harg-0000-web-202006-0002", "harg-0000-web-202006-0003", "harg-0000-web-202006-0004"],
-                           "Title": ["Student Government Association Facebook", "UGA NAACP Twitter", "Zeta Pi Chapter of Alpha Phi Alpha Twitter", "UGA Commencement"],
-                           "Department": ["hargrett", "hargrett", "hargrett", "hargrett"],
-                           "UGA_Collection": ["0000", "0000", "0000", "0000"],
-                           "AIT_Collection": [12181, 12181, 12181, 12912],
-                           "Job_ID": [1177700, 1177700, 1177700, 1176433],
-                           "Size_GB": [3.62, 0.05, 0.11, 0.06],
-                           "WARCs": [4, 1, 1, 1],
-                           "WARC_Filenames": ["ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601191649570-00000-h3.warc.gz,ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601195532797-00002-h3.warc.gz,ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601194617707-00001-h3.warc.gz,ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601200733748-00003-h3.warc.gz",
-                                              "ARCHIVEIT-12181-TEST-JOB1177700-SEED2030942-20200601191649636-00000-h3.warc.gz",
-                                              "ARCHIVEIT-12181-TEST-JOB1177700-SEED2084785-20200601191752355-00000-h3.warc.gz",
-                                              "ARCHIVEIT-12912-TEST-JOB1176433-SEED2270486-20200529202848582-00000-h3.warc.gz"],
-                           "Seed_Metadata_Errors": ["Successfully calculated seed metadata", "Successfully calculated seed metadata",
-                                                    "Successfully calculated seed metadata", "Successfully calculated seed metadata"],
-                           "Metadata_Report_Errors": ["BLANK", "BLANK", "BLANK", "BLANK"],
-                           "Metadata_Report_Info": ["BLANK", "BLANK", "BLANK", "BLANK"],
-                           "WARC_API_Errors": ["BLANK", "BLANK", "BLANK", "BLANK"],
-                           "WARC_Fixity_Errors": ["BLANK", "BLANK", "BLANK", "BLANK"],
-                           "WARC_Unzip_Errors": ["BLANK", "BLANK", "BLANK", "BLANK"]})
-compare_df("Hargrett", harg_df, harg_ex_df)
+# # Test: 4 Hargrett seeds, including 1 and multiple WARCS. None have related collection.
+# harg_df = web.seed_data("2020-06-08", "2020-06-09")
+# harg_ex_df = pd.DataFrame({"Seed_ID": ["2187482", "2030942", "2084785", "2270486"],
+#                            "AIP_ID": ["harg-0000-web-202006-0001", "harg-0000-web-202006-0002", "harg-0000-web-202006-0003", "harg-0000-web-202006-0004"],
+#                            "Title": ["Student Government Association Facebook", "UGA NAACP Twitter", "Zeta Pi Chapter of Alpha Phi Alpha Twitter", "UGA Commencement"],
+#                            "Department": ["hargrett", "hargrett", "hargrett", "hargrett"],
+#                            "UGA_Collection": ["0000", "0000", "0000", "0000"],
+#                            "AIT_Collection": [12181, 12181, 12181, 12912],
+#                            "Job_ID": [1177700, 1177700, 1177700, 1176433],
+#                            "Size_GB": [3.62, 0.05, 0.11, 0.06],
+#                            "WARCs": [4, 1, 1, 1],
+#                            "WARC_Filenames": ["ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601191649570-00000-h3.warc.gz,ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601195532797-00002-h3.warc.gz,ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601194617707-00001-h3.warc.gz,ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601200733748-00003-h3.warc.gz",
+#                                               "ARCHIVEIT-12181-TEST-JOB1177700-SEED2030942-20200601191649636-00000-h3.warc.gz",
+#                                               "ARCHIVEIT-12181-TEST-JOB1177700-SEED2084785-20200601191752355-00000-h3.warc.gz",
+#                                               "ARCHIVEIT-12912-TEST-JOB1176433-SEED2270486-20200529202848582-00000-h3.warc.gz"],
+#                            "Seed_Metadata_Errors": ["Successfully calculated seed metadata", "Successfully calculated seed metadata",
+#                                                     "Successfully calculated seed metadata", "Successfully calculated seed metadata"],
+#                            "Metadata_Report_Errors": ["BLANK", "BLANK", "BLANK", "BLANK"],
+#                            "Metadata_Report_Info": ["BLANK", "BLANK", "BLANK", "BLANK"],
+#                            "WARC_API_Errors": ["BLANK", "BLANK", "BLANK", "BLANK"],
+#                            "WARC_Fixity_Errors": ["BLANK", "BLANK", "BLANK", "BLANK"],
+#                            "WARC_Unzip_Errors": ["BLANK", "BLANK", "BLANK", "BLANK"]})
+# compare_df("Hargrett", harg_df, harg_ex_df)
 #
 # # Test: 2 MAGIL seeds, including 1 and multiple WARCS.
 # magil_df = web.seed_data("2022-04-11", "2022-04-13")
@@ -81,6 +81,34 @@ compare_df("Hargrett", harg_df, harg_ex_df)
 #                            "WARC_Fixity_Errors": ["BLANK", "BLANK"],
 #                            "WARC_Unzip_Errors": ["BLANK", "BLANK"]})
 # compare_df("MAGIL", magil_df, magil_ex_df)
+
+# # Test: 6 Russell seeds, including 1 and multiple WARCS.
+# # All have related collection, some collections have multiple seeds.
+# rbrl_df = web.seed_data("2021-02-11", "2021-02-12")
+# rbrl_ex_df = pd.DataFrame({"Seed_ID": ["2467336", "2454513", "2454516", "2444048", "2454520", "2467334"],
+#                            "AIP_ID": ["rbrl-496-web-202102-0001", "rbrl-495-web-202102-0001", "rbrl-497-web-202102-0001", "rbrl-494-web-202102-0001", "rbrl-497-web-202102-0002", "rbrl-496-web-202102-0002"],
+#                            "Title": ["Senator Kelly Loeffler (@senloeffler) - Instagram photos and videos", "Doug Collins (@RepDougCollins) / Twitter", "Rob Woodall (@RepRobWoodall) / Twitter", "Bob Trammell (@TrammellBob) / Twitter", "Rep. Rob Woodall (@reprobwoodall) - Instagram photos and videos", "Senator Kelly Loeffler - YouTube"],
+#                            "Department": ["russell", "russell", "russell", "russell", "russell", "russell"],
+#                            "UGA_Collection": ["rbrl-496", "rbrl-495", "rbrl-497", "rbrl-494", "rbrl-497", "rbrl-496"],
+#                            "AIT_Collection": [12265, 12265, 12265, 12265, 12265, 12265],
+#                            "Job_ID": [1343968, 1331748, 1331754, 1331741, 1362694, 1343961],
+#                            "Size_GB": [0, 0.38, 0.14, 0.07, 0, 1.46],
+#                            "WARCs": [1, 1, 1, 2, 1, 3],
+#                            "WARC_Filenames": ["ARCHIVEIT-12265-TEST-JOB1343968-0-SEED2467336-20210107234951732-00000-ntej8lcr.warc.gz",
+#                                               "ARCHIVEIT-12265-TEST-JOB1331748-0-SEED2454513-20201215211605582-00000-hr7k2if1.warc.gz",
+#                                               "ARCHIVEIT-12265-TEST-JOB1331754-0-SEED2454516-20201215212108745-00000-wtezbqjr.warc.gz",
+#                                               "ARCHIVEIT-12265-TEST-JOB1331741-0-SEED2444048-20201215210645991-00000-cwumey2o.warc.gz,ARCHIVEIT-12265-TEST-JOB1331741-0-SEED2444048-20201215212055722-00000-2ec78ok3.warc.gz",
+#                                               "ARCHIVEIT-12265-TEST-JOB1362694-0-SEED2454520-20210210182243522-00000-ucgqbp1w.warc.gz",
+#                                               "ARCHIVEIT-12265-TEST-JOB1343961-0-SEED2467334-20210107234944827-00000-pacx1ueb.warc.gz,ARCHIVEIT-12265-TEST-JOB1343961-0-SEED2467334-20210107233308683-00000-4fqdlznu.warc.gz,ARCHIVEIT-12265-TEST-JOB1343961-0-SEED2467334-20210107234913594-00001-4fqdlznu.warc.gz"],
+#                            "Seed_Metadata_Errors": ["Successfully calculated seed metadata", "Successfully calculated seed metadata",
+#                                                     "Successfully calculated seed metadata", "Successfully calculated seed metadata",
+#                                                     "Successfully calculated seed metadata", "Successfully calculated seed metadata"],
+#                            "Metadata_Report_Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+#                            "Metadata_Report_Info": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+#                            "WARC_API_Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+#                            "WARC_Fixity_Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+#                            "WARC_Unzip_Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]})
+# compare_df("Russell", rbrl_df, rbrl_ex_df)
 
 # # Test: BMA seed 2028986 has 2 WARCs.
 # # Has minimum metadata in Archive-It but is not a department that uses the script so can't calculate values.
@@ -104,3 +132,33 @@ compare_df("Hargrett", harg_df, harg_ex_df)
 #                           "WARC_Fixity_Errors": ["BLANK"],
 #                           "WARC_Unzip_Errors": ["BLANK"]})
 # compare_df("BMA", bma_df, bma_ex_df)
+
+# Test:
+mix_df = web.seed_data("2019-06-26", "2019-07-04")
+mix_ex_df = pd.DataFrame({"Seed_ID": ["2024640", "2024246", "2024250", "2024247", "2024249", "2024248"],
+                          "AIP_ID": ["rbrl-057-web-201907-0001", "harg-0000-web-201907-0001", "BLANK", "harg-0000-web-201907-0002", "BLANK", "BLANK"],
+                          "Title": ["Democratic Party of Georgia - Help Move Georgia Forward", "UGA Black Theatrical Ensemble Twittter", "BLANK", "Infusion Magazine website", "BLANK", "BLANK"],
+                          "Department": ["russell", "hargrett", "BLANK", "hargrett", "BLANK", "BLANK"],
+                          "UGA_Collection": ["rbrl-057", "0000", "BLANK", "0000", "BLANK", "BLANK"],
+                          "AIT_Collection": [12265, 12181, 12181, 12181, 12181, 12181],
+                          "Job_ID": [940298, 938127, 938127, 938127, 938127, 938127],
+                          "Size_GB": [0.67, 1.94, 0.85, 0.91, 0.24, 1.17],
+                          "WARCs": [1, 2, 1, 1, 1, 2],
+                          "WARC_Filenames": ["ARCHIVEIT-12265-TEST-JOB940298-SEED2024640-20190701154831318-00000-h3.warc.gz",
+                                             "ARCHIVEIT-12181-CRAWL_SELECTED_SEEDS-JOB938127-SEED2024246-20190626135802459-00001-h3.warc.gz,ARCHIVEIT-12181-CRAWL_SELECTED_SEEDS-JOB938127-SEED2024246-20190625222324356-00000-h3.warc.gz",
+                                             "ARCHIVEIT-12181-CRAWL_SELECTED_SEEDS-JOB938127-SEED2024250-20190625222414653-00000-h3.warc.gz",
+                                             "ARCHIVEIT-12181-CRAWL_SELECTED_SEEDS-JOB938127-SEED2024247-20190625222324141-00000-h3.warc.gz",
+                                             "ARCHIVEIT-12181-CRAWL_SELECTED_SEEDS-JOB938127-SEED2024249-20190625222349710-00000-h3.warc.gz",
+                                             "ARCHIVEIT-12181-CRAWL_SELECTED_SEEDS-JOB938127-SEED2024248-20190626131257414-00001-h3.warc.gz,ARCHIVEIT-12181-CRAWL_SELECTED_SEEDS-JOB938127-SEED2024248-20190625222324244-00000-h3.warc.gz"],
+                          "Seed_Metadata_Errors": ["Successfully calculated seed metadata",
+                                                   "Successfully calculated seed metadata",
+                                                   "Couldn't get all required metadata values from the seed report. Will not download files or make AIP.",
+                                                   "Successfully calculated seed metadata",
+                                                   "Couldn't get all required metadata values from the seed report. Will not download files or make AIP.",
+                                                   "Couldn't get all required metadata values from the seed report. Will not download files or make AIP."],
+                          "Metadata_Report_Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                          "Metadata_Report_Info": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                          "WARC_API_Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                          "WARC_Fixity_Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                          "WARC_Unzip_Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]})
+compare_df("Mix", mix_df, mix_ex_df)
