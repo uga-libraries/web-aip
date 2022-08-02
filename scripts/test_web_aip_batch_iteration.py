@@ -403,16 +403,39 @@ data = {"Seed_ID": seeds, "AIP_ID": aips, "Title": titles, "Department": depts, 
         "Bag Valid": bag_valid, "Package Errors": package, "Manifest Errors": manifest, "Processing Complete": complete}
 expected_seeds_df = pd.DataFrame(data)
 
-# Fills NaN with text and removes timestamps from validation columnsto allow the comparison.
+# Fills NaN with text and removes timestamps from validation columns to allow the comparison.
 seed_df.fillna("BLANK", inplace=True)
-seed_df["WARC_Fixity_Errors"] = seed_df["WARC_Fixity_Errors"].str.replace(" \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{6}",
-                                                                          "")
-seed_df["Preservation.xml Valid"] = seed_df["Preservation.xml Valid"].str.replace(
-    " \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{6}", "")
+seed_df["WARC_Fixity_Errors"] = seed_df["WARC_Fixity_Errors"].str.replace(" \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{6}", "")
+seed_df["Preservation.xml Valid"] = seed_df["Preservation.xml Valid"].str.replace(" \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{6}", "")
 seed_df["Bag Valid"] = seed_df["Bag Valid"].str.replace(" \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{6}", "")
 
 # Compares the expected seeds.csv to the seeds.csv produced by the script.
 compare_seed_df = seed_df.merge(expected_seeds_df, indicator=True, how="outer")
+
+# Makes dataframe with expected values for completeness_check.csv.
+expected_check_df = pd.DataFrame({"AIP": ["harg-0000-web-202006-0001", "harg-0000-web-202006-0002", "harg-0000-web-202006-0003", "harg-0000-web-202006-0004", "harg-0000-web-202006-0005", "harg-0000-web-202006-0006", "harg-0000-web-202006-0007", "harg-0000-web-202006-0008", "harg-0000-web-202006-0009", "rbrl-246-web-202006-0001", "harg-0000-web-202006-0010", "harg-0000-web-202006-0011", "harg-0000-web-202006-0012", "rbrl-459-web-202006-0001", "rbrl-343-web-202006-0001", "rbrl-447-web-202006-0001"],
+                                  "URL": ["https://www.facebook.com/ugasga/", "https://twitter.com/uganaacp/", "https://twitter.com/UGA_Alphas/", "https://commencement.uga.edu/", "https://www.uga.edu/coronavirus/", "https://twitter.com/universityofga/", "https://news.uga.edu/", "https://ugahealthydawg.com/", "https://www.uga.edu/", "https://www.youtube.com/channel/UC-LF69SBOSgT1S1-yy-VgaA/videos?view=0&sort=dd&shelf_id=0", "https://www.facebook.com/FootballUGA/", "https://oir.uga.edu/", "https://twitter.com/UGAAthletics/", "https://cleanenergy.org/", "https://www.silcga.org/", "http://k7moa.com/site_map.htm"],
+                                  "AIP Folder Made": [True, True, True, True, True, True, True, True, True, True, True, True, True, False, True, True],
+                                  "coll.csv": [True, True, True, True, True, True, True, True, True, True, True, True, True, "BLANK", True, True],
+                                  "collscope.csv": [True, True, True, True, True, True, True, True, True, True, False, True, False, "BLANK", True, True],
+                                  "seed.csv": [True, True, True, True, True, True, True, True, True, True, True, True, True, "BLANK", True, True],
+                                  "seedscope.csv": [True, True, True, False, False, True, True, False, False, True, True, False, True, "BLANK", True, False],
+                                  "crawldef.csv count": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, "BLANK", 1, 1],
+                                  "crawljob.csv count": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, "BLANK", 1, 1],
+                                  "preservation.xml": [True, True, True, True, True, True, True, True, True, True, True, True, True, "BLANK", True, True],
+                                  "WARC Count Correct": [True, True, True, True, True, True, True, True, True, True, True, True, True, "BLANK", True, True],
+                                  "Objects is all WARCs": [True, True, True, True, True, True, True, True, True, True, True, True, True, "BLANK", True, True],
+                                  "fits.xml Count Correct": [True, True, True, True, True, True, True, True, True, True, True, True, True, "BLANK", True, True],
+                                  "No Extra Metadata": [True, True, True, True, True, True, True, True, True, True, True, True, True, "BLANK", True, True]
+                                  })
+
+# Reads completeness_check.csv, made by the script, into a dataframe.
+# Fills blanks with text to allow the comparison.
+check_df = pd.read_csv("aips_2020-06-09/completeness_check.csv")
+check_df.fillna("BLANK", inplace=True)
+
+# Compares the expected completeness check values to the completeness_check.csv produced by the script.
+compare_check_df = check_df.merge(expected_check_df, indicator=True, how="outer")
 
 # Checks directory structure.
 # Creates a list with the expected related paths.
@@ -866,6 +889,7 @@ compare_dir_df = actual_dir.merge(expected_dir, indicator=True, how="outer")
 # Saves the result of all three comparisons to a spreadsheet.
 with pd.ExcelWriter(os.path.join(c.script_output, "error_test_results.xlsx")) as results:
     compare_seed_df.to_excel(results, sheet_name="Seeds_CSV", index=False)
+    compare_check_df.to_excel(results, sheet_name="completeness_check")
     compare_dir_df.to_excel(results, sheet_name="Directory", index=False)
 
 print('\nScript is complete.')
