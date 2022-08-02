@@ -9,6 +9,7 @@ Usage: python /path/test_web_aip_batch_iteration
 import datetime
 import os
 import pandas as pd
+import re
 import sys
 
 # Import functions and constant variables from other UGA scripts.
@@ -849,9 +850,12 @@ directory_expected = [r"aips_2020-06-09\completeness_check.csv", r"aips_2020-06-
                       r"aips_2020-06-09\rbrl-459-web-202006-0001\objects\ARCHIVEIT-12263-TEST-JOB1010662-SEED2089428-20191022105907919-00007-h3.warc"]
 
 # Creates a list with relative paths starting at the AIPs directory so paths are predictable.
+# Removes the size from the file names in aips-to-ingest since they vary slightly each time they are made.
 directory_list = []
-for root, dirs, files in os.walk(f"aips_{date_end}"):
+for root, dirs, files in os.walk("aips_2020-06-09"):
     for file in files:
+        if root == r"aips_2020-06-09\aips-to-ingest" and file.endswith(".tar.bz2"):
+            file = re.sub(r"_bag.\d+.tar", "_bag.tar", file)
         directory_list.append(os.path.join(root, file))
 
 # Makes dataframes of the expected and actual directory lists and compares them.
