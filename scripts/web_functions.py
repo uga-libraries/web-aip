@@ -260,13 +260,18 @@ def download_metadata(seed, seed_df):
     # Row index for the seed being processed in the dataframe, to use for adding logging information.
     row_index = seed_df.index[seed_df["Seed_ID"] == seed.Seed_ID].tolist()[0]
 
-    # Downloads five of the six metadata reports from Archive-It needed to understand the context of the WARC.
+    # Downloads four of the six metadata reports from Archive-It needed to understand the context of the WARC.
     # These are reports where there is only one report per seed or collection.
     get_report("id", seed.Seed_ID, "seed", f"{seed.AIP_ID}_seed.csv")
     get_report("seed", seed.Seed_ID, "scope_rule", f"{seed.AIP_ID}_seedscope.csv")
     get_report("collection", seed.AIT_Collection, "scope_rule", f"{seed.AIP_ID}_collscope.csv")
     get_report("id", seed.AIT_Collection, "collection", f"{seed.AIP_ID}_coll.csv")
-    get_report("id", seed.Job_ID, "crawl_job", f"{seed.AIP_ID}_{seed.Job_ID}_crawljob.csv")
+
+    # Downloads each of the crawl job reports.
+    # If a seed has more than one, Job_ID has a comma-separated string of the IDs.
+    job_list = seed.Job_ID.split(",")
+    for job in job_list:
+        get_report("id", job, "crawl_job", f"{seed.AIP_ID}_{job}_crawljob.csv")
 
     # Gets the crawl definition id from the crawl job report and downloads it.
     try:
