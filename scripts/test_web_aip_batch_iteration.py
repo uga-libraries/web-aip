@@ -403,11 +403,14 @@ data = {"Seed_ID": seeds, "AIP_ID": aips, "Title": titles, "Department": depts, 
         "Bag Valid": bag_valid, "Package Errors": package, "Manifest Errors": manifest, "Processing Complete": complete}
 expected_seeds_df = pd.DataFrame(data)
 
-# Fills NaN with text and removes timestamps from validation columns to allow the comparison.
+# To allow a comparison with expected results: fills NaN with text, removes timestamps from validation columns,
+# and removes login column error that is not consistently present.
 seed_df.fillna("BLANK", inplace=True)
 seed_df["WARC_Fixity_Errors"] = seed_df["WARC_Fixity_Errors"].str.replace(" \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{6}", "")
 seed_df["Preservation.xml Valid"] = seed_df["Preservation.xml Valid"].str.replace(" \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{6}", "")
 seed_df["Bag Valid"] = seed_df["Bag Valid"].str.replace(" \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.\d{6}", "")
+seed_df["Metadata_Report_Info"] = seed_df["Metadata_Report_Info"].str.replace("Seed report does not have login columns to redact; ", "")
+seed_df["Metadata_Report_Info"] = seed_df["Metadata_Report_Info"].str.replace("Seed report does not have login columns to redact", "No additional information")
 
 # Compares the expected seeds.csv to the seeds.csv produced by the script.
 compare_seed_df = seed_df.merge(expected_seeds_df, indicator=True, how="outer")
