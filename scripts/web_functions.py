@@ -95,15 +95,17 @@ def seed_data(date_start, date_end):
         regex_seed = re.match(r"^.*-SEED(\d+)-", warc_info["filename"])
         seed_identifier = regex_seed.group(1)
 
-        # If the seed is already in the dataframe, adds to the size, WARC count, and WARC filenames.
+        # If the seed is already in the dataframe, adds to the size, WARC count, WARC filenames, and Job ID (if new).
         # If the seed is new, gets the data needed about the seed and adds it to the dataframe.
         if seed_identifier in seed_df.Seed_ID.values:
             seed_df.loc[seed_df.Seed_ID == seed_identifier, "Size_GB"] += round(warc_info["size"]/1000000000, 2)
             seed_df.loc[seed_df.Seed_ID == seed_identifier, "WARCs"] += 1
             seed_df.loc[seed_df.Seed_ID == seed_identifier, "WARC_Filenames"] += f',{warc_info["filename"]}'
+            if seed_df.loc[seed_df.Seed_ID == seed_identifier, "Job_ID"].str.contains(str(warc_info["crawl"])).bool() is False:
+                seed_df.loc[seed_df.Seed_ID == seed_identifier, "Job_ID"] += f',{warc_info["crawl"]}'
         else:
             seed_info = {"Seed_ID": seed_identifier, "AIT_Collection": warc_info["collection"],
-                         "Job_ID": warc_info["crawl"], "Size_GB": round(warc_info["size"]/1000000000, 2),
+                         "Job_ID": str(warc_info["crawl"]), "Size_GB": round(warc_info["size"]/1000000000, 2),
                          "WARCs": 1, "WARC_Filenames": warc_info["filename"]}
             seed_df = seed_df.append(seed_info, ignore_index=True)
 
