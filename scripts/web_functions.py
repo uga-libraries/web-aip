@@ -267,19 +267,18 @@ def download_metadata(seed, seed_df):
     get_report("collection", seed.AIT_Collection, "scope_rule", f"{seed.AIP_ID}_collscope.csv")
     get_report("id", seed.AIT_Collection, "collection", f"{seed.AIP_ID}_coll.csv")
 
-    # Downloads each of the crawl job reports.
+    # Downloads each of the crawl job reports and its corresponding crawl definition report (if new).
     # If a seed has more than one, Job_ID has a comma-separated string of the IDs.
     job_list = seed.Job_ID.split(",")
     for job in job_list:
         get_report("id", job, "crawl_job", f"{seed.AIP_ID}_{job}_crawljob.csv")
-
-    # Gets the crawl definition id from the crawl job report and downloads it.
-    try:
-        report_df = pd.read_csv(f"{seed.AIP_ID}/metadata/{seed.AIP_ID}_{seed.Job_ID}_crawljob.csv", dtype="object")
-        crawl_def_id = report_df.loc[0, "crawl_definition"]
-        get_report("id", crawl_def_id, "crawl_definition", f"{seed.Seed_ID}_{crawl_def_id}_crawldef.csv")
-    except FileNotFoundError:
-        log("Crawl job was not downloaded so can't get crawl definition id", seed_df, row_index, "Metadata_Report_Errors")
+        try:
+            report_df = pd.read_csv(f"{seed.AIP_ID}/metadata/{seed.AIP_ID}_{job}_crawljob.csv", dtype="object")
+            crawl_def_id = report_df.loc[0, "crawl_definition"]
+            if not os.path.exists(f"{seed.AIP_ID}/metadata/{seed.Seed_ID}_{crawl_def_id}_crawldef.csv"):
+                get_report("id", crawl_def_id, "crawl_definition", f"{seed.Seed_ID}_{crawl_def_id}_crawldef.csv")
+        except FileNotFoundError:
+            log("Crawl job was not downloaded so can't get crawl definition id", seed_df, row_index, "Metadata_Report_Errors")
 
     # If there were no download errors (the dataframe still has no value in that cell), updates the log to show success.
     if pd.isnull(seed_df.at[row_index, "Metadata_Report_Errors"]):
