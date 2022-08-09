@@ -5,7 +5,7 @@ encompassed by the tests).
 
 This is a separate test from the rest of the workflow for making AIPs to make it easier to create the variations.
 
-Usage: python path/test_seed_data.py
+Usage: python path/test_seed_data_function.py
 """
 import os
 import pandas as pd

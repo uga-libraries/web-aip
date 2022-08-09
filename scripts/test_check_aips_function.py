@@ -2,7 +2,7 @@
 This is a separate test from the rest of the workflow for making AIPs to make it easier to create the variations
 and develop this function, which is not dependent on the data from the previous part of the script.
 
-Usage: python path/test_check_aips.py
+Usage: python path/test_check_aips_function.py
 """
 
 import os
