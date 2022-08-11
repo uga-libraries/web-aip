@@ -8,6 +8,7 @@ This is a separate test from the rest of the workflow for making AIPs to make it
 Usage: python path/test_seed_data_function.py
 """
 import os
+import numpy as np
 import pandas as pd
 import configuration as c
 import web_functions as web
@@ -18,7 +19,7 @@ def compare_df(test, df_actual, df_expected):
 
     # Replaces empty fields with string "BLANK" since this causes type errors when comparing to the
     # expected dataframe which is made by the script.
-    df_actual.fillna("BLANK", inplace=True)
+    # df_actual.fillna("BLANK", inplace=True)
 
     # Makes a new dataframe with a merge of the two and removes the ones that match exactly (_merge is both).
     df = df_actual.merge(df_expected, indicator=True, how="outer")
@@ -54,11 +55,11 @@ harg_ex_df = pd.DataFrame({"Seed_ID": ["2187482", "2030942", "2084785", "2270486
                                               "ARCHIVEIT-12912-TEST-JOB1176433-SEED2270486-20200529202848582-00000-h3.warc.gz"],
                            "Seed_Metadata_Errors": ["Successfully calculated seed metadata", "Successfully calculated seed metadata",
                                                     "Successfully calculated seed metadata", "Successfully calculated seed metadata"],
-                           "Metadata_Report_Errors": ["BLANK", "BLANK", "BLANK", "BLANK"],
-                           "Metadata_Report_Info": ["BLANK", "BLANK", "BLANK", "BLANK"],
-                           "WARC_API_Errors": ["BLANK", "BLANK", "BLANK", "BLANK"],
-                           "WARC_Fixity_Errors": ["BLANK", "BLANK", "BLANK", "BLANK"],
-                           "WARC_Unzip_Errors": ["BLANK", "BLANK", "BLANK", "BLANK"]})
+                           "Metadata_Report_Errors": [np.NaN, np.NaN, np.NaN, np.NaN],
+                           "Metadata_Report_Info": [np.NaN, np.NaN, np.NaN, np.NaN],
+                           "WARC_API_Errors": [np.NaN, np.NaN, np.NaN, np.NaN],
+                           "WARC_Fixity_Errors": [np.NaN, np.NaN, np.NaN, np.NaN],
+                           "WARC_Unzip_Errors": [np.NaN, np.NaN, np.NaN, np.NaN]})
 compare_df("Hargrett", harg_df, harg_ex_df)
 
 # Test: 2 MAGIL seeds, including 1 and multiple WARCS.
@@ -75,11 +76,11 @@ magil_ex_df = pd.DataFrame({"Seed_ID": ["2529647", "2472043"],
                            "WARC_Filenames": ["ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220331151300136-00000-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220331223248449-00001-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401021708141-00002-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401024320779-00003-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401042238966-00004-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401055943204-00005-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401141604806-00006-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402030302049-00007-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402081423469-00008-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402113301104-00009-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402141557823-00010-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402201602620-00011-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402230559530-00012-urcpzn95.warc.gz",
                                               "ARCHIVEIT-15678-TEST-JOB1583270-0-SEED2472043-20220331170557241-00000-xzgq9wm8.warc.gz"],
                            "Seed_Metadata_Errors": ["Successfully calculated seed metadata", "Successfully calculated seed metadata"],
-                           "Metadata_Report_Errors": ["BLANK", "BLANK"],
-                           "Metadata_Report_Info": ["BLANK", "BLANK"],
-                           "WARC_API_Errors": ["BLANK", "BLANK"],
-                           "WARC_Fixity_Errors": ["BLANK", "BLANK"],
-                           "WARC_Unzip_Errors": ["BLANK", "BLANK"]})
+                           "Metadata_Report_Errors": [np.NaN, np.NaN],
+                           "Metadata_Report_Info": [np.NaN, np.NaN],
+                           "WARC_API_Errors": [np.NaN, np.NaN],
+                           "WARC_Fixity_Errors": [np.NaN, np.NaN],
+                           "WARC_Unzip_Errors": [np.NaN, np.NaN]})
 compare_df("MAGIL", magil_df, magil_ex_df)
 
 # Test: 6 Russell seeds, including 1 and multiple WARCS.
@@ -103,21 +104,21 @@ rbrl_ex_df = pd.DataFrame({"Seed_ID": ["2467336", "2454513", "2454516", "2444048
                            "Seed_Metadata_Errors": ["Successfully calculated seed metadata", "Successfully calculated seed metadata",
                                                     "Successfully calculated seed metadata", "Successfully calculated seed metadata",
                                                     "Successfully calculated seed metadata", "Successfully calculated seed metadata"],
-                           "Metadata_Report_Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
-                           "Metadata_Report_Info": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
-                           "WARC_API_Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
-                           "WARC_Fixity_Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
-                           "WARC_Unzip_Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]})
+                           "Metadata_Report_Errors": [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                           "Metadata_Report_Info": [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                           "WARC_API_Errors": [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                           "WARC_Fixity_Errors": [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                           "WARC_Unzip_Errors": [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]})
 compare_df("Russell", rbrl_df, rbrl_ex_df)
-
+#
 # Test: BMA seed 2028986 has 2 WARCs.
 # Has minimum metadata in Archive-It but is not a department that uses the script so can't calculate values.
 bma_df = web.seed_data("2020-02-18", "2020-02-19")
 bma_ex_df = pd.DataFrame({"Seed_ID": ["2028986"],
-                          "AIP_ID": ["BLANK"],
+                          "AIP_ID": [np.NaN],
                           "Title": ["The Now Explosion Website"],
-                          "Department": ["BLANK"],
-                          "UGA_Collection": ["BLANK"],
+                          "Department": [np.NaN],
+                          "UGA_Collection": [np.NaN],
                           "AIT_Collection": [12470],
                           "Job_ID": [1085452],
                           "Size_GB": [1.3],
@@ -126,20 +127,20 @@ bma_ex_df = pd.DataFrame({"Seed_ID": ["2028986"],
                                              "ARCHIVEIT-12470-TEST-JOB1085452-SEED2028986-20200129213514425-00000-h3.warc.gz"],
                           "Seed_Metadata_Errors": ["Couldn't get all required metadata values from the seed report. "
                                                    "Will not download files or make AIP."],
-                          "Metadata_Report_Errors": ["BLANK"],
-                          "Metadata_Report_Info": ["BLANK"],
-                          "WARC_API_Errors": ["BLANK"],
-                          "WARC_Fixity_Errors": ["BLANK"],
-                          "WARC_Unzip_Errors": ["BLANK"]})
+                          "Metadata_Report_Errors": [np.NaN],
+                          "Metadata_Report_Info": [np.NaN],
+                          "WARC_API_Errors": [np.NaN],
+                          "WARC_Fixity_Errors": [np.NaN],
+                          "WARC_Unzip_Errors": [np.NaN]})
 compare_df("BMA", bma_df, bma_ex_df)
 
 # Test: Combination of Hargrett, Russell, and deleted seeds with no metadata.
 mix_df = web.seed_data("2019-06-26", "2019-07-04")
 mix_ex_df = pd.DataFrame({"Seed_ID": ["2024640", "2024246", "2024250", "2024247", "2024249", "2024248"],
-                          "AIP_ID": ["rbrl-057-web-201907-0001", "harg-0000-web-201907-0001", "BLANK", "harg-0000-web-201907-0002", "BLANK", "BLANK"],
-                          "Title": ["Democratic Party of Georgia - Help Move Georgia Forward", "UGA Black Theatrical Ensemble Twittter", "BLANK", "Infusion Magazine website", "BLANK", "BLANK"],
-                          "Department": ["russell", "hargrett", "BLANK", "hargrett", "BLANK", "BLANK"],
-                          "UGA_Collection": ["rbrl-057", "0000", "BLANK", "0000", "BLANK", "BLANK"],
+                          "AIP_ID": ["rbrl-057-web-201907-0001", "harg-0000-web-201907-0001", np.NaN, "harg-0000-web-201907-0002", np.NaN, np.NaN],
+                          "Title": ["Democratic Party of Georgia - Help Move Georgia Forward", "UGA Black Theatrical Ensemble Twittter", np.NaN, "Infusion Magazine website", np.NaN, np.NaN],
+                          "Department": ["russell", "hargrett", np.NaN, "hargrett", np.NaN, np.NaN],
+                          "UGA_Collection": ["rbrl-057", "0000", np.NaN, "0000", np.NaN, np.NaN],
                           "AIT_Collection": [12265, 12181, 12181, 12181, 12181, 12181],
                           "Job_ID": [940298, 938127, 938127, 938127, 938127, 938127],
                           "Size_GB": [0.67, 1.94, 0.85, 0.91, 0.24, 1.17],
@@ -156,9 +157,9 @@ mix_ex_df = pd.DataFrame({"Seed_ID": ["2024640", "2024246", "2024250", "2024247"
                                                    "Successfully calculated seed metadata",
                                                    "Couldn't get all required metadata values from the seed report. Will not download files or make AIP.",
                                                    "Couldn't get all required metadata values from the seed report. Will not download files or make AIP."],
-                          "Metadata_Report_Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
-                          "Metadata_Report_Info": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
-                          "WARC_API_Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
-                          "WARC_Fixity_Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
-                          "WARC_Unzip_Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]})
+                          "Metadata_Report_Errors": [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                          "Metadata_Report_Info": [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                          "WARC_API_Errors": [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                          "WARC_Fixity_Errors": [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                          "WARC_Unzip_Errors": [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]})
 compare_df("Mix", mix_df, mix_ex_df)
