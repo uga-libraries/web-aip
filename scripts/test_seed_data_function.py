@@ -3,10 +3,12 @@ error handling and data calculations. It calls the seed_data function multiple t
 conditions while still getting a simpler amount of data to analyze (rather than doing the entire date range
 encompassed by the tests).
 
-This is a separate test from the rest of the workflow for making AIPs to make it easier to create the variations.
-
-Usage: python path/test_seed_data_function.py
+This is a separate test from the rest of the workflow for making AIPs to make it easier to create the variations and
+because it does not rely on any other part of the script.
 """
+
+# Usage: python path/test_seed_data_function.py
+
 import os
 import numpy as np
 import pandas as pd
@@ -134,11 +136,11 @@ def make_expected_df(test):
         fixitys = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
         unzips = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
 
-    df = pd.DataFrame({"Seed_ID": seeds, "AIP_ID": aips, "Title": titles, "Department": depts, "UGA_Collection": uga_colls,
-                       "AIT_Collection": ait_colls, "Job_ID": jobs, "Size_GB": sizes, "WARCs": warcs,
-                       "WARC_Filenames": names, "Seed_Metadata_Errors": seed_errs, "Metadata_Report_Errors": metadata_errs,
-                       "Metadata_Report_Info": infos, "WARC_API_Errors": apis, "WARC_Fixity_Errors": fixitys,
-                       "WARC_Unzip_Errors": unzips})
+    df = pd.DataFrame({"Seed_ID": seeds, "AIP_ID": aips, "Title": titles, "Department": depts,
+                       "UGA_Collection": uga_colls, "AIT_Collection": ait_colls, "Job_ID": jobs,
+                       "Size_GB": sizes, "WARCs": warcs, "WARC_Filenames": names, "Seed_Metadata_Errors": seed_errs,
+                       "Metadata_Report_Errors": metadata_errs, "Metadata_Report_Info": infos,
+                       "WARC_API_Errors": apis, "WARC_Fixity_Errors": fixitys, "WARC_Unzip_Errors": unzips})
     return df
 
 
@@ -159,11 +161,11 @@ def compare_df(test, df_actual, df_expected):
         df.to_csv(f"{test}_differences.csv", index=False)
 
 
-# Make the script output folder the current directory for easy saving of test results.
+# Changes the current directory to the script output folder for short paths for saving test results.
 os.chdir(c.script_output)
 
 # Test: BMA seed 2028986 has 2 WARCs.
-# Has minimum metadata in Archive-It but is not a department that uses the script so can't calculate all values.
+# Has minimum metadata in Archive-It but is not a department that uses the script so can't calculate additional values.
 bma_df = web.seed_data("2020-02-18", "2020-02-19")
 bma_ex_df = make_expected_df("bma")
 compare_df("BMA", bma_df, bma_ex_df)
@@ -183,7 +185,7 @@ mix_df = web.seed_data("2019-06-26", "2019-07-04")
 mix_ex_df = make_expected_df("mix")
 compare_df("Mix", mix_df, mix_ex_df)
 
-# Test: 6 Russell seeds, including 1 and multiple WARCS.
+# Test: 6 Russell seeds, including 1 WARC and multiple WARCS.
 # All have related collection; some collections have multiple seeds.
 rbrl_df = web.seed_data("2021-02-11", "2021-02-12")
 rbrl_ex_df = make_expected_df("russell")
