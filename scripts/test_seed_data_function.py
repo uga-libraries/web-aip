@@ -162,6 +162,12 @@ def compare_df(test, df_actual, df_expected):
 # Make the script output folder the current directory for easy saving of test results.
 os.chdir(c.script_output)
 
+# Test: BMA seed 2028986 has 2 WARCs.
+# Has minimum metadata in Archive-It but is not a department that uses the script so can't calculate all values.
+bma_df = web.seed_data("2020-02-18", "2020-02-19")
+bma_ex_df = make_expected_df("bma")
+compare_df("BMA", bma_df, bma_ex_df)
+
 # Test: 4 Hargrett seeds, including 1 WARC and multiple WARCS. None have related collections.
 harg_df = web.seed_data("2020-06-08", "2020-06-09")
 harg_ex_df = make_expected_df("hargrett")
@@ -172,19 +178,13 @@ magil_df = web.seed_data("2022-04-11", "2022-04-13")
 magil_ex_df = make_expected_df("magil")
 compare_df("MAGIL", magil_df, magil_ex_df)
 
+# Test: Combination of Hargrett, Russell, and deleted seeds with no metadata.
+mix_df = web.seed_data("2019-06-26", "2019-07-04")
+mix_ex_df = make_expected_df("mix")
+compare_df("Mix", mix_df, mix_ex_df)
+
 # Test: 6 Russell seeds, including 1 and multiple WARCS.
 # All have related collection; some collections have multiple seeds.
 rbrl_df = web.seed_data("2021-02-11", "2021-02-12")
 rbrl_ex_df = make_expected_df("russell")
 compare_df("Russell", rbrl_df, rbrl_ex_df)
-#
-# Test: BMA seed 2028986 has 2 WARCs.
-# Has minimum metadata in Archive-It but is not a department that uses the script so can't calculate all values.
-bma_df = web.seed_data("2020-02-18", "2020-02-19")
-bma_ex_df = make_expected_df("bma")
-compare_df("BMA", bma_df, bma_ex_df)
-
-# Test: Combination of Hargrett, Russell, and deleted seeds with no metadata.
-mix_df = web.seed_data("2019-06-26", "2019-07-04")
-mix_ex_df = make_expected_df("mix")
-compare_df("Mix", mix_df, mix_ex_df)
