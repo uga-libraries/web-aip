@@ -24,6 +24,284 @@ import web_functions as web
 
 
 # ----------------------------------------------------------------------------------------------------------------
+# Functions to make dataframes of expected values for all script outputs.
+# ----------------------------------------------------------------------------------------------------------------
+def make_expected_seed_df():
+    """Makes and returns a dataframe with the expected values for seed_df. Starts by making a list of the values
+    for each column in the dataframe."""
+
+    seeds = [2529634, 2529660, 2529629, 2529642, 2529627,
+             2529652, 2529631, 2529668, 2529681, 2529676,
+             2454507, 2454506, 2739136, 2184360]
+    aips = ["magil-ggp-2529634-2022-03", "magil-ggp-2529660-2022-03", "magil-ggp-2529629-2022-03",
+            "magil-ggp-2529642-2022-03", "magil-ggp-2529627-2022-03", "magil-ggp-2529652-2022-03",
+            "magil-ggp-2529631-2022-03", "magil-ggp-2529668-2022-03", "magil-ggp-2529681-2022-03",
+            "magil-ggp-2529676-2022-03", "rbrl-246-web-202203-0001", "rbrl-246-web-202203-0002",
+            "rbrl-499-web-202203-0001", "harg-0000-web-202203-0011"]
+    titles = ["Georgia Office of Attorney General Consumer Protection Division",
+              "Georgia Governor's Office of Disability Services Ombudsman",
+              "Georgia Board of Pharmacy",
+              "Georgia Department of Community Supervision",
+              "Georgia Aviation Authority",
+              "Georgia Drugs and Narcotics Agency",
+              "Georgia Commission on Equal Opportunity",
+              "Georgia Office of the Child Advocate",
+              "Georgia State Properties Commission",
+              "Georgia State Board of Accountancy",
+              "SenatorIsakson - YouTube",
+              "SenatorIsakson - YouTube [channel page]",
+              "Savannah River Site",
+              "UGA Today"]
+    depts = ["magil", "magil", "magil", "magil", "magil",
+             "magil", "magil", "magil", "magil", "magil",
+             "russell", "russell", "russell", "hargrett"]
+    uga_colls = ["0000", "0000", "0000", "0000", "0000",
+                 "0000", "0000", "0000", "0000", "0000",
+                 "rbrl-246", "rbrl-246", "rbrl-499", "0000"]
+    ait_colls = [15678, 15678, 15678, 15678, 15678,
+                 15678, 15678, 15678, 15678, 15678,
+                 12265, 12265, 12263, 12912]
+    jobs = [1576505, 1573937, 1573937, 1573937, 1573937,
+            1576493, 1576492, 1577241, 1577187, 1577186,
+            1542317, 1542317, 1539793, 1497166]
+    sizes = [1.2, 0.1, 0.93, 0.94, 0.06, 0.19, 0.23, 0.39, 0.33, 0.19, 0.0, 8.04, 1.35999999999999, 34.7399999999999]
+    warcs = [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9, 2, 35]
+    names = ["ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220318151112447-00000-h3.warc.gz,ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220320234830550-00001-h3.warc.gz",
+             "ARCHIVEIT-15678-TEST-JOB1573937-SEED2529660-20220314173634919-00000-h3.warc.gz",
+             "ARCHIVEIT-15678-TEST-JOB1573937-SEED2529629-20220314173634874-00000-h3.warc.gz",
+             "ARCHIVEIT-15678-TEST-JOB1573937-SEED2529642-20220314173635152-00000-h3.warc.gz",
+             "ARCHIVEIT-15678-TEST-JOB1573937-SEED2529627-20220314173635069-00000-h3.warc.gz",
+             "ARCHIVEIT-15678-TEST-JOB1576493-SEED2529652-20220318145745554-00000-h3.warc.gz",
+             "ARCHIVEIT-15678-TEST-JOB1576492-SEED2529631-20220318145704126-00000-h3.warc.gz",
+             "ARCHIVEIT-15678-TEST-JOB1577241-SEED2529668-20220320182657667-00000-h3.warc.gz",
+             "ARCHIVEIT-15678-TEST-JOB1577187-SEED2529681-20220320144922213-00000-h3.warc.gz",
+             "ARCHIVEIT-15678-TEST-JOB1577186-SEED2529676-20220320144814871-00000-h3.warc.gz",
+             "ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454507-20220114214056178-00000-hlvkp53o.warc.gz",
+             "ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220114214053021-00000-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220115132006340-00001-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220115233148240-00002-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116063911435-00003-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116131550492-00004-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117010033395-00005-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117200343134-00008-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117064534470-00006-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117130422336-00007-8dgxemts.warc.gz",
+             "ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220110194710516-00000-h3.warc.gz,ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220111130848517-00001-h3.warc.gz",
+             "ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017105304659-00034-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211018211851376-00035-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103754760-00033-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102717487-00031-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103234346-00032-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101611745-00029-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102203466-00030-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101049993-00028-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017100311992-00027-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094753960-00025-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017095516699-00026-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094020636-00024-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017093516000-00023-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017092934974-00022-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091918474-00021-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091205263-00020-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090702655-00019-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090255676-00018-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085824384-00017-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085024644-00016-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017081603923-00015-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017074632435-00014-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073724465-00013-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073125245-00012-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017071639642-00011-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070834820-00010-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070215160-00009-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017065508860-00008-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017064416641-00007-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063723971-00006-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063009068-00005-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017061815778-00004-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017060858471-00003-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017020639822-00002-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211016171927511-00001-h3.warc.gz"]
+    seed_errs = ["Successfully calculated seed metadata", "Successfully calculated seed metadata",
+                 "Successfully calculated seed metadata", "Successfully calculated seed metadata",
+                 "Successfully calculated seed metadata", "Successfully calculated seed metadata",
+                 "Successfully calculated seed metadata", "Successfully calculated seed metadata",
+                 "Successfully calculated seed metadata", "Successfully calculated seed metadata",
+                 "Successfully calculated seed metadata", "Successfully calculated seed metadata",
+                 "Successfully calculated seed metadata", "Successfully calculated seed metadata"]
+    metadata_errs = ["Successfully downloaded all metadata reports",
+                     "Successfully downloaded all metadata reports",
+                     "Successfully downloaded all metadata reports",
+                     "Successfully downloaded all metadata reports",
+                     "Successfully downloaded all metadata reports",
+                     "magil-ggp-2529652-2022-03_1576493_crawljob.csv API error 999; Crawl job was not downloaded so can't get crawl definition id",
+                     "Successfully downloaded all metadata reports",
+                     "Successfully downloaded all metadata reports",
+                     "Successfully downloaded all metadata reports",
+                     "magil-ggp-2529676-2022-03_seed.csv API error 999; magil-ggp-2529676-2022-03_seedscope.csv API error 999; magil-ggp-2529676-2022-03_collscope.csv API error 999; magil-ggp-2529676-2022-03_coll.csv API error 999; 2529676_31104537579_crawldef.csv API error 999",
+                     "Successfully downloaded all metadata reports",
+                     "Successfully downloaded all metadata reports",
+                     "Successfully downloaded all metadata reports",
+                     "Successfully downloaded all metadata reports"]
+    infos = ["Empty report magil-ggp-2529634-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529634-2022-03_collscope.csv not saved",
+             "Empty report magil-ggp-2529660-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529660-2022-03_collscope.csv not saved",
+             "Empty report magil-ggp-2529629-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529629-2022-03_collscope.csv not saved",
+             "Empty report magil-ggp-2529642-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529642-2022-03_collscope.csv not saved",
+             "Empty report magil-ggp-2529627-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529627-2022-03_collscope.csv not saved",
+             "Empty report magil-ggp-2529652-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529652-2022-03_collscope.csv not saved",
+             "Seed report does not have login columns to redact; Empty report magil-ggp-2529631-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529631-2022-03_collscope.csv not saved",
+             "Empty report magil-ggp-2529668-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529668-2022-03_collscope.csv not saved",
+             "Empty report magil-ggp-2529681-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529681-2022-03_collscope.csv not saved",
+             "No additional information",
+             "No additional information",
+             "No additional information",
+             "Empty report rbrl-499-web-202203-0001_seedscope.csv not saved",
+             "No additional information"]
+    apis = ["API error 999: can't download ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220318151112447-00000-h3.warc.gz; Successfully downloaded ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220320234830550-00001-h3.warc.gz",
+            "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1573937-SEED2529660-20220314173634919-00000-h3.warc.gz",
+            "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1573937-SEED2529629-20220314173634874-00000-h3.warc.gz",
+            "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1573937-SEED2529642-20220314173635152-00000-h3.warc.gz",
+            "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1573937-SEED2529627-20220314173635069-00000-h3.warc.gz",
+            "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1576493-SEED2529652-20220318145745554-00000-h3.warc.gz",
+            "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1576492-SEED2529631-20220318145704126-00000-h3.warc.gz",
+            "API error 999: can't download ARCHIVEIT-15678-TEST-JOB1577241-SEED2529668-20220320182657667-00000-h3.warc.gz",
+            "API error 999: can't get info about ARCHIVEIT-15678-TEST-JOB1577187-SEED2529681-20220320144922213-00000-h3.warc.gz",
+            "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1577186-SEED2529676-20220320144814871-00000-h3.warc.gz",
+            "Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454507-20220114214056178-00000-hlvkp53o.warc.gz",
+            "API error 999: can't get info about ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220114214053021-00000-8dgxemts.warc.gz; API error 999: can't download ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220115132006340-00001-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220115233148240-00002-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116063911435-00003-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116131550492-00004-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117010033395-00005-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117200343134-00008-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117064534470-00006-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117130422336-00007-8dgxemts.warc.gz",
+            "Successfully downloaded ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220110194710516-00000-h3.warc.gz; Successfully downloaded ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220111130848517-00001-h3.warc.gz",
+            "Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017105304659-00034-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211018211851376-00035-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103754760-00033-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102717487-00031-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103234346-00032-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101611745-00029-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102203466-00030-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101049993-00028-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017100311992-00027-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094753960-00025-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017095516699-00026-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094020636-00024-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017093516000-00023-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017092934974-00022-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091918474-00021-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091205263-00020-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090702655-00019-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090255676-00018-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085824384-00017-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085024644-00016-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017081603923-00015-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017074632435-00014-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073724465-00013-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073125245-00012-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017071639642-00011-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070834820-00010-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070215160-00009-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017065508860-00008-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017064416641-00007-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063723971-00006-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063009068-00005-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017061815778-00004-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017060858471-00003-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017020639822-00002-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211016171927511-00001-h3.warc.gz"]
+    fixitys = ["Successfully verified ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220320234830550-00001-h3.warc.gz fixity on",
+               "Fixity for ARCHIVEIT-15678-TEST-JOB1573937-SEED2529660-20220314173634919-00000-h3.warc.gz cannot be extracted from md5deep output: b'@Something#Unexpected'",
+               "Successfully verified ARCHIVEIT-15678-TEST-JOB1573937-SEED2529629-20220314173634874-00000-h3.warc.gz fixity on",
+               "Successfully verified ARCHIVEIT-15678-TEST-JOB1573937-SEED2529642-20220314173635152-00000-h3.warc.gz fixity on",
+               "Fixity for ARCHIVEIT-15678-TEST-JOB1573937-SEED2529627-20220314173635069-00000-h3.warc.gz changed and it was deleted: 5074238e67149f99f5e8b3700196db97 before, abc123abc123abc123abc123 after",
+               "Successfully verified ARCHIVEIT-15678-TEST-JOB1576493-SEED2529652-20220318145745554-00000-h3.warc.gz fixity on",
+               "Successfully verified ARCHIVEIT-15678-TEST-JOB1576492-SEED2529631-20220318145704126-00000-h3.warc.gz fixity on",
+               "BLANK",
+               "BLANK",
+               "Successfully verified ARCHIVEIT-15678-TEST-JOB1577186-SEED2529676-20220320144814871-00000-h3.warc.gz fixity on 2022-07-25 16:13:18.742668",
+               "Successfully verified ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454507-20220114214056178-00000-hlvkp53o.warc.gz fixity on 2022-07-25 16:13:39.473768",
+               "Fixity for ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220115233148240-00002-8dgxemts.warc.gz cannot be extracted from md5deep output: b'@Something#Unexpected'; Successfully verified ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116063911435-00003-8dgxemts.warc.gz fixity on 2022-07-25 16:13:58.072782; Successfully verified ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116131550492-00004-8dgxemts.warc.gz fixity on 2022-07-25 16:14:13.495123; Successfully verified ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117010033395-00005-8dgxemts.warc.gz fixity on 2022-07-25 16:14:28.962814; Fixity for ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117200343134-00008-8dgxemts.warc.gz changed and it was deleted: 0bc2fd86f2e1a8ea6e0f87701f60ef79 before, abc123abc123abc123abc123 after; Successfully verified ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117064534470-00006-8dgxemts.warc.gz fixity on; Successfully verified ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117130422336-00007-8dgxemts.warc.gz fixity on",
+               "Successfully verified ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220110194710516-00000-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220111130848517-00001-h3.warc.gz fixity on",
+               "Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017105304659-00034-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211018211851376-00035-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103754760-00033-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102717487-00031-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103234346-00032-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101611745-00029-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102203466-00030-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101049993-00028-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017100311992-00027-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094753960-00025-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017095516699-00026-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094020636-00024-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017093516000-00023-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017092934974-00022-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091918474-00021-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091205263-00020-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090702655-00019-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090255676-00018-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085824384-00017-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085024644-00016-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017081603923-00015-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017074632435-00014-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073724465-00013-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073125245-00012-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017071639642-00011-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070834820-00010-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070215160-00009-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017065508860-00008-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017064416641-00007-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063723971-00006-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063009068-00005-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017061815778-00004-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017060858471-00003-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017020639822-00002-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211016171927511-00001-h3.warc.gz fixity on"]
+    unzips = ["Successfully unzipped ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220320234830550-00001-h3.warc.gz",
+              "BLANK",
+              "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1573937-SEED2529629-20220314173634874-00000-h3.warc.gz",
+              "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1573937-SEED2529642-20220314173635152-00000-h3.warc.gz",
+              "BLANK",
+              "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1576493-SEED2529652-20220318145745554-00000-h3.warc.gz",
+              "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1576492-SEED2529631-20220318145704126-00000-h3.warc.gz",
+              "BLANK",
+              "BLANK",
+              "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1577186-SEED2529676-20220320144814871-00000-h3.warc.gz",
+              "Error unzipping ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454507-20220114214056178-00000-hlvkp53o.warc.gz: Error message stand-in.",
+              "Error unzipping ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116063911435-00003-8dgxemts.warc.gz: Error message stand-in.; Successfully unzipped ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116131550492-00004-8dgxemts.warc.gz; Successfully unzipped ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117010033395-00005-8dgxemts.warc.gz; Successfully unzipped ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117064534470-00006-8dgxemts.warc.gz; Successfully unzipped ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117130422336-00007-8dgxemts.warc.gz",
+              "Successfully unzipped ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220110194710516-00000-h3.warc.gz; Successfully unzipped ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220111130848517-00001-h3.warc.gz",
+              "Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017105304659-00034-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211018211851376-00035-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103754760-00033-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102717487-00031-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103234346-00032-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101611745-00029-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102203466-00030-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101049993-00028-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017100311992-00027-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094753960-00025-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017095516699-00026-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094020636-00024-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017093516000-00023-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017092934974-00022-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091918474-00021-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091205263-00020-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090702655-00019-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090255676-00018-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085824384-00017-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085024644-00016-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017081603923-00015-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017074632435-00014-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073724465-00013-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073125245-00012-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017071639642-00011-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070834820-00010-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070215160-00009-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017065508860-00008-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017064416641-00007-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063723971-00006-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063009068-00005-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017061815778-00004-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017060858471-00003-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017020639822-00002-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211016171927511-00001-h3.warc.gz"]
+
+    df = pd.DataFrame({"Seed_ID": seeds, "AIP_ID": aips, "Title": titles, "Department": depts,
+                       "UGA_Collection": uga_colls, "AIT_Collection": ait_colls, "Job_ID": jobs,
+                       "Size_GB": sizes, "WARCs": warcs, "WARC_Filenames": names,
+                       "Seed_Metadata_Errors": seed_errs, "Metadata_Report_Errors": metadata_errs,
+                       "Metadata_Report_Info": infos, "WARC_API_Errors": apis, "WARC_Fixity_Errors": fixitys,
+                       "WARC_Unzip_Errors": unzips})
+    return df
+
+
+def make_expected_aip_log_df():
+    """Makes and returns a dataframe with the expected values for aip_log. Starts by making a list of the values
+    for each column in the dataframe."""
+
+    ids = ["magil-ggp-2529634-2022-03", "magil-ggp-2529660-2022-03", "magil-ggp-2529629-2022-03",
+           "magil-ggp-2529629-2022-03", "magil-ggp-2529642-2022-03", "magil-ggp-2529642-2022-03",
+           "magil-ggp-2529627-2022-03", "magil-ggp-2529627-2022-03", "magil-ggp-2529652-2022-03",
+           "magil-ggp-2529631-2022-03", "magil-ggp-2529668-2022-03", "magil-ggp-2529668-2022-03",
+           "magil-ggp-2529681-2022-03", "magil-ggp-2529681-2022-03", "magil-ggp-2529676-2022-03",
+           "rbrl-246-web-202203-0001", "rbrl-246-web-202203-0002", "rbrl-499-web-202203-0001",
+           "rbrl-499-web-202203-0001", "harg-0000-web-202203-0011", "harg-0000-web-202203-0011"]
+    deleted = ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",
+               "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]
+    objects = ["Successfully created objects folder", "Successfully created objects folder", "Objects folder is empty.",
+               "Objects folder is empty.", "Successfully created objects folder",
+               "Successfully created objects folder", "Objects folder is empty.",
+               "Objects folder is empty.", "Successfully created objects folder",
+               "Successfully created objects folder", "Objects folder is empty.",
+               "Objects folder is empty.", "Objects folder is empty.",
+               "Objects folder is empty.", "Successfully created objects folder",
+               "Successfully created objects folder", "Successfully created objects folder",
+               "Successfully created objects folder", "Successfully created objects folder",
+               "Objects folder is missing.", "Objects folder is missing."]
+    metadata = ["Successfully created metadata folder", "Successfully created metadata folder", "BLANK",
+                "BLANK", "Metadata folder is missing.",
+                "Metadata folder is missing.", "BLANK",
+                "BLANK", "Successfully created metadata folder",
+                "Successfully created metadata folder", "BLANK",
+                "BLANK", "BLANK",
+                "BLANK", "Successfully created metadata folder",
+                "Successfully created metadata folder", "Successfully created metadata folder",
+                "Metadata folder is empty.", "Metadata folder is empty.",
+                "BLANK", "BLANK"]
+    fits_tools = ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",
+                  "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",]
+    fits_combine = ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",
+                    "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]
+    pres_made = ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",
+                 "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]
+    pres_valid = ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",
+                  "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]
+    bag_valid = ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",
+                 "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]
+    package = ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",
+               "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]
+    manifest = ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",
+                "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]
+    complete = ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",
+                "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]
+
+    df = pd.DataFrame({"AIP ID": ids, "Files Deleted": deleted, "Objects Folder": objects, "Metadata Folder": metadata,
+                       "FITS Tool Errors": fits_tools, "FITS Combination Errors": fits_combine,
+                       "Preservation.xml Made": pres_made, "Preservation.xml Valid": pres_valid,
+                       "Bag Valid": bag_valid, "Package Errors": package, "Manifest Errors": manifest,
+                       "Processing Complete": complete})
+    return df
+
+
+def make_directory_structure_df():
+    """Makes and returns a dataframe with the expected relative path for every file in the aips directory.
+    Starts by making a list of the paths."""
+
+    paths = [r"aips_2022-03-24\aip_log.csv",
+             r"aips_2022-03-24\seeds.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\harg-0000-web-202203-0011\metadata\2184360_31104307871_crawldef.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\harg-0000-web-202203-0011\metadata\harg-0000-web-202203-0011_1497166_crawljob.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\harg-0000-web-202203-0011\metadata\harg-0000-web-202203-0011_coll.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\harg-0000-web-202203-0011\metadata\harg-0000-web-202203-0011_collscope.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\harg-0000-web-202203-0011\metadata\harg-0000-web-202203-0011_seed.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\harg-0000-web-202203-0011\metadata\harg-0000-web-202203-0011_seedscope.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529627-2022-03\metadata\2529627_31104535848_crawldef.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529627-2022-03\metadata\magil-ggp-2529627-2022-03_1573937_crawljob.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529627-2022-03\metadata\magil-ggp-2529627-2022-03_coll.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529627-2022-03\metadata\magil-ggp-2529627-2022-03_seed.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529629-2022-03\metadata\2529629_31104535848_crawldef.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529629-2022-03\metadata\magil-ggp-2529629-2022-03_1573937_crawljob.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529629-2022-03\metadata\magil-ggp-2529629-2022-03_coll.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529629-2022-03\metadata\magil-ggp-2529629-2022-03_seed.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529642-2022-03\objects\ARCHIVEIT-15678-TEST-JOB1573937-SEED2529642-20220314173635152-00000-h3.warc",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529668-2022-03\metadata\2529668_31104537585_crawldef.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529668-2022-03\metadata\magil-ggp-2529668-2022-03_1577241_crawljob.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529668-2022-03\metadata\magil-ggp-2529668-2022-03_coll.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529668-2022-03\metadata\magil-ggp-2529668-2022-03_seed.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529681-2022-03\metadata\2529681_31104537580_crawldef.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529681-2022-03\metadata\magil-ggp-2529681-2022-03_1577187_crawljob.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529681-2022-03\metadata\magil-ggp-2529681-2022-03_coll.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529681-2022-03\metadata\magil-ggp-2529681-2022-03_seed.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\rbrl-499-web-202203-0001\objects\ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220110194710516-00000-h3.warc",
+             r"aips_2022-03-24\errors\incomplete_directory\rbrl-499-web-202203-0001\objects\ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220111130848517-00001-h3.warc",
+             r"aips_2022-03-24\magil-ggp-2529631-2022-03\metadata\2529631_31104537364_crawldef.csv",
+             r"aips_2022-03-24\magil-ggp-2529631-2022-03\metadata\magil-ggp-2529631-2022-03_1576492_crawljob.csv",
+             r"aips_2022-03-24\magil-ggp-2529631-2022-03\metadata\magil-ggp-2529631-2022-03_coll.csv",
+             r"aips_2022-03-24\magil-ggp-2529631-2022-03\metadata\magil-ggp-2529631-2022-03_seed.csv",
+             r"aips_2022-03-24\magil-ggp-2529631-2022-03\objects\ARCHIVEIT-15678-TEST-JOB1576492-SEED2529631-20220318145704126-00000-h3.warc",
+             r"aips_2022-03-24\magil-ggp-2529634-2022-03\metadata\2529634_31104537372_crawldef.csv",
+             r"aips_2022-03-24\magil-ggp-2529634-2022-03\metadata\magil-ggp-2529634-2022-03_1576505_crawljob.csv",
+             r"aips_2022-03-24\magil-ggp-2529634-2022-03\metadata\magil-ggp-2529634-2022-03_coll.csv",
+             r"aips_2022-03-24\magil-ggp-2529634-2022-03\metadata\magil-ggp-2529634-2022-03_seed.csv",
+             r"aips_2022-03-24\magil-ggp-2529634-2022-03\objects\ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220320234830550-00001-h3.warc",
+             r"aips_2022-03-24\magil-ggp-2529652-2022-03\metadata\magil-ggp-2529652-2022-03_coll.csv",
+             r"aips_2022-03-24\magil-ggp-2529652-2022-03\metadata\magil-ggp-2529652-2022-03_seed.csv",
+             r"aips_2022-03-24\magil-ggp-2529652-2022-03\objects\ARCHIVEIT-15678-TEST-JOB1576493-SEED2529652-20220318145745554-00000-h3.warc",
+             r"aips_2022-03-24\magil-ggp-2529660-2022-03\metadata\2529660_31104535848_crawldef.csv",
+             r"aips_2022-03-24\magil-ggp-2529660-2022-03\metadata\magil-ggp-2529660-2022-03_1573937_crawljob.csv",
+             r"aips_2022-03-24\magil-ggp-2529660-2022-03\metadata\magil-ggp-2529660-2022-03_coll.csv",
+             r"aips_2022-03-24\magil-ggp-2529660-2022-03\metadata\magil-ggp-2529660-2022-03_seed.csv",
+             r"aips_2022-03-24\magil-ggp-2529660-2022-03\objects\ARCHIVEIT-15678-TEST-JOB1573937-SEED2529660-20220314173634919-00000-h3.warc.gz",
+             r"aips_2022-03-24\magil-ggp-2529676-2022-03\metadata\magil-ggp-2529676-2022-03_1577186_crawljob.csv",
+             r"aips_2022-03-24\magil-ggp-2529676-2022-03\objects\ARCHIVEIT-15678-TEST-JOB1577186-SEED2529676-20220320144814871-00000-h3.warc",
+             r"aips_2022-03-24\rbrl-246-web-202203-0001\metadata\2454507_31104519079_crawldef.csv",
+             r"aips_2022-03-24\rbrl-246-web-202203-0001\metadata\rbrl-246-web-202203-0001_1542317_crawljob.csv",
+             r"aips_2022-03-24\rbrl-246-web-202203-0001\metadata\rbrl-246-web-202203-0001_coll.csv",
+             r"aips_2022-03-24\rbrl-246-web-202203-0001\metadata\rbrl-246-web-202203-0001_collscope.csv",
+             r"aips_2022-03-24\rbrl-246-web-202203-0001\metadata\rbrl-246-web-202203-0001_seed.csv",
+             r"aips_2022-03-24\rbrl-246-web-202203-0001\metadata\rbrl-246-web-202203-0001_seedscope.csv",
+             r"aips_2022-03-24\rbrl-246-web-202203-0001\objects\ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454507-20220114214056178-00000-hlvkp53o.warc.gz",
+             r"aips_2022-03-24\rbrl-246-web-202203-0001\objects\ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454507-20220114214056178-00000-hlvkp53o.warc.gz.open",
+             r"aips_2022-03-24\rbrl-246-web-202203-0002\metadata\2454506_31104519079_crawldef.csv",
+             r"aips_2022-03-24\rbrl-246-web-202203-0002\metadata\rbrl-246-web-202203-0002_1542317_crawljob.csv",
+             r"aips_2022-03-24\rbrl-246-web-202203-0002\metadata\rbrl-246-web-202203-0002_coll.csv",
+             r"aips_2022-03-24\rbrl-246-web-202203-0002\metadata\rbrl-246-web-202203-0002_collscope.csv",
+             r"aips_2022-03-24\rbrl-246-web-202203-0002\metadata\rbrl-246-web-202203-0002_seed.csv",
+             r"aips_2022-03-24\rbrl-246-web-202203-0002\metadata\rbrl-246-web-202203-0002_seedscope.csv",
+             r"aips_2022-03-24\rbrl-246-web-202203-0002\objects\ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220115233148240-00002-8dgxemts.warc.gz",
+             r"aips_2022-03-24\rbrl-246-web-202203-0002\objects\ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116063911435-00003-8dgxemts.warc.gz",
+             r"aips_2022-03-24\rbrl-246-web-202203-0002\objects\ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116131550492-00004-8dgxemts.warc",
+             r"aips_2022-03-24\rbrl-246-web-202203-0002\objects\ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117010033395-00005-8dgxemts.warc",
+             r"aips_2022-03-24\rbrl-246-web-202203-0002\objects\ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117064534470-00006-8dgxemts.warc",
+             r"aips_2022-03-24\rbrl-246-web-202203-0002\objects\ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117130422336-00007-8dgxemts.warc"]
+
+    df = pd.DataFrame({"File_Path": paths})
+    return df
+
+
+# ----------------------------------------------------------------------------------------------------------------
 # ALTERNATIVE VERSIONS OF FUNCTIONS THAT GENERATE ERRORS.
 # IF THERE IS MORE THAN ONE ERROR NEEDED, ADDS AN ARGUMENT FOR ERROR_TYPE TO SPECIFY.
 # ----------------------------------------------------------------------------------------------------------------
@@ -459,289 +737,32 @@ for item in os.listdir("."):
 # TESTS seed_df, aip_log.csv AND AIPS DIRECTORY STRUCTURE.
 # COMPARISONS ARE SAVED AS TABS ON A SPREADSHEET IN THE SCRIPT OUTPUT FOLDER.
 # ----------------------------------------------------------------------------------------------------------------
-print("\nColumn types in seed_df in case those don't match.")
-print(seed_df.dtypes)
 
-# CHECKS VALUES IN: seed_df
-
-# Makes a dataframe with the expected values for the seed dataframe.
-data = {"Seed_ID": ["2529634", "2529660", "2529629", "2529642", "2529627", "2529652", "2529631",
-                    "2529668", "2529681", "2529676", "2454507", "2454506", "2739136", "2184360"],
-        "AIP_ID": ["magil-ggp-2529634-2022-03", "magil-ggp-2529660-2022-03", "magil-ggp-2529629-2022-03",
-                   "magil-ggp-2529642-2022-03", "magil-ggp-2529627-2022-03", "magil-ggp-2529652-2022-03",
-                   "magil-ggp-2529631-2022-03", "magil-ggp-2529668-2022-03", "magil-ggp-2529681-2022-03",
-                   "magil-ggp-2529676-2022-03", "rbrl-246-web-202203-0001", "rbrl-246-web-202203-0002",
-                   "rbrl-499-web-202203-0001", "harg-0000-web-202203-0011"],
-        "Title": ["Georgia Office of Attorney General Consumer Protection Division",
-                  "Georgia Governor's Office of Disability Services Ombudsman",
-                  "Georgia Board of Pharmacy",
-                  "Georgia Department of Community Supervision",
-                  "Georgia Aviation Authority",
-                  "Georgia Drugs and Narcotics Agency",
-                  "Georgia Commission on Equal Opportunity",
-                  "Georgia Office of the Child Advocate",
-                  "Georgia State Properties Commission",
-                  "Georgia State Board of Accountancy",
-                  "SenatorIsakson - YouTube",
-                  "SenatorIsakson - YouTube [channel page]",
-                  "Savannah River Site",
-                  "UGA Today"],
-        "Department": ["magil", "magil", "magil", "magil", "magil", "magil", "magil",
-                       "magil", "magil", "magil", "russell", "russell", "russell", "hargrett"],
-        "UGA_Collection": ["0000", "0000", "0000", "0000", "0000", "0000", "0000",
-                           "0000", "0000", "0000", "rbrl-246", "rbrl-246", "rbrl-499", "0000"],
-        "AIT_Collection": ["15678", "15678", "15678", "15678", "15678", "15678", "15678",
-                           "15678", "15678", "15678", "12265", "12265", "12263", "12912"],
-        "Job_ID": ["1576505", "1573937", "1573937", "1573937", "1573937", "1576493", "1576492",
-                   "1577241", "1577187", "1577186", "1542317", "1542317", "1539793", "1497166"],
-        "Size_GB": [1.2, 0.1, 0.93, 0.94, 0.06, 0.19, 0.23,
-                    0.39, 0.33, 0.19, 0.0, 8.04, 1.35999999999999, 34.7399999999999],
-        "WARCs": ["2", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "9", "2", "35"],
-        "WARC_Filenames": ["ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220318151112447-00000-h3.warc.gz,ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220320234830550-00001-h3.warc.gz",
-                           "ARCHIVEIT-15678-TEST-JOB1573937-SEED2529660-20220314173634919-00000-h3.warc.gz",
-                           "ARCHIVEIT-15678-TEST-JOB1573937-SEED2529629-20220314173634874-00000-h3.warc.gz",
-                           "ARCHIVEIT-15678-TEST-JOB1573937-SEED2529642-20220314173635152-00000-h3.warc.gz",
-                           "ARCHIVEIT-15678-TEST-JOB1573937-SEED2529627-20220314173635069-00000-h3.warc.gz",
-                           "ARCHIVEIT-15678-TEST-JOB1576493-SEED2529652-20220318145745554-00000-h3.warc.gz",
-                           "ARCHIVEIT-15678-TEST-JOB1576492-SEED2529631-20220318145704126-00000-h3.warc.gz",
-                           "ARCHIVEIT-15678-TEST-JOB1577241-SEED2529668-20220320182657667-00000-h3.warc.gz",
-                           "ARCHIVEIT-15678-TEST-JOB1577187-SEED2529681-20220320144922213-00000-h3.warc.gz",
-                           "ARCHIVEIT-15678-TEST-JOB1577186-SEED2529676-20220320144814871-00000-h3.warc.gz",
-                           "ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454507-20220114214056178-00000-hlvkp53o.warc.gz",
-                           "ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220114214053021-00000-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220115132006340-00001-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220115233148240-00002-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116063911435-00003-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116131550492-00004-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117010033395-00005-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117200343134-00008-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117064534470-00006-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117130422336-00007-8dgxemts.warc.gz",
-                           "ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220110194710516-00000-h3.warc.gz,ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220111130848517-00001-h3.warc.gz",
-                           "ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017105304659-00034-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211018211851376-00035-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103754760-00033-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102717487-00031-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103234346-00032-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101611745-00029-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102203466-00030-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101049993-00028-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017100311992-00027-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094753960-00025-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017095516699-00026-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094020636-00024-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017093516000-00023-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017092934974-00022-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091918474-00021-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091205263-00020-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090702655-00019-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090255676-00018-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085824384-00017-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085024644-00016-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017081603923-00015-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017074632435-00014-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073724465-00013-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073125245-00012-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017071639642-00011-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070834820-00010-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070215160-00009-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017065508860-00008-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017064416641-00007-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063723971-00006-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063009068-00005-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017061815778-00004-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017060858471-00003-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017020639822-00002-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211016171927511-00001-h3.warc.gz"],
-        "Seed_Metadata_Errors": ["Successfully calculated seed metadata", "Successfully calculated seed metadata",
-                                 "Successfully calculated seed metadata", "Successfully calculated seed metadata",
-                                 "Successfully calculated seed metadata", "Successfully calculated seed metadata",
-                                 "Successfully calculated seed metadata", "Successfully calculated seed metadata",
-                                 "Successfully calculated seed metadata", "Successfully calculated seed metadata",
-                                 "Successfully calculated seed metadata", "Successfully calculated seed metadata",
-                                 "Successfully calculated seed metadata", "Successfully calculated seed metadata"],
-        "Metadata_Report_Errors": ["Successfully downloaded all metadata reports",
-                                   "Successfully downloaded all metadata reports",
-                                   "Successfully downloaded all metadata reports",
-                                   "Successfully downloaded all metadata reports",
-                                   "Successfully downloaded all metadata reports",
-                                   "magil-ggp-2529652-2022-03_1576493_crawljob.csv API error 999; Crawl job was not downloaded so can't get crawl definition id",
-                                   "Successfully downloaded all metadata reports",
-                                   "Successfully downloaded all metadata reports",
-                                   "Successfully downloaded all metadata reports",
-                                   "magil-ggp-2529676-2022-03_seed.csv API error 999; magil-ggp-2529676-2022-03_seedscope.csv API error 999; magil-ggp-2529676-2022-03_collscope.csv API error 999; magil-ggp-2529676-2022-03_coll.csv API error 999; 2529676_31104537579_crawldef.csv API error 999",
-                                   "Successfully downloaded all metadata reports",
-                                   "Successfully downloaded all metadata reports",
-                                   "Successfully downloaded all metadata reports",
-                                   "Successfully downloaded all metadata reports"],
-        "Metadata_Report_Info": ["Empty report magil-ggp-2529634-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529634-2022-03_collscope.csv not saved",
-                                 "Empty report magil-ggp-2529660-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529660-2022-03_collscope.csv not saved",
-                                 "Empty report magil-ggp-2529629-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529629-2022-03_collscope.csv not saved",
-                                 "Empty report magil-ggp-2529642-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529642-2022-03_collscope.csv not saved",
-                                 "Empty report magil-ggp-2529627-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529627-2022-03_collscope.csv not saved",
-                                 "Empty report magil-ggp-2529652-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529652-2022-03_collscope.csv not saved",
-                                 "Seed report does not have login columns to redact; Empty report magil-ggp-2529631-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529631-2022-03_collscope.csv not saved",
-                                 "Empty report magil-ggp-2529668-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529668-2022-03_collscope.csv not saved",
-                                 "Empty report magil-ggp-2529681-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529681-2022-03_collscope.csv not saved",
-                                 "No additional information",
-                                 "No additional information",
-                                 "No additional information",
-                                 "Empty report rbrl-499-web-202203-0001_seedscope.csv not saved",
-                                 "No additional information"],
-        "WARC_API_Errors": ["API error 999: can't download ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220318151112447-00000-h3.warc.gz; Successfully downloaded ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220320234830550-00001-h3.warc.gz",
-                            "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1573937-SEED2529660-20220314173634919-00000-h3.warc.gz",
-                            "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1573937-SEED2529629-20220314173634874-00000-h3.warc.gz",
-                            "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1573937-SEED2529642-20220314173635152-00000-h3.warc.gz",
-                            "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1573937-SEED2529627-20220314173635069-00000-h3.warc.gz",
-                            "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1576493-SEED2529652-20220318145745554-00000-h3.warc.gz",
-                            "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1576492-SEED2529631-20220318145704126-00000-h3.warc.gz",
-                            "API error 999: can't download ARCHIVEIT-15678-TEST-JOB1577241-SEED2529668-20220320182657667-00000-h3.warc.gz",
-                            "API error 999: can't get info about ARCHIVEIT-15678-TEST-JOB1577187-SEED2529681-20220320144922213-00000-h3.warc.gz",
-                            "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1577186-SEED2529676-20220320144814871-00000-h3.warc.gz",
-                            "Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454507-20220114214056178-00000-hlvkp53o.warc.gz",
-                            "API error 999: can't get info about ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220114214053021-00000-8dgxemts.warc.gz; API error 999: can't download ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220115132006340-00001-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220115233148240-00002-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116063911435-00003-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116131550492-00004-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117010033395-00005-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117200343134-00008-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117064534470-00006-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117130422336-00007-8dgxemts.warc.gz",
-                            "Successfully downloaded ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220110194710516-00000-h3.warc.gz; Successfully downloaded ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220111130848517-00001-h3.warc.gz",
-                            "Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017105304659-00034-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211018211851376-00035-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103754760-00033-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102717487-00031-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103234346-00032-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101611745-00029-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102203466-00030-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101049993-00028-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017100311992-00027-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094753960-00025-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017095516699-00026-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094020636-00024-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017093516000-00023-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017092934974-00022-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091918474-00021-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091205263-00020-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090702655-00019-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090255676-00018-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085824384-00017-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085024644-00016-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017081603923-00015-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017074632435-00014-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073724465-00013-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073125245-00012-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017071639642-00011-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070834820-00010-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070215160-00009-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017065508860-00008-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017064416641-00007-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063723971-00006-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063009068-00005-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017061815778-00004-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017060858471-00003-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017020639822-00002-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211016171927511-00001-h3.warc.gz"],
-        "WARC_Fixity_Errors": ["Successfully verified ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220320234830550-00001-h3.warc.gz fixity on",
-                               "Fixity for ARCHIVEIT-15678-TEST-JOB1573937-SEED2529660-20220314173634919-00000-h3.warc.gz cannot be extracted from md5deep output: b'@Something#Unexpected'",
-                               "Successfully verified ARCHIVEIT-15678-TEST-JOB1573937-SEED2529629-20220314173634874-00000-h3.warc.gz fixity on",
-                               "Successfully verified ARCHIVEIT-15678-TEST-JOB1573937-SEED2529642-20220314173635152-00000-h3.warc.gz fixity on",
-                               "Fixity for ARCHIVEIT-15678-TEST-JOB1573937-SEED2529627-20220314173635069-00000-h3.warc.gz changed and it was deleted: 5074238e67149f99f5e8b3700196db97 before, abc123abc123abc123abc123 after",
-                               "Successfully verified ARCHIVEIT-15678-TEST-JOB1576493-SEED2529652-20220318145745554-00000-h3.warc.gz fixity on",
-                               "Successfully verified ARCHIVEIT-15678-TEST-JOB1576492-SEED2529631-20220318145704126-00000-h3.warc.gz fixity on",
-                               "BLANK",
-                               "BLANK",
-                               "Successfully verified ARCHIVEIT-15678-TEST-JOB1577186-SEED2529676-20220320144814871-00000-h3.warc.gz fixity on 2022-07-25 16:13:18.742668",
-                               "Successfully verified ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454507-20220114214056178-00000-hlvkp53o.warc.gz fixity on 2022-07-25 16:13:39.473768",
-                               "Fixity for ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220115233148240-00002-8dgxemts.warc.gz cannot be extracted from md5deep output: b'@Something#Unexpected'; Successfully verified ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116063911435-00003-8dgxemts.warc.gz fixity on 2022-07-25 16:13:58.072782; Successfully verified ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116131550492-00004-8dgxemts.warc.gz fixity on 2022-07-25 16:14:13.495123; Successfully verified ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117010033395-00005-8dgxemts.warc.gz fixity on 2022-07-25 16:14:28.962814; Fixity for ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117200343134-00008-8dgxemts.warc.gz changed and it was deleted: 0bc2fd86f2e1a8ea6e0f87701f60ef79 before, abc123abc123abc123abc123 after; Successfully verified ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117064534470-00006-8dgxemts.warc.gz fixity on; Successfully verified ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117130422336-00007-8dgxemts.warc.gz fixity on",
-                               "Successfully verified ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220110194710516-00000-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220111130848517-00001-h3.warc.gz fixity on",
-                               "Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017105304659-00034-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211018211851376-00035-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103754760-00033-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102717487-00031-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103234346-00032-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101611745-00029-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102203466-00030-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101049993-00028-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017100311992-00027-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094753960-00025-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017095516699-00026-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094020636-00024-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017093516000-00023-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017092934974-00022-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091918474-00021-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091205263-00020-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090702655-00019-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090255676-00018-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085824384-00017-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085024644-00016-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017081603923-00015-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017074632435-00014-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073724465-00013-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073125245-00012-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017071639642-00011-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070834820-00010-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070215160-00009-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017065508860-00008-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017064416641-00007-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063723971-00006-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063009068-00005-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017061815778-00004-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017060858471-00003-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017020639822-00002-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211016171927511-00001-h3.warc.gz fixity on"],
-        "WARC_Unzip_Errors": ["Successfully unzipped ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220320234830550-00001-h3.warc.gz",
-                              "BLANK",
-                              "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1573937-SEED2529629-20220314173634874-00000-h3.warc.gz",
-                              "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1573937-SEED2529642-20220314173635152-00000-h3.warc.gz",
-                              "BLANK",
-                              "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1576493-SEED2529652-20220318145745554-00000-h3.warc.gz",
-                              "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1576492-SEED2529631-20220318145704126-00000-h3.warc.gz",
-                              "BLANK",
-                              "BLANK",
-                              "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1577186-SEED2529676-20220320144814871-00000-h3.warc.gz",
-                              "Error unzipping ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454507-20220114214056178-00000-hlvkp53o.warc.gz: Error message stand-in.",
-                              "Error unzipping ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116063911435-00003-8dgxemts.warc.gz: Error message stand-in.; Successfully unzipped ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116131550492-00004-8dgxemts.warc.gz; Successfully unzipped ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117010033395-00005-8dgxemts.warc.gz; Successfully unzipped ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117064534470-00006-8dgxemts.warc.gz; Successfully unzipped ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117130422336-00007-8dgxemts.warc.gz",
-                              "Successfully unzipped ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220110194710516-00000-h3.warc.gz; Successfully unzipped ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220111130848517-00001-h3.warc.gz",
-                              "Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017105304659-00034-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211018211851376-00035-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103754760-00033-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102717487-00031-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103234346-00032-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101611745-00029-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102203466-00030-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101049993-00028-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017100311992-00027-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094753960-00025-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017095516699-00026-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094020636-00024-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017093516000-00023-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017092934974-00022-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091918474-00021-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091205263-00020-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090702655-00019-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090255676-00018-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085824384-00017-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085024644-00016-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017081603923-00015-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017074632435-00014-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073724465-00013-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073125245-00012-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017071639642-00011-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070834820-00010-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070215160-00009-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017065508860-00008-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017064416641-00007-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063723971-00006-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063009068-00005-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017061815778-00004-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017060858471-00003-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017020639822-00002-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211016171927511-00001-h3.warc.gz"]}
-expected_seed_df = pd.DataFrame(data)
-
-print("\nColumn types in expected_seed_df")
-print(expected_seed_df.dtypes)
-
-# Updates seeds_df created by the script to make comparison with consistent values possible.
-# Removes time stamps from WARC fixity column and fills NaN with text.
+# Checks the values in seed_df against the expected values.
+# Removes the timestamps from seed_df to make comparison with consistent expected values possible.
+expected_seed_df = make_expected_seed_df()
+seed_df = pd.read_csv("seeds.csv")
 seed_df["WARC_Fixity_Errors"] = seed_df["WARC_Fixity_Errors"].str.replace(" \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}", "")
 seed_df.fillna("BLANK", inplace=True)
-
-# Compares the actual and expected values of seed_df
+print(seed_df.dtypes)
 compare_seed_df = seed_df.merge(expected_seed_df, indicator=True, how="outer")
 
-# CHECKS VALUES IN: aip_log.csv
-
-# Makes dataframe with expected values for aip_log.csv.
-data = {"AIP ID": ["magil-ggp-2529634-2022-03", "magil-ggp-2529629-2022-03", "magil-ggp-2529629-2022-03",
-                   "magil-ggp-2529642-2022-03", "magil-ggp-2529642-2022-03", "magil-ggp-2529627-2022-03",
-                   "magil-ggp-2529627-2022-03", "magil-ggp-2529652-2022-03", "magil-ggp-2529631-2022-03",
-                   "magil-ggp-2529668-2022-03", "magil-ggp-2529668-2022-03", "magil-ggp-2529681-2022-03",
-                   "magil-ggp-2529681-2022-03", "magil-ggp-2529676-2022-03", "rbrl-246-web-202203-0001",
-                   "rbrl-246-web-202203-0002", "rbrl-499-web-202203-0001", "rbrl-499-web-202203-0001",
-                   "harg-0000-web-202203-0011", "harg-0000-web-202203-0011"],
-        "Files Deleted": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",
-                          "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
-        "Objects Folder": ["Successfully created objects folder", "Objects folder is empty.",
-                           "Objects folder is empty.", "Successfully created objects folder",
-                           "Successfully created objects folder", "Objects folder is empty.",
-                           "Objects folder is empty.", "Successfully created objects folder",
-                           "Successfully created objects folder", "Objects folder is empty.",
-                           "Objects folder is empty.", "Objects folder is empty.",
-                           "Objects folder is empty.", "Successfully created objects folder",
-                           "Successfully created objects folder", "Successfully created objects folder",
-                           "Successfully created objects folder", "Successfully created objects folder",
-                           "Objects folder is missing.", "Objects folder is missing."],
-        "Metadata Folder": ["Successfully created metadata folder", "BLANK",
-                            "BLANK", "Metadata folder is missing.",
-                            "Metadata folder is missing.", "BLANK",
-                            "BLANK", "Successfully created metadata folder",
-                            "Successfully created metadata folder", "BLANK",
-                            "BLANK", "BLANK",
-                            "BLANK", "Successfully created metadata folder",
-                            "Successfully created metadata folder", "Successfully created metadata folder",
-                            "Metadata folder is empty.", "Metadata folder is empty.",
-                            "BLANK", "BLANK"],
-        "FITS Tool Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",
-                             "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
-        "FITS Combination Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",
-                                    "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
-        "Preservation.xml Made": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",
-                                  "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
-        "Preservation.xml Valid": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",
-                                   "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
-        "Bag Valid": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",
-                      "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
-        "Package Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",
-                           "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
-        "Manifest Errors": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",
-                            "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
-        "Processing Complete": ["BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK",
-                                "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]}
-expected_aip_log_df = pd.DataFrame(data)
-
-# Reads aip_log.csv, made by the script, into a dataframe.
+# Checks the values in aip_log.csv against the expected values.
 # Removes Time Started in aip_log.csv and fills NaN with text so the data is can be compared.
-aip_log_df = pd.read_csv(os.path.join(c.script_output, aips_directory, "aip_log.csv"))
+expected_aip_log_df = make_expected_aip_log_df()
+aip_log_df = pd.read_csv(os.path.join(c.script_output, "aips_2022-03-24", "aip_log.csv"))
 aip_log_df.drop(["Time Started"], axis=1, inplace=True)
 aip_log_df.fillna("BLANK", inplace=True)
-print("\nColumn types in aip_log_df in case those don't match.")
-print(aip_log_df.dtypes)
-
-# Compares the actual and expected values of aip_log.csv
 compare_aip_df = aip_log_df.merge(expected_aip_log_df, indicator=True, how="outer")
 
-# CHECKS VALUES IN: directory structure.
-
-# Creates a list with the expected relative paths.
-expected = [r"aips_2022-03-24\aip_log.csv",
-            r"aips_2022-03-24\seeds.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\harg-0000-web-202203-0011\metadata\2184360_31104307871_crawldef.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\harg-0000-web-202203-0011\metadata\harg-0000-web-202203-0011_1497166_crawljob.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\harg-0000-web-202203-0011\metadata\harg-0000-web-202203-0011_coll.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\harg-0000-web-202203-0011\metadata\harg-0000-web-202203-0011_collscope.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\harg-0000-web-202203-0011\metadata\harg-0000-web-202203-0011_seed.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\harg-0000-web-202203-0011\metadata\harg-0000-web-202203-0011_seedscope.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529627-2022-03\metadata\2529627_31104535848_crawldef.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529627-2022-03\metadata\magil-ggp-2529627-2022-03_1573937_crawljob.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529627-2022-03\metadata\magil-ggp-2529627-2022-03_coll.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529627-2022-03\metadata\magil-ggp-2529627-2022-03_seed.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529629-2022-03\metadata\2529629_31104535848_crawldef.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529629-2022-03\metadata\magil-ggp-2529629-2022-03_1573937_crawljob.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529629-2022-03\metadata\magil-ggp-2529629-2022-03_coll.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529629-2022-03\metadata\magil-ggp-2529629-2022-03_seed.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529642-2022-03\objects\ARCHIVEIT-15678-TEST-JOB1573937-SEED2529642-20220314173635152-00000-h3.warc",
-            r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529668-2022-03\metadata\2529668_31104537585_crawldef.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529668-2022-03\metadata\magil-ggp-2529668-2022-03_1577241_crawljob.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529668-2022-03\metadata\magil-ggp-2529668-2022-03_coll.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529668-2022-03\metadata\magil-ggp-2529668-2022-03_seed.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529681-2022-03\metadata\2529681_31104537580_crawldef.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529681-2022-03\metadata\magil-ggp-2529681-2022-03_1577187_crawljob.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529681-2022-03\metadata\magil-ggp-2529681-2022-03_coll.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529681-2022-03\metadata\magil-ggp-2529681-2022-03_seed.csv",
-            r"aips_2022-03-24\errors\incomplete_directory\rbrl-499-web-202203-0001\objects\ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220110194710516-00000-h3.warc",
-            r"aips_2022-03-24\errors\incomplete_directory\rbrl-499-web-202203-0001\objects\ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220111130848517-00001-h3.warc",
-            r"aips_2022-03-24\magil-ggp-2529631-2022-03\metadata\2529631_31104537364_crawldef.csv",
-            r"aips_2022-03-24\magil-ggp-2529631-2022-03\metadata\magil-ggp-2529631-2022-03_1576492_crawljob.csv",
-            r"aips_2022-03-24\magil-ggp-2529631-2022-03\metadata\magil-ggp-2529631-2022-03_coll.csv",
-            r"aips_2022-03-24\magil-ggp-2529631-2022-03\metadata\magil-ggp-2529631-2022-03_seed.csv",
-            r"aips_2022-03-24\magil-ggp-2529631-2022-03\objects\ARCHIVEIT-15678-TEST-JOB1576492-SEED2529631-20220318145704126-00000-h3.warc",
-            r"aips_2022-03-24\magil-ggp-2529634-2022-03\metadata\2529634_31104537372_crawldef.csv",
-            r"aips_2022-03-24\magil-ggp-2529634-2022-03\metadata\magil-ggp-2529634-2022-03_1576505_crawljob.csv",
-            r"aips_2022-03-24\magil-ggp-2529634-2022-03\metadata\magil-ggp-2529634-2022-03_coll.csv",
-            r"aips_2022-03-24\magil-ggp-2529634-2022-03\metadata\magil-ggp-2529634-2022-03_seed.csv",
-            r"aips_2022-03-24\magil-ggp-2529634-2022-03\objects\ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220320234830550-00001-h3.warc",
-            r"aips_2022-03-24\magil-ggp-2529652-2022-03\metadata\magil-ggp-2529652-2022-03_coll.csv",
-            r"aips_2022-03-24\magil-ggp-2529652-2022-03\metadata\magil-ggp-2529652-2022-03_seed.csv",
-            r"aips_2022-03-24\magil-ggp-2529652-2022-03\objects\ARCHIVEIT-15678-TEST-JOB1576493-SEED2529652-20220318145745554-00000-h3.warc",
-            r"aips_2022-03-24\magil-ggp-2529660-2022-03\metadata\2529660_31104535848_crawldef.csv",
-            r"aips_2022-03-24\magil-ggp-2529660-2022-03\metadata\magil-ggp-2529660-2022-03_1573937_crawljob.csv",
-            r"aips_2022-03-24\magil-ggp-2529660-2022-03\metadata\magil-ggp-2529660-2022-03_coll.csv",
-            r"aips_2022-03-24\magil-ggp-2529660-2022-03\metadata\magil-ggp-2529660-2022-03_seed.csv",
-            r"aips_2022-03-24\magil-ggp-2529660-2022-03\objects\ARCHIVEIT-15678-TEST-JOB1573937-SEED2529660-20220314173634919-00000-h3.warc.gz",
-            r"aips_2022-03-24\magil-ggp-2529676-2022-03\metadata\magil-ggp-2529676-2022-03_1577186_crawljob.csv",
-            r"aips_2022-03-24\magil-ggp-2529676-2022-03\objects\ARCHIVEIT-15678-TEST-JOB1577186-SEED2529676-20220320144814871-00000-h3.warc",
-            r"aips_2022-03-24\rbrl-246-web-202203-0001\metadata\2454507_31104519079_crawldef.csv",
-            r"aips_2022-03-24\rbrl-246-web-202203-0001\metadata\rbrl-246-web-202203-0001_1542317_crawljob.csv",
-            r"aips_2022-03-24\rbrl-246-web-202203-0001\metadata\rbrl-246-web-202203-0001_coll.csv",
-            r"aips_2022-03-24\rbrl-246-web-202203-0001\metadata\rbrl-246-web-202203-0001_collscope.csv",
-            r"aips_2022-03-24\rbrl-246-web-202203-0001\metadata\rbrl-246-web-202203-0001_seed.csv",
-            r"aips_2022-03-24\rbrl-246-web-202203-0001\metadata\rbrl-246-web-202203-0001_seedscope.csv",
-            r"aips_2022-03-24\rbrl-246-web-202203-0001\objects\ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454507-20220114214056178-00000-hlvkp53o.warc.gz",
-            r"aips_2022-03-24\rbrl-246-web-202203-0001\objects\ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454507-20220114214056178-00000-hlvkp53o.warc.gz.open",
-            r"aips_2022-03-24\rbrl-246-web-202203-0002\metadata\2454506_31104519079_crawldef.csv",
-            r"aips_2022-03-24\rbrl-246-web-202203-0002\metadata\rbrl-246-web-202203-0002_1542317_crawljob.csv",
-            r"aips_2022-03-24\rbrl-246-web-202203-0002\metadata\rbrl-246-web-202203-0002_coll.csv",
-            r"aips_2022-03-24\rbrl-246-web-202203-0002\metadata\rbrl-246-web-202203-0002_collscope.csv",
-            r"aips_2022-03-24\rbrl-246-web-202203-0002\metadata\rbrl-246-web-202203-0002_seed.csv",
-            r"aips_2022-03-24\rbrl-246-web-202203-0002\metadata\rbrl-246-web-202203-0002_seedscope.csv",
-            r"aips_2022-03-24\rbrl-246-web-202203-0002\objects\ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220115233148240-00002-8dgxemts.warc.gz",
-            r"aips_2022-03-24\rbrl-246-web-202203-0002\objects\ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116063911435-00003-8dgxemts.warc.gz",
-            r"aips_2022-03-24\rbrl-246-web-202203-0002\objects\ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116131550492-00004-8dgxemts.warc",
-            r"aips_2022-03-24\rbrl-246-web-202203-0002\objects\ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117010033395-00005-8dgxemts.warc",
-            r"aips_2022-03-24\rbrl-246-web-202203-0002\objects\ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117064534470-00006-8dgxemts.warc",
-            r"aips_2022-03-24\rbrl-246-web-202203-0002\objects\ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117130422336-00007-8dgxemts.warc"]
-
-# Creates a list with relative paths starting at the AIPs directory so paths are predictable.
+# Checks the directory structure against the expected directory structure.
+# Makes a dataframe with the relative paths in the apis directory structure and compares to the expected paths.
 directory_list = []
-for root, dirs, files in os.walk(f"aips_{date_end}"):
+for root, dirs, files in os.walk("aips_2022-03-24"):
     for file in files:
         directory_list.append(os.path.join(root, file))
-
-# Makes dataframes of the expected and actual directory lists and compares them.
 directory_df = pd.DataFrame({"File_Path": directory_list})
-expected_directory_df = pd.DataFrame({"File_Path": expected})
+expected_directory_df = make_directory_structure_df()
 compare_dir_df = directory_df.merge(expected_directory_df, indicator=True, how="outer")
 
 # Saves the results to tabs on a spreadsheet (error_test_results.xlsx) in the script output folder.
