@@ -778,7 +778,7 @@ aip_log_df.drop(["Time Started"], axis=1, inplace=True)
 compare_aip_df = aip_log_df.merge(expected_aip_log_df, indicator=True, how="outer")
 
 # Checks the directory structure against the expected directory structure.
-# Makes a dataframe with the relative paths in the apis directory structure and compares to the expected paths.
+# Makes a dataframe with the relative paths in the AIPs directory structure and compares to the expected paths.
 directory_list = []
 for root, dirs, files in os.walk("aips_2022-03-24"):
     for file in files:
