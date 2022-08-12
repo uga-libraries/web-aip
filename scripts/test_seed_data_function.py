@@ -17,7 +17,8 @@ import web_functions as web
 
 
 def make_expected_df(test):
-    """Makes and returns a dataframe with the expected values for the specified test scenario."""
+    """Makes and returns a dataframe with the expected values for the specified test scenario. Starts by making
+    lists for each column with the values for that test scenario, and then combines those into a dataframe."""
 
     if test == "bma":
         seeds = ["2028986"]
