@@ -71,7 +71,7 @@ def seed_data(date_start, date_end):
     # Starts a dataframe for storing seed level data about the WARCs in this download.
     # Includes columns that will be used for logging steps prior to using the general-aip script functions.
     seed_df = pd.DataFrame(columns=["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection", "AIT_Collection",
-                                    "Job_ID", "Size_GB", "WARCs", "WARC_Filenames", "Seed_Metadata_Errors",
+                                    "Job_ID", "Size", "WARCs", "WARC_Filenames", "Seed_Metadata_Errors",
                                     "Metadata_Report_Errors", "Metadata_Report_Info",
                                     "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
 
@@ -98,16 +98,21 @@ def seed_data(date_start, date_end):
         # If the seed is already in the dataframe, adds to the size, WARC count, WARC filenames, and Job ID (if new).
         # If the seed is new, gets the data needed about the seed and adds it to the dataframe.
         if seed_identifier in seed_df.Seed_ID.values:
-            seed_df.loc[seed_df.Seed_ID == seed_identifier, "Size_GB"] += round(warc_info["size"]/1000000000, 2)
+            seed_df.loc[seed_df.Seed_ID == seed_identifier, "Size"] += warc_info["size"]
             seed_df.loc[seed_df.Seed_ID == seed_identifier, "WARCs"] += 1
             seed_df.loc[seed_df.Seed_ID == seed_identifier, "WARC_Filenames"] += f',{warc_info["filename"]}'
             if seed_df.loc[seed_df.Seed_ID == seed_identifier, "Job_ID"].str.contains(str(warc_info["crawl"])).bool() is False:
                 seed_df.loc[seed_df.Seed_ID == seed_identifier, "Job_ID"] += f',{warc_info["crawl"]}'
         else:
             seed_info = {"Seed_ID": seed_identifier, "AIT_Collection": warc_info["collection"],
-                         "Job_ID": str(warc_info["crawl"]), "Size_GB": round(warc_info["size"]/1000000000, 2),
+                         "Job_ID": str(warc_info["crawl"]), "Size": warc_info["size"],
                          "WARCs": 1, "WARC_Filenames": warc_info["filename"]}
             seed_df = seed_df.append(seed_info, ignore_index=True)
+
+    # Makes a new column in the dataframe with size converted to GB, rounded to 2 decimal places.
+    # Calculating the size in GB during the WARC loop was resulting in some that weren't rounded.
+    seed_df["Size_GB"] = round((seed_df["Size"]/1000000000).astype(float), 2)
+    seed_df.drop(["Size"], axis=1, inplace=True)
 
     # Gets a list of the seeds and uses the Partner API (seed report) to get additional information.
     # Includes: seed title, related archival collection, and department (all part of the metadata)
