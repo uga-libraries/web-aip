@@ -154,7 +154,7 @@ def compare_df(test, df_actual, df_expected):
     # If the merged dataframe is empty (everything matched), prints test success.
     # Otherwise, saves the rows that didn't match to a CSV in the script output directory:
     # left_only is the actual value and right_only is the expected value.
-    if len(df) is 0:
+    if len(df) == 0:
         print(f"{test} test passes.")
     else:
         print(f"{test} test had errors. See CSV in script output directory for details.")
