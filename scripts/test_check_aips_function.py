@@ -172,7 +172,7 @@ compare_df = actual_df.merge(expected_df, indicator=True, how="outer")
 # If there are any that don't match (_merge isn't both), saves to a CSV.
 # Otherwise, prints a message to the terminal that the test passed.
 compare_df = compare_df[compare_df["_merge"] != "both"]
-if len(compare_df) is 0:
+if len(compare_df) == 0:
     print("\nAll tests pass. The check_aips function produced expected results.")
 else:
     print("\nErrors: see 'completeness_check_differences.csv' for details.")
