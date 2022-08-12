@@ -22,7 +22,7 @@ def make_file(path):
         new_file.write("For Testing")
 
 
-def expected_completeness_check_df():
+def make_expected_completeness_check_df():
     """Makes a dataframe with the expected values for the completeness_check.csv that this script will produce
     if everything works correctly."""
 
@@ -165,7 +165,7 @@ web.check_aips(date_end, date_start, seed_df, aips_directory)
 
 # Compares the results from the script (read from the script CSV output) to the expected results.
 os.chdir(c.script_output)
-expected_df = expected_completeness_check_df()
+expected_df = make_expected_completeness_check_df()
 actual_df = pd.read_csv("completeness_check.csv")
 compare_df = actual_df.merge(expected_df, indicator=True, how="outer")
 
