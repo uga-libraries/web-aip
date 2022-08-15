@@ -108,6 +108,55 @@ def make_expected_df(test):
         fixitys = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
         unzips = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
 
+    elif test == "multiple":
+        seeds = ["2454528", "2483020", "2483023", "2483022", "2483019", "2483024", "2483021",
+                 "2467332", "2481633", "2481632", "2481634", "2481631", "2184360"]
+        aips = ["rbrl-495-web-202102-0001", "rbrl-495-web-202102-0002", "rbrl-495-web-202102-0003",
+                "rbrl-495-web-202102-0004", "rbrl-495-web-202102-0005", "rbrl-495-web-202102-0006",
+                "rbrl-495-web-202102-0007", "rbrl-496-web-202102-0001", "rbrl-496-web-202102-0002",
+                "rbrl-496-web-202102-0003", "rbrl-496-web-202102-0004", "rbrl-496-web-202102-0005",
+                "harg-0000-web-202102-0001"]
+        titles = ["Doug Collins for Senate - Home | Facebook", "Doug Collins - Posts | Facebook",
+                  "Doug Collins - Photos | Facebook", "Doug Collins - Events | Facebook",
+                  "Doug Collins - About | Facebook", "Doug Collins - Community | Facebook",
+                  "Doug Collins - Videos | Facebook", "Sen. Kelly Loeffler - Home | Facebook",
+                  "Sen. Kelly Loeffler - Posts | Facebook", "Sen. Kelly Loeffler - Videos | Facebook",
+                  "Sen. Kelly Loeffler - Photos | Facebook", "Sen. Kelly Loeffler - About | Facebook", "UGA Today"]
+        depts = ["russell", "russell", "russell", "russell", "russell", "russell", "russell",
+                 "russell", "russell", "russell", "russell", "russell", "hargrett"]
+        uga_colls = ["rbrl-495", "rbrl-495", "rbrl-495", "rbrl-495", "rbrl-495", "rbrl-495", "rbrl-495",
+                     "rbrl-496", "rbrl-496", "rbrl-496", "rbrl-496", "rbrl-496", "0000"]
+        ait_colls = [12265, 12265, 12265, 12265, 12265, 12265, 12265, 12265, 12265, 12265, 12265, 12265, 12912]
+        jobs = ["1365541", "1365541", "1365541", "1365541", "1365541", "1365541", "1365541", "1365539,1360420",
+                "1365539,1360420", "1365539,1360420", "1365539,1360420", "1365539,1360420", "1365262"]
+        sizes = [2.69, 2.22, 0.79, 0.77, 0.78, 0.77, 0.79, 1.38, 1.1, 0.86, 1.47, 0.8, 2.72]
+        warcs = [3, 3, 1, 1, 1, 1, 1, 3, 3, 2, 2, 2, 3]
+        names = ["ARCHIVEIT-12265-TEST-JOB1365541-SEED2454528-20210216160709989-00000-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1365541-SEED2454528-20210216175007597-00001-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1365541-SEED2454528-20210217005857702-00002-h3.warc.gz",
+                 "ARCHIVEIT-12265-TEST-JOB1365541-SEED2483020-20210216161756658-00000-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1365541-SEED2483020-20210217025521093-00001-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1365541-SEED2483020-20210218125429980-00002-h3.warc.gz",
+                 "ARCHIVEIT-12265-TEST-JOB1365541-SEED2483023-20210216163040755-00000-h3.warc.gz",
+                 "ARCHIVEIT-12265-TEST-JOB1365541-SEED2483022-20210216162544981-00000-h3.warc.gz",
+                 "ARCHIVEIT-12265-TEST-JOB1365541-SEED2483019-20210216161617342-00000-h3.warc.gz",
+                 "ARCHIVEIT-12265-TEST-JOB1365541-SEED2483024-20210216163135976-00000-h3.warc.gz",
+                 "ARCHIVEIT-12265-TEST-JOB1365541-SEED2483021-20210216162201596-00000-h3.warc.gz",
+                 "ARCHIVEIT-12265-TEST-JOB1365539-SEED2467332-20210216160534209-00000-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1365539-SEED2467332-20210217050217105-00001-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1360420-0-SEED2467332-20210205184307156-00000-htl6r9yj.warc.gz",
+                 "ARCHIVEIT-12265-TEST-JOB1365539-SEED2481633-20210216163158712-00000-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1365539-SEED2481633-20210219104712285-00001-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1360420-0-SEED2481633-20210205184316027-00000-8r6d2i9m.warc.gz",
+                 "ARCHIVEIT-12265-TEST-JOB1365539-SEED2481632-20210216162414083-00000-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1360420-0-SEED2481632-20210205184307213-00000-5ejos6fh.warc.gz",
+                 "ARCHIVEIT-12265-TEST-JOB1365539-SEED2481634-20210216165211862-00000-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1360420-0-SEED2481634-20210205184307279-00000-j3vx7i5n.warc.gz",
+                 "ARCHIVEIT-12265-TEST-JOB1365539-SEED2481631-20210216162203968-00000-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1360420-0-SEED2481631-20210205184307392-00000-7gwb8haf.warc.gz",
+                 "ARCHIVEIT-12912-MONTHLY-JOB1365262-SEED2184360-20210218011718988-00002-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1365262-SEED2184360-20210216082333741-00001-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1365262-SEED2184360-20210215221717805-00000-h3.warc.gz"]
+        seed_errs = ["Successfully calculated seed metadata", "Successfully calculated seed metadata",
+                     "Successfully calculated seed metadata", "Successfully calculated seed metadata",
+                     "Successfully calculated seed metadata", "Successfully calculated seed metadata",
+                     "Successfully calculated seed metadata", "Successfully calculated seed metadata",
+                     "Successfully calculated seed metadata", "Successfully calculated seed metadata",
+                     "Successfully calculated seed metadata", "Successfully calculated seed metadata",
+                     "Successfully calculated seed metadata"]
+        metadata_errs = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+        infos = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+        apis = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+        fixitys = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+        unzips = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+
     elif test == "russell":
         seeds = ["2467336", "2454513", "2454516", "2444048", "2454520", "2467334"]
         aips = ["rbrl-496-web-202102-0001", "rbrl-495-web-202102-0001", "rbrl-497-web-202102-0001",
@@ -156,9 +205,9 @@ def compare_df(test, df_actual, df_expected):
     # Otherwise, saves the rows that didn't match to a CSV in the script output directory:
     # left_only is the actual value and right_only is the expected value.
     if len(df) == 0:
-        print(f"{test} test passes.")
+        print(f"Test passes: {test}")
     else:
-        print(f"{test} test had errors. See CSV in script output directory for details.")
+        print(f"Test fails: {test}. See CSV in script output directory for details.")
         df.to_csv(f"{test}_differences.csv", index=False)
 
 
@@ -185,6 +234,11 @@ compare_df("MAGIL", magil_df, magil_expected_df)
 mix_df = web.seed_data("2019-06-26", "2019-07-04")
 mix_expected_df = make_expected_df("mix")
 compare_df("Mix", mix_df, mix_expected_df)
+
+# Test: combination of Hargrett and Russell with some that have multiple crawl jobs.
+multiple_df = web.seed_data("2021-02-16", "2021-02-20")
+multiple_expected_df = make_expected_df("multiple")
+compare_df("Multiple Jobs", multiple_df, multiple_expected_df)
 
 # Test: 6 Russell seeds, including 1 WARC and multiple WARCS.
 # All have related collection; some collections have multiple seeds.
