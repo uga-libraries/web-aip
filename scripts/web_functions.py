@@ -280,8 +280,8 @@ def download_metadata(seed, seed_df):
         try:
             report_df = pd.read_csv(f"{seed.AIP_ID}/metadata/{seed.AIP_ID}_{job}_crawljob.csv", dtype="object")
             crawl_def_id = report_df.loc[0, "crawl_definition"]
-            if not os.path.exists(f"{seed.AIP_ID}/metadata/{seed.Seed_ID}_{crawl_def_id}_crawldef.csv"):
-                get_report("id", crawl_def_id, "crawl_definition", f"{seed.Seed_ID}_{crawl_def_id}_crawldef.csv")
+            if not os.path.exists(f"{seed.AIP_ID}/metadata/{seed.AIP_ID}_{crawl_def_id}_crawldef.csv"):
+                get_report("id", crawl_def_id, "crawl_definition", f"{seed.AIP_ID}_{crawl_def_id}_crawldef.csv")
         except FileNotFoundError:
             log("Crawl job was not downloaded so can't get crawl definition id", seed_df, row_index, "Metadata_Report_Errors")
 
