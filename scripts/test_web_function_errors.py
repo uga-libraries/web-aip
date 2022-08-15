@@ -31,13 +31,13 @@ def make_expected_seed_df():
 
     seeds = ["2529634", "2529660", "2529629", "2529642", "2529627",
              "2529652", "2529631", "2529668", "2529681", "2529676",
-             "2454507", "2454506", "2739136", "2184360"]
+             "2454507", "2454506", "2739136", "2184360", "2173769"]
 
     aips = ["magil-ggp-2529634-2022-03", "magil-ggp-2529660-2022-03", "magil-ggp-2529629-2022-03",
             "magil-ggp-2529642-2022-03", "magil-ggp-2529627-2022-03", "magil-ggp-2529652-2022-03",
             "magil-ggp-2529631-2022-03", "magil-ggp-2529668-2022-03", "magil-ggp-2529681-2022-03",
             "magil-ggp-2529676-2022-03", "rbrl-246-web-202203-0001", "rbrl-246-web-202203-0002",
-            "rbrl-499-web-202203-0001", "harg-0000-web-202203-0026"]
+            "rbrl-499-web-202203-0001", "harg-0000-web-202203-0026", "harg-0000-web-202203-0027"]
 
     titles = ["Georgia Office of Attorney General Consumer Protection Division",
               "Georgia Governor's Office of Disability Services Ombudsman",
@@ -52,25 +52,26 @@ def make_expected_seed_df():
               "SenatorIsakson - YouTube",
               "SenatorIsakson - YouTube [channel page]",
               "Savannah River Site",
-              "UGA Today"]
+              "UGA Today",
+              "Coronavirus (COVID-19) Information and Resources website"]
 
     depts = ["magil", "magil", "magil", "magil", "magil",
              "magil", "magil", "magil", "magil", "magil",
-             "russell", "russell", "russell", "hargrett"]
+             "russell", "russell", "russell", "hargrett", "hargrett"]
 
     uga_colls = ["0000", "0000", "0000", "0000", "0000",
                  "0000", "0000", "0000", "0000", "0000",
-                 "rbrl-246", "rbrl-246", "rbrl-499", "0000"]
+                 "rbrl-246", "rbrl-246", "rbrl-499", "0000", "0000"]
 
     ait_colls = [15678, 15678, 15678, 15678, 15678,
                  15678, 15678, 15678, 15678, 15678,
-                 12265, 12265, 12263, 12912]
+                 12265, 12265, 12263, 12912, 12912]
 
     jobs = ["1576505", "1573937", "1573937", "1573937", "1573937",
             "1576493", "1576492", "1577241", "1577187", "1577186",
-            "1542317", "1542317", "1539793", "1497166"]
+            "1542317", "1542317", "1539793", "1497166", "1496119,1493118,1490068"]
 
-    warcs = [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9, 2, 36]
+    warcs = [2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9, 2, 36, 3]
 
     names = ["ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220318151112447-00000-h3.warc.gz,ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220320234830550-00001-h3.warc.gz",
              "ARCHIVEIT-15678-TEST-JOB1573937-SEED2529660-20220314173634919-00000-h3.warc.gz",
@@ -85,7 +86,8 @@ def make_expected_seed_df():
              "ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454507-20220114214056178-00000-hlvkp53o.warc.gz",
              "ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220114214053021-00000-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220115132006340-00001-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220115233148240-00002-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116063911435-00003-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116131550492-00004-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117010033395-00005-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117200343134-00008-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117064534470-00006-8dgxemts.warc.gz,ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117130422336-00007-8dgxemts.warc.gz",
              "ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220110194710516-00000-h3.warc.gz,ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220111130848517-00001-h3.warc.gz",
-             "ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017105304659-00034-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211018211851376-00035-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103754760-00033-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102717487-00031-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103234346-00032-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101611745-00029-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102203466-00030-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101049993-00028-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017100311992-00027-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094753960-00025-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017095516699-00026-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094020636-00024-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017093516000-00023-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017092934974-00022-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091918474-00021-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091205263-00020-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090702655-00019-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090255676-00018-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085824384-00017-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085024644-00016-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017081603923-00015-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017074632435-00014-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073724465-00013-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073125245-00012-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017071639642-00011-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070834820-00010-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070215160-00009-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017065508860-00008-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017064416641-00007-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063723971-00006-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063009068-00005-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017061815778-00004-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017060858471-00003-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017020639822-00002-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211016171927511-00001-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211015221823419-00000-h3.warc.gz"]
+             "ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017105304659-00034-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211018211851376-00035-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103754760-00033-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102717487-00031-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017103234346-00032-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101611745-00029-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017102203466-00030-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017101049993-00028-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017100311992-00027-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094753960-00025-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017095516699-00026-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017094020636-00024-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017093516000-00023-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017092934974-00022-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091918474-00021-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017091205263-00020-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090702655-00019-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017090255676-00018-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085824384-00017-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017085024644-00016-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017081603923-00015-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017074632435-00014-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073724465-00013-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017073125245-00012-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017071639642-00011-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070834820-00010-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017070215160-00009-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017065508860-00008-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017064416641-00007-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063723971-00006-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017063009068-00005-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017061815778-00004-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017060858471-00003-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211017020639822-00002-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211016171927511-00001-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1497166-SEED2184360-20211015221823419-00000-h3.warc.gz",
+             "ARCHIVEIT-12912-WEEKLY-JOB1496119-SEED2173769-20211013221706082-00000-h3.warc.gz,ARCHIVEIT-12912-WEEKLY-JOB1493118-SEED2173769-20211006221709530-00000-h3.warc.gz,ARCHIVEIT-12912-WEEKLY-JOB1490068-SEED2173769-20210929221708074-00000-h3.warc.gz"]
 
     seed_errs = ["Successfully calculated seed metadata", "Successfully calculated seed metadata",
                  "Successfully calculated seed metadata", "Successfully calculated seed metadata",
@@ -93,7 +95,8 @@ def make_expected_seed_df():
                  "Successfully calculated seed metadata", "Successfully calculated seed metadata",
                  "Successfully calculated seed metadata", "Successfully calculated seed metadata",
                  "Successfully calculated seed metadata", "Successfully calculated seed metadata",
-                 "Successfully calculated seed metadata", "Successfully calculated seed metadata"]
+                 "Successfully calculated seed metadata", "Successfully calculated seed metadata",
+                 "Successfully calculated seed metadata"]
 
     metadata_errs = ["Successfully downloaded all metadata reports",
                      "Successfully downloaded all metadata reports",
@@ -104,10 +107,11 @@ def make_expected_seed_df():
                      "Successfully downloaded all metadata reports",
                      "Successfully downloaded all metadata reports",
                      "Successfully downloaded all metadata reports",
-                     "magil-ggp-2529676-2022-03_seed.csv API error 999; magil-ggp-2529676-2022-03_seedscope.csv API error 999; magil-ggp-2529676-2022-03_collscope.csv API error 999; magil-ggp-2529676-2022-03_coll.csv API error 999; 2529676_31104537579_crawldef.csv API error 999",
+                     "magil-ggp-2529676-2022-03_seed.csv API error 999; magil-ggp-2529676-2022-03_seedscope.csv API error 999; magil-ggp-2529676-2022-03_collscope.csv API error 999; magil-ggp-2529676-2022-03_coll.csv API error 999; magil-ggp-2529676-2022-03_31104537579_crawldef.csv API error 999",
                      "Successfully downloaded all metadata reports",
                      "Successfully downloaded all metadata reports",
                      np.NaN,
+                     "Successfully downloaded all metadata reports",
                      "Successfully downloaded all metadata reports"]
 
     infos = ["Empty report magil-ggp-2529634-2022-03_seedscope.csv not saved; Empty report magil-ggp-2529634-2022-03_collscope.csv not saved",
@@ -123,7 +127,8 @@ def make_expected_seed_df():
              "No additional information",
              "No additional information",
              np.NaN,
-             "No additional information"]
+             "No additional information",
+             "Empty report harg-0000-web-202203-0027_seedscope.csv not saved"]
 
     apis = ["API error 999: can't download ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220318151112447-00000-h3.warc.gz; Successfully downloaded ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220320234830550-00001-h3.warc.gz",
             "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1573937-SEED2529660-20220314173634919-00000-h3.warc.gz",
@@ -138,7 +143,8 @@ def make_expected_seed_df():
             "Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454507-20220114214056178-00000-hlvkp53o.warc.gz",
             "API error 999: can't get info about ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220114214053021-00000-8dgxemts.warc.gz; API error 999: can't download ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220115132006340-00001-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220115233148240-00002-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116063911435-00003-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116131550492-00004-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117010033395-00005-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117200343134-00008-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117064534470-00006-8dgxemts.warc.gz; Successfully downloaded ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117130422336-00007-8dgxemts.warc.gz",
             np.NaN,
-            np.NaN]
+            np.NaN,
+            "Successfully downloaded ARCHIVEIT-12912-WEEKLY-JOB1496119-SEED2173769-20211013221706082-00000-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-WEEKLY-JOB1493118-SEED2173769-20211006221709530-00000-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-WEEKLY-JOB1490068-SEED2173769-20210929221708074-00000-h3.warc.gz"]
 
     fixitys = ["Successfully verified ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220320234830550-00001-h3.warc.gz fixity on",
                "Fixity for ARCHIVEIT-15678-TEST-JOB1573937-SEED2529660-20220314173634919-00000-h3.warc.gz cannot be extracted from md5deep output: b'@Something#Unexpected'",
@@ -153,7 +159,8 @@ def make_expected_seed_df():
                "Successfully verified ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454507-20220114214056178-00000-hlvkp53o.warc.gz fixity on",
                "Fixity for ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220115233148240-00002-8dgxemts.warc.gz cannot be extracted from md5deep output: b'@Something#Unexpected'; Successfully verified ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116063911435-00003-8dgxemts.warc.gz fixity on; Successfully verified ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116131550492-00004-8dgxemts.warc.gz fixity on; Successfully verified ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117010033395-00005-8dgxemts.warc.gz fixity on; Fixity for ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117200343134-00008-8dgxemts.warc.gz changed and it was deleted: 0bc2fd86f2e1a8ea6e0f87701f60ef79 before, abc123abc123abc123abc123 after; Successfully verified ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117064534470-00006-8dgxemts.warc.gz fixity on; Successfully verified ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117130422336-00007-8dgxemts.warc.gz fixity on",
                np.NaN,
-               np.NaN]
+               np.NaN,
+               "Successfully verified ARCHIVEIT-12912-WEEKLY-JOB1496119-SEED2173769-20211013221706082-00000-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-WEEKLY-JOB1493118-SEED2173769-20211006221709530-00000-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-WEEKLY-JOB1490068-SEED2173769-20210929221708074-00000-h3.warc.gz fixity on"]
 
     unzips = ["Successfully unzipped ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220320234830550-00001-h3.warc.gz",
               np.NaN,
@@ -168,9 +175,10 @@ def make_expected_seed_df():
               "Error unzipping ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454507-20220114214056178-00000-hlvkp53o.warc.gz: Error message stand-in.",
               "Error unzipping ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116063911435-00003-8dgxemts.warc.gz: Error message stand-in.; Successfully unzipped ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220116131550492-00004-8dgxemts.warc.gz; Successfully unzipped ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117010033395-00005-8dgxemts.warc.gz; Successfully unzipped ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117064534470-00006-8dgxemts.warc.gz; Successfully unzipped ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454506-20220117130422336-00007-8dgxemts.warc.gz",
               np.NaN,
-              np.NaN]
+              np.NaN,
+              "Successfully unzipped ARCHIVEIT-12912-WEEKLY-JOB1496119-SEED2173769-20211013221706082-00000-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-WEEKLY-JOB1493118-SEED2173769-20211006221709530-00000-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-WEEKLY-JOB1490068-SEED2173769-20210929221708074-00000-h3.warc.gz"]
 
-    sizes = [1.2, 0.1, 0.93, 0.94, 0.06, 0.19, 0.23, 0.39, 0.33, 0.19, 0, 8.05, 1.36, 35.78]
+    sizes = [1.2, 0.1, 0.93, 0.94, 0.06, 0.19, 0.23, 0.39, 0.33, 0.19, 0, 8.05, 1.36, 35.78, 0.85]
 
     df = pd.DataFrame({"Seed_ID": seeds, "AIP_ID": aips, "Title": titles, "Department": depts,
                        "UGA_Collection": uga_colls, "AIT_Collection": ait_colls, "Job_ID": jobs,
@@ -185,16 +193,14 @@ def make_expected_aip_log_df():
     """Makes and returns a dataframe with the expected values for aip_log. Starts by making a list of the values
     for each column in the dataframe."""
 
-    ids = ["magil-ggp-2529634-2022-03", "magil-ggp-2529660-2022-03",
-           "magil-ggp-2529629-2022-03", "magil-ggp-2529642-2022-03",
-           "magil-ggp-2529627-2022-03", "magil-ggp-2529652-2022-03",
-           "magil-ggp-2529631-2022-03", "magil-ggp-2529668-2022-03",
-           "magil-ggp-2529681-2022-03", "magil-ggp-2529676-2022-03",
-           "rbrl-246-web-202203-0001", "rbrl-246-web-202203-0002",
-           "rbrl-499-web-202203-0001", "harg-0000-web-202203-0026"]
+    ids = ["magil-ggp-2529634-2022-03", "magil-ggp-2529660-2022-03", "magil-ggp-2529629-2022-03",
+           "magil-ggp-2529642-2022-03", "magil-ggp-2529627-2022-03", "magil-ggp-2529652-2022-03",
+           "magil-ggp-2529631-2022-03", "magil-ggp-2529668-2022-03", "magil-ggp-2529681-2022-03",
+           "magil-ggp-2529676-2022-03", "rbrl-246-web-202203-0001", "rbrl-246-web-202203-0002",
+           "rbrl-499-web-202203-0001", "harg-0000-web-202203-0026", "harg-0000-web-202203-0027"]
 
     deleted = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN,
-               np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+               np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
 
     objects = ["Successfully created objects folder", "Successfully created objects folder",
                "Objects folder is empty.", "Successfully created objects folder",
@@ -202,7 +208,8 @@ def make_expected_aip_log_df():
                "Objects folder is empty.", "Objects folder is empty.",
                "Objects folder is empty.", "Objects folder is empty.",
                "Successfully created objects folder", "Successfully created objects folder",
-               "Successfully created objects folder", "Objects folder is missing."]
+               "Successfully created objects folder", "Objects folder is missing.",
+               "Successfully created objects folder"]
 
     metadata = ["Successfully created metadata folder", "Successfully created metadata folder",
                 np.NaN, "Metadata folder is missing.",
@@ -210,31 +217,31 @@ def make_expected_aip_log_df():
                 np.NaN, np.NaN,
                 np.NaN, np.NaN,
                 "Successfully created metadata folder", "Successfully created metadata folder",
-                "Metadata folder is empty.", np.NaN]
+                "Metadata folder is empty.", np.NaN, "Successfully created metadata folder"]
 
     fits_tools = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN,
-                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
 
     fits_combine = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN,
-                    np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+                    np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
 
     pres_made = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN,
-                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
 
     pres_valid = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN,
-                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
 
     bag_valid = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN,
-                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
 
     package = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN,
-               np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+               np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
 
     manifest = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN,
-                np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+                np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
 
     complete = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN,
-                np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+                np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
 
     df = pd.DataFrame({"AIP ID": ids, "Files Deleted": deleted, "Objects Folder": objects, "Metadata Folder": metadata,
                        "FITS Tool Errors": fits_tools, "FITS Combination Errors": fits_combine,
@@ -250,48 +257,58 @@ def make_directory_structure_df():
 
     paths = [r"aips_2022-03-29\aip_log.csv",
              r"aips_2022-03-29\seeds.csv",
-             r"aips_2022-03-29\errors\incomplete_directory\harg-0000-web-202203-0026\metadata\2184360_31104307871_crawldef.csv",
+             r"aips_2022-03-29\errors\incomplete_directory\harg-0000-web-202203-0026\metadata\harg-0000-web-202203-0026_31104307871_crawldef.csv",
              r"aips_2022-03-29\errors\incomplete_directory\harg-0000-web-202203-0026\metadata\harg-0000-web-202203-0026_1497166_crawljob.csv",
              r"aips_2022-03-29\errors\incomplete_directory\harg-0000-web-202203-0026\metadata\harg-0000-web-202203-0026_coll.csv",
              r"aips_2022-03-29\errors\incomplete_directory\harg-0000-web-202203-0026\metadata\harg-0000-web-202203-0026_collscope.csv",
              r"aips_2022-03-29\errors\incomplete_directory\harg-0000-web-202203-0026\metadata\harg-0000-web-202203-0026_seed.csv",
              r"aips_2022-03-29\errors\incomplete_directory\harg-0000-web-202203-0026\metadata\harg-0000-web-202203-0026_seedscope.csv",
-             r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529627-2022-03\metadata\2529627_31104535848_crawldef.csv",
+             r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529627-2022-03\metadata\magil-ggp-2529627-2022-03_31104535848_crawldef.csv",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529627-2022-03\metadata\magil-ggp-2529627-2022-03_1573937_crawljob.csv",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529627-2022-03\metadata\magil-ggp-2529627-2022-03_coll.csv",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529627-2022-03\metadata\magil-ggp-2529627-2022-03_seed.csv",
-             r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529629-2022-03\metadata\2529629_31104535848_crawldef.csv",
+             r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529629-2022-03\metadata\magil-ggp-2529629-2022-03_31104535848_crawldef.csv",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529629-2022-03\metadata\magil-ggp-2529629-2022-03_1573937_crawljob.csv",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529629-2022-03\metadata\magil-ggp-2529629-2022-03_coll.csv",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529629-2022-03\metadata\magil-ggp-2529629-2022-03_seed.csv",
-             r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529631-2022-03\metadata\2529631_31104537364_crawldef.csv",
+             r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529631-2022-03\metadata\magil-ggp-2529631-2022-03_31104537364_crawldef.csv",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529631-2022-03\metadata\magil-ggp-2529631-2022-03_1576492_crawljob.csv",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529631-2022-03\metadata\magil-ggp-2529631-2022-03_coll.csv",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529631-2022-03\metadata\magil-ggp-2529631-2022-03_seed.csv",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529642-2022-03\objects\for_test.txt",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529652-2022-03\metadata\magil-ggp-2529652-2022-03_coll.csv",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529652-2022-03\metadata\magil-ggp-2529652-2022-03_seed.csv",
-             r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529668-2022-03\metadata\2529668_31104537585_crawldef.csv",
+             r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529668-2022-03\metadata\magil-ggp-2529668-2022-03_31104537585_crawldef.csv",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529668-2022-03\metadata\magil-ggp-2529668-2022-03_1577241_crawljob.csv",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529668-2022-03\metadata\magil-ggp-2529668-2022-03_coll.csv",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529668-2022-03\metadata\magil-ggp-2529668-2022-03_seed.csv",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529676-2022-03\metadata\magil-ggp-2529676-2022-03_1577186_crawljob.csv",
-             r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529681-2022-03\metadata\2529681_31104537580_crawldef.csv",
+             r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529681-2022-03\metadata\magil-ggp-2529681-2022-03_31104537580_crawldef.csv",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529681-2022-03\metadata\magil-ggp-2529681-2022-03_1577187_crawljob.csv",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529681-2022-03\metadata\magil-ggp-2529681-2022-03_coll.csv",
              r"aips_2022-03-29\errors\incomplete_directory\magil-ggp-2529681-2022-03\metadata\magil-ggp-2529681-2022-03_seed.csv",
              r"aips_2022-03-29\errors\incomplete_directory\rbrl-499-web-202203-0001\objects\for_test.txt",
-             r"aips_2022-03-29\magil-ggp-2529634-2022-03\metadata\2529634_31104537372_crawldef.csv",
+             r"aips_2022-03-29\harg-0000-web-202203-0027\metadata\harg-0000-web-202203-0027_31104307305_crawldef.csv",
+             r"aips_2022-03-29\harg-0000-web-202203-0027\metadata\harg-0000-web-202203-0027_1490068_crawljob.csv",
+             r"aips_2022-03-29\harg-0000-web-202203-0027\metadata\harg-0000-web-202203-0027_1493118_crawljob.csv",
+             r"aips_2022-03-29\harg-0000-web-202203-0027\metadata\harg-0000-web-202203-0027_1496119_crawljob.csv",
+             r"aips_2022-03-29\harg-0000-web-202203-0027\metadata\harg-0000-web-202203-0027_coll.csv",
+             r"aips_2022-03-29\harg-0000-web-202203-0027\metadata\harg-0000-web-202203-0027_collscope.csv",
+             r"aips_2022-03-29\harg-0000-web-202203-0027\metadata\harg-0000-web-202203-0027_seed.csv",
+             r"aips_2022-03-29\harg-0000-web-202203-0027\objects\ARCHIVEIT-12912-WEEKLY-JOB1490068-SEED2173769-20210929221708074-00000-h3.warc",
+             r"aips_2022-03-29\harg-0000-web-202203-0027\objects\ARCHIVEIT-12912-WEEKLY-JOB1493118-SEED2173769-20211006221709530-00000-h3.warc",
+             r"aips_2022-03-29\harg-0000-web-202203-0027\objects\ARCHIVEIT-12912-WEEKLY-JOB1496119-SEED2173769-20211013221706082-00000-h3.warc",
+             r"aips_2022-03-29\magil-ggp-2529634-2022-03\metadata\magil-ggp-2529634-2022-03_31104537372_crawldef.csv",
              r"aips_2022-03-29\magil-ggp-2529634-2022-03\metadata\magil-ggp-2529634-2022-03_1576505_crawljob.csv",
              r"aips_2022-03-29\magil-ggp-2529634-2022-03\metadata\magil-ggp-2529634-2022-03_coll.csv",
              r"aips_2022-03-29\magil-ggp-2529634-2022-03\metadata\magil-ggp-2529634-2022-03_seed.csv",
              r"aips_2022-03-29\magil-ggp-2529634-2022-03\objects\ARCHIVEIT-15678-TEST-JOB1576505-SEED2529634-20220320234830550-00001-h3.warc",
-             r"aips_2022-03-29\magil-ggp-2529660-2022-03\metadata\2529660_31104535848_crawldef.csv",
+             r"aips_2022-03-29\magil-ggp-2529660-2022-03\metadata\magil-ggp-2529660-2022-03_31104535848_crawldef.csv",
              r"aips_2022-03-29\magil-ggp-2529660-2022-03\metadata\magil-ggp-2529660-2022-03_1573937_crawljob.csv",
              r"aips_2022-03-29\magil-ggp-2529660-2022-03\metadata\magil-ggp-2529660-2022-03_coll.csv",
              r"aips_2022-03-29\magil-ggp-2529660-2022-03\metadata\magil-ggp-2529660-2022-03_seed.csv",
              r"aips_2022-03-29\magil-ggp-2529660-2022-03\objects\ARCHIVEIT-15678-TEST-JOB1573937-SEED2529660-20220314173634919-00000-h3.warc.gz",
-             r"aips_2022-03-29\rbrl-246-web-202203-0001\metadata\2454507_31104519079_crawldef.csv",
+             r"aips_2022-03-29\rbrl-246-web-202203-0001\metadata\rbrl-246-web-202203-0001_31104519079_crawldef.csv",
              r"aips_2022-03-29\rbrl-246-web-202203-0001\metadata\rbrl-246-web-202203-0001_1542317_crawljob.csv",
              r"aips_2022-03-29\rbrl-246-web-202203-0001\metadata\rbrl-246-web-202203-0001_coll.csv",
              r"aips_2022-03-29\rbrl-246-web-202203-0001\metadata\rbrl-246-web-202203-0001_collscope.csv",
@@ -299,7 +316,7 @@ def make_directory_structure_df():
              r"aips_2022-03-29\rbrl-246-web-202203-0001\metadata\rbrl-246-web-202203-0001_seedscope.csv",
              r"aips_2022-03-29\rbrl-246-web-202203-0001\objects\ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454507-20220114214056178-00000-hlvkp53o.warc.gz",
              r"aips_2022-03-29\rbrl-246-web-202203-0001\objects\ARCHIVEIT-12265-TEST-JOB1542317-0-SEED2454507-20220114214056178-00000-hlvkp53o.warc.gz.open",
-             r"aips_2022-03-29\rbrl-246-web-202203-0002\metadata\2454506_31104519079_crawldef.csv",
+             r"aips_2022-03-29\rbrl-246-web-202203-0002\metadata\rbrl-246-web-202203-0002_31104519079_crawldef.csv",
              r"aips_2022-03-29\rbrl-246-web-202203-0002\metadata\rbrl-246-web-202203-0002_1542317_crawljob.csv",
              r"aips_2022-03-29\rbrl-246-web-202203-0002\metadata\rbrl-246-web-202203-0002_coll.csv",
              r"aips_2022-03-29\rbrl-246-web-202203-0002\metadata\rbrl-246-web-202203-0002_collscope.csv",
@@ -383,21 +400,26 @@ def download_metadata(seed, seed_df, error_type):
     # Row index for the seed being processed in the dataframe, to use for adding logging information.
     row_index = seed_df.index[seed_df["Seed_ID"] == seed.Seed_ID].tolist()[0]
 
-    # Downloads five of the six metadata reports from Archive-It needed to understand the context of the WARC.
+    # Downloads four of the six metadata reports from Archive-It needed to understand the context of the WARC.
     # These are reports where there is only one report per seed or collection.
     get_report("id", seed.Seed_ID, "seed", f"{seed.AIP_ID}_seed.csv")
     get_report("seed", seed.Seed_ID, "scope_rule", f"{seed.AIP_ID}_seedscope.csv")
     get_report("collection", seed.AIT_Collection, "scope_rule", f"{seed.AIP_ID}_collscope.csv")
     get_report("id", seed.AIT_Collection, "collection", f"{seed.AIP_ID}_coll.csv")
-    get_report("id", seed.Job_ID, "crawl_job", f"{seed.AIP_ID}_{seed.Job_ID}_crawljob.csv")
 
-    # Gets the crawl definition id from the crawl job report and downloads it.
-    try:
-        report_df = pd.read_csv(f"{seed.AIP_ID}/metadata/{seed.AIP_ID}_{seed.Job_ID}_crawljob.csv", dtype="object")
-        crawl_def_id = report_df.loc[0, "crawl_definition"]
-        get_report("id", crawl_def_id, "crawl_definition", f"{seed.Seed_ID}_{crawl_def_id}_crawldef.csv")
-    except FileNotFoundError:
-        web.log("Crawl job was not downloaded so can't get crawl definition id", seed_df, row_index, "Metadata_Report_Errors")
+    # Downloads each of the crawl job reports and its corresponding crawl definition report (if new).
+    # If a seed has more than one, Job_ID has a comma-separated string of the IDs.
+    job_list = seed.Job_ID.split(",")
+    for job in job_list:
+        get_report("id", job, "crawl_job", f"{seed.AIP_ID}_{job}_crawljob.csv")
+        try:
+            report_df = pd.read_csv(f"{seed.AIP_ID}/metadata/{seed.AIP_ID}_{job}_crawljob.csv", dtype="object")
+            crawl_def_id = report_df.loc[0, "crawl_definition"]
+            if not os.path.exists(f"{seed.AIP_ID}/metadata/{seed.AIP_ID}_{crawl_def_id}_crawldef.csv"):
+                get_report("id", crawl_def_id, "crawl_definition", f"{seed.AIP_ID}_{crawl_def_id}_crawldef.csv")
+        except FileNotFoundError:
+            web.log("Crawl job was not downloaded so can't get crawl definition id", seed_df, row_index,
+                "Metadata_Report_Errors")
 
     # If there were no download errors (the dataframe still has no value in that cell), updates the log to show success.
     if pd.isnull(seed_df.at[row_index, "Metadata_Report_Errors"]):
@@ -588,6 +610,16 @@ for seed in seed_df.itertuples():
     # Displays the script progress.
     print(f"Processing seed {seed.Seed_ID} (AIP {seed.AIP_ID}).")
 
+    # Complete AIP with multiple crawl jobs.
+    if seed.Seed_ID == "2173769":
+        os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
+        os.makedirs(os.path.join(seed.AIP_ID, "objects"))
+        download_metadata(seed, seed_df, error_type=None)
+        download_warcs(seed, date_end, seed_df, error_type=None)
+        aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
+        web.check_directory(aip)
+        a.log(aip.log)
+
     # ERROR 1: API error downloading metadata reports.
     if seed.Seed_ID == "2529676":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
@@ -747,7 +779,7 @@ for item in os.listdir("."):
 # removes seeds that are in the date range but not currently used for tests.
 expected_seed_df = make_expected_seed_df()
 seed_df["WARC_Fixity_Errors"] = seed_df["WARC_Fixity_Errors"].str.replace(" \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6}", "")
-skip_seeds = ["2173769", "2472041", "2472044", "2508399", "2511963", "2529633", "2529636", "2529657", "2529665",
+skip_seeds = ["2472041", "2472044", "2508399", "2511963", "2529633", "2529636", "2529657", "2529665",
               "2529667", "2529669", "2529671", "2529682", "2547114", "2552505", "2783588", "2783596"]
 seed_df = seed_df[~seed_df["Seed_ID"].isin(skip_seeds)]
 compare_seed_df = seed_df.merge(expected_seed_df, indicator=True, how="outer")
