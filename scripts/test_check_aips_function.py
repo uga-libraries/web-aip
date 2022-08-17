@@ -23,70 +23,33 @@ def make_file(path):
 
 
 def make_expected_completeness_check_df():
-    """Makes a dataframe with the expected values for the completeness_check.csv that this script will produce
-    if everything works correctly."""
+    """Makes and returns a dataframe with the expected values for the completeness_check.csv
+    that this script will produce if everything works correctly.
+    Starts with a list for the values each AIP, which become the rows in the dataframe."""
 
-    aip_list = ["magil-ggp-2472041-2022-03", "magil-ggp-2529671-2022-03",
-                "magil-ggp-2529669-2022-03", "magil-ggp-2529633-2022-03",
-                "magil-ggp-2529665-2022-03", "magil-ggp-2529634-2022-03",
-                "magil-ggp-2529660-2022-03", "magil-ggp-2529629-2022-03",
-                "magil-ggp-2529642-2022-03", "magil-ggp-2529627-2022-03",
-                "magil-ggp-2529652-2022-03", "magil-ggp-2529631-2022-03",
-                "magil-ggp-2529668-2022-03", "magil-ggp-2529681-2022-03",
-                "magil-ggp-2529676-2022-03", "magil-ggp-extra1-2022-03_bag", "magil-ggp-extra2-2022-03_bag"]
+    column_names = ["AIP", "URL", "AIP Folder Made", "coll.csv", "collscope.csv", "seed.csv", "seedscope.csv",
+                    "crawldef.csv count", "crawljob.csv count", "preservation.xml", "WARC Count Correct",
+                    "Objects is all WARCs", "fits.xml Count Correct", "No Extra Metadata"]
 
-    url_list = ["https://www.legis.ga.gov/", "https://grec.state.ga.us/",
-                "https://oig.georgia.gov/", "https://medicalboard.georgia.gov/",
-                "https://ltgov.georgia.gov/", "https://consumer.georgia.gov/",
-                "https://dso.georgia.gov/", "https://gbp.georgia.gov/",
-                "https://dcs.georgia.gov/", "https://gaa.georgia.gov/",
-                "https://gdna.georgia.gov/", "https://gceo.georgia.gov/",
-                "https://oca.georgia.gov/", "https://gspc.georgia.gov/",
-                "https://gsba.georgia.gov/", np.NaN, np.NaN]
+    rows = [["magil-ggp-2472041-2022-03", "https://www.legis.ga.gov/", "False", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+            ["magil-ggp-2529671-2022-03", "https://grec.state.ga.us/", "True", True, True, True, True, 1, 1, True, False, True, False, True],
+            ["magil-ggp-2529669-2022-03", "https://oig.georgia.gov/", "True", True, True, True, True, 1, 1, True, True, True, False, True],
+            ["magil-ggp-2529633-2022-03", "https://medicalboard.georgia.gov/", "True", True, True, True, True, 1, 1, True, True, True, True, True],
+            ["magil-ggp-2529665-2022-03", "https://ltgov.georgia.gov/", "True", True, True, True, True, 0, 0, True, True, True, True, True],
+            ["magil-ggp-2529634-2022-03", "https://consumer.georgia.gov/", "True", True, True, True, True, 1, 1, True, True, True, True, True],
+            ["magil-ggp-2529660-2022-03", "https://dso.georgia.gov/", "True", True, True, False, False, 1, 1, True, True, True, True, True],
+            ["magil-ggp-2529629-2022-03", "https://gbp.georgia.gov/", "True", True, True, True, True, 2, 1, True, True, True, True, True],
+            ["magil-ggp-2529642-2022-03", "https://dcs.georgia.gov/", "True", False, True, True, True, 1, 1, True, True, True, True, True],
+            ["magil-ggp-2529627-2022-03", "https://gaa.georgia.gov/", "True", True, True, True, True, 1, 1, True, True, True, True, True],
+            ["magil-ggp-2529652-2022-03", "https://gdna.georgia.gov/", "True", True, False, True, True, 1, 1, True, True, True, True, True],
+            ["magil-ggp-2529631-2022-03", "https://gceo.georgia.gov/", "True", True, True, True, True, 1, 3, True, True, True, True, True],
+            ["magil-ggp-2529668-2022-03", "https://oca.georgia.gov/", "True", True, True, True, True, 1, 1, False, True, True, False, True],
+            ["magil-ggp-2529681-2022-03", "https://gspc.georgia.gov/", "True", True, True, True, True, 1, 1, True, True, False, True, True],
+            ["magil-ggp-2529676-2022-03", "https://gsba.georgia.gov/", "True", True, True, True, True, 1, 1, True, True, True, True, False],
+            ["magil-ggp-extra1-2022-03_bag", np.NaN, "Not expected", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+            ["magil-ggp-extra2-2022-03_bag", np.NaN, "Not expected", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]]
 
-    folder_list = ["False", "True", "True", "True", "True", "True", "True", "True", "True", "True",
-                   "True", "True", "True", "True", "True", "Not expected", "Not expected"]
-
-    coll_list = [np.NaN, True, True, True, True, True, True, True, False, True,
-                 True, True, True, True, True, np.NaN, np.NaN]
-
-    collscope_list = [np.NaN, True, True, True, True, True, True, True, True, True,
-                      False, True, True, True, True, np.NaN, np.NaN]
-
-    seed_list = [np.NaN, True, True, True, True, True, False, True, True, True,
-                 True, True, True, True, True, np.NaN, np.NaN]
-
-    seedscope_list = [np.NaN, True, True, True, True, True, False, True, True, True,
-                      True, True, True, True, True, np.NaN, np.NaN]
-
-    crawldef_list = [np.NaN, 1, 1, 1, 0, 1, 1, 2, 1, 1,
-                     1, 1, 1, 1, 1, np.NaN, np.NaN]
-
-    crawljob_list = [np.NaN, 1, 1, 1, 0, 1, 1, 1, 1, 1,
-                     1, 3, 1, 1, 1, np.NaN, np.NaN]
-
-    presxml_list = [np.NaN, True, True, True, True, True, True, True, True, True,
-                    True, True, False, True, True, np.NaN, np.NaN]
-
-    warc_list = [np.NaN, False, True, True, True, True, True, True, True, True,
-                 True, True, True, True, True, np.NaN, np.NaN]
-
-    objects_list = [np.NaN, True, True, True, True, True, True, True, True, True,
-                    True, True, True, False, True, np.NaN, np.NaN]
-
-    fits_list = [np.NaN, False, False, True, True, True, True, True, True, True,
-                 True, True, False, True, True, np.NaN, np.NaN]
-
-    metadata_list = [np.NaN, True, True, True, True, True, True, True, True, True,
-                     True, True, True, True, False, np.NaN, np.NaN]
-
-    data = {"AIP": aip_list, "URL": url_list, "AIP Folder Made": folder_list, "coll.csv": coll_list,
-            "collscope.csv": collscope_list, "seed.csv": seed_list, "seedscope.csv": seedscope_list,
-            "crawldef.csv count": crawldef_list, "crawljob.csv count": crawljob_list, "preservation.xml": presxml_list,
-            "WARC Count Correct": warc_list, "Objects is all WARCs": objects_list, "fits.xml Count Correct": fits_list,
-            "No Extra Metadata": metadata_list}
-
-    df = pd.DataFrame(data)
+    df = pd.DataFrame(rows, columns=column_names)
     return df
 
 
@@ -103,17 +66,15 @@ os.chdir(aips_directory)
 # Makes a dataframe with seed and AIP ids to use for making the test AIPs.
 # In the full script, this is made using the seed_data() function and there is a lot more in the seed dataframe,
 # but the check_aip() function only needs the two ids columns.
-seed_df = pd.DataFrame({"Seed_ID": ["2472041", "2529627", "2529629", "2529631", "2529633",
-                                    "2529634", "2529642", "2529652", "2529660", "2529665",
-                                    "2529668", "2529669", "2529671", "2529676", "2529681"],
-                        "AIP_ID": ["magil-ggp-2472041-2022-03", "magil-ggp-2529627-2022-03",
-                                   "magil-ggp-2529629-2022-03", "magil-ggp-2529631-2022-03",
-                                   "magil-ggp-2529633-2022-03", "magil-ggp-2529634-2022-03",
-                                   "magil-ggp-2529642-2022-03", "magil-ggp-2529652-2022-03",
-                                   "magil-ggp-2529660-2022-03", "magil-ggp-2529665-2022-03",
-                                   "magil-ggp-2529668-2022-03", "magil-ggp-2529669-2022-03",
-                                   "magil-ggp-2529671-2022-03", "magil-ggp-2529676-2022-03",
-                                   "magil-ggp-2529681-2022-03"]})
+rows = [["2472041", "magil-ggp-2472041-2022-03"], ["2529627", "magil-ggp-2529627-2022-03"],
+        ["2529629", "magil-ggp-2529629-2022-03"], ["2529631", "magil-ggp-2529631-2022-03"],
+        ["2529633", "magil-ggp-2529633-2022-03"], ["2529634", "magil-ggp-2529634-2022-03"],
+        ["2529642", "magil-ggp-2529642-2022-03"], ["2529652", "magil-ggp-2529652-2022-03"],
+        ["2529660", "magil-ggp-2529660-2022-03"], ["2529665", "magil-ggp-2529665-2022-03"],
+        ["2529668", "magil-ggp-2529668-2022-03"], ["2529669", "magil-ggp-2529669-2022-03"],
+        ["2529671", "magil-ggp-2529671-2022-03"], ["2529676", "magil-ggp-2529676-2022-03"],
+        ["2529681", "magil-ggp-2529681-2022-03"]]
+seed_df = pd.DataFrame(rows, columns=["Seed_ID", "AIP_ID"])
 
 # Makes a minimum correct AIP for each of the seeds.
 # The folder is named _bag but is not a real bag and the files are plain text rather than actually downloaded.
