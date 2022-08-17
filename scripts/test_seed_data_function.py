@@ -21,176 +21,148 @@ def make_expected_df(test):
     lists for each column with the values for that test scenario, and then combines those into a dataframe."""
 
     if test == "bma":
-        seeds = ["2028986"]
-        aips = [np.NaN]
-        titles = ["The Now Explosion Website"]
-        depts = [np.NaN]
-        uga_colls = [np.NaN]
-        ait_colls = [12470]
-        jobs = ["1085452"]
-        sizes = [1.3]
-        warcs = [2]
-        names = ["ARCHIVEIT-12470-TEST-JOB1085452-SEED2028986-20200129224159397-00001-h3.warc.gz,"
-                 "ARCHIVEIT-12470-TEST-JOB1085452-SEED2028986-20200129213514425-00000-h3.warc.gz"]
-        seed_errs = ["Couldn't get all required metadata values from the seed report. Will not download files or make AIP."]
-        metadata_errs = [np.NaN]
-        infos = [np.NaN]
-        apis = [np.NaN]
-        fixitys = [np.NaN]
-        unzips = [np.NaN]
+        rows = [["2028986", np.NaN, "The Now Explosion Website", np.NaN, np.NaN, 12470, "1085452", 1.3, 2,
+                "ARCHIVEIT-12470-TEST-JOB1085452-SEED2028986-20200129224159397-00001-h3.warc.gz,ARCHIVEIT-12470-TEST-JOB1085452-SEED2028986-20200129213514425-00000-h3.warc.gz",
+                "Couldn't get all required metadata values from the seed report. Will not download files or make AIP.",
+                np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]]
 
     elif test == "hargrett":
-        seeds = ["2187482", "2030942", "2084785", "2270486"]
-        aips = ["harg-0000-web-202006-0001", "harg-0000-web-202006-0002", "harg-0000-web-202006-0003", "harg-0000-web-202006-0004"]
-        titles = ["Student Government Association Facebook", "UGA NAACP Twitter", "Zeta Pi Chapter of Alpha Phi Alpha Twitter", "UGA Commencement"]
-        depts = ["hargrett", "hargrett", "hargrett", "hargrett"]
-        uga_colls = ["0000", "0000", "0000", "0000"]
-        ait_colls = [12181, 12181, 12181, 12912]
-        jobs = ["1177700", "1177700", "1177700", "1176433"]
-        sizes = [3.62, 0.05, 0.11, 0.06]
-        warcs = [4, 1, 1, 1]
-        names = ["ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601191649570-00000-h3.warc.gz,ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601195532797-00002-h3.warc.gz,ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601194617707-00001-h3.warc.gz,ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601200733748-00003-h3.warc.gz",
+        rows = [["2187482", "harg-0000-web-202006-0001", "Student Government Association Facebook",
+                 "hargrett", "0000", 12181, "1177700", 3.62, 4,
+                 "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601191649570-00000-h3.warc.gz,ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601195532797-00002-h3.warc.gz,ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601194617707-00001-h3.warc.gz,ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601200733748-00003-h3.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2030942", "harg-0000-web-202006-0002", "UGA NAACP Twitter",
+                 "hargrett", "0000", 12181, "1177700", 0.05, 1,
                  "ARCHIVEIT-12181-TEST-JOB1177700-SEED2030942-20200601191649636-00000-h3.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2084785", "harg-0000-web-202006-0003", "Zeta Pi Chapter of Alpha Phi Alpha Twitter",
+                 "hargrett", "0000", 12181, "1177700", 0.11, 1,
                  "ARCHIVEIT-12181-TEST-JOB1177700-SEED2084785-20200601191752355-00000-h3.warc.gz",
-                 "ARCHIVEIT-12912-TEST-JOB1176433-SEED2270486-20200529202848582-00000-h3.warc.gz"]
-        seed_errs = ["Successfully calculated seed metadata", "Successfully calculated seed metadata", "Successfully calculated seed metadata", "Successfully calculated seed metadata"]
-        metadata_errs = [np.NaN, np.NaN, np.NaN, np.NaN]
-        infos = [np.NaN, np.NaN, np.NaN, np.NaN]
-        apis = [np.NaN, np.NaN, np.NaN, np.NaN]
-        fixitys = [np.NaN, np.NaN, np.NaN, np.NaN]
-        unzips = [np.NaN, np.NaN, np.NaN, np.NaN]
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2270486", "harg-0000-web-202006-0004", "UGA Commencement",
+                 "hargrett", "0000", 12912, "1176433", 0.06, 1,
+                 "ARCHIVEIT-12912-TEST-JOB1176433-SEED2270486-20200529202848582-00000-h3.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]]
 
     elif test == "magil":
-        seeds = ["2529647", "2472043"]
-        aips = ["magil-ggp-2529647-2022-04", "magil-ggp-2472043-2022-04"]
-        titles = ["Georgia Department of Transportation", "Georgia Department of Audits and Accounts"]
-        depts = ["magil", "magil"]
-        uga_colls = ["0000", "0000"]
-        ait_colls = [15678, 15678]
-        jobs = ["1583117", "1583270"]
-        sizes = [12.87, .12]
-        warcs = [13, 1]
-        names = ["ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220331151300136-00000-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220331223248449-00001-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401021708141-00002-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401024320779-00003-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401042238966-00004-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401055943204-00005-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401141604806-00006-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402030302049-00007-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402081423469-00008-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402113301104-00009-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402141557823-00010-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402201602620-00011-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402230559530-00012-urcpzn95.warc.gz",
-                 "ARCHIVEIT-15678-TEST-JOB1583270-0-SEED2472043-20220331170557241-00000-xzgq9wm8.warc.gz"]
-        seed_errs = ["Successfully calculated seed metadata", "Successfully calculated seed metadata"]
-        metadata_errs = [np.NaN, np.NaN]
-        infos = [np.NaN, np.NaN]
-        apis = [np.NaN, np.NaN]
-        fixitys = [np.NaN, np.NaN]
-        unzips = [np.NaN, np.NaN]
+        rows = [["2529647", "magil-ggp-2529647-2022-04", "Georgia Department of Transportation",
+                 "magil", "0000", 15678, "1583117", 12.87, 13,
+                 "ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220331151300136-00000-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220331223248449-00001-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401021708141-00002-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401024320779-00003-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401042238966-00004-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401055943204-00005-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220401141604806-00006-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402030302049-00007-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402081423469-00008-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402113301104-00009-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402141557823-00010-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402201602620-00011-urcpzn95.warc.gz,ARCHIVEIT-15678-TEST-JOB1583117-0-SEED2529647-20220402230559530-00012-urcpzn95.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2472043", "magil-ggp-2472043-2022-04", "Georgia Department of Audits and Accounts",
+                "magil", "0000", 15678, "1583270", .12, 1,
+                "ARCHIVEIT-15678-TEST-JOB1583270-0-SEED2472043-20220331170557241-00000-xzgq9wm8.warc.gz",
+                "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]]
 
     elif test == "mix":
-        seeds = ["2024640", "2024246", "2024250", "2024247", "2024249", "2024248"]
-        aips = ["rbrl-057-web-201907-0001", "harg-0000-web-201907-0001", np.NaN, "harg-0000-web-201907-0002", np.NaN, np.NaN]
-        titles = ["Democratic Party of Georgia - Help Move Georgia Forward",
-                  "UGA Black Theatrical Ensemble Twittter",
-                  np.NaN, "Infusion Magazine website", np.NaN, np.NaN]
-        depts = ["russell", "hargrett", np.NaN, "hargrett", np.NaN, np.NaN]
-        uga_colls = ["rbrl-057", "0000", np.NaN, "0000", np.NaN, np.NaN]
-        ait_colls = [12265, 12181, 12181, 12181, 12181, 12181]
-        jobs = ["940298", "938127", "938127", "938127", "938127", "938127"]
-        sizes = [0.67, 1.94, 0.85, 0.91, 0.24, 1.17]
-        warcs = [1, 2, 1, 1, 1, 2]
-        names = ["ARCHIVEIT-12265-TEST-JOB940298-SEED2024640-20190701154831318-00000-h3.warc.gz",
-                 "ARCHIVEIT-12181-CRAWL_SELECTED_SEEDS-JOB938127-SEED2024246-20190626135802459-00001-h3.warc.gz,ARCHIVEIT-12181-CRAWL_SELECTED_SEEDS-JOB938127-SEED2024246-20190625222324356-00000-h3.warc.gz",
+        rows = [["2024640", "rbrl-057-web-201907-0001", "Democratic Party of Georgia - Help Move Georgia Forward",
+                 "russell", "rbrl-057", 12265, "940298", 0.67, 1,
+                 "ARCHIVEIT-12265-TEST-JOB940298-SEED2024640-20190701154831318-00000-h3.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2024246", "harg-0000-web-201907-0001", "UGA Black Theatrical Ensemble Twittter",
+                 "hargrett", "0000", 12181, "938127", 1.94, 2,
+                 "ARCHIVEIT-12181-CRAWL_SELECTED_SEEDS-JOB938127-SEED2024246-20190626135802459-00001-h3.warc.gz,ARCHIVEIT-12181-CRAWL_SELECTED_SEEDS-JOB938127-SEED2024246-20190625222324356-00000-h3.warc.gz", "Successfully calculated seed metadata",
+                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2024250", np.NaN, np.NaN, np.NaN, np.NaN, 12181, "938127", 0.85, 1,
                  "ARCHIVEIT-12181-CRAWL_SELECTED_SEEDS-JOB938127-SEED2024250-20190625222414653-00000-h3.warc.gz",
+                 "Couldn't get all required metadata values from the seed report. Will not download files or make AIP.",
+                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2024247", "harg-0000-web-201907-0002", "Infusion Magazine website",
+                 "hargrett", "0000", 12181, "938127", 0.91, 1,
                  "ARCHIVEIT-12181-CRAWL_SELECTED_SEEDS-JOB938127-SEED2024247-20190625222324141-00000-h3.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2024249", np.NaN, np.NaN, np.NaN, np.NaN, 12181, "938127", 0.24, 1,
                  "ARCHIVEIT-12181-CRAWL_SELECTED_SEEDS-JOB938127-SEED2024249-20190625222349710-00000-h3.warc.gz",
-                 "ARCHIVEIT-12181-CRAWL_SELECTED_SEEDS-JOB938127-SEED2024248-20190626131257414-00001-h3.warc.gz,ARCHIVEIT-12181-CRAWL_SELECTED_SEEDS-JOB938127-SEED2024248-20190625222324244-00000-h3.warc.gz"]
-        seed_errs = ["Successfully calculated seed metadata", "Successfully calculated seed metadata",
-                     "Couldn't get all required metadata values from the seed report. Will not download files or make AIP.",
-                     "Successfully calculated seed metadata",
-                     "Couldn't get all required metadata values from the seed report. Will not download files or make AIP.",
-                     "Couldn't get all required metadata values from the seed report. Will not download files or make AIP."]
-        metadata_errs = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
-        infos = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
-        apis = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
-        fixitys = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
-        unzips = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+                 "Couldn't get all required metadata values from the seed report. Will not download files or make AIP.",
+                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2024248", np.NaN, np.NaN, np.NaN, np.NaN, 12181, "938127", 1.17, 2,
+                 "ARCHIVEIT-12181-CRAWL_SELECTED_SEEDS-JOB938127-SEED2024248-20190626131257414-00001-h3.warc.gz,ARCHIVEIT-12181-CRAWL_SELECTED_SEEDS-JOB938127-SEED2024248-20190625222324244-00000-h3.warc.gz", "Couldn't get all required metadata values from the seed report. Will not download files or make AIP.",
+                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]]
 
     elif test == "multiple":
-        seeds = ["2454528", "2483020", "2483023", "2483022", "2483019", "2483024", "2483021",
-                 "2467332", "2481633", "2481632", "2481634", "2481631", "2184360"]
-        aips = ["rbrl-495-web-202102-0001", "rbrl-495-web-202102-0002", "rbrl-495-web-202102-0003",
-                "rbrl-495-web-202102-0004", "rbrl-495-web-202102-0005", "rbrl-495-web-202102-0006",
-                "rbrl-495-web-202102-0007", "rbrl-496-web-202102-0001", "rbrl-496-web-202102-0002",
-                "rbrl-496-web-202102-0003", "rbrl-496-web-202102-0004", "rbrl-496-web-202102-0005",
-                "harg-0000-web-202102-0001"]
-        titles = ["Doug Collins for Senate - Home | Facebook", "Doug Collins - Posts | Facebook",
-                  "Doug Collins - Photos | Facebook", "Doug Collins - Events | Facebook",
-                  "Doug Collins - About | Facebook", "Doug Collins - Community | Facebook",
-                  "Doug Collins - Videos | Facebook", "Sen. Kelly Loeffler - Home | Facebook",
-                  "Sen. Kelly Loeffler - Posts | Facebook", "Sen. Kelly Loeffler - Videos | Facebook",
-                  "Sen. Kelly Loeffler - Photos | Facebook", "Sen. Kelly Loeffler - About | Facebook", "UGA Today"]
-        depts = ["russell", "russell", "russell", "russell", "russell", "russell", "russell",
-                 "russell", "russell", "russell", "russell", "russell", "hargrett"]
-        uga_colls = ["rbrl-495", "rbrl-495", "rbrl-495", "rbrl-495", "rbrl-495", "rbrl-495", "rbrl-495",
-                     "rbrl-496", "rbrl-496", "rbrl-496", "rbrl-496", "rbrl-496", "0000"]
-        ait_colls = [12265, 12265, 12265, 12265, 12265, 12265, 12265, 12265, 12265, 12265, 12265, 12265, 12912]
-        jobs = ["1365541", "1365541", "1365541", "1365541", "1365541", "1365541", "1365541", "1365539,1360420",
-                "1365539,1360420", "1365539,1360420", "1365539,1360420", "1365539,1360420", "1365262"]
-        sizes = [2.69, 2.22, 0.79, 0.77, 0.78, 0.77, 0.79, 1.38, 1.1, 0.86, 1.47, 0.8, 2.72]
-        warcs = [3, 3, 1, 1, 1, 1, 1, 3, 3, 2, 2, 2, 3]
-        names = ["ARCHIVEIT-12265-TEST-JOB1365541-SEED2454528-20210216160709989-00000-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1365541-SEED2454528-20210216175007597-00001-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1365541-SEED2454528-20210217005857702-00002-h3.warc.gz",
+        rows = [["2454528", "rbrl-495-web-202102-0001", "Doug Collins for Senate - Home | Facebook", 
+                 "russell", "rbrl-495", 12265, "1365541", 2.69, 3,
+                 "ARCHIVEIT-12265-TEST-JOB1365541-SEED2454528-20210216160709989-00000-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1365541-SEED2454528-20210216175007597-00001-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1365541-SEED2454528-20210217005857702-00002-h3.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2483020", "rbrl-495-web-202102-0002", "Doug Collins - Posts | Facebook",
+                 "russell", "rbrl-495", 12265, "1365541", 2.22, 3, 
                  "ARCHIVEIT-12265-TEST-JOB1365541-SEED2483020-20210216161756658-00000-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1365541-SEED2483020-20210217025521093-00001-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1365541-SEED2483020-20210218125429980-00002-h3.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2483023", "rbrl-495-web-202102-0003", "Doug Collins - Photos | Facebook",
+                 "russell", "rbrl-495", 12265, "1365541", 0.79, 1, 
                  "ARCHIVEIT-12265-TEST-JOB1365541-SEED2483023-20210216163040755-00000-h3.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2483022", "rbrl-495-web-202102-0004", "Doug Collins - Events | Facebook",
+                 "russell", "rbrl-495", 12265, "1365541", 0.77, 1,
                  "ARCHIVEIT-12265-TEST-JOB1365541-SEED2483022-20210216162544981-00000-h3.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2483019", "rbrl-495-web-202102-0005", "Doug Collins - About | Facebook",
+                 "russell", "rbrl-495", 12265, "1365541", 0.78, 1, 
                  "ARCHIVEIT-12265-TEST-JOB1365541-SEED2483019-20210216161617342-00000-h3.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2483024", "rbrl-495-web-202102-0006", "Doug Collins - Community | Facebook",
+                 "russell", "rbrl-495", 12265, "1365541", 0.77, 1, 
                  "ARCHIVEIT-12265-TEST-JOB1365541-SEED2483024-20210216163135976-00000-h3.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2483021", "rbrl-495-web-202102-0007", "Doug Collins - Videos | Facebook",
+                 "russell", "rbrl-495", 12265, "1365541", 0.79, 1, 
                  "ARCHIVEIT-12265-TEST-JOB1365541-SEED2483021-20210216162201596-00000-h3.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2467332", "rbrl-496-web-202102-0001", "Sen. Kelly Loeffler - Home | Facebook",
+                 "russell", "rbrl-496", 12265, "1365539,1360420", 1.38, 3,
                  "ARCHIVEIT-12265-TEST-JOB1365539-SEED2467332-20210216160534209-00000-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1365539-SEED2467332-20210217050217105-00001-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1360420-0-SEED2467332-20210205184307156-00000-htl6r9yj.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2481633", "rbrl-496-web-202102-0002", "Sen. Kelly Loeffler - Posts | Facebook",
+                 "russell", "rbrl-496", 12265, "1365539,1360420", 1.1, 3,
                  "ARCHIVEIT-12265-TEST-JOB1365539-SEED2481633-20210216163158712-00000-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1365539-SEED2481633-20210219104712285-00001-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1360420-0-SEED2481633-20210205184316027-00000-8r6d2i9m.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2481632", "rbrl-496-web-202102-0003", "Sen. Kelly Loeffler - Videos | Facebook",
+                 "russell", "rbrl-496", 12265, "1365539,1360420", 0.86, 2,
                  "ARCHIVEIT-12265-TEST-JOB1365539-SEED2481632-20210216162414083-00000-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1360420-0-SEED2481632-20210205184307213-00000-5ejos6fh.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2481634", "rbrl-496-web-202102-0004", "Sen. Kelly Loeffler - Photos | Facebook",
+                 "russell", "rbrl-496", 12265, "1365539,1360420", 1.47, 2,
                  "ARCHIVEIT-12265-TEST-JOB1365539-SEED2481634-20210216165211862-00000-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1360420-0-SEED2481634-20210205184307279-00000-j3vx7i5n.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2481631", "rbrl-496-web-202102-0005", "Sen. Kelly Loeffler - About | Facebook",
+                 "russell", "rbrl-496", 12265, "1365539,1360420", 0.8, 2,
                  "ARCHIVEIT-12265-TEST-JOB1365539-SEED2481631-20210216162203968-00000-h3.warc.gz,ARCHIVEIT-12265-TEST-JOB1360420-0-SEED2481631-20210205184307392-00000-7gwb8haf.warc.gz",
-                 "ARCHIVEIT-12912-MONTHLY-JOB1365262-SEED2184360-20210218011718988-00002-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1365262-SEED2184360-20210216082333741-00001-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1365262-SEED2184360-20210215221717805-00000-h3.warc.gz"]
-        seed_errs = ["Successfully calculated seed metadata", "Successfully calculated seed metadata",
-                     "Successfully calculated seed metadata", "Successfully calculated seed metadata",
-                     "Successfully calculated seed metadata", "Successfully calculated seed metadata",
-                     "Successfully calculated seed metadata", "Successfully calculated seed metadata",
-                     "Successfully calculated seed metadata", "Successfully calculated seed metadata",
-                     "Successfully calculated seed metadata", "Successfully calculated seed metadata",
-                     "Successfully calculated seed metadata"]
-        metadata_errs = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
-        infos = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
-        apis = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
-        fixitys = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
-        unzips = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2184360", "harg-0000-web-202102-0001", "UGA Today",
+                 "hargrett", "0000", 12912, "1365262", 2.72, 3,
+                 "ARCHIVEIT-12912-MONTHLY-JOB1365262-SEED2184360-20210218011718988-00002-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1365262-SEED2184360-20210216082333741-00001-h3.warc.gz,ARCHIVEIT-12912-MONTHLY-JOB1365262-SEED2184360-20210215221717805-00000-h3.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]]
 
     elif test == "russell":
-        seeds = ["2467336", "2454513", "2454516", "2444048", "2454520", "2467334"]
-        aips = ["rbrl-496-web-202102-0001", "rbrl-495-web-202102-0001", "rbrl-497-web-202102-0001",
-                "rbrl-494-web-202102-0001", "rbrl-497-web-202102-0002", "rbrl-496-web-202102-0002"]
-        titles = ["Senator Kelly Loeffler (@senloeffler) - Instagram photos and videos",
-               "Doug Collins (@RepDougCollins) / Twitter", "Rob Woodall (@RepRobWoodall) / Twitter",
-               "Bob Trammell (@TrammellBob) / Twitter",
-               "Rep. Rob Woodall (@reprobwoodall) - Instagram photos and videos", "Senator Kelly Loeffler - YouTube"]
-        depts = ["russell", "russell", "russell", "russell", "russell", "russell"]
-        uga_colls = ["rbrl-496", "rbrl-495", "rbrl-497", "rbrl-494", "rbrl-497", "rbrl-496"]
-        ait_colls = [12265, 12265, 12265, 12265, 12265, 12265]
-        jobs = ["1343968", "1331748", "1331754", "1331741", "1362694", "1343961"]
-        sizes = [0, 0.38, 0.14, 0.07, 0, 1.46]
-        warcs = [1, 1, 1, 2, 1, 3]
-        names = ["ARCHIVEIT-12265-TEST-JOB1343968-0-SEED2467336-20210107234951732-00000-ntej8lcr.warc.gz",
+        rows = [["2467336", "rbrl-496-web-202102-0001", "Senator Kelly Loeffler (@senloeffler) - Instagram photos and videos",
+                 "russell", "rbrl-496", 12265, "1343968", 0, 1,
+                 "ARCHIVEIT-12265-TEST-JOB1343968-0-SEED2467336-20210107234951732-00000-ntej8lcr.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2454513", "rbrl-495-web-202102-0001", "Doug Collins (@RepDougCollins) / Twitter",
+                 "russell", "rbrl-495", 12265, "1331748", 0.38, 1,
                  "ARCHIVEIT-12265-TEST-JOB1331748-0-SEED2454513-20201215211605582-00000-hr7k2if1.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2454516", "rbrl-497-web-202102-0001", "Rob Woodall (@RepRobWoodall) / Twitter",
+                 "russell", "rbrl-497", 12265, "1331754", 0.14, 1,
                  "ARCHIVEIT-12265-TEST-JOB1331754-0-SEED2454516-20201215212108745-00000-wtezbqjr.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2444048", "rbrl-494-web-202102-0001", "Bob Trammell (@TrammellBob) / Twitter",
+                 "russell", "rbrl-494", 12265, "1331741", 0.07, 2,
                  "ARCHIVEIT-12265-TEST-JOB1331741-0-SEED2444048-20201215210645991-00000-cwumey2o.warc.gz,ARCHIVEIT-12265-TEST-JOB1331741-0-SEED2444048-20201215212055722-00000-2ec78ok3.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2454520", "rbrl-497-web-202102-0002", "Rep. Rob Woodall (@reprobwoodall) - Instagram photos and videos",
+                 "russell", "rbrl-497", 12265, "1362694", 0, 1,
                  "ARCHIVEIT-12265-TEST-JOB1362694-0-SEED2454520-20210210182243522-00000-ucgqbp1w.warc.gz",
-                 "ARCHIVEIT-12265-TEST-JOB1343961-0-SEED2467334-20210107234944827-00000-pacx1ueb.warc.gz,ARCHIVEIT-12265-TEST-JOB1343961-0-SEED2467334-20210107233308683-00000-4fqdlznu.warc.gz,ARCHIVEIT-12265-TEST-JOB1343961-0-SEED2467334-20210107234913594-00001-4fqdlznu.warc.gz"]
-        seed_errs = ["Successfully calculated seed metadata", "Successfully calculated seed metadata",
-                     "Successfully calculated seed metadata", "Successfully calculated seed metadata",
-                     "Successfully calculated seed metadata", "Successfully calculated seed metadata"]
-        metadata_errs = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
-        infos = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
-        apis = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
-        fixitys = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
-        unzips = [np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                ["2467334", "rbrl-496-web-202102-0002", "Senator Kelly Loeffler - YouTube",
+                 "russell", "rbrl-496", 12265, "1343961", 1.46, 3,
+                 "ARCHIVEIT-12265-TEST-JOB1343961-0-SEED2467334-20210107234944827-00000-pacx1ueb.warc.gz,ARCHIVEIT-12265-TEST-JOB1343961-0-SEED2467334-20210107233308683-00000-4fqdlznu.warc.gz,ARCHIVEIT-12265-TEST-JOB1343961-0-SEED2467334-20210107234913594-00001-4fqdlznu.warc.gz",
+                 "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]]
 
-    df = pd.DataFrame({"Seed_ID": seeds, "AIP_ID": aips, "Title": titles, "Department": depts,
-                       "UGA_Collection": uga_colls, "AIT_Collection": ait_colls, "Job_ID": jobs,
-                       "Size_GB": sizes, "WARCs": warcs, "WARC_Filenames": names, "Seed_Metadata_Errors": seed_errs,
-                       "Metadata_Report_Errors": metadata_errs, "Metadata_Report_Info": infos,
-                       "WARC_API_Errors": apis, "WARC_Fixity_Errors": fixitys, "WARC_Unzip_Errors": unzips})
+    column_names = ["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection", "AIT_Collection", "Job_ID",
+                    "Size_GB", "WARCs", "WARC_Filenames", "Seed_Metadata_Errors", "Metadata_Report_Errors",
+                    "Metadata_Report_Info", "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"]
+    df = pd.DataFrame(rows, columns=column_names)
     return df
 
 
