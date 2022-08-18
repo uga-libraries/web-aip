@@ -550,7 +550,7 @@ for seed in seed_df.itertuples():
     # Displays the script progress.
     print(f"Processing seed {seed.Seed_ID} (AIP {seed.AIP_ID}).")
 
-    # ERROR 1: API error downloading metadata reports.
+    # ERROR 1 (magil-ggp-2529631-2022-03): API error downloading metadata reports.
     if seed.Seed_ID == "2529631":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
@@ -560,7 +560,7 @@ for seed in seed_df.itertuples():
         web.check_directory(aip)
         a.log(aip.log)
 
-    # ERROR 2: API error downloading crawl_job so can't download crawl_definition.
+    # ERROR 2 (magil-ggp-2529676-2022-03): API error downloading crawl_job so can't download crawl_definition.
     if seed.Seed_ID == "2529676":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
@@ -570,7 +570,7 @@ for seed in seed_df.itertuples():
         web.check_directory(aip)
         a.log(aip.log)
 
-    # ERROR 3: No login columns in seed to redact.
+    # ERROR 3 (magil-ggp-2529668-2022-03): No login columns in seed to redact.
     if seed.Seed_ID == "2529668":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
@@ -580,7 +580,7 @@ for seed in seed_df.itertuples():
         web.check_directory(aip)
         a.log(aip.log)
 
-    # ERROR 4: API error downloading WARC metadata. AIP has 1 WARC.
+    # ERROR 4 (magil-ggp-2529629-2022-03): API error downloading WARC metadata. AIP has 1 WARC.
     if seed.Seed_ID == "2529629":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
@@ -590,7 +590,7 @@ for seed in seed_df.itertuples():
         web.check_directory(aip)
         a.log(aip.log)
 
-    # ERROR 5: API error downloading WARC. AIP has 1 WARC.
+    # ERROR 5 (rbrl-506-web-202203-0001): API error downloading WARC. AIP has 1 WARC.
     if seed.Seed_ID == "2547114":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
@@ -600,7 +600,7 @@ for seed in seed_df.itertuples():
         web.check_directory(aip)
         a.log(aip.log)
 
-    # ERROR 6: API error downloading first WARC. AIP has 3 WARCs.
+    # ERROR 6 (harg-0000-web-202203-0012): API error downloading first WARC. AIP has 3 WARCs.
     if seed.Seed_ID == "2173769":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
@@ -610,7 +610,7 @@ for seed in seed_df.itertuples():
         web.check_directory(aip)
         a.log(aip.log)
 
-    # ERROR 7: Cannot extract fixity from MD5deep output. AIP has 1 WARC.
+    # ERROR 7 (magil-ggp-2529660-2022-03): Cannot extract fixity from MD5deep output. AIP has 1 WARC.
     if seed.Seed_ID == "2529660":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
@@ -620,7 +620,7 @@ for seed in seed_df.itertuples():
         web.check_directory(aip)
         a.log(aip.log)
 
-    # ERROR 8: WARC fixity after download doesn't match Archive-It record. AIP has 1 WARC.
+    # ERROR 8 (magil-ggp-2529627-2022-03): WARC fixity after download doesn't match Archive-It record. AIP has 1 WARC.
     if seed.Seed_ID == "2529627":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
@@ -630,7 +630,7 @@ for seed in seed_df.itertuples():
         web.check_directory(aip)
         a.log(aip.log)
 
-    # ERROR 9: Error unzipping WARC. AIP has 1 WARC.
+    # ERROR 9 (rbrl-246-web-202203-0001): Error unzipping WARC. AIP has 1 WARC.
     if seed.Seed_ID == "2454507":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
@@ -640,7 +640,7 @@ for seed in seed_df.itertuples():
         web.check_directory(aip)
         a.log(aip.log)
 
-    # ERROR 10: Different error for the two WARCs.
+    # ERROR 10 (rbrl-499-web-202203-0001): Different error for the two WARCs.
     if seed.Seed_ID == "2739136":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
@@ -650,7 +650,7 @@ for seed in seed_df.itertuples():
         web.check_directory(aip)
         a.log(aip.log)
 
-    # ERROR 11: No objects folder.
+    # ERROR 11 (harg-0000-web-202203-0011): No objects folder.
     if seed.Seed_ID == "2184360":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         web.download_metadata(seed, seed_df)
@@ -658,7 +658,7 @@ for seed in seed_df.itertuples():
         web.check_directory(aip)
         a.log(aip.log)
 
-    # ERROR 12: Objects folder is empty.
+    # ERROR 12 (magil-ggp-2529681-2022-03): Objects folder is empty.
     if seed.Seed_ID == "2529681":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
@@ -667,7 +667,7 @@ for seed in seed_df.itertuples():
         web.check_directory(aip)
         a.log(aip.log)
 
-    # ERROR 13: No metadata folder.
+    # ERROR 13 (magil-ggp-2529652-2022-03): No metadata folder.
     if seed.Seed_ID == "2529652":
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         make_warc_placeholder(seed.AIP_ID)
@@ -675,7 +675,7 @@ for seed in seed_df.itertuples():
         web.check_directory(aip)
         a.log(aip.log)
 
-    # Error 14: Metadata folder is empty.
+    # Error 14 (magil-ggp-2529634-2022-03): Metadata folder is empty.
     if seed.Seed_ID == "2529634":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
@@ -684,14 +684,14 @@ for seed in seed_df.itertuples():
         web.check_directory(aip)
         a.log(aip.log)
 
-    # Error 15: Objects and metadata folders are missing.
+    # Error 15 (rbrl-246-web-202203-0002): Objects and metadata folders are missing.
     if seed.Seed_ID == "2454506":
         os.makedirs(seed.AIP_ID)
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
         a.log(aip.log)
 
-    # Error 16: Objects folder is missing; metadata folder is empty.
+    # Error 16 (magil-ggp-2529642-2022-03): Objects folder is missing; metadata folder is empty.
     if seed.Seed_ID == "2529642":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
