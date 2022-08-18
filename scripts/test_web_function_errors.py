@@ -165,7 +165,7 @@ def make_expected_aip_log_df():
         ["magil-ggp-2529629-2022-03", np.NaN, "Objects folder is empty.", np.NaN,
          np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
 
-        ["magil-ggp-2529631-2022-03", np.NaN, "Objects folder is empty.", np.NaN,
+        ["magil-ggp-2529631-2022-03", np.NaN, "Successfully created objects folder", "Successfully created metadata folder",
          np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
 
         ["magil-ggp-2529634-2022-03", np.NaN, "Successfully created objects folder", "Metadata folder is empty.",
@@ -177,10 +177,10 @@ def make_expected_aip_log_df():
         ["magil-ggp-2529660-2022-03", np.NaN, "Successfully created objects folder", "Successfully created metadata folder",
         np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
 
-        ["magil-ggp-2529668-2022-03", np.NaN, "Objects folder is empty.", np.NaN,
+        ["magil-ggp-2529668-2022-03", np.NaN, "Successfully created objects folder", "Successfully created metadata folder",
          np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
 
-        ["magil-ggp-2529676-2022-03", np.NaN, "Objects folder is empty.", np.NaN,
+        ["magil-ggp-2529676-2022-03", np.NaN, "Successfully created objects folder", "Successfully created metadata folder",
          np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
 
         ["magil-ggp-2529681-2022-03", np.NaN, "Objects folder is empty.", np.NaN,
@@ -229,15 +229,8 @@ def make_directory_structure_df():
              r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529629-2022-03\metadata\magil-ggp-2529629-2022-03_31104535848_crawldef.csv",
              r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529629-2022-03\metadata\magil-ggp-2529629-2022-03_coll.csv",
              r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529629-2022-03\metadata\magil-ggp-2529629-2022-03_seed.csv",
-             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529631-2022-03\metadata\magil-ggp-2529631-2022-03_1576492_crawljob.csv",
-             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529634-2022-03\objects\for_test.txt",
-             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529652-2022-03\objects\for_test.txt",
-             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529668-2022-03\metadata\magil-ggp-2529668-2022-03_1577241_crawljob.csv",
-             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529668-2022-03\metadata\magil-ggp-2529668-2022-03_31104537585_crawldef.csv",
-             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529668-2022-03\metadata\magil-ggp-2529668-2022-03_coll.csv",
-             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529668-2022-03\metadata\magil-ggp-2529668-2022-03_seed.csv",
-             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529676-2022-03\metadata\magil-ggp-2529676-2022-03_coll.csv",
-             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529676-2022-03\metadata\magil-ggp-2529676-2022-03_seed.csv",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529634-2022-03\objects\warc_placeholder.txt",
+             r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529652-2022-03\objects\warc_placeholder.txt",
              r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529681-2022-03\metadata\magil-ggp-2529681-2022-03_1577187_crawljob.csv",
              r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529681-2022-03\metadata\magil-ggp-2529681-2022-03_31104537580_crawldef.csv",
              r"aips_2022-03-24\errors\incomplete_directory\magil-ggp-2529681-2022-03\metadata\magil-ggp-2529681-2022-03_coll.csv",
@@ -261,11 +254,21 @@ def make_directory_structure_df():
              r"aips_2022-03-24\harg-0000-web-202203-0012\metadata\harg-0000-web-202203-0012_seed.csv",
              r"aips_2022-03-24\harg-0000-web-202203-0012\objects\ARCHIVEIT-12912-WEEKLY-JOB1490068-SEED2173769-20210929221708074-00000-h3.warc",
              r"aips_2022-03-24\harg-0000-web-202203-0012\objects\ARCHIVEIT-12912-WEEKLY-JOB1493118-SEED2173769-20211006221709530-00000-h3.warc",
+             r"aips_2022-03-24\magil-ggp-2529631-2022-03\metadata\magil-ggp-2529631-2022-03_1576492_crawljob.csv",
+             r"aips_2022-03-24\magil-ggp-2529631-2022-03\objects\warc_placeholder.txt",
              r"aips_2022-03-24\magil-ggp-2529660-2022-03\metadata\magil-ggp-2529660-2022-03_1573937_crawljob.csv",
              r"aips_2022-03-24\magil-ggp-2529660-2022-03\metadata\magil-ggp-2529660-2022-03_31104535848_crawldef.csv",
              r"aips_2022-03-24\magil-ggp-2529660-2022-03\metadata\magil-ggp-2529660-2022-03_coll.csv",
              r"aips_2022-03-24\magil-ggp-2529660-2022-03\metadata\magil-ggp-2529660-2022-03_seed.csv",
              r"aips_2022-03-24\magil-ggp-2529660-2022-03\objects\ARCHIVEIT-15678-TEST-JOB1573937-SEED2529660-20220314173634919-00000-h3.warc.gz",
+             r"aips_2022-03-24\magil-ggp-2529668-2022-03\metadata\magil-ggp-2529668-2022-03_1577241_crawljob.csv",
+             r"aips_2022-03-24\magil-ggp-2529668-2022-03\metadata\magil-ggp-2529668-2022-03_31104537585_crawldef.csv",
+             r"aips_2022-03-24\magil-ggp-2529668-2022-03\metadata\magil-ggp-2529668-2022-03_coll.csv",
+             r"aips_2022-03-24\magil-ggp-2529668-2022-03\metadata\magil-ggp-2529668-2022-03_seed.csv",
+             r"aips_2022-03-24\magil-ggp-2529668-2022-03\objects\warc_placeholder.txt",
+             r"aips_2022-03-24\magil-ggp-2529676-2022-03\metadata\magil-ggp-2529676-2022-03_coll.csv",
+             r"aips_2022-03-24\magil-ggp-2529676-2022-03\metadata\magil-ggp-2529676-2022-03_seed.csv",
+             r"aips_2022-03-24\magil-ggp-2529676-2022-03\objects\warc_placeholder.txt",
              r"aips_2022-03-24\rbrl-246-web-202203-0001\metadata\rbrl-246-web-202203-0001_1542317_crawljob.csv",
              r"aips_2022-03-24\rbrl-246-web-202203-0001\metadata\rbrl-246-web-202203-0001_31104519079_crawldef.csv",
              r"aips_2022-03-24\rbrl-246-web-202203-0001\metadata\rbrl-246-web-202203-0001_coll.csv",
@@ -509,6 +512,15 @@ def download_warcs(seed, date_end, seed_df, error_type):
         time.sleep(15)
 
 
+def make_warc_placeholder(aip_id):
+    """For tests that do not involve the objects folder, makes a text file inside the objects folder
+    instead of downloading the WARC(s), which makes the test faster and prevents an empty objects folder error.
+    It only makes one file, not the number of warcs associated with that AIP."""
+
+    with open(os.path.join(aip_id, "objects", "warc_placeholder.txt"), "w") as warc_file:
+        warc_file.write("WARC placeholder for testing")
+
+
 # ----------------------------------------------------------------------------------------------------------------
 # THIS PART OF THE SCRIPT IS THE SAME AS web_aip_batch.py TO SET UP EVERYTHING CORRECTLY BEFORE THE DESIRED TESTS.
 # ERROR HANDLING FOR SCRIPT ARGUMENTS AND THE CONFIGURATION FILE ARE TESTED BY GIVING THE WRONG INPUTS INSTEAD.
@@ -561,6 +573,7 @@ for seed in seed_df.itertuples():
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         download_metadata(seed, seed_df, error_type="download")
+        make_warc_placeholder(seed.AIP_ID)
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
         a.log(aip.log)
@@ -570,6 +583,7 @@ for seed in seed_df.itertuples():
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         download_metadata(seed, seed_df, error_type="crawl_job")
+        make_warc_placeholder(seed.AIP_ID)
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
         a.log(aip.log)
@@ -579,6 +593,7 @@ for seed in seed_df.itertuples():
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         download_metadata(seed, seed_df, error_type="redact")
+        make_warc_placeholder(seed.AIP_ID)
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
         a.log(aip.log)
@@ -653,10 +668,6 @@ for seed in seed_df.itertuples():
         web.check_directory(aip)
         a.log(aip.log)
 
-    # The rest of the errors are for empty or missing objects and metadata folders.
-    # Still makes the folders and downloads everything so the seeds.csv has expected log values.
-    # Uses download_warcs with error_type of none to speed up the process by not really downloading.
-
     # ERROR 11: No objects folder.
     if seed.Seed_ID == "2184360":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
@@ -678,8 +689,7 @@ for seed in seed_df.itertuples():
     # Adds a file to the objects folder since downloading WARCs is slow, so the test is just about the metadata folder.
     if seed.Seed_ID == "2529652":
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
-        with open(os.path.join(seed.AIP_ID, "objects", "for_test.txt"), "w") as file:
-            file.write("Test Message")
+        make_warc_placeholder(seed.AIP_ID)
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
         a.log(aip.log)
@@ -689,8 +699,7 @@ for seed in seed_df.itertuples():
     if seed.Seed_ID == "2529634":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
-        with open(os.path.join(seed.AIP_ID, "objects", "for_test.txt"), "w") as file:
-            file.write("Test Message")
+        make_warc_placeholder(seed.AIP_ID)
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
         a.log(aip.log)
