@@ -81,7 +81,7 @@ def make_expected_seed_df():
          "magil", "0000", 15678, "1576492", 0.23, 1,
          "ARCHIVEIT-15678-TEST-JOB1576492-SEED2529631-20220318145704126-00000-h3.warc.gz",
          "Successfully calculated seed metadata",
-         "magil-ggp-2529631-2022-03_seed.csv API error 999; magil-ggp-2529631-2022-03_seedscope.csv API error 999; magil-ggp-2529631-2022-03_collscope.csv API error 999; magil-ggp-2529631-2022-03_coll.csv API error 999; magil-ggp-2529631-2022-03_31104537364_crawldef.csv API error 999",
+         "magil-ggp-2529631-2022-03_seed.csv API error 999; magil-ggp-2529631-2022-03_seedscope.csv API error 999; magil-ggp-2529631-2022-03_collscope.csv API error 999; magil-ggp-2529631-2022-03_coll.csv API error 999",
          "No additional information", np.NaN, np.NaN, np.NaN],
 
         ["2529634", "magil-ggp-2529634-2022-03", "Georgia Office of Attorney General Consumer Protection Division",
@@ -262,6 +262,7 @@ def make_directory_structure_df():
              r"aips_2022-03-24\harg-0000-web-202203-0012\objects\ARCHIVEIT-12912-WEEKLY-JOB1490068-SEED2173769-20210929221708074-00000-h3.warc",
              r"aips_2022-03-24\harg-0000-web-202203-0012\objects\ARCHIVEIT-12912-WEEKLY-JOB1496119-SEED2173769-20211013221706082-00000-h3.warc",
              r"aips_2022-03-24\magil-ggp-2529631-2022-03\metadata\magil-ggp-2529631-2022-03_1576492_crawljob.csv",
+             r"aips_2022-03-24\magil-ggp-2529631-2022-03\metadata\magil-ggp-2529631-2022-03_31104537364_crawldef.csv",
              r"aips_2022-03-24\magil-ggp-2529631-2022-03\objects\warc_placeholder.txt",
              r"aips_2022-03-24\magil-ggp-2529660-2022-03\metadata\magil-ggp-2529660-2022-03_1573937_crawljob.csv",
              r"aips_2022-03-24\magil-ggp-2529660-2022-03\metadata\magil-ggp-2529660-2022-03_31104535848_crawldef.csv",
@@ -311,12 +312,12 @@ def download_metadata(seed, seed_df, error_type):
         filters = {"limit": -1, filter_type: filter_value, "format": "csv"}
         metadata_report = requests.get(f"{c.partner_api}/{report_type}", params=filters, auth=(c.username, c.password))
 
-        # GENERATE ERROR 1: API error downloading metadata reports.
+        # GENERATE ERROR 1: API error downloading unrepeatable reports (seed, seedscope, collection, collectionscope).
         # Doesn't make an error for crawl_job so that crawl_def error handling can be done separately.
-        if error_type == "download" and not(report_type == "crawl_job"):
+        if error_type == "download" and report_type in ("seed", "scope_rule", "collection"):
             metadata_report.status_code = 999
 
-        # GENERATE ERROR 2: API error downloading crawl_job.
+        # GENERATE ERROR 2: API error downloading repeatable reports (crawl_job and crawl_def).
         # Without crawl_job, crawl definition will also not download as part of standard error handling.
         if error_type == "crawl_job" and report_type == "crawl_job":
             metadata_report.status_code = 999
