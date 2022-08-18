@@ -36,9 +36,9 @@ def make_expected_seed_df():
          "ARCHIVEIT-12912-WEEKLY-JOB1496119-SEED2173769-20211013221706082-00000-h3.warc.gz,ARCHIVEIT-12912-WEEKLY-JOB1493118-SEED2173769-20211006221709530-00000-h3.warc.gz,ARCHIVEIT-12912-WEEKLY-JOB1490068-SEED2173769-20210929221708074-00000-h3.warc.gz",
          "Successfully calculated seed metadata", "Successfully downloaded all metadata reports",
          "Empty report harg-0000-web-202203-0012_seedscope.csv not saved",
-         "API error 999: can't download ARCHIVEIT-12912-WEEKLY-JOB1496119-SEED2173769-20211013221706082-00000-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-WEEKLY-JOB1493118-SEED2173769-20211006221709530-00000-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-WEEKLY-JOB1490068-SEED2173769-20210929221708074-00000-h3.warc.gz",
-         "Successfully verified ARCHIVEIT-12912-WEEKLY-JOB1493118-SEED2173769-20211006221709530-00000-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-WEEKLY-JOB1490068-SEED2173769-20210929221708074-00000-h3.warc.gz fixity on",
-         "Successfully unzipped ARCHIVEIT-12912-WEEKLY-JOB1493118-SEED2173769-20211006221709530-00000-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-WEEKLY-JOB1490068-SEED2173769-20210929221708074-00000-h3.warc.gz"],
+         "Successfully downloaded ARCHIVEIT-12912-WEEKLY-JOB1496119-SEED2173769-20211013221706082-00000-h3.warc.gz; API error 999: can't download ARCHIVEIT-12912-WEEKLY-JOB1493118-SEED2173769-20211006221709530-00000-h3.warc.gz; Successfully downloaded ARCHIVEIT-12912-WEEKLY-JOB1490068-SEED2173769-20210929221708074-00000-h3.warc.gz",
+         "Successfully verified ARCHIVEIT-12912-WEEKLY-JOB1496119-SEED2173769-20211013221706082-00000-h3.warc.gz fixity on; Successfully verified ARCHIVEIT-12912-WEEKLY-JOB1490068-SEED2173769-20210929221708074-00000-h3.warc.gz fixity on",
+         "Successfully unzipped ARCHIVEIT-12912-WEEKLY-JOB1496119-SEED2173769-20211013221706082-00000-h3.warc.gz; Successfully unzipped ARCHIVEIT-12912-WEEKLY-JOB1490068-SEED2173769-20210929221708074-00000-h3.warc.gz"],
 
         ["2184360", "harg-0000-web-202203-0011", "UGA Today",
          "hargrett", "0000", 12912, "1497166", 35.78, 36,
@@ -142,8 +142,9 @@ def make_expected_seed_df():
          "ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220110194710516-00000-h3.warc.gz,ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220111130848517-00001-h3.warc.gz",
          "Successfully calculated seed metadata", "Successfully downloaded all metadata reports",
          "Empty report rbrl-499-web-202203-0001_seedscope.csv not saved",
-         "API error 999: can't get info about ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220110194710516-00000-h3.warc.gz; API error 999: can't download ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220111130848517-00001-h3.warc.gz",
-         np.NaN, np.NaN]]
+         "API error 999: can't get info about ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220110194710516-00000-h3.warc.gz; Successfully downloaded ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220111130848517-00001-h3.warc.gz",
+         "Fixity for ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220111130848517-00001-h3.warc.gz changed and it was deleted: 889a8211569d99832915b3d2d55872d7 before, abc123abc123abc123abc123 after",
+         np.NaN]]
 
     column_names = ["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection", "AIT_Collection", "Job_ID",
                     "Size_GB", "WARCs", "WARC_Filenames", "Seed_Metadata_Errors", "Metadata_Report_Errors",
@@ -259,7 +260,7 @@ def make_directory_structure_df():
              r"aips_2022-03-24\harg-0000-web-202203-0012\metadata\harg-0000-web-202203-0012_collscope.csv",
              r"aips_2022-03-24\harg-0000-web-202203-0012\metadata\harg-0000-web-202203-0012_seed.csv",
              r"aips_2022-03-24\harg-0000-web-202203-0012\objects\ARCHIVEIT-12912-WEEKLY-JOB1490068-SEED2173769-20210929221708074-00000-h3.warc",
-             r"aips_2022-03-24\harg-0000-web-202203-0012\objects\ARCHIVEIT-12912-WEEKLY-JOB1493118-SEED2173769-20211006221709530-00000-h3.warc",
+             r"aips_2022-03-24\harg-0000-web-202203-0012\objects\ARCHIVEIT-12912-WEEKLY-JOB1496119-SEED2173769-20211013221706082-00000-h3.warc",
              r"aips_2022-03-24\magil-ggp-2529631-2022-03\metadata\magil-ggp-2529631-2022-03_1576492_crawljob.csv",
              r"aips_2022-03-24\magil-ggp-2529631-2022-03\objects\warc_placeholder.txt",
              r"aips_2022-03-24\magil-ggp-2529660-2022-03\metadata\magil-ggp-2529660-2022-03_1573937_crawljob.csv",
@@ -290,7 +291,7 @@ def make_directory_structure_df():
 
 # ----------------------------------------------------------------------------------------------------------------
 # ALTERNATIVE VERSIONS OF FUNCTIONS THAT GENERATE ERRORS.
-# IF THERE IS MORE THAN ONE ERROR NEEDED, ADDS AN ARGUMENT FOR ERROR_TYPE TO SPECIFY.
+# ARGUMENT ERROR_TYPE SPECIFIES WHICH ERROR.
 # ----------------------------------------------------------------------------------------------------------------
 def download_metadata(seed, seed_df, error_type):
     """"Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
@@ -389,10 +390,7 @@ def download_metadata(seed, seed_df, error_type):
 
 
 def download_warcs(seed, date_end, seed_df, error_type):
-    """Downloads every WARC file and verifies that fixity is unchanged after downloading.
-
-    FOR ERROR TESTING: make a text file instead of downloading because it is faster and add variable status_code
-    to be able to test error handling from status code without having done an API call."""
+    """Downloads every WARC file and verifies that fixity is unchanged after downloading."""
 
     # Row index for the seed being processed in the dataframe, to use for adding logging information.
     row_index = seed_df.index[seed_df["Seed_ID"] == seed.Seed_ID].tolist()[0]
@@ -402,16 +400,13 @@ def download_warcs(seed, date_end, seed_df, error_type):
 
     # Downloads and validates every WARC.
     # If an error is caught at any point, logs the error and starts the next WARC.
-    # FOR TESTING, ADD WARC COUNTER FOR WHEN DIFFERENT ERRORS HAPPEN TO DIFFERENT WARCS.
-    warc_count = 0
     for warc in warc_names:
-        warc_count += 1
 
         # Gets URL for downloading the WARC and WARC MD5 from Archive-It using WASAPI.
         warc_data = requests.get(f'{c.wasapi}?filename={warc}', auth=(c.username, c.password))
 
         # GENERATE ERROR 4: API error downloading WARC metadata.
-        if error_type == "metadata" or (error_type == "everything" and warc_count == 1):
+        if error_type == "metadata" or (error_type == "mix" and warc == "ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220110194710516-00000-h3.warc.gz"):
             warc_data.status_code = 999
 
         # Gets URL for downloading the WARC and WARC MD5 from Archive-It using WASAPI. (continued)
@@ -427,44 +422,33 @@ def download_warcs(seed, date_end, seed_df, error_type):
         warc_path = f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/objects/{warc}'
 
         # Downloads the WARC, which will be zipped.
-        # Or if will later make text file for quicker testing, assign md5 and status code.
-        # status_code variable is needed because anything that wasn't really downloaded doesn't have warc_download.status_code
-        if error_type in ("fixity", "unzip") or (error_type == "everything" and warc_count == 7):
-            warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
-            status_code = warc_download.status_code
-        else:
-            warc_md5 = "18c7f874cbf0b4de2dfb5dbeb46ac659"
-            status_code = 200
+        warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
 
         # GENERATE ERROR 5: API error downloading WARC.
-        if error_type == "download" or (error_type == "everything" and warc_count == 2):
-            status_code = 999
+        if error_type == "download":
+            warc_download.status_code = 999
 
         # GENERATE ERROR 6: API error downloading the first WARC when seed has 2.
-        if error_type == "download_partial" and warc_count == 1:
-            status_code = 999
+        if error_type == "download_partial" and warc == "ARCHIVEIT-12912-WEEKLY-JOB1493118-SEED2173769-20211006221709530-00000-h3.warc.gz":
+            warc_download.status_code = 999
 
         # If there was an error with the API call, starts the next WARC.
-        if not status_code == 200:
-            web.log(f"API error {status_code}: can't download {warc}",
+        if not warc_download.status_code == 200:
+            web.log(f"API error {warc_download.status_code}: can't download {warc}",
                     seed_df, row_index, "WARC_API_Errors")
             continue
         else:
             web.log(f"Successfully downloaded {warc}", seed_df, row_index, "WARC_API_Errors")
 
         # Saves the zipped WARC in the objects folder, keeping the original filename.
-        # Saves a text file with the warc filename and extension for quicker tests if it isn't needed for the test.
         with open(warc_path, 'wb') as warc_file:
-            if error_type in ("fixity", "unzip") or (error_type == "everything" and warc_count == 7):
-                warc_file.write(warc_download.content)
-            else:
-                warc_file.write(b"Testing Text")
+            warc_file.write(warc_download.content)
 
         # Calculates the md5 for the downloaded zipped WARC with md5deep.
         md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
 
         # GENERATES ERROR 7: Cannot extract fixity from MD5deep output (doesn't match regex pattern).
-        if error_type == "md5deep" or (error_type == "everything" and warc_count == 3):
+        if error_type == "md5deep":
             md5deep_output.stdout = b"@Something#Unexpected"
 
         # Calculates the md5 for the downloaded zipped WARC with md5deep. (continued)
@@ -477,7 +461,7 @@ def download_warcs(seed, date_end, seed_df, error_type):
             continue
 
         # GENERATES ERROR 8: WARC fixity after download doesn't match Archive-It record.
-        if error_type == "fixity" or (error_type == "everything" and warc_count == 7):
+        if error_type == "fixity" or (error_type == "mix" and warc == "ARCHIVEIT-12263-TEST-JOB1539793-SEED2739136-20220111130848517-00001-h3.warc.gz"):
             downloaded_warc_md5 = "abc123abc123abc123abc123"
 
         # Compares the md5 of the downloaded zipped WARC to Archive-It metadata.
@@ -491,28 +475,21 @@ def download_warcs(seed, date_end, seed_df, error_type):
             web.log(f"Successfully verified {warc} fixity on {datetime.datetime.now()}",
                     seed_df, row_index, "WARC_Fixity_Errors")
 
-        # PREVENTS ERROR: If text files are used in place of WARCs, rename to simulate unzipping.
-        # Otherwise, the unzip steps give an error because the text files are no real zips.
-        if error_type in ("fixity", "unzip") or (error_type == "everything" and warc_count == 4):
-            # Extracts the WARC from the gzip file.
-            unzip_output = subprocess.run(f'"C:/Program Files/7-Zip/7z.exe" x "{warc_path}" -o"{seed.AIP_ID}/objects"',
-                                          stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
+        # Extracts the WARC from the gzip file.
+        unzip_output = subprocess.run(f'"C:/Program Files/7-Zip/7z.exe" x "{warc_path}" -o"{seed.AIP_ID}/objects"',
+                                      stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
 
-            # GENERATES ERROR 9: Error unzipping WARC.
-            if error_type == "unzip" or (error_type == "everything" and warc_count == 4):
-                unzip_output.stderr = b'Error message stand-in.'
+        # GENERATES ERROR 9: Error unzipping WARC.
+        if error_type == "unzip" or (error_type == "everything" and warc == "name"):
+            unzip_output.stderr = b'Error message stand-in.'
 
-            # Deletes the gzip file, unless 7zip had an error during unzipping.
-            if unzip_output.stderr == b'':
-                os.remove(warc_path)
-                web.log(f"Successfully unzipped {warc}", seed_df, row_index, "WARC_Unzip_Errors")
-            else:
-                web.log(f"Error unzipping {warc}: {unzip_output.stderr.decode('utf-8')}",
-                        seed_df, row_index, "WARC_Unzip_Errors")
-        else:
-            new_warc_path = warc_path.replace(".warc.gz", ".warc")
-            os.replace(warc_path, new_warc_path)
+        # Deletes the gzip file, unless 7zip had an error during unzipping.
+        if unzip_output.stderr == b'':
+            os.remove(warc_path)
             web.log(f"Successfully unzipped {warc}", seed_df, row_index, "WARC_Unzip_Errors")
+        else:
+            web.log(f"Error unzipping {warc}: {unzip_output.stderr.decode('utf-8')}",
+                    seed_df, row_index, "WARC_Unzip_Errors")
 
         # Wait 15 second to give the API a rest.
         time.sleep(15)
@@ -623,7 +600,7 @@ for seed in seed_df.itertuples():
         web.check_directory(aip)
         a.log(aip.log)
 
-    # ERROR 6: API error downloading first WARC. AIP has 2 WARCs.
+    # ERROR 6: API error downloading first WARC. AIP has 3 WARCs.
     if seed.Seed_ID == "2173769":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
@@ -663,12 +640,12 @@ for seed in seed_df.itertuples():
         web.check_directory(aip)
         a.log(aip.log)
 
-    # ERROR 10: All WARC errors happen to a single WARC and other WARCs have no errors.
+    # ERROR 10: Different error for the two WARCs.
     if seed.Seed_ID == "2739136":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         web.download_metadata(seed, seed_df)
-        download_warcs(seed, date_end, seed_df, error_type="everything")
+        download_warcs(seed, date_end, seed_df, error_type="mix")
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
         a.log(aip.log)
