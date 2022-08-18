@@ -27,27 +27,28 @@ def make_expected_completeness_check_df():
     that this script will produce if everything works correctly.
     Starts with a list for the values each AIP, which become the rows in the dataframe."""
 
+    rows = [
+        ["magil-ggp-2472041-2022-03", "https://www.legis.ga.gov/", "False", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+        ["magil-ggp-2529627-2022-03", "https://gaa.georgia.gov/", "True", True, True, True, True, 1, 1, True, True, True, True, True],
+        ["magil-ggp-2529629-2022-03", "https://gbp.georgia.gov/", "True", True, True, True, True, 2, 1, True, True, True, True, True],
+        ["magil-ggp-2529631-2022-03", "https://gceo.georgia.gov/", "True", True, True, True, True, 1, 3, True, True, True, True, True],
+        ["magil-ggp-2529633-2022-03", "https://medicalboard.georgia.gov/", "True", True, True, True, True, 1, 1, True, True, True, True, True],
+        ["magil-ggp-2529634-2022-03", "https://consumer.georgia.gov/", "True", True, True, True, True, 1, 1, True, True, True, True, True],
+        ["magil-ggp-2529642-2022-03", "https://dcs.georgia.gov/", "True", False, True, True, True, 1, 1, True, True, True, True, True],
+        ["magil-ggp-2529652-2022-03", "https://gdna.georgia.gov/", "True", True, False, True, True, 1, 1, True, True, True, True, True],
+        ["magil-ggp-2529660-2022-03", "https://dso.georgia.gov/", "True", True, True, False, False, 1, 1, True, True, True, True, True],
+        ["magil-ggp-2529665-2022-03", "https://ltgov.georgia.gov/", "True", True, True, True, True, 0, 0, True, True, True, True, True],
+        ["magil-ggp-2529668-2022-03", "https://oca.georgia.gov/", "True", True, True, True, True, 1, 1, False, True, True, False, True],
+        ["magil-ggp-2529669-2022-03", "https://oig.georgia.gov/", "True", True, True, True, True, 1, 1, True, True, True, False, True],
+        ["magil-ggp-2529671-2022-03", "https://grec.state.ga.us/", "True", True, True, True, True, 1, 1, True, False, True, False, True],
+        ["magil-ggp-2529676-2022-03", "https://gsba.georgia.gov/", "True", True, True, True, True, 1, 1, True, True, True, True, False],
+        ["magil-ggp-2529681-2022-03", "https://gspc.georgia.gov/", "True", True, True, True, True, 1, 1, True, True, False, True, True],
+        ["magil-ggp-extra1-2022-03_bag", np.NaN, "Not expected", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+        ["magil-ggp-extra2-2022-03_bag", np.NaN, "Not expected", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]]
+
     column_names = ["AIP", "URL", "AIP Folder Made", "coll.csv", "collscope.csv", "seed.csv", "seedscope.csv",
                     "crawldef.csv count", "crawljob.csv count", "preservation.xml", "WARC Count Correct",
                     "Objects is all WARCs", "fits.xml Count Correct", "No Extra Metadata"]
-
-    rows = [["magil-ggp-2472041-2022-03", "https://www.legis.ga.gov/", "False", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
-            ["magil-ggp-2529671-2022-03", "https://grec.state.ga.us/", "True", True, True, True, True, 1, 1, True, False, True, False, True],
-            ["magil-ggp-2529669-2022-03", "https://oig.georgia.gov/", "True", True, True, True, True, 1, 1, True, True, True, False, True],
-            ["magil-ggp-2529633-2022-03", "https://medicalboard.georgia.gov/", "True", True, True, True, True, 1, 1, True, True, True, True, True],
-            ["magil-ggp-2529665-2022-03", "https://ltgov.georgia.gov/", "True", True, True, True, True, 0, 0, True, True, True, True, True],
-            ["magil-ggp-2529634-2022-03", "https://consumer.georgia.gov/", "True", True, True, True, True, 1, 1, True, True, True, True, True],
-            ["magil-ggp-2529660-2022-03", "https://dso.georgia.gov/", "True", True, True, False, False, 1, 1, True, True, True, True, True],
-            ["magil-ggp-2529629-2022-03", "https://gbp.georgia.gov/", "True", True, True, True, True, 2, 1, True, True, True, True, True],
-            ["magil-ggp-2529642-2022-03", "https://dcs.georgia.gov/", "True", False, True, True, True, 1, 1, True, True, True, True, True],
-            ["magil-ggp-2529627-2022-03", "https://gaa.georgia.gov/", "True", True, True, True, True, 1, 1, True, True, True, True, True],
-            ["magil-ggp-2529652-2022-03", "https://gdna.georgia.gov/", "True", True, False, True, True, 1, 1, True, True, True, True, True],
-            ["magil-ggp-2529631-2022-03", "https://gceo.georgia.gov/", "True", True, True, True, True, 1, 3, True, True, True, True, True],
-            ["magil-ggp-2529668-2022-03", "https://oca.georgia.gov/", "True", True, True, True, True, 1, 1, False, True, True, False, True],
-            ["magil-ggp-2529681-2022-03", "https://gspc.georgia.gov/", "True", True, True, True, True, 1, 1, True, True, False, True, True],
-            ["magil-ggp-2529676-2022-03", "https://gsba.georgia.gov/", "True", True, True, True, True, 1, 1, True, True, True, True, False],
-            ["magil-ggp-extra1-2022-03_bag", np.NaN, "Not expected", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
-            ["magil-ggp-extra2-2022-03_bag", np.NaN, "Not expected", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]]
 
     df = pd.DataFrame(rows, columns=column_names)
     return df
