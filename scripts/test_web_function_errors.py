@@ -545,6 +545,7 @@ a.log("header")
 # Errors are listed in script order. Seeds are processed out of order to get desired input for specific tests.
 # For each seed, calls web functions but does not call the aip functions, which are tested elsewhere.
 # Only calls the download_warcs() function if it is needed for the test, since downloading is slow.
+# Only calls a.log() function if check_directory() will not produce an error, since it saves to the log upon an error.
 for seed in seed_df.itertuples():
 
     # Displays the script progress.
@@ -588,7 +589,6 @@ for seed in seed_df.itertuples():
         download_warcs(seed, date_end, seed_df, error_type="metadata")
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
-        a.log(aip.log)
 
     # ERROR 5 (rbrl-506-web-202203-0001): API error downloading WARC. AIP has 1 WARC.
     if seed.Seed_ID == "2547114":
@@ -598,9 +598,8 @@ for seed in seed_df.itertuples():
         download_warcs(seed, date_end, seed_df, error_type="download")
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
-        a.log(aip.log)
 
-    # ERROR 6 (harg-0000-web-202203-0012): API error downloading first WARC. AIP has 3 WARCs.
+    # ERROR 6 (harg-0000-web-202203-0012): API error downloading one WARC. AIP has 3 WARCs.
     if seed.Seed_ID == "2173769":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
@@ -628,7 +627,6 @@ for seed in seed_df.itertuples():
         download_warcs(seed, date_end, seed_df, error_type="fixity")
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
-        a.log(aip.log)
 
     # ERROR 9 (rbrl-246-web-202203-0001): Error unzipping WARC. AIP has 1 WARC.
     if seed.Seed_ID == "2454507":
@@ -648,7 +646,6 @@ for seed in seed_df.itertuples():
         download_warcs(seed, date_end, seed_df, error_type="mix")
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
-        a.log(aip.log)
 
     # ERROR 11 (harg-0000-web-202203-0011): No objects folder.
     if seed.Seed_ID == "2184360":
@@ -656,7 +653,6 @@ for seed in seed_df.itertuples():
         web.download_metadata(seed, seed_df)
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
-        a.log(aip.log)
 
     # ERROR 12 (magil-ggp-2529681-2022-03): Objects folder is empty.
     if seed.Seed_ID == "2529681":
@@ -665,7 +661,6 @@ for seed in seed_df.itertuples():
         web.download_metadata(seed, seed_df)
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
-        a.log(aip.log)
 
     # ERROR 13 (magil-ggp-2529652-2022-03): No metadata folder.
     if seed.Seed_ID == "2529652":
@@ -673,7 +668,6 @@ for seed in seed_df.itertuples():
         make_warc_placeholder(seed.AIP_ID)
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
-        a.log(aip.log)
 
     # Error 14 (magil-ggp-2529634-2022-03): Metadata folder is empty.
     if seed.Seed_ID == "2529634":
@@ -682,21 +676,18 @@ for seed in seed_df.itertuples():
         make_warc_placeholder(seed.AIP_ID)
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
-        a.log(aip.log)
 
     # Error 15 (rbrl-246-web-202203-0002): Objects and metadata folders are missing.
     if seed.Seed_ID == "2454506":
         os.makedirs(seed.AIP_ID)
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
-        a.log(aip.log)
 
     # Error 16 (magil-ggp-2529642-2022-03): Objects folder is missing; metadata folder is empty.
     if seed.Seed_ID == "2529642":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
-        a.log(aip.log)
 
 # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) and logs into the AIPs folder
 # to keep everything together if another set is downloaded before these are deleted.
