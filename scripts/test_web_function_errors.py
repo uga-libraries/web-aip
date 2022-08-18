@@ -171,6 +171,9 @@ def make_expected_aip_log_df():
         ["magil-ggp-2529634-2022-03", np.NaN, "Successfully created objects folder", "Metadata folder is empty.",
          np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
 
+        ["magil-ggp-2529642-2022-03", np.NaN, "Objects folder is missing.", np.NaN,
+         np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+
         ["magil-ggp-2529652-2022-03", np.NaN, "Successfully created objects folder", "Metadata folder is missing.",
          np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
 
@@ -193,6 +196,9 @@ def make_expected_aip_log_df():
          np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
 
         ["rbrl-246-web-202203-0001", np.NaN, "Successfully created objects folder", "Successfully created metadata folder",
+         np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+
+        ["rbrl-246-web-202203-0002", np.NaN, "Objects folder is missing.", np.NaN,
          np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
 
         ["rbrl-499-web-202203-0001", np.NaN, "Objects folder is empty.", np.NaN,
@@ -560,7 +566,6 @@ a.log("header")
 # ----------------------------------------------------------------------------------------------------------------
 
 # Errors are listed in script order. Seeds are processed out of order to get desired input for specific tests.
-# Some seeds in the date range are not needed for testing and are skipped because their number isn't used.
 # For each seed, calls web functions but does not call the aip functions, which are tested elsewhere.
 # Only calls the download_warcs() function if it is needed for the test, since downloading is slow.
 for seed in seed_df.itertuples():
@@ -686,7 +691,6 @@ for seed in seed_df.itertuples():
         a.log(aip.log)
 
     # ERROR 13: No metadata folder.
-    # Adds a file to the objects folder since downloading WARCs is slow, so the test is just about the metadata folder.
     if seed.Seed_ID == "2529652":
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         make_warc_placeholder(seed.AIP_ID)
@@ -695,11 +699,24 @@ for seed in seed_df.itertuples():
         a.log(aip.log)
 
     # Error 14: Metadata folder is empty.
-    # Adds a file to the objects folder since downloading WARCs is slow, so the test is just about the metadata folder.
     if seed.Seed_ID == "2529634":
         os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         os.makedirs(os.path.join(seed.AIP_ID, "objects"))
         make_warc_placeholder(seed.AIP_ID)
+        aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
+        web.check_directory(aip)
+        a.log(aip.log)
+
+    # Error 15: Objects and metadata folders are missing.
+    if seed.Seed_ID == "2454506":
+        os.makedirs(seed.AIP_ID)
+        aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
+        web.check_directory(aip)
+        a.log(aip.log)
+
+    # Error 16: Objects folder is missing; metadata folder is empty.
+    if seed.Seed_ID == "2529642":
+        os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
         aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, 1, True)
         web.check_directory(aip)
         a.log(aip.log)
