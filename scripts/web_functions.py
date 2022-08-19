@@ -8,431 +8,370 @@ Dependencies:
 import csv
 import datetime
 import os
+import pandas as pd
 import re
 import requests
+import shutil
 import subprocess
+import time
 
 # Import constant variables and functions from another UGA preservation script.
 import aip_functions as a
 import configuration as c
 
 
-def warc_log(log_data):
-    """Saves information about each step done on a WARC to a CSV file, warc_log.csv, in the script output folder.
-    Information is saved to a dictionary after each step and saved to the log after the end of WARC processing
-    or if there is an error. The AIP steps use a different log structure."""
+def check_configuration():
+    """Verifies all the expected variables specific to the web workflow are in the configuration file
+    and paths are valid if they are a path. The check_configuration() function in aip_functions.py
+    does similar tests for general aip variables.
+    Returns a list of paths with errors or "no errors".
+    This avoids wasting processing time by doing earlier steps before the path error is encountered."""
 
-    # Formats the information from log_data as a list for adding to the CSV.
-    # If it is header, it uses default values. Otherwise, log_data is a dictionary with known keys.
-    if log_data == "header":
-        log_row = ["WARC Filename", "WARC JSON Error", "Seed ID Error", "JOB ID Error", "Seed Metadata Error",
-                   "Metadata Report Errors", "Metadata Report Information", "WARC Download API Error",
-                   "WARC Fixity Error", "Processing Complete"]
-    else:
-        log_row = [log_data["filename"], log_data["warc_json"], log_data["seed_id"], log_data["job_id"],
-                   log_data["seed_metadata"], log_data["report_download"], log_data["report_info"],
-                   log_data["warc_api"], log_data["warc_fixity"], log_data["complete"]]
+    errors = []
 
-    # Saves the log_row information to a row in the WARC log CSV.
-    with open("../warc_log.csv", "a", newline="") as log_file:
-        log_writer = csv.writer(log_file)
-        log_writer.writerow(log_row)
+    # The variable script_output is the only one with a path.
+    # Checks first for if it is present, and if it is checks if it is valid.
+    try:
+        if not os.path.exists(c.script_output):
+            errors.append(f"Script output path '{c.script_output}' is not correct.")
+    except AttributeError:
+        errors.append("script_output variable is missing from the configuration file.")
+
+    # For the other web variables, tests if they are present.
+    try:
+        c.partner_api
+    except AttributeError:
+        errors.append("partner_api variable is missing from the configuration file.")
+    try:
+        c.wasapi
+    except AttributeError:
+        errors.append("wasapi variable is missing from the configuration file.")
+    try:
+        c.inst_page
+    except AttributeError:
+        errors.append("inst_page variable is missing from the configuration file.")
+    try:
+        c.username
+    except AttributeError:
+        errors.append("username variable is missing from the configuration file.")
+    try:
+        c.password
+    except AttributeError:
+        errors.append("password variable is missing from the configuration file.")
+
+    # Returns the errors list. If there were no errors, it will be empty.
+    return errors
 
 
-def warc_data(date_start, date_end, collections=None):
-    """Gets data about WARCs to include in this download using WASAPI. A WARC is included if it was saved in the 3
-    months since the last preservation download date and is part of a relevant collection. The relevant collection
-    list is either provided as an argument or the function will calculate a list of departments who regularly use
-    this script.
+def seed_data(date_start, date_end):
+    """Uses WASAPI and the Partner API to get information about each seed to include in the download.
+    Returns the data as a dataframe and also saves it to a CSV in the script output folder to use for the log
+    and for splitting big downloads or restarting jobs if the script breaks."""
 
-    Returns json converted to a Python object with all the WASAPI data on the included WARCs."""
+    # Starts a dataframe for storing seed level data about the WARCs in this download.
+    # Includes columns that will be used for logging steps prior to using the general-aip script functions.
+    seed_df = pd.DataFrame(columns=["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection", "AIT_Collection",
+                                    "Job_ID", "Size", "WARCs", "WARC_Filenames", "Seed_Metadata_Errors",
+                                    "Metadata_Report_Errors", "Metadata_Report_Info",
+                                    "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
 
-    def collection_list():
-        """Makes a list of Hargrett, MAGIL, and Russell Archive-It collections. Skips test collections and
-        collections of other departments (e.g., BMA) who occasionally crawl but don't save to ARCHive."""
-
-        # Starts lists to store the collections to include and exclude, depending on the department.
-        collections_include = []
-        collections_exclude = []
-
-        # Uses the Partner API to get the data from the seed report, which has repository (department) information.
-        # Limit of -1 means it will get data on all seeds, no matter how many there are.
-        seed_reports = requests.get(f'{c.partner_api}/seed?limit=-1', auth=(c.username, c.password))
-
-        # If there was an error with the API call, quits the script.
-        if not seed_reports.status_code == 200:
-            print(f"API error {seed_reports.status_code} when making collection list.")
-            print(f"Ending script (this information is required). Try script again later.")
-            exit()
-
-        # Converts the seed data from json to a Python object.
-        py_seeds = seed_reports.json()
-
-        # Iterates over data about each seed.
-        for seed in py_seeds:
-
-            # Gets the collection id. If it has already been evaluated, stops processing this seed and starts the next.
-            # Collections may have multiple seeds.
-            collection_id = seed['collection']
-            if collection_id in collections_include or collection_id in collections_exclude:
-                continue
-
-            # Gets the department name from the Collector field. If there is no information in the field, adds it to
-            # the excluded list and to the log (so staff can verify it was correctly excluded) and starts the next seed.
-            try:
-                department_name = seed['metadata']['Collector'][0]['value']
-            except (KeyError, IndexError):
-                collections_exclude.append(collection_id)
-                continue
-
-            # If the department is Hargrett, MAGIL, or Russell, adds the collection id to the collections list.
-            # Otherwise, adds it to the excluded list.
-            if department_name.startswith(('Hargrett', 'Map', 'Richard B. Russell')):
-                collections_include.append(seed['collection'])
-            else:
-                collections_exclude.append(collection_id)
-
-        return collections_include
-
-    # Gets data about WARCs to include in this download using WASAPI. Explanation of filters:
-    #   * store time is when the WARC was saved, so test crawls saved in the quarter after they were run aren't missed.
-    #   * collections are the Archive-It ids for collections to include in the download.
-    #   * page size is the maximum number of WARCs the API call will return.
-    if not collections:
-        collections = collection_list()
-
-    filters = {'store-time-after': date_start, 'store-time-before': date_end,
-               'collection': collections, 'page_size': 1000}
+    # Uses WASAPI to get information about all WARCs in this download, based on the date limits.
+    # WASAPI is the only API that allows limiting by date.
+    filters = {"store-time-after": date_start, "store-time-before": date_end, "page_size": 1000}
     warcs = requests.get(c.wasapi, params=filters, auth=(c.username, c.password))
 
     # If there was an error with the API call, quits the script.
     if not warcs.status_code == 200:
-        print(f'\nAPI error {warcs.status_code} when getting WARC data.')
+        print(f"\nAPI error {warcs.status_code} when getting WARC data.")
         print(f"Ending script (this information is required). Try script again later.")
         exit()
 
-    # Converts the WARC data from json to a Python object and returns that Python object.
+    # Converts the WARC data from json to a Python object and organizes it in the dataframe by seed.
+    # Includes seed, Archive-It collection, job, size in GB, number of WARCs, and list of WARC filenames.
     py_warcs = warcs.json()
-    return py_warcs
+    for warc_info in py_warcs["files"]:
 
+        # Calculates the seed id, which is a portion of the WARC filename.
+        regex_seed = re.match(r"^.*-SEED(\d+)-", warc_info["filename"])
+        seed_identifier = regex_seed.group(1)
 
-def seed_data(py_warcs, date_end):
-    """Extracts information from the warc and seed data to define the AIP id, AIP title, and crawl definition id.
-    Returns this data in a dictionary with the seed id as the key and makes a metadata.csv file with seed metadata
-    needed for making AIPs later."""
+        # If the seed is already in the dataframe, adds to the size, WARC count, WARC filenames, and Job ID (if new).
+        # If the seed is new, gets the data needed about the seed and adds it to the dataframe.
+        if seed_identifier in seed_df.Seed_ID.values:
+            seed_df.loc[seed_df.Seed_ID == seed_identifier, "Size"] += warc_info["size"]
+            seed_df.loc[seed_df.Seed_ID == seed_identifier, "WARCs"] += 1
+            seed_df.loc[seed_df.Seed_ID == seed_identifier, "WARC_Filenames"] += f',{warc_info["filename"]}'
+            if seed_df.loc[seed_df.Seed_ID == seed_identifier, "Job_ID"].str.contains(str(warc_info["crawl"])).bool() is False:
+                seed_df.loc[seed_df.Seed_ID == seed_identifier, "Job_ID"] += f',{warc_info["crawl"]}'
+        else:
+            seed_info = {"Seed_ID": seed_identifier, "AIT_Collection": warc_info["collection"],
+                         "Job_ID": str(warc_info["crawl"]), "Size": warc_info["size"],
+                         "WARCs": 1, "WARC_Filenames": warc_info["filename"]}
+            seed_df = seed_df.append(seed_info, ignore_index=True)
 
-    # Starts a dictionary for the number of seeds per collection, which is used in the AIP id.
-    seed_count = {}
+    # Makes a new column in the dataframe with size converted to GB, rounded to 2 decimal places.
+    # Calculating the size in GB during the WARC loop was resulting in some that weren't rounded.
+    seed_df["Size_GB"] = round((seed_df["Size"]/1000000000).astype(float), 2)
+    seed_df.drop(["Size"], axis=1, inplace=True)
 
-    # Starts a dictionary for data about seeds included in this download.
-    seeds_include = {}
+    # Gets a list of the seeds and uses the Partner API (seed report) to get additional information.
+    # Includes: seed title, related archival collection, and department (all part of the metadata)
+    # and constructs the AIP ID. Adds these fields to the dataframe.
+    seed_list = seed_df["Seed_ID"].to_list()
+    for seed in seed_list:
 
-    # Starts a list of seed ids for seeds that will not be included in this download so the script doesn't have to
-    # check them again. There are often multiple warcs per seed.
-    seeds_exclude = []
-
-    # Gets the year, month, and day of the date_end. Year and month are used as part of AIP IDs.
-    # date_end is the end of the preservation download period and formatted YYYY-MM-DD.
-    year, month, day = date_end.split("-")
-
-    # Makes a file named metadata.csv in the AIPs directory, with a header.
-    metadata_open = open("metadata.csv", "a", newline="")
-    metadata_csv = csv.writer(metadata_open)
-    metadata_csv.writerow(["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"])
-
-    # Iterates through data for each warc to get the seed ids which are included in this download. Those seed ids are
-    # then used to look up information via the Partner API needed to generate the desired AIP information.
-    for warc_info in py_warcs['files']:
-
-        # Calculates the seed id, which is a portion of the warc filename.
-        # Stops processing this warc and starts the next one if the filename doesn't match the expected pattern.
+        # If any data is missing, the try/except notes the error and the seed will be skipped when making AIPs.
         try:
-            regex_seed = re.match(r'^.*-SEED(\d+)-', warc_info['filename'])
-            seed_identifier = regex_seed.group(1)
-        except AttributeError:
-            continue
+            # Row index is used to save the data to the correct row in the dataframe.
+            row_index = seed_df.index[seed_df["Seed_ID"] == seed].tolist()[0]
 
-        # Stops processing this warc and starts the next one if the script has already assigned an AIP id to this seed.
-        # This happens when a seed has multiple warcs.
-        if seed_identifier in seeds_include or int(seed_identifier) in seeds_exclude:
-            continue
-
-        # Uses the Partner API to get data about this seed.
-        seed_report = requests.get(f'{c.partner_api}/seed?id={seed_identifier}', auth=(c.username, c.password))
-
-        # If there was an error with the API call, quits the script.
-        if not seed_report.status_code == 200:
-            print(f"\nAPI error {seed_report.status_code} for seed report.")
-            print(f"Ending script (this information is required). Try script again later.")
-            exit()
-
-        # Converts the seed data from json to a Python object.
-        py_seed_report = seed_report.json()
-
-        # Constructs the AIP id from the seed data. If at any stage a piece of the AIP id cannot be calculated,
-        # the seed is added to the exclude list and the next warc is processed.
-        for seed_info in py_seed_report:
-
-            # Gets the title for the seed from the Title field.
-            # Stops processing this seed if the title is missing. It is required.
-            try:
-                title = seed_info['metadata']['Title'][0]['value']
-            except (KeyError, IndexError):
-                seeds_exclude.append(seed_info['id'])
+            # Gets the seed metadata from the Archive-It Partner API and logs an error if the connection fails.
+            seed_report = requests.get(f"{c.partner_api}/seed?id={seed}", auth=(c.username, c.password))
+            if not seed_report.status_code == 200:
+                log(f"API error {seed_report.status_code}: can't make this AIP", seed_df, row_index, "Seed_Metadata_Errors")
                 continue
+            py_seed_report = seed_report.json()
 
-            # Gets the department from the Collector field.
-            # Stops processing this seed if there is no department. It is required.
-            try:
-                department_name = seed_info['metadata']['Collector'][0]['value']
-            except (KeyError, IndexError):
-                seeds_exclude.append(seed_info['id'])
-                continue
+            # Gets the AIP title from the seed metadata.
+            seed_df.loc[row_index, "Title"] = py_seed_report[0]["metadata"]["Title"][0]["value"]
 
-            # Constructs a Hargrett AIP ID: harg-collection-web-download_yearmonth-sequential_number.
-            if department_name.startswith('Hargrett'):
-
-                # Gets the related archival collection from Archive-it metadata.
-                # If there is none, collection is '0000'.
-                try:
-                    regex_collection = re.match('^Hargrett (.*):', seed_info['metadata']['Relation'][0]['value'])
-                    related_collection = regex_collection.group(1)
-                except (KeyError, AttributeError):
-                    related_collection = '0000'
-
-                # Adds or updates the count for the number of AIPs from this collection in the seed_count dictionary.
-                # Then gets the current count and formats it as a 4 digit number.
-                seed_count[related_collection] = seed_count.get(related_collection, 0) + 1
-                sequential_number = format(seed_count[related_collection], '04d')
-
-                # Constructs the AIP id for the seed.
-                identifier = f'harg-{related_collection}-web-{year}{month}-{sequential_number}'
-
-            # Constructs a MAGIL AIP ID: magil-ggp-seed_id-download_year-download_month.
-            elif department_name.startswith('Map'):
-                identifier = f'magil-ggp-{seed_info["id"]}-{year}-{month}'
-                related_collection = "0000"
-
-            # Constructs a Russell AIP ID: rbrl-collection-web-download_yearmonth-sequential_number.
-            elif department_name.startswith('Richard B. Russell'):
-
-                # Gets the related archival collection from Archive-it metadata.
-                # If there is none, collection is '000'.
-                try:
-                    regex_collection = re.match(r'^RBRL/(\d{3})', seed_info['metadata']['Relation'][0]['value'])
-                    related_collection = regex_collection.group(1)
-                except (KeyError, AttributeError):
-                    related_collection = '000'
-
-                # Adds or updates the count for the number of AIPs from this collection in the seed_count dictionary.
-                # Then gets the current count and formats it as a 4 digit number.
-                seed_count[related_collection] = seed_count.get(related_collection, 0) + 1
-                sequential_number = format(seed_count[related_collection], '04d')
-
-                # Constructs the AIP id for the seed.
-                identifier = f'rbrl-{related_collection}-web-{year}{month}-{sequential_number}'
-
-            # Stops processing this seed if the department isn't Hargrett, MAGIL, or Russell.
-            # This shouldn't happen since the script is only processing seeds from these,
-            # but there could have been an error in making the collections list.
-            else:
-                seeds_exclude.append(seed_info['id'])
-                continue
-
-            # Saves AIP id and AIP title to the seeds_include dictionary.
-            # This only contains information about seeds that had no errors and were fully processed.
-            seeds_include[seed_identifier] = [identifier, title]
-
-            # Gets the ARCHive group for the department,
-            # adds the department prefix to the related collection number if necessary,
-            # and saves all the AIP information to the metadata.csv
+            # Gets the department name from the seed metadata and translates it to the ARCHive group code.
             dept_to_group = {"Hargrett Rare Book & Manuscript Library": "hargrett",
                              "Map and Government Information Library": "magil",
                              "Richard B. Russell Library for Political Research and Studies": "russell"}
-            group = dept_to_group[department_name]
-            if group == "russell":
-                related_collection = "rbrl-" + related_collection
+            department = dept_to_group[py_seed_report[0]["metadata"]["Collector"][0]["value"]]
+            seed_df.loc[row_index, "Department"] = department
 
-            metadata_csv.writerow([group, related_collection, identifier, identifier, title, 1])
+            # Gets the related archival collection from the seed metadata, reformatting if necessary.
+            if department == "hargrett":
+                try:
+                    regex_collection = re.match("^Hargrett (.*):", py_seed_report[0]["metadata"]["Relation"][0]["value"])
+                    seed_df.loc[row_index, "UGA_Collection"] = regex_collection.group(1)
+                except (KeyError, AttributeError):
+                    seed_df.loc[row_index, "UGA_Collection"] = "0000"
+            elif department == "magil":
+                seed_df.loc[row_index, "UGA_Collection"] = "0000"
+            elif department == "russell":
+                try:
+                    regex_collection = re.match(r"^RBRL/(\d{3})", py_seed_report[0]["metadata"]["Relation"][0]["value"])
+                    seed_df.loc[row_index, "UGA_Collection"] = "rbrl-" + regex_collection.group(1)
+                except (KeyError, AttributeError):
+                    seed_df.loc[row_index, "UGA_Collection"] = "rbrl-000"
 
-    # Closes the metadata file and returns the dictionary with AIP ID and title.
-    metadata_open.close()
-    return seeds_include
+            # Constructs the AIP ID according to department specifications.
+            # Also temporarily adds a column to the dataframe which counts the number of seeds per collection,
+            # and calculates the year and month of the download, both of which are needed for AIP IDs.
+            seed_df["coll_sequence"] = seed_df.groupby(["UGA_Collection"]).cumcount() + 1
+            year, month, day = date_end.split("-")
+            if department == "hargrett":
+                seed_df.loc[row_index, "AIP_ID"] = f'harg-{seed_df.at[row_index, "UGA_Collection"]}-web-{year}{month}-{format(seed_df.at[row_index, "coll_sequence"], "04d")}'
+            elif department == "magil":
+                seed_df.loc[row_index, "AIP_ID"] = f"magil-ggp-{seed}-{year}-{month}"
+            elif department == "russell":
+                seed_df.loc[row_index, "AIP_ID"] = f'{seed_df.at[row_index, "UGA_Collection"]}-web-{year}{month}-{format(seed_df.at[row_index, "coll_sequence"], "04d")}'
+            seed_df.drop(["coll_sequence"], axis=1, inplace=True)
+        except:
+            seed_df.loc[row_index, "Seed_Metadata_Errors"] = "Couldn't get all required metadata values from the seed report. Will not download files or make AIP."
+
+    # If there were no errors (the row has no value in the Seed_Metadata_Errors column),
+    # updates the dataframe to show success.
+    seed_df["Seed_Metadata_Errors"] = seed_df["Seed_Metadata_Errors"].fillna("Successfully calculated seed metadata")
+
+    # Saves the dataframe as a CSV in the script output folder for splitting or restarting a batch.
+    # Returns the dataframe for when the entire group will be downloaded as one batch.
+    seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+    return seed_df
 
 
-def make_aip_directory(aip_folder):
-    """Makes the AIP directory structure: a folder named with the AIP ID that contains folders named "metadata" and
-    "objects", provided they are not already present from processing a previous WARC. """
+def log(message, df, row, column):
+    """Adds log information to the seeds dataframe and saves an updated version of seeds.csv."""
 
-    if not os.path.exists(f'{aip_folder}/metadata'):
-        os.makedirs(f'{aip_folder}/metadata')
+    # Updates the dataframe. Separates messages with a a semicolon if there is more than one.
+    if pd.isnull(df.at[row, column]):
+        df.loc[row, column] = message
+    else:
+        df.loc[row, column] += "; " + message
 
-    if not os.path.exists(f'{aip_folder}/objects'):
-        os.makedirs(f'{aip_folder}/objects')
+    # Saves a new version of seeds.csv with the updated information.
+    # The previous version of the file is overwritten.
+    df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
 
 
-def download_metadata(aip_id, warc_collection, job_id, seed_id, date_end, log_data):
+def reset_aip(aip_id, df):
+    """Deletes the directories and log information for a seed
+    that was partially completed when the script broke so it can be remade."""
+
+    # Deletes the AIP directory and all its contents.
+    shutil.rmtree(aip_id)
+
+    # Clears data in the seed dataframe related to successfully completing metadata and WARC downloading
+    # from the failed attempt.
+    row_index = df.index[df["AIP_ID"] == aip_id].tolist()[0]
+    df.loc[row_index, "Metadata_Report_Errors"] = None
+    df.loc[row_index, "Metadata_Report_Info"] = None
+    df.loc[row_index, "WARC_API_Errors"] = None
+    df.loc[row_index, "WARC_Fixity_Errors"] = None
+    df.loc[row_index, "WARC_Unzip_Errors"] = None
+
+    # Saves a new version of seeds.csv with the updated information.
+    # The previous version of the file is overwritten.
+    df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+
+
+def download_metadata(seed, seed_df):
     """Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
-    deletes any empty reports (meaning there was no data of that type for this seed), and redacts login information
-    from the seed report. """
+    deletes any empty reports (meaning there was no data of that type for this seed),
+    and redacts login information from the seed report.
+    Any errors are added to the seed dataframe and saved to the script log at the end of the function."""
 
     def get_report(filter_type, filter_value, report_type, report_name):
         """Downloads a single metadata report and saves it as a csv in the AIP's metadata folder.
+            Only saves if there is data of that type and also redacts the login info from the seed report.
             filter_type and filter_value are used to filter the API call to the right AIP's report
             report_type is the Archive-It name for the report
             report_name is the name for the report saved in the AIP, including the ARCHive metadata code """
 
-        # Checks if the report has already been downloaded and ends the function if so.
-        # If there is more than one WARC for a seed, reports may already be in the metadata folder.
-        report_path = f'{c.script_output}/aips_{date_end}/{aip_id}/metadata/{report_name}'
-        if os.path.exists(report_path):
-            return
-
         # Builds the API call to get the report as a csv.
         # Limit of -1 will return all matches. Default is only the first 100.
-        filters = {'limit': -1, filter_type: filter_value, 'format': 'csv'}
-        metadata_report = requests.get(f'{c.partner_api}/{report_type}', params=filters, auth=(c.username, c.password))
+        filters = {"limit": -1, filter_type: filter_value, "format": "csv"}
+        metadata_report = requests.get(f"{c.partner_api}/{report_type}", params=filters, auth=(c.username, c.password))
 
-        # Saves the metadata report if there were no errors with the API or logs the error.
+        # Saves the metadata report if there were no API errors and there was data of this type (content isn't empty).
+        # For scope rules, it is common for one or both to not have data since these aren't required.
         if metadata_report.status_code == 200:
-            with open(f'{aip_id}/metadata/{report_name}', 'wb') as report_csv:
-                report_csv.write(metadata_report.content)
-        else:
-            if log_data['report_download'] == "n/a":
-                log_data['report_download'] = f'{report_type} API error {metadata_report.status_code}'
-            else:
-                log_data['report_download'] += f'; {report_type} API error {metadata_report.status_code}'
-
-    def redact(metadata_report_path):
-        """Replaces the seed report with a redacted version of the file, removing login information if those columns
-        are present. Even if the columns are blank, replaces it with REDACTED. Since not all login information is
-        meaningful (some is from staff web browsers autofill information while viewing the metadata), knowing if
-        there was login information or not is misleading. """
-
-        # Starts a list for storing the redacted rows that will be saved in the new version of the document.
-        redacted_rows = []
-
-        # Opens and reads the seed report.
-        with open(metadata_report_path) as seed_csv:
-            seed_read = csv.reader(seed_csv)
-
-            # Adds the header row to the redacted_rows list without altering it.
-            header = next(seed_read)
-            redacted_rows.append(header)
-
-            # Gets the index of the password and username columns. Since the report is inconsistent about if these
-            # are included at all, also want to catch if columns are in a different order. If the login columns are not
-            # present, exits the function and leaves the seed report as it was.
-            try:
-                password_index = header.index('login_password')
-                username_index = header.index('login_username')
-            except ValueError:
-                if log_data['report_info'] == "n/a":
-                    log_data['report_info'] = 'Seed report does not have login columns to redact.'
-                else:
-                    log_data['report_info'] += '; Seed report does not have login columns to redact.'
+            if metadata_report.content == b"":
+                log(f"Empty report {report_name} not saved", seed_df, row_index, "Metadata_Report_Info")
                 return
-
-            # Puts 'REDACTED' in the password and username columns for each non-header row and adds the updated
-            # rows to the redacted_rows list.
-            for row in seed_read:
-                row[password_index] = 'REDACTED'
-                row[username_index] = 'REDACTED'
-                redacted_rows.append(row)
-
-        # Opens the seed report again, but in write mode to replace the rows with the redacted rows.
-        # Gets each row from the redacted_rows list and saves it to the csv.
-        with open(metadata_report_path, 'w', newline='') as report_csv:
-            report_write = csv.writer(report_csv)
-            for row in redacted_rows:
-                report_write.writerow(row)
-
-    # Downloads five of the six metadata reports from Archive-It needed to understand the context of the WARC.
-    # These are reports where there is only one report per seed or collection.
-    get_report('id', seed_id, 'seed', f'{aip_id}_seed.csv')
-    get_report('seed', seed_id, 'scope_rule', f'{aip_id}_seedscope.csv')
-    get_report('collection', warc_collection, 'scope_rule', f'{aip_id}_collscope.csv')
-    get_report('id', warc_collection, 'collection', f'{aip_id}_coll.csv')
-    get_report('id', job_id, 'crawl_job', f'{aip_id}_{job_id}_crawljob.csv')
-
-    # Downloads the crawl definition report for the job this WARC was part of.
-    # The crawl definition id is obtained from the crawl job report using the job id.
-    # There may be more than one crawl definition report per AIP.
-    # Logs an error if there is no crawl job report to get the job id(s) from.
-    try:
-        with open(f'{aip_id}/metadata/{aip_id}_{job_id}_crawljob.csv', 'r') as crawljob_csv:
-            crawljob_data = csv.DictReader(crawljob_csv)
-            for job in crawljob_data:
-                if job_id == job['id']:
-                    crawl_def_id = job['crawl_definition']
-                    get_report('id', crawl_def_id, 'crawl_definition', f'{aip_id}_{crawl_def_id}_crawldef.csv')
-                    break
-    except FileNotFoundError:
-        log_data['report_download'] += f'; Crawl Job was not downloaded so cannot get Crawl Definition'
-
-    # If there were no download errors (the log still has the default value), updates the log to show success.
-    if log_data['report_download'] == "n/a":
-        log_data['report_download'] = "Successfully downloaded all metadata reports."
-
-    # Iterates over each report in the metadata folder to delete empty reports and redact login information from the
-    # seed report.
-    for report in os.listdir(f'{aip_id}/metadata'):
-
-        # Saves the full file path of the report.
-        report_path = f'{c.script_output}/aips_{date_end}/{aip_id}/metadata/{report}'
-
-        # Deletes any empty metadata files (file size of 0) and begins processing the next file. A file is empty if
-        # there is no metadata of that type, which is most common for collection and seed scope reports.
-        if os.path.getsize(report_path) == 0:
-            if log_data['report_info'] == "n/a":
-                log_data['report_info'] = f'Deleted empty report {report}'
             else:
-                log_data['report_info'] += f'; Deleted empty report {report}'
-            os.remove(report_path)
+                with open(f"{seed.AIP_ID}/metadata/{report_name}", "wb") as report_csv:
+                    report_csv.write(metadata_report.content)
+        else:
+            log(f"{report_name} API Error {metadata_report.status_code}", seed_df, row_index, "Metadata_Report_Errors")
+            return
+
+        # Replaces the seed report with a redacted version of the file, removing login information if those columns
+        # are present. Even if the columns are blank, replaces it with REDACTED. Since not all login information is
+        # meaningful (some is from staff web browsers autofill information while viewing the metadata), knowing if
+        # there was login information or not is misleading. """
+        if report_type == "seed":
+            report_df = pd.read_csv(f"{seed.AIP_ID}/metadata/{report_name}")
+            if "login_password" in report_df.columns:
+                report_df["login_username"] = "REDACTED"
+                report_df["login_password"] = "REDACTED"
+                report_df.to_csv(f"{seed.AIP_ID}/metadata/{report_name}")
+            else:
+                log("Seed report does not have login columns to redact", seed_df, row_index, "Metadata_Report_Info")
+
+    # Row index for the seed being processed in the dataframe, to use for adding logging information.
+    row_index = seed_df.index[seed_df["Seed_ID"] == seed.Seed_ID].tolist()[0]
+
+    # Downloads four of the six metadata reports from Archive-It needed to understand the context of the WARC.
+    # These are reports where there is only one report per seed or collection.
+    get_report("id", seed.Seed_ID, "seed", f"{seed.AIP_ID}_seed.csv")
+    get_report("seed", seed.Seed_ID, "scope_rule", f"{seed.AIP_ID}_seedscope.csv")
+    get_report("collection", seed.AIT_Collection, "scope_rule", f"{seed.AIP_ID}_collscope.csv")
+    get_report("id", seed.AIT_Collection, "collection", f"{seed.AIP_ID}_coll.csv")
+
+    # Downloads each of the crawl job reports and its corresponding crawl definition report (if new).
+    # If a seed has more than one, Job_ID has a comma-separated string of the IDs.
+    job_list = seed.Job_ID.split(",")
+    for job in job_list:
+        get_report("id", job, "crawl_job", f"{seed.AIP_ID}_{job}_crawljob.csv")
+        try:
+            report_df = pd.read_csv(f"{seed.AIP_ID}/metadata/{seed.AIP_ID}_{job}_crawljob.csv", dtype="object")
+            crawl_def_id = report_df.loc[0, "crawl_definition"]
+            if not os.path.exists(f"{seed.AIP_ID}/metadata/{seed.AIP_ID}_{crawl_def_id}_crawldef.csv"):
+                get_report("id", crawl_def_id, "crawl_definition", f"{seed.AIP_ID}_{crawl_def_id}_crawldef.csv")
+        except FileNotFoundError:
+            log("Crawl job was not downloaded so can't get crawl definition id", seed_df, row_index, "Metadata_Report_Errors")
+
+    # If there were no download errors (the dataframe still has no value in that cell), updates the log to show success.
+    if pd.isnull(seed_df.at[row_index, "Metadata_Report_Errors"]):
+        seed_df.loc[row_index, "Metadata_Report_Errors"] = "Successfully downloaded all metadata reports"
+        seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+
+    # If there is nothing in the report info field, updates the log with default text.
+    # Can't assume that blank means success because it could mean API errors.
+    if pd.isnull(seed_df.at[row_index, "Metadata_Report_Info"]):
+        seed_df.loc[row_index, "Metadata_Report_Info"] = "No additional information"
+        seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+
+
+def download_warcs(seed, date_end, seed_df):
+    """Downloads every WARC file and verifies that fixity is unchanged after downloading."""
+
+    # Row index for the seed being processed in the dataframe, to use for adding logging information.
+    row_index = seed_df.index[seed_df["Seed_ID"] == seed.Seed_ID].tolist()[0]
+
+    # Makes a list of the filenames for all WARCs for this seed.
+    warc_names = seed.WARC_Filenames.split(",")
+
+    # Downloads and validates every WARC.
+    # If an error is caught at any point, logs the error and starts the next WARC.
+    for warc in warc_names:
+
+        # Gets URL for downloading the WARC and WARC MD5 from Archive-It using WASAPI.
+        warc_data = requests.get(f'{c.wasapi}?filename={warc}', auth=(c.username, c.password))
+        if not warc_data.status_code == 200:
+            log(f"API error {warc_data.status_code}: can't get info about {warc}",
+                seed_df, row_index, "WARC_API_Errors")
+            continue
+        py_warc = warc_data.json()
+        warc_url = py_warc["files"][0]["locations"][0]
+        warc_md5 = py_warc["files"][0]["checksums"]["md5"]
+
+        # The path for where the WARC will be saved on the local machine (it is long and used twice in this script).
+        warc_path = f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/objects/{warc}'
+
+        # Downloads the WARC, which will be zipped.
+        warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
+
+        # If there was an error with the API call, starts the next WARC.
+        if not warc_download.status_code == 200:
+            log(f"API error {warc_download.status_code}: can't download {warc}",
+                seed_df, row_index, "WARC_API_Errors")
+            continue
+        else:
+            log(f"Successfully downloaded {warc}", seed_df, row_index, "WARC_API_Errors")
+
+        # Saves the zipped WARC in the objects folder, keeping the original filename.
+        with open(warc_path, 'wb') as warc_file:
+            warc_file.write(warc_download.content)
+
+        # Calculates the md5 for the downloaded zipped WARC with md5deep.
+        md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
+        try:
+            regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
+            downloaded_warc_md5 = regex_md5.group(1)
+        except AttributeError:
+            log(f"Fixity for {warc} cannot be extracted from md5deep output: {md5deep_output.stdout}",
+                seed_df, row_index, "WARC_Fixity_Errors")
             continue
 
-        # Redacts login password and username from the seed report so we can share the seed report with researchers.
-        if report.endswith('_seed.csv'):
-            redact(report_path)
+        # Compares the md5 of the downloaded zipped WARC to Archive-It metadata.
+        # If the md5 has changed, deletes the WARC.
+        if not warc_md5 == downloaded_warc_md5:
+            os.remove(warc_path)
+            log(f"Fixity for {warc} changed and it was deleted: {warc_md5} before, {downloaded_warc_md5} after",
+                seed_df, row_index, "WARC_Fixity_Errors")
+            continue
+        else:
+            log(f"Successfully verified {warc} fixity on {datetime.datetime.now()}",
+                seed_df, row_index, "WARC_Fixity_Errors")
 
+        # Extracts the WARC from the gzip file.
+        # Deletes the gzip file, unless 7zip had an error during unzipping.
+        unzip_output = subprocess.run(f'"C:/Program Files/7-Zip/7z.exe" x "{warc_path}" -o"{seed.AIP_ID}/objects"',
+                                      stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
+        if unzip_output.stderr == b'':
+            os.remove(warc_path)
+            log(f"Successfully unzipped {warc}", seed_df, row_index, "WARC_Unzip_Errors")
+        else:
+            log(f"Error unzipping {warc}: {unzip_output.stderr.decode('utf-8')}",
+                seed_df, row_index, "WARC_Unzip_Errors")
 
-def download_warc(aip_id, warc_filename, warc_url, warc_md5, date_end, log_data):
-    """Downloads a warc file and verifies that fixity is unchanged after downloading."""
-
-    # The path for where the warc will be saved on the local machine (it is long and used twice in this script).
-    warc_path = f'{c.script_output}/aips_{date_end}/{aip_id}/objects/{warc_filename}'
-
-    # Downloads the warc.
-    warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
-
-    # If there was an error with the API call, quits the function.
-    if not warc_download.status_code == 200:
-        log_data["warc_api"] = f'API error {warc_download.status_code}'
-        return
-    else:
-        log_data["warc_api"] = "Successfully downloaded WARC."
-
-    # Saves the warc in the objects folder, keeping the original filename.
-    with open(warc_path, 'wb') as warc_file:
-        warc_file.write(warc_download.content)
-
-    # Calculates the md5 for the downloaded WARC, using a regular expression to get the md5 from the md5deep output.
-    # If the output is not formatted as expected, quits the function.
-    md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
-    try:
-        regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
-        downloaded_warc_md5 = regex_md5.group(1)
-    except AttributeError:
-        log_data["warc_fixity"] = f"Fixity cannot be extracted from md5deep output: {md5deep_output.stdout}"
-        return
-
-    # Compares the md5 of the download warc to what Archive-It has for the warc (warc_md5). If the md5 has changed,
-    # deletes the WARC so the check for AIP completeness will catch that there was a problem.
-    if not warc_md5 == downloaded_warc_md5:
-        os.remove(warc_path)
-        log_data["warc_fixity"] = f"Fixity changed and WARC deleted. {warc_md5} before, {downloaded_warc_md5} after"
-    else:
-        log_data["warc_fixity"] = f"Successfully verified WARC fixity on {datetime.datetime.now()}"
+        # Wait 15 second to give the API a rest.
+        time.sleep(15)
 
 
 def check_directory(aip):
@@ -469,7 +408,7 @@ def check_directory(aip):
         aip.log["MetadataError"] = "Successfully created metadata folder"
 
 
-def check_aips(date_end, date_start, seed_to_aip, aips_directory):
+def check_aips(date_end, date_start, seed_df, aips_directory):
     """Verifies that all the expected AIPs for the download are complete and no unexpected AIPs were created.
     Produces a csv named completeness_check with the results in the AIPs directory. """
 
@@ -486,7 +425,7 @@ def check_aips(date_end, date_start, seed_to_aip, aips_directory):
 
         # If there was an API error, ends the function.
         if warcs.status_code != 200:
-            print("WASAPI Status code:", warcs.status_code)
+            print("WASAPI error, status code: ", warcs.status_code)
             raise ValueError
 
         # Converts json from API to a python object.
@@ -510,6 +449,7 @@ def check_aips(date_end, date_start, seed_to_aip, aips_directory):
                 regex_seed = re.match(r".*-SEED(\d+)-.*", warc_info['filename'])
                 seed_identifier = regex_seed.group(1)
             except AttributeError:
+                print(f"Unable to get seed ID for {warc_info['filename']}")
                 raise ValueError
 
             # Filter one: only includes the WARC in the dictionary if it was created since the last download and
@@ -520,9 +460,11 @@ def check_aips(date_end, date_start, seed_to_aip, aips_directory):
                 regex_crawl_date = re.match(r"(\d{4}-\d{2}-\d{2})T.*", warc_info['store-time'])
                 crawl_date = regex_crawl_date.group(1)
             except AttributeError:
+                print(f"Unable to reformat date {warc_info['store-time']} for {warc_info['filename']}")
                 raise ValueError
 
-            if crawl_date < date_start or crawl_date > date_end:
+            # With WASAPI the start date is inclusive but the end date is not.
+            if crawl_date < date_start or crawl_date >= date_end:
                 warcs_exclude += 1
                 continue
 
@@ -543,7 +485,7 @@ def check_aips(date_end, date_start, seed_to_aip, aips_directory):
 
                 # If there was an API error, ends the function.
                 if seed_report.status_code != 200:
-                    print(f'API error {seed_report.status_code} getting seed report for seed {seed_identifier}.')
+                    print(f"Unable to get seed report for seed {seed_identifier}. Status {seed_report.status_code}.")
                     raise ValueError
 
                 # Gets the repository from the seed report, if present. If not, this WARC is not included.
@@ -559,18 +501,20 @@ def check_aips(date_end, date_start, seed_to_aip, aips_directory):
                     continue
 
                 # Saves data about the WARC to the dictionary (AIP id, WARC count, URL). If the seed is not in
-                # seed_to_aip, it is an unexpected seed and cannot be added to the dictionary.
+                # seed_df, it is an unexpected seed and cannot be added to the dictionary.
                 try:
-                    aip_info[seed_identifier] = [seed_to_aip[seed_identifier], 1, json_seed[0]['url']]
-                #TODO: do something with the errors.
-                except (KeyError, IndexError):
-                    pass
+                    aip_info[seed_identifier] = [seed_df.loc[seed_df["Seed_ID"] == seed_identifier]["AIP_ID"].item(),
+                                                 1, json_seed[0]['url']]
+                except (KeyError, ValueError, IndexError):
+                    print(f"Seed {seed_identifier} is not in seeds_df")
+                    warcs_exclude += 1
+                    continue
 
                 warcs_include += 1
 
         # Checks that the right number of WARCs were evaluated.
         if warcs_expected != warcs_include + warcs_exclude:
-            print('Check AIPs did not review the expected number of WARCs.')
+            print("Check AIPs did not review the expected number of WARCs.")
             raise ValueError
 
         return aip_info
@@ -584,7 +528,7 @@ def check_aips(date_end, date_start, seed_to_aip, aips_directory):
 
         # Tests if there is a folder for this AIP in the AIPs directory. If not, returns the result for this AIP and
         # does not run the rest of the function's tests since there is no directory to check for completeness.
-        if any(folder.startswith(aip_id) for folder in os.listdir(aips_directory)):
+        if f"{aip_id}_bag" in os.listdir(aips_directory):
             result.append(True)
         else:
             result.extend([False, 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a'])
@@ -610,8 +554,8 @@ def check_aips(date_end, date_start, seed_to_aip, aips_directory):
         result.append(os.path.exists(f'{metadata}/{aip_id}_preservation.xml'))
 
         # Tests if the number of WARCs is correct. Compares the number of WARCs in the objects folder, calculated
-        # with len(), to the number of WARCs expected from the API (warc_count).
-        warcs = len([file for file in os.listdir(objects) if file.endswith('.warc.gz')])
+        # with len(), to the number of WARCs expected from the API (warc_total).
+        warcs = len([file for file in os.listdir(objects) if file.endswith('.warc')])
         if warcs == warc_total:
             result.append(True)
         else:
@@ -621,7 +565,7 @@ def check_aips(date_end, date_start, seed_to_aip, aips_directory):
         # of a different format, based on the file extension, it updates the value to False.
         result.append(True)
         for file in os.listdir(objects):
-            if not file.endswith('.warc.gz'):
+            if not file.endswith('.warc'):
                 result[-1] = False
 
         # Tests if the number of FITS files is correct (one for each WARC). Compares the number of FITS files in the
@@ -654,13 +598,9 @@ def check_aips(date_end, date_start, seed_to_aip, aips_directory):
         # Iterates through the folder with the AIPs.
         for aip_directory in os.listdir(aips_directory):
 
-            # Skips the metadata.csv used to make the AIPs.
-            if aip_directory == "metadata.csv":
-                continue
-
-            # Creates a tuple of the expected AIPs, which are the values in the seed_to_aip dictionary generated
-            # earlier in the script.
-            expected_aip_ids = tuple(seed_to_aip.values())
+            # Creates a tuple of the expected AIPs, which are the values in the AIP_ID row in the seed dataframe.
+            # Does not include blanks from any seeds where the AIP ID was not calculated.
+            expected_aip_ids = tuple(seed_df[seed_df["AIP_ID"].notnull()]["AIP_ID"].to_list())
 
             # If there is an AIP that does not start with one of the expected AIP ids, adds a list with the values
             # for that AIP's row in the completeness check csv to the extras list.
@@ -672,13 +612,10 @@ def check_aips(date_end, date_start, seed_to_aip, aips_directory):
         if len(extras) > 0:
             return extras
 
-    # Makes a dictionary with information about expected AIPs for this download. The key is the seed id,
-    # and the value is a list with the AIP id, WARC count, and URL. If there were errors when calculating the
-    # dictionary, ends the function.
     try:
         aips_metadata = aip_dictionary()
-    except ValueError:
-        print('\nUnable to check AIPs for completeness. AIP dictionary not generated.')
+    except (ValueError, IndexError, KeyError):
+        print("Unable to make aip dictionary and cannot check for completeness.")
         return
 
     # Starts a csv for the results of the quality review.
