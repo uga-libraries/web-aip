@@ -17,7 +17,9 @@ python /path/web_aip_batch.py date_start date_end
 
 python /path/web_aip_single.py seed_identifier aip_identifier archive-it_collection_identifier date_start date_end
 
-date_start and date_end define the timeframe that the WARCs you want to download were stored in Archive-It.
+date_start and date_end: the store date range for WARCs to be downloaded.
+date_start is inclusive: the download will include WARCs stored on date_start.
+date_end is exclusive: the download will not include WARCs stored on date_end.
 
 This script has been tested on Windows 10 and Mac OS X.
 
