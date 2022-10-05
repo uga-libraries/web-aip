@@ -92,23 +92,53 @@ The workflow for each seed is essentially the same for the batch script and sing
 8. Uses md5deep to calculate the md5 for each packaged AIP and saves it to a manifest.
 
 # Additional Scripts
-These are scripts that support the web preservation workflow. See the notes at the beginning of each script for further information and usage instructions.
+These are scripts that support the web preservation workflow. 
+See the notes at the beginning of each script for further information and usage instructions.
 
-* **aip_from_download.py**: Converts a batch of folders organized as AIP directories (metadata and objects folders) with already downloaded WARCs and metadata files into an AIP. Use this where space limitations prevent you from duplicating the files to create the AIPs. WARNING: Created for one time use so variables are part of the code (lines 136-139) instead of script arguments. Script usage: 
-  ```
-  python path/aip_from_download.py
+## aip_from_download.py 
+Converts a batch of folders organized as AIP directories (metadata and objects folders) with already downloaded WARCs and metadata files into an AIP. 
+Use this when space limitations prevent download and AIP creation or errors cause you to need to manually download. 
+WARNING: Created for a one time use so variables are part of the code (lines 136-139) instead of script arguments. 
 
-* **metadata_check_combined.py**: Generates reports of UGA's collection and seed metadata fields, either required only or all fields depending on the if the second optional argument is included. Used for a holistic review of Archive-It usage. Script usage:
-   ```
-  python path/metadata_check_combined.py path/output_directory [all_fields]
+Script usage: `python path/aip_from_download.py`
 
-* **metadata_check_department.py**: Generates reports of UGA's required collection and seed metadata fields organized by the collector (department). Used to verify all required metadata is present prior to a preservation download. Script usage:
-   ```
-   python path/metadata_check_department.py [path/output_directory]
+## linux_unzip.py
+Checks WARC fixity, unzips the warc using the gunzip command, and bags the seed.
+Must be run in a Linux environment.
+Use there 7zip or other Windows zip programs have errors while unzipping the gzipped WARCs.
 
-* **warc_csv.py**: Generates a CSV with information about each WARC stored during a specified time frame using both APIs. Includes WARC file name, collection id, seed id, crawl job id, crawl definition id, store date, size in GB, and seed title. Used for auditing that all WARCs have been downloaded and for previewing which WARCs will be in an upcoming preservation download. Script usage:
-   ```
-   python path/warc_xml_to_csv.py
+Script usage: `python linux_unzip.py aips_directory`
+
+## metadata_check_combined.py
+Generates reports of collection and seed metadata fields, 
+either just required fields or all fields depending on the if the second optional argument is included. 
+Used for a holistic review of Archive-It usage. 
+
+Script usage: `python path/metadata_check_combined.py path/output_directory [all_fields]`
+
+## metadata_check_department.py
+Generates reports of required collection and seed metadata fields organized by the collector (department). 
+Used to verify all required metadata is present prior to a preservation download. 
+
+Script usage: `python path/metadata_check_department.py [path/output_directory]`
+
+## Test Scripts
+The four test scripts generate predictable script inputs to test the full functionality of web_aip_batch.py.
+None of the scripts have arguments.
+
+## update_web_aip.py
+Remakes web AIPs when some but not all files had errors during the initial download.
+Manually download any incorrect files from Archive-It before running this script.
+This script saves time by not needing to re-download all the correct content.
+
+Script usage: `python update_web_aip.py aips_directory`
+
+## warc_csv.py
+Generates a CSV with information about each WARC stored during a specified time frame using both APIs. 
+Includes WARC file name, collection id, seed id, crawl job id, crawl definition id, store date, size in GB, and seed title. 
+Used for auditing that all WARCs have been downloaded and for previewing which WARCs will be in an upcoming preservation download. 
+
+Script usage: `python path/warc_xml_to_csv.py`
 
 # Initial Author
 Adriane Hanson, Head of Digital Stewardship, January 2020
