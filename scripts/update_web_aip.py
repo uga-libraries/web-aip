@@ -5,7 +5,7 @@ this script will remake the AIPs so we don't have to re-download all the correct
 Prior to running the script, make a metadata.csv file with the expected metadata for the general-aip script
 and any additional metadata you need to verify the new contents of the AIP."""
 
-# usage: python update-web-aip.py aips_directory
+# usage: python update_web_aip.py aips_directory
 
 import re
 import sys

@@ -8,7 +8,7 @@ To finish, run web_aip_batch.py without web.download_metadata() and web.download
 The MD5 for each WARC is double-checked before it is unzipped and the seed folder is bagged to detect errors
 from moving the files between Windows and Linux environments."""
 
-# usage: python linux-unzip.py aips_directory
+# usage: python linux_unzip.py aips_directory
 # aips_directory is the parent directory of the AIP folders
 
 import bagit
