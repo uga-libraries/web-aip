@@ -116,7 +116,7 @@ for seed in seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfull
         a.manifest(aip)
 
 # PART THREE: UPDATE LOG, VERIFY AIP COMPLETENESS, AND CLEAN UP DIRECTORY
-# This is the same as web_aip_batch.py
+# This is the same as web_aip_batch.py except for the optional fixity check with the unzip log.
 
 # Adds the information from aip_log.csv to seeds.csv and deletes aip_log.csv
 # to have one spreadsheet the documents the entire process.
@@ -132,10 +132,37 @@ os.remove("aip_log.csv")
 print('\nStarting completeness check.')
 web.check_aips(date_end, date_start, seed_df, aips_directory)
 
+# If there is a warc_unzip_log.csv, verifies the fixity matches what is in the bag manifests.
+if os.path.exists("warc_unzip_log.csv"):
+
+    # Dataframe with WARC filename and MD5 from the unzipping log.
+    # Removes ".gz" from the end of the WARC name and removes extra columns so it matches the bag manifest.
+    log_df = pd.read_csv("warc_unzip_log.csv")
+    log_df["WARC"] = log_df["WARC"].str.replace(".warc.gz", ".warc", regex=False)
+    log_df.drop(["AIP", "Fixity", "Unzipping"], inplace=True, axis=1)
+
+    # Dataframe that combines the WARc rows from the md5 manifests from every bag.
+    # Removes the path from the WARC filename so it matches what is in the warc unzip log.
+    bag_df = pd.DataFrame(columns=["Unzip_MD5", "WARC"])
+    for root, dirs, files in os.walk(f"aips_{date_end}"):
+        if "manifest-md5.txt" in files:
+            manifest_path = os.path.join(root, "manifest-md5.txt")
+            manifest_df = pd.read_csv(manifest_path, names=["Unzip_MD5", "Extra_Space", "WARC"], sep=" ")
+            manifest_df.drop(["Extra_Space"], inplace=True, axis=1)
+            bag_df = pd.concat([bag_df, manifest_df], ignore_index=True)
+    bag_df = bag_df[bag_df["WARC"].str.endswith(".warc")]
+    bag_df["WARC"] = bag_df["WARC"].str.replace("data/objects/", "")
+
+    # Compares the two dataframes. If they don't match, saves an error log.
+    # It will be moved into the AIPs directory in the next step
+    df = log_df.merge(bag_df, indicator=True, how="outer")
+    if len(df[df["_merge"] != "both"]) > 0:
+        df.to_csv(f"warc_md5_differences.csv", index=False)
+
 # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) and logs into the AIPs folder
 # to keep everything together if another set is downloaded before these are deleted.
 to_move = ("aips-to-ingest", "errors", "fits-xml", "preservation-xml",
-           "seeds.csv", "completeness_check.csv")
+           "seeds.csv", "completeness_check.csv", "warc_md5_differences.csv", "warc_unzip_log.csv")
 for item in os.listdir("."):
     if item in to_move:
         os.replace(item, f"{aips_directory}/{item}")
