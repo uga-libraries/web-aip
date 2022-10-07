@@ -1,93 +1,92 @@
 # The WARCs and metadata files for a group of web AIPs were downloaded but the AIPs still need to be made.
 # Using a separate script for ease of customization, but basically it is the second half of web_aip_batch.
-# Extras: creates metadata dictionaries from a csv with the information and extra checking.
 
-# Usage: python path/aip_from_download.py path/aips_directory date_start date_end
+# Before running the script:
+#   * The AIPs directory is named aips_date_end
+#   * The AIPs directory contains one folder per AIP, named with the AIP ID
+#   * The AIP folders contain a metadata folder and objects folder
+#   * The metadata folder contains all Archive-It metadata reports
+#   * The objects folder contains all WARCs, which are zipped (gzip)
+#   * The parent folder of the AIPs directory contains:
+#           * seeds.csv, with data through "Seed_Metadata_Errors" plus "Size_GB"
+#           * aip_log.csv, with just the header
+#           * script output folders (aips-to-ingest, fits-xml, preservation-xml), all empty
+#           * optional: warc_unzip_log.csv (if had to unzip in Linux OS)
 
-import csv
-import datetime
+# Usage: python path/aip_from_download.py date_start date_end
+
 import os
+import pandas as pd
 import re
-import requests
 import sys
 
 # Import functions and constant variables from other UGA scripts.
+# Configuration is made by the user and could be forgotten. The others are in the script repo.
+try:
+    import configuration as c
+except ModuleNotFoundError:
+    print("\nScript cannot run without a configuration file in the local copy of the GitHub repo.")
+    print("Make a file named configuration.py using configuration_template.py and run the script again.")
+    sys.exit()
 import aip_functions as a
-import configuration as c
 import web_functions as web
 
 
-# PART ONE: ANY STEPS THAT ARE USUALLY DONE IN web_aip_batch.py NEEDED FOR THE AIP STAGE
+# PART ONE: TEST SCRIPT INPUTS AND MAKE OTHER GLOBAL VARIABLES
+# This is web_aip_batch.py but without making script output folders or the AIP log.
 
-# Script arguments.
+# Tests the script arguments (start and end date, which should be formatted YYYY-MM-DD).
 try:
-    aips_directory, date_start, date_end = sys.argv[1:]
-    os.chdir(aips_directory)
-except:
-    print("Something is wrong with the script arguments.")
-    print("Expect full file path for aips directory, date start (yyyy-mm-dd) and date end (yyyy-mm-dd).")
-    sys.exit()
+    date_start, date_end = sys.argv[1:]
+except ValueError:
+    print("\nExiting script: must provide exactly two arguments, the start and end date of the download.")
+    exit()
+if not re.match(r"\d{4}-\d{2}-\d{2}", date_start):
+    print(f"\nExiting script: start date '{date_start}' must be formatted YYYY-MM-DD.")
+    exit()
+if not re.match(r"\d{4}-\d{2}-\d{2}", date_end):
+    print(f"\nExiting script: end date '{date_end}' must be formatted YYYY-MM-DD.")
+    exit()
+if date_start > date_end:
+    print(f"\nExisting script: start date '{date_start}' must be earlier than end date '{date_end}'.")
+    exit()
 
 # Tests the paths in the configuration file to verify they exist. Quits the script if any are incorrect.
 # It is common to get typos when setting up the configuration file on a new machine.
-configuration_errors = a.check_configuration()
+configuration_web = web.check_configuration()
+configuration_aip = a.check_configuration()
+configuration_errors = configuration_web + configuration_aip
 if len(configuration_errors) > 0:
-    print("/nProblems detected with configuration.py:")
+    print("\nProblems detected with configuration.py:")
     for error in configuration_errors:
         print(error)
-    print("Correct the configuration file and run the script again.")
+    print("\nCorrect the configuration file and run the script again.")
     sys.exit()
 
-# Dictionary that maps seed id to aip id for the completeness check.
-# Will add the values when reading the metadata.csv for each AIP.
-seed_to_aip = {}
+# Makes the AIPs directory the current directory.
+aips_directory = os.path.join(c.script_output, f"aips_{date_end}")
+os.chdir(aips_directory)
 
-# PART TWO: CREATE AIPS THAT ARE READY FOR INGEST INTO ARCHIVE
+# Reads the data in seeds.csv into a dataframe.
+seed_df = pd.read_csv(os.path.join(c.script_output, "seeds.csv"), dtype="object")
 
-# Verifies the metadata.csv file is present.
-aip_metadata_csv = "metadata.csv"
-if not os.path.exists(aip_metadata_csv):
-    print("Cannot make AIPs from the downloaded content because metadata.csv is missing.")
-    sys.exit()
+# Starts counter for tracking script progress.
+# Some processes are slow, so this shows the script is still working and how much remains.
+current_seed = 0
+total_seeds = len(seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfully"))
+                          & (seed_df["WARC_Unzip_Errors"].isnull())])
 
-# Reads the metadata.csv and verifies that the contents are formatted correctly.
-open_metadata = open(aip_metadata_csv)
-read_metadata = csv.reader(open_metadata)
-metadata_errors = a.check_metadata_csv(read_metadata)
-if len(metadata_errors) > 0:
-    print('\nProblems detected with metadata.csv:')
-    for error in metadata_errors:
-        print("   * " + error)
-    print('\nCannot make AIPs from the downloaded content.')
-    sys.exit()
+# PART TWO: CREATE AIPS THAT ARE READY FOR INGEST INTO ARCHIVE FROM EACH AIP FOLDER
+# This is like the loop in web_aip_batch.py but without making the AIP directory or downloading files.
+for seed in seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfully"))
+                    & (seed_df["WARC_Unzip_Errors"].isnull())].itertuples():
 
-# Starts a log for AIP information.
-a.log("header")
+    # Updates the current seed number and displays the script progress.
+    current_seed += 1
+    print(f"\nStarting seed {current_seed} of {total_seeds}.")
 
-# Makes directories used to store script outputs, if they aren't already there.
-a.make_output_directories()
-
-# Starts counts for tracking script progress. Some processes are slow, so this shows the script is still working.
-# Subtracts one from the count for the metadata file.
-current_aip = 0
-total_aips = len(os.listdir('.')) - 1
-
-# Returns to the beginning of the CSV (the script is at the end because of checking it for errors) and skips the header.
-open_metadata.seek(0)
-next(read_metadata)
-
-# Uses the AIP functions to create an AIP for each folder in the metadata CSV.
-# Checks if the AIP folder is still present before calling the function for the next step
-# in case it was moved due to an error in the previous step.
-for aip_row in read_metadata:
-
-    # Makes an instance of the AIP class using metadata from the CSV and global variables.
-    department, collection_id, aip_folder, aip_id, title, version = aip_row
-    aip = a.AIP(aips_directory, department, collection_id, aip_folder, aip_id, title, version, True)
-
-    # Updates the current AIP number and displays the script progress.
-    current_aip += 1
-    print(f"\tStarting AIP {current_aip} of {total_aips}.")
+    # Makes an instance of the AIP class using metadata from the seeds.csv and global variables.
+    aip = a.AIP(aips_directory, seed.Department, seed.UGA_Collection, seed.AIP_ID, seed.AIP_ID, seed.Title, version=1, to_zip=True)
 
     # Verifies the metadata and objects folders exist and have content.
     # This is unlikely but could happen if there were uncaught download errors.
@@ -96,50 +95,47 @@ for aip_row in read_metadata:
     # Deletes any temporary files and makes a log of each deleted file.
     a.delete_temp(aip)
 
-    # Calculates the seed id from the first WARC in the objects folder and
-    # adds the AIP to the seed_to_aip dictionary.
-    first_warc = next(warc for warc in os.listdir(f"{aip.id}/objects"))
-    try:
-        seed_regex = re.match(r'^.*-SEED(\d+)-', first_warc)
-        seed_id = seed_regex.group(1)
-    except AttributeError:
-        print("Can't extract seed id from: ", first_warc)
-        continue
-    seed_to_aip[seed_id] = aip.id
-
     # Extracts technical metadata from the files using FITS.
-    if aip_folder in os.listdir('.'):
+    if aip.id in os.listdir('.'):
         a.extract_metadata(aip)
 
     # Transforms the FITS metadata into the PREMIS preservation.xml file using saxon and xslt stylesheets.
-    if aip_folder in os.listdir('.'):
-        a.make_preservationxml(aip, "website")
+    if aip.id in os.listdir('.'):
+        a.make_preservationxml(aip)
 
     # Bags the aip.
-    if aip_folder in os.listdir('.'):
+    if aip.id in os.listdir('.'):
         a.bag(aip)
 
-    # Tars, and zips the aip.
-    if f'{aip_folder}_bag' in os.listdir('.'):
+    # Tars and zips the aip.
+    if f'{aip.id}_bag' in os.listdir('.'):
         a.package(aip)
 
     # Adds the packaged AIP to the MD5 manifest in the aips-to-ingest folder.
     if f'{aip.id}_bag' in os.listdir('.'):
         a.manifest(aip)
 
-# Closes the metadata CSV.
-open_metadata.close()
+# PART THREE: UPDATE LOG, VERIFY AIP COMPLETENESS, AND CLEAN UP DIRECTORY
+# This is the same as web_aip_batch.py
+
+# Adds the information from aip_log.csv to seeds.csv and deletes aip_log.csv
+# to have one spreadsheet the documents the entire process.
+os.chdir(c.script_output)
+aip_df = pd.read_csv("aip_log.csv")
+seed_df = pd.merge(seed_df, aip_df, left_on="AIP_ID", right_on="AIP ID", how="left")
+seed_df.drop(["Time Started", "AIP ID"], axis=1, inplace=True)
+seed_df.to_csv("seeds.csv", index=False)
+os.remove("aip_log.csv")
 
 # Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
 # errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
 print('\nStarting completeness check.')
-web.check_aips(date_end, date_start, seed_to_aip, aips_directory)
+web.check_aips(date_end, date_start, seed_df, aips_directory)
 
 # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) and logs into the AIPs folder
 # to keep everything together if another set is downloaded before these are deleted.
-os.chdir(c.script_output)
 to_move = ("aips-to-ingest", "errors", "fits-xml", "preservation-xml",
-           "warc_log.csv", "aip_log.csv", "completeness_check.csv")
+           "seeds.csv", "completeness_check.csv")
 for item in os.listdir("."):
     if item in to_move:
         os.replace(item, f"{aips_directory}/{item}")
