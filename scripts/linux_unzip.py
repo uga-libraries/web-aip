@@ -47,34 +47,37 @@ for aip in os.listdir("."):
         # Starts a list with log information.
         log_row = [aip, warc]
 
-        # Gets the WARC MD5 from Archive-It using WASAPI.
-        warc_data = requests.get(f'{c.wasapi}?filename={warc}', auth=(c.username, c.password))
-        if not warc_data.status_code == 200:
-            log_row.append(f"API error {warc_data.status_code}: can't get MD5 for WARC")
-            log_write.writerow(log_row)
-            continue
-        py_warc = warc_data.json()
-        warc_md5 = py_warc["files"][0]["checksums"]["md5"]
+        # # Gets the WARC MD5 from Archive-It using WASAPI.
+        # # Didn't end up using this because of the switch to MD5DEEP
+        # warc_data = requests.get(f'{c.wasapi}?filename={warc}', auth=(c.username, c.password))
+        # if not warc_data.status_code == 200:
+        #     log_row.append(f"API error {warc_data.status_code}: can't get MD5 for WARC")
+        #     log_write.writerow(log_row)
+        #     continue
+        # py_warc = warc_data.json()
+        # warc_md5 = py_warc["files"][0]["checksums"]["md5"]
 
         # Calculates the MD5 for the downloaded (zipped) WARC.
+        # Switched to MD5DEEP because of memory errors.
         warc_path = os.path.join(objects_path, warc)
-        with open(warc_path, "rb") as file:
-            file_read = file.read()
-            downloaded_warc_md5 = hashlib.md5(file_read).hexdigest()
+        output = subprocess.run(f"md5deep {warc_path}", stdout=subprocess.PIPE, shell=True)
+        log_row.append(output.stdout.decode('utf-8'))
+        # with open(warc_path, "rb") as file:
+        #     file_read = file.read()
+        #     downloaded_warc_md5 = hashlib.md5(file_read).hexdigest()
 
-        # Compares the md5 of the downloaded (zipped) WARC to Archive-It metadata.
-        if not warc_md5 == downloaded_warc_md5:
-            log_row.append(f"Fixity changed: AIT {warc_md5}, Downloaded {downloaded_warc_md5}")
-            log_write.writerow(log_row)
-            continue
-        else:
-            log_row.append(f"Successfully verified fixity on {datetime.datetime.now()}")
+        # # Compares the md5 of the downloaded (zipped) WARC to Archive-It metadata.
+        # # Didn't end up using this because of the switch to MD5DEEP. Need to parse the output better to compare.
+        # if not warc_md5 == downloaded_warc_md5:
+        #     log_row.append(f"Fixity changed: AIT {warc_md5}, Downloaded {downloaded_warc_md5}")
+        #     log_write.writerow(log_row)
+        #     continue
+        # else:
+        #     log_row.append(f"Successfully verified fixity on {datetime.datetime.now()}")
 
-        # If the fixity matched in the previous step, unzips the WARC.
         # The zipped WARC is automatically deleted. Work on a copy in case there is a problem.
-        # TODO: this hasn't been tested
         unzip_output = subprocess.run(f"gunzip {warc_path}", stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
-        if not unzip_output == b'':
+        if not unzip_output.stderr == b'':
             log_row.append(f"Error while unzipping: {unzip_output.stderr.decode('utf-8')}")
             log_write.writerow(log_row)
             continue
@@ -83,10 +86,13 @@ for aip in os.listdir("."):
 
         # Calculates the MD5 of the unzipped WARC so it can be tested before making the AIP.
         # The path to the unzipped WARC is the warc_path without the .gz extension.
-        with open(warc_path[:-3], "rb") as file:
-            file_read = file.read()
-            md5 = hashlib.md5(file_read).hexdigest()
-            log_row.append(md5)
+        # Switched to MD5DEEP because of memory errors.
+        output = subprocess.run(f"md5deep {warc_path[:-3]}", stdout=subprocess.PIPE, shell=True)
+        log_row.append(output.stdout.decode('utf-8'))
+        # with open(warc_path[:-3], "rb") as file:
+        #     file_read = file.read()
+        #     md5 = hashlib.md5(file_read).hexdigest()
+        #     log_row.append(md5)
 
         # Saves the log information for any WARC that successfully unzipped.
         log_write.writerow(log_row)
