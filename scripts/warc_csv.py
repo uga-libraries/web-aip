@@ -93,7 +93,7 @@ SEED_TO_TITLE = {}
 WARC_CSV = open(os.path.join(c.script_output, "converted_warc_xml.csv"), "w", newline="")
 CSV_WRITER = csv.writer(WARC_CSV)
 CSV_WRITER.writerow(["WARC Filename", "AIT Collection", "Seed", "Job", "Date (store-time)",
-                     "Size (GB)", "Crawl Def", "AIP", "AIP Title"])
+                     "Size (GB)", "Crawl Def", "AIP", "AIP Title", "MD5"])
 
 # Gets the data for each WARC.
 for warc in PY_WARC_DATA["files"]:
@@ -102,6 +102,7 @@ for warc in PY_WARC_DATA["files"]:
     collection = warc["collection"]
     job_id = warc["crawl"]
     store_time = warc["store-time"]
+    md5 = warc["checksums"]["md5"]
 
     # Gets the seed id from the WARC filename.
     try:
@@ -131,6 +132,6 @@ for warc in PY_WARC_DATA["files"]:
         SEED_TO_TITLE[seed_id] = title
 
     # Saves the WARC data as a row in the CSV.
-    CSV_WRITER.writerow([filename, collection, seed_id, job_id, store_time, size, crawl_def, "", title])
+    CSV_WRITER.writerow([filename, collection, seed_id, job_id, store_time, size, crawl_def, "", title, md5])
 
 WARC_CSV.close()
