@@ -158,6 +158,8 @@ if os.path.exists("warc_unzip_log.csv"):
     df = log_df.merge(bag_df, indicator=True, how="outer")
     if len(df[df["_merge"] != "both"]) > 0:
         df.to_csv(f"warc_md5_differences.csv", index=False)
+    else:
+        print("All WARC fixity was unchanged")
 
 # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) and logs into the AIPs folder
 # to keep everything together if another set is downloaded before these are deleted.
