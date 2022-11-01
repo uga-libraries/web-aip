@@ -361,11 +361,16 @@ def download_warcs(seed, date_end, seed_df):
 
         # Extracts the WARC from the gzip file.
         # Deletes the gzip file, unless 7zip had an error during unzipping.
+        # 7zip errors include an error message (stderr) or unzipping creating a file with a .gz.open extension.
         unzip_output = subprocess.run(f'"C:/Program Files/7-Zip/7z.exe" x "{warc_path}" -o"{seed.AIP_ID}/objects"',
                                       stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
         if unzip_output.stderr == b'':
-            os.remove(warc_path)
-            log(f"Successfully unzipped {warc}", seed_df, row_index, "WARC_Unzip_Errors")
+            if os.path.exists(f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/objects/{warc}.open'):
+                os.remove(f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/objects/{warc}.open')
+                log(f"Error unzipping {warc}: unzipped to '.gz.open' file", seed_df, row_index, "WARC_Unzip_Errors")
+            else:
+                os.remove(warc_path)
+                log(f"Successfully unzipped {warc}", seed_df, row_index, "WARC_Unzip_Errors")
         else:
             log(f"Error unzipping {warc}: {unzip_output.stderr.decode('utf-8')}",
                 seed_df, row_index, "WARC_Unzip_Errors")
