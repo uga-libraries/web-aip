@@ -6,7 +6,7 @@
 #   * The AIPs directory contains one folder per AIP, named with the AIP ID
 #   * The AIP folders contain a metadata folder and objects folder
 #   * The metadata folder contains all Archive-It metadata reports
-#   * The objects folder contains all WARCs, which are zipped (gzip)
+#   * The objects folder contains all WARCs, which are unzipped
 #   * The parent folder of the AIPs directory contains:
 #           * seeds.csv, with data through "Seed_Metadata_Errors" plus "Size_GB"
 #           * aip_log.csv, with just the header
@@ -139,7 +139,7 @@ if os.path.exists("warc_unzip_log.csv"):
     # Removes ".gz" from the end of the WARC name and removes extra columns so it matches the bag manifest.
     log_df = pd.read_csv("warc_unzip_log.csv")
     log_df["WARC"] = log_df["WARC"].str.replace(".warc.gz", ".warc", regex=False)
-    log_df.drop(["AIP", "Fixity", "Unzipping"], inplace=True, axis=1)
+    log_df.drop(["AIP", "Fixity before Unzipping", "Fixity Before Unzipping Matches Archive-It", "Unzipping"], inplace=True, axis=1)
 
     # Dataframe that combines the WARc rows from the md5 manifests from every bag.
     # Removes the path from the WARC filename so it matches what is in the warc unzip log.
@@ -158,6 +158,8 @@ if os.path.exists("warc_unzip_log.csv"):
     df = log_df.merge(bag_df, indicator=True, how="outer")
     if len(df[df["_merge"] != "both"]) > 0:
         df.to_csv(f"warc_md5_differences.csv", index=False)
+    else:
+        print("All WARC fixity was unchanged")
 
 # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) and logs into the AIPs folder
 # to keep everything together if another set is downloaded before these are deleted.
