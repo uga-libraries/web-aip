@@ -308,6 +308,7 @@ def download_warcs(seed, date_end, seed_df):
 
     # Downloads and validates every WARC.
     # If an error is caught at any point, logs the error and starts the next WARC.
+    errors = False
     for warc in warc_names:
 
         # Gets URL for downloading the WARC and WARC MD5 from Archive-It using WASAPI.
@@ -315,6 +316,7 @@ def download_warcs(seed, date_end, seed_df):
         if not warc_data.status_code == 200:
             log(f"API error {warc_data.status_code}: can't get info about {warc}",
                 seed_df, row_index, "WARC_API_Errors")
+            errors = True
             continue
         py_warc = warc_data.json()
         warc_url = py_warc["files"][0]["locations"][0]
@@ -330,6 +332,7 @@ def download_warcs(seed, date_end, seed_df):
         if not warc_download.status_code == 200:
             log(f"API error {warc_download.status_code}: can't download {warc}",
                 seed_df, row_index, "WARC_API_Errors")
+            errors = True
             continue
         else:
             log(f"Successfully downloaded {warc}", seed_df, row_index, "WARC_API_Errors")
@@ -346,6 +349,7 @@ def download_warcs(seed, date_end, seed_df):
         except AttributeError:
             log(f"Fixity for {warc} cannot be extracted from md5deep output: {md5deep_output.stdout}",
                 seed_df, row_index, "WARC_Fixity_Errors")
+            errors = True
             continue
 
         # Compares the md5 of the downloaded zipped WARC to Archive-It metadata.
@@ -354,6 +358,7 @@ def download_warcs(seed, date_end, seed_df):
             os.remove(warc_path)
             log(f"Fixity for {warc} changed and it was deleted: {warc_md5} before, {downloaded_warc_md5} after",
                 seed_df, row_index, "WARC_Fixity_Errors")
+            errors = True
             continue
         else:
             log(f"Successfully verified {warc} fixity on {datetime.datetime.now()}",
@@ -368,15 +373,24 @@ def download_warcs(seed, date_end, seed_df):
             if os.path.exists(f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/objects/{warc}.open'):
                 os.remove(f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/objects/{warc}.open')
                 log(f"Error unzipping {warc}: unzipped to '.gz.open' file", seed_df, row_index, "WARC_Unzip_Errors")
+                errors = True
             else:
                 os.remove(warc_path)
                 log(f"Successfully unzipped {warc}", seed_df, row_index, "WARC_Unzip_Errors")
         else:
             log(f"Error unzipping {warc}: {unzip_output.stderr.decode('utf-8')}",
                 seed_df, row_index, "WARC_Unzip_Errors")
+            errors = True
 
         # Wait 15 second to give the API a rest.
         time.sleep(15)
+
+    # Tests the log for errors and moves the aip to an error folder if any WARC had an error.
+    # It attempts to download all WARCs first since typically the AIP can be made from what is downloaded
+    # after the error is fixed, such as getting a new copy of one with changed fixity or
+    # unzipping ones with gzip errors using a Linux environment.
+    if errors:
+        a.move_error('download_warcs', seed.AIP_ID)
 
 
 def check_directory(aip):

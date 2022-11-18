@@ -122,10 +122,12 @@ for seed in seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfull
 
     # Verifies the metadata and objects folders exist and have content.
     # This is unlikely but could happen if there were uncaught download errors.
-    web.check_directory(aip)
+    if aip.id in os.listdir("."):
+        web.check_directory(aip)
 
     # Deletes any temporary files and makes a log of each deleted file.
-    a.delete_temp(aip)
+    if aip.id in os.listdir("."):
+        a.delete_temp(aip)
 
     # Extracts technical metadata from the files using FITS.
     if aip.id in os.listdir("."):
