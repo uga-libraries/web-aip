@@ -139,7 +139,7 @@ if os.path.exists("warc_unzip_log.csv"):
     # Removes ".gz" from the end of the WARC name and removes extra columns so it matches the bag manifest.
     log_df = pd.read_csv("warc_unzip_log.csv")
     log_df["WARC"] = log_df["WARC"].str.replace(".warc.gz", ".warc", regex=False)
-    log_df.drop(["AIP", "Fixity before Unzipping", "Fixity Before Unzipping Matches Archive-It", "Unzipping"], inplace=True, axis=1)
+    log_df.drop(["AIP", "Zip_MD5", "Fixity_Comparison", "Unzipping_Result"], inplace=True, axis=1)
 
     # Dataframe that combines the WARc rows from the md5 manifests from every bag.
     # Removes the path from the WARC filename so it matches what is in the warc unzip log.
