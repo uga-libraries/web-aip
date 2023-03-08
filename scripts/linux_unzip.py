@@ -78,7 +78,7 @@ for aip in os.listdir("."):
 
         # Unzips the WARC.
         # The zipped WARC is automatically deleted. Work on a copy in case there is a problem.
-        unzip_output = subprocess.run(f"gunzip {warc_path}", stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
+        unzip_output = subprocess.run(f"gunzip -f {warc_path}", stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
         if not unzip_output.stderr == b'':
             log_row.append(f"Error while unzipping: {unzip_output.stderr.decode('utf-8')}")
             log_write.writerow(log_row)
