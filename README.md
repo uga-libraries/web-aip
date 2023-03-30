@@ -105,22 +105,9 @@ Script usage: `python path/aip_from_download.py`
 ## linux_unzip.py
 Checks WARC fixity, unzips the warc using the gunzip command, and bags the seed.
 Must be run in a Linux environment.
-Use there 7zip or other Windows zip programs have errors while unzipping the gzipped WARCs.
+Use when 7zip or other Windows zip programs have errors while unzipping the gzipped WARCs.
 
 Script usage: `python linux_unzip.py aips_directory`
-
-## metadata_check_combined.py
-Generates reports of collection and seed metadata fields, 
-either just required fields or all fields depending on the if the second optional argument is included. 
-Used for a holistic review of Archive-It usage. 
-
-Script usage: `python path/metadata_check_combined.py path/output_directory [all_fields]`
-
-## metadata_check_department.py
-Generates reports of required collection and seed metadata fields organized by the collector (department). 
-Used to verify all required metadata is present prior to a preservation download. 
-
-Script usage: `python path/metadata_check_department.py [path/output_directory]`
 
 ## Test Scripts
 The four test scripts generate predictable script inputs to test the full functionality of web_aip_batch.py.
@@ -133,12 +120,6 @@ This script saves time by not needing to re-download all the correct content.
 
 Script usage: `python update_web_aip.py aips_directory`
 
-## warc_csv.py
-Generates a CSV with information about each WARC stored during a specified time frame using both APIs. 
-Includes WARC file name, collection id, seed id, crawl job id, crawl definition id, store date, size in GB, and seed title. 
-Used for auditing that all WARCs have been downloaded and for previewing which WARCs will be in an upcoming preservation download. 
-
-Script usage: `python path/warc_xml_to_csv.py`
 
 # Initial Author
 Adriane Hanson, Head of Digital Stewardship, January 2020
