@@ -1,6 +1,6 @@
 .idea
-scripts/configuration.py
-scripts/aip_functions.py
+configuration.py
+aip_functions.py
 scripts/_pycache_
 *.pyc
 test_files/
