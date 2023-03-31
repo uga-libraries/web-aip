@@ -1,7 +1,6 @@
 .idea
 configuration.py
 aip_functions.py
-scripts/_pycache_
+_pycache_
 *.pyc
-test_files/
-scripts/general_aip.py
+test_files
