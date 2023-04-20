@@ -96,23 +96,23 @@ for seed in seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfull
     a.delete_temp(aip)
 
     # Extracts technical metadata from the files using FITS.
-    if aip.id in os.listdir('.'):
+    if aip.id in os.listdir('..'):
         a.extract_metadata(aip)
 
     # Transforms the FITS metadata into the PREMIS preservation.xml file using saxon and xslt stylesheets.
-    if aip.id in os.listdir('.'):
+    if aip.id in os.listdir('..'):
         a.make_preservationxml(aip)
 
     # Bags the aip.
-    if aip.id in os.listdir('.'):
+    if aip.id in os.listdir('..'):
         a.bag(aip)
 
     # Tars and zips the aip.
-    if f'{aip.id}_bag' in os.listdir('.'):
+    if f'{aip.id}_bag' in os.listdir('..'):
         a.package(aip)
 
     # Adds the packaged AIP to the MD5 manifest in the aips-to-ingest folder.
-    if f'{aip.id}_bag' in os.listdir('.'):
+    if f'{aip.id}_bag' in os.listdir('..'):
         a.manifest(aip)
 
 # PART THREE: UPDATE LOG, VERIFY AIP COMPLETENESS, AND CLEAN UP DIRECTORY
@@ -165,7 +165,7 @@ if os.path.exists("warc_unzip_log.csv"):
 # to keep everything together if another set is downloaded before these are deleted.
 to_move = ("aips-to-ingest", "errors", "fits-xml", "preservation-xml",
            "seeds.csv", "completeness_check.csv", "warc_md5_differences.csv", "warc_unzip_log.csv")
-for item in os.listdir("."):
+for item in os.listdir(".."):
     if item in to_move:
         os.replace(item, f"{aips_directory}/{item}")
 

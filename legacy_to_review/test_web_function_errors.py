@@ -695,7 +695,7 @@ for seed in seed_df.itertuples():
 os.chdir(c.script_output)
 to_move = ("aips-to-ingest", "errors", "fits-xml", "preservation-xml",
            "seeds.csv", "aip_log.csv", "completeness_check.csv")
-for item in os.listdir("."):
+for item in os.listdir("../tests"):
     if item in to_move:
         os.replace(item, f"{aips_directory}/{item}")
 

@@ -178,11 +178,11 @@ for row in read_metadata:
     aip.log["BagValid"] = f"Updated bag valid on {datetime.datetime.now()}"
 
     # Tars and zips the aip.
-    if aip.folder_name in os.listdir('.'):
+    if aip.folder_name in os.listdir('..'):
         package(aip)
 
     # Adds the packaged AIP to the MD5 manifest in the aips-to-ingest folder.
-    if aip.folder_name in os.listdir('.'):
+    if aip.folder_name in os.listdir('..'):
         manifest(aip)
 
 print("\nUpdate script is complete.")

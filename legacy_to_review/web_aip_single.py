@@ -318,27 +318,27 @@ print("Converting into an AIP.")
 aip.make_output_directories()
 
 # Extracts technical metadata from the files using FITS.
-if aip_id in os.listdir('.'):
+if aip_id in os.listdir('..'):
     aip.extract_metadata(aip_id, f"{c.script_output}/{aips_directory}", log_path)
 
 # Transforms the FITS metadata into the PREMIS preservation.xml file using saxon and xslt stylesheets. Determines the
 # third argument (ARCHive group name) from the department code parsed from the folder name.
-if aip_id in os.listdir('.'):
+if aip_id in os.listdir('..'):
     group = {"harg": "hargrett", "magil": "magil", "rbrl": "russell"}
     department = group[dept_code]
     aip.make_preservationxml(aip_id, aip_title, department, "website", log_path)
 
 # Bags the aip.
-if aip_id in os.listdir('.'):
+if aip_id in os.listdir('..'):
     aip.bag(aip_id, log_path)
 
 # Tars, and zips the aip.
-if f"{aip_id}_bag" in os.listdir('.'):
+if f"{aip_id}_bag" in os.listdir('..'):
     aip.package(aip_id, os.getcwd(), zip=True)
 
 # If the AIP has not been moved to the errors folder, verifies the AIP is complete.
 # Anything that is missing is added to the log. A notification if anything was missing or not prints to the terminal.
-if f'{aip_id}_bag' in os.listdir('.'):
+if f'{aip_id}_bag' in os.listdir('..'):
     print('\nStarting completeness check.')
     any_missing = check_aip()
     if any_missing is True:
