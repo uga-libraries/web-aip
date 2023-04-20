@@ -1,4 +1,4 @@
-"""Purpose: remake web AIPs after the initial attempt with the web_aip_batch.py script has errors,
+"""Purpose: remake web AIPs after the initial attempt with the web_aip_download.py script has errors,
 such as download WARCs that have fixity changes and were deleted. After manually downloading the missing files,
 this script will remake the AIPs so we don't have to re-download all the correct content.
 

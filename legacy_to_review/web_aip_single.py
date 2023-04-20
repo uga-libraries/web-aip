@@ -53,7 +53,7 @@ def get_title():
 
 def check_aip():
     """Verifies a single AIP is complete, checking the contents of the metadata and objects folders. Prints any
-    errors to the terminal. This is different from the check_aips() function used by web_aip_batch.py since it has to
+    errors to the terminal. This is different from the check_aips() function used by web_aip_download.py since it has to
     filter by seed id and is only checking one AIP. """
     # TODO: this is outdated for how it expects fits and crawldef to be named.
 

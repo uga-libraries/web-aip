@@ -1,4 +1,4 @@
-"""Purpose: This script generates every known error to use for testing the error handling of web_aip_batch.py.
+"""Purpose: This script generates every known error to use for testing the error handling of web_aip_download.py.
 
 Usage: python /path/test_web_function_errors.py
 Date values need to be 2022-03-20 and 2022-03-25 to test for predictable results,
@@ -506,7 +506,7 @@ def make_warc_placeholder(aip_id):
 
 
 # ----------------------------------------------------------------------------------------------------------------
-# THIS PART OF THE SCRIPT IS THE SAME AS web_aip_batch.py TO SET UP EVERYTHING CORRECTLY BEFORE THE DESIRED TESTS.
+# THIS PART OF THE SCRIPT IS THE SAME AS web_aip_download.py TO SET UP EVERYTHING CORRECTLY BEFORE THE DESIRED TESTS.
 # ERROR HANDLING FOR SCRIPT ARGUMENTS AND THE CONFIGURATION FILE ARE TESTED BY GIVING THE WRONG INPUTS INSTEAD.
 # Only difference is that I removed the code that lets the script keep restarting.
 # ----------------------------------------------------------------------------------------------------------------

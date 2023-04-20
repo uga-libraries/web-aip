@@ -1,7 +1,7 @@
 """Purpose: 7zip sometimes has errors with unzipping the downloaded gzipped WARCs due to a bug in PC zip programs.
 When this happens, use this script to unzip the WARC in a Linux environment.
 
-The web_aip_batch.py script moves the AIP to an error folder after web.download_warcs() if it didn't unzip.
+The web_aip_download.py script moves the AIP to an error folder after web.download_warcs() if it didn't unzip.
 This means the metadata folder has Archive-It metadata reports and the objects folder has zipped WARCs.
 To finish making AIPs after this script, run aip_from_download.py.
 

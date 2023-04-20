@@ -12,7 +12,7 @@ Dependencies:
 Prior to the preservation download, all seed metadata should be entered into Archive-It. Use the metadata_check.py
 script to verify all required fields are present. """
 
-# Usage: python /path/web_aip_batch.py date_start date_end
+# Usage: python /path/web_aip_download.py date_start date_end
 
 import os
 import pandas as pd
