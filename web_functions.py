@@ -13,54 +13,74 @@ import re
 import requests
 import shutil
 import subprocess
+import sys
 import time
 
 # Import constant variables and functions from another UGA preservation script.
-import aip_functions as a
 import configuration as c
 
 
-def check_configuration():
-    """Verifies all the expected variables specific to the web workflow are in the configuration file
-    and paths are valid if they are a path. The check_configuration() function in aip_functions.py
-    does similar tests for general aip variables.
-    Returns a list of paths with errors or "no errors".
-    This avoids wasting processing time by doing earlier steps before the path error is encountered."""
-
+def check_config():
+    """
+    Checks that all required variables are in the configuration file and correct.
+    If there are any errors, prints an explanation and quits the script.
+    """
     errors = []
 
-    # The variable script_output is the only one with a path.
-    # Checks first for if it is present, and if it is checks if it is valid.
+    # Checks if the path in script_output exists on the local machine.
     try:
         if not os.path.exists(c.script_output):
-            errors.append(f"Script output path '{c.script_output}' is not correct.")
+            errors.append(f"Variable path '{c.script_output}' is not correct.")
     except AttributeError:
-        errors.append("script_output variable is missing from the configuration file.")
+        errors.append("Variable 'script_output' is missing from the configuration file.")
 
-    # For the other web variables, tests if they are present.
+    # Checks that the API URLs, which are consistent values, are correct.
     try:
-        c.partner_api
+        if c.partner_api != 'https://partner.archive-it.org/api':
+            errors.append("Partner API path is not correct.")
     except AttributeError:
-        errors.append("partner_api variable is missing from the configuration file.")
+        errors.append("Variable 'partner_api' is missing from the configuration file.")
     try:
-        c.wasapi
+        if c.wasapi != 'https://warcs.archive-it.org/wasapi/v1/webdata':
+            errors.append("WASAPI path is not correct.")
     except AttributeError:
-        errors.append("wasapi variable is missing from the configuration file.")
+        errors.append("Variable 'wasapi' is missing from the configuration file.")
+
+    # Checks that the institution page exists.
     try:
-        c.inst_page
+        response = requests.get(c.inst_page)
+        if response.status_code != 200:
+            errors.append("Institution Page URL is not correct.")
     except AttributeError:
-        errors.append("inst_page variable is missing from the configuration file.")
+        errors.append("Variable 'inst_page' is missing from the configuration file.")
+
+    # Checks that the username and password are present.
     try:
         c.username
     except AttributeError:
-        errors.append("username variable is missing from the configuration file.")
+        errors.append("Variable 'username' is missing from the configuration file.")
     try:
         c.password
     except AttributeError:
-        errors.append("password variable is missing from the configuration file.")
+        errors.append("Variable 'password' is missing from the configuration file.")
 
-    # Returns the errors list. If there were no errors, it will be empty.
-    return errors
+    # Checks that the Archive-It username and password are correct by using them with an API call.
+    # This only works if the partner_api variable is in the configuration file.
+    try:
+        response = requests.get(f'{c.partner_api}/seed?limit=5', auth=(c.username, c.password))
+        if response.status_code != 200:
+            errors.append("Could not access Partner API with provided credentials. "
+                          "Check if the partner_api, username, and/or password variables have errors.")
+    except AttributeError:
+        errors.append("Variables 'partner_api', 'username', and/or 'password' are missing from the configuration file.")
+
+    # If there were errors, prints them and exits the script.
+    if len(errors) > 0:
+        print("\nProblems detected with configuration.py.")
+        for error in errors:
+            print("    *", error)
+        print("\nCorrect the configuration file using configuration_template.py as a model")
+        sys.exit()
 
 
 def seed_data(date_start, date_end):
