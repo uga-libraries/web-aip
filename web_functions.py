@@ -524,7 +524,7 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
         if aip_id in os.listdir(aips_directory):
             result.append(True)
         else:
-            result.extend([False, 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a'])
+            result.extend([False, 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a'])
             return result
 
         # Tests if each of the four Archive-It metadata reports that never repeat are present.
@@ -577,7 +577,7 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
             # for that AIP's row in the completeness check csv to the extras list.
             if not aip_directory.startswith(expected_aip_ids):
                 extras.append([aip_directory, 'n/a', 'Not expected', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a',
-                               'n/a', 'n/a', 'n/a', 'n/a'])
+                               'n/a', 'n/a'])
 
         # Only returns the extras list if at least one unexpected AIP was found.
         if len(extras) > 0:
@@ -598,7 +598,7 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
         complete_write.writerow(
             ['AIP', 'URL', 'AIP Folder Made', 'coll.csv', 'collscope.csv', 'seed.csv',
              'seedscope.csv', 'crawldef.csv count', 'crawljob.csv count', 'WARC Count Correct',
-             'Objects is all WARCs', 'No Extra Metadata'])
+             'All Expected File Types'])
 
         # Tests each AIP for completeness and saves the results.
         for seed in aips_metadata:
