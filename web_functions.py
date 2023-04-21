@@ -191,7 +191,7 @@ def seed_data(date_start, date_end):
                 seed_df.loc[row_index, "AIP_ID"] = f'{seed_df.at[row_index, "UGA_Collection"]}-web-{year}{month}-{format(seed_df.at[row_index, "coll_sequence"], "04d")}'
             seed_df.drop(["coll_sequence"], axis=1, inplace=True)
         except:
-            seed_df.loc[row_index, "Seed_Metadata_Errors"] = "Couldn't get all required metadata values from the seed report. Will not download files or make AIP."
+            seed_df.loc[row_index, "Seed_Metadata_Errors"] = "Couldn't get all required metadata values from the seed report. Will not download files."
 
     # If there were no errors (the row has no value in the Seed_Metadata_Errors column),
     # updates the dataframe to show success.
