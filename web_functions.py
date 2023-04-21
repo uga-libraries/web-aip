@@ -245,7 +245,7 @@ def download_metadata(seed, seed_df):
     Any errors are added to the seed dataframe and saved to the script log at the end of the function."""
 
     def get_report(filter_type, filter_value, report_type, report_name):
-        """Downloads a single metadata report and saves it as a csv in the AIP's metadata folder.
+        """Downloads a single metadata report and saves it as a csv in the seed's folder.
             Only saves if there is data of that type and also redacts the login info from the seed report.
             filter_type and filter_value are used to filter the API call to the right AIP's report
             report_type is the Archive-It name for the report
@@ -263,7 +263,7 @@ def download_metadata(seed, seed_df):
                 log(f"Empty report {report_name} not saved", seed_df, row_index, "Metadata_Report_Info")
                 return
             else:
-                with open(f"{seed.AIP_ID}/metadata/{report_name}", "wb") as report_csv:
+                with open(f"{seed.AIP_ID}/{report_name}", "wb") as report_csv:
                     report_csv.write(metadata_report.content)
         else:
             log(f"{report_name} API Error {metadata_report.status_code}", seed_df, row_index, "Metadata_Report_Errors")
@@ -274,11 +274,11 @@ def download_metadata(seed, seed_df):
         # meaningful (some is from staff web browsers autofill information while viewing the metadata), knowing if
         # there was login information or not is misleading. """
         if report_type == "seed":
-            report_df = pd.read_csv(f"{seed.AIP_ID}/metadata/{report_name}")
+            report_df = pd.read_csv(f"{seed.AIP_ID}/{report_name}")
             if "login_password" in report_df.columns:
                 report_df["login_username"] = "REDACTED"
                 report_df["login_password"] = "REDACTED"
-                report_df.to_csv(f"{seed.AIP_ID}/metadata/{report_name}")
+                report_df.to_csv(f"{seed.AIP_ID}/{report_name}")
             else:
                 log("Seed report does not have login columns to redact", seed_df, row_index, "Metadata_Report_Info")
 
@@ -298,9 +298,9 @@ def download_metadata(seed, seed_df):
     for job in job_list:
         get_report("id", job, "crawl_job", f"{seed.AIP_ID}_{job}_crawljob.csv")
         try:
-            report_df = pd.read_csv(f"{seed.AIP_ID}/metadata/{seed.AIP_ID}_{job}_crawljob.csv", dtype="object")
+            report_df = pd.read_csv(f"{seed.AIP_ID}/{seed.AIP_ID}_{job}_crawljob.csv", dtype="object")
             crawl_def_id = report_df.loc[0, "crawl_definition"]
-            if not os.path.exists(f"{seed.AIP_ID}/metadata/{seed.AIP_ID}_{crawl_def_id}_crawldef.csv"):
+            if not os.path.exists(f"{seed.AIP_ID}/{seed.AIP_ID}_{crawl_def_id}_crawldef.csv"):
                 get_report("id", crawl_def_id, "crawl_definition", f"{seed.AIP_ID}_{crawl_def_id}_crawldef.csv")
         except FileNotFoundError:
             log("Crawl job was not downloaded so can't get crawl definition id", seed_df, row_index, "Metadata_Report_Errors")
@@ -318,7 +318,8 @@ def download_metadata(seed, seed_df):
 
 
 def download_warcs(seed, date_end, seed_df):
-    """Downloads every WARC file and verifies that fixity is unchanged after downloading."""
+    """Downloads every WARC file and verifies that fixity is unchanged after downloading.
+    Unzips each WARC."""
 
     # Row index for the seed being processed in the dataframe, to use for adding logging information.
     row_index = seed_df.index[seed_df["Seed_ID"] == seed.Seed_ID].tolist()[0]
@@ -328,7 +329,6 @@ def download_warcs(seed, date_end, seed_df):
 
     # Downloads and validates every WARC.
     # If an error is caught at any point, logs the error and starts the next WARC.
-    errors = False
     for warc in warc_names:
 
         # Gets URL for downloading the WARC and WARC MD5 from Archive-It using WASAPI.
@@ -336,14 +336,13 @@ def download_warcs(seed, date_end, seed_df):
         if not warc_data.status_code == 200:
             log(f"API error {warc_data.status_code}: can't get info about {warc}",
                 seed_df, row_index, "WARC_API_Errors")
-            errors = True
             continue
         py_warc = warc_data.json()
         warc_url = py_warc["files"][0]["locations"][0]
         warc_md5 = py_warc["files"][0]["checksums"]["md5"]
 
         # The path for where the WARC will be saved on the local machine (it is long and used twice in this script).
-        warc_path = f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/objects/{warc}'
+        warc_path = f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/{warc}'
 
         # Downloads the WARC, which will be zipped.
         warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
@@ -352,24 +351,22 @@ def download_warcs(seed, date_end, seed_df):
         if not warc_download.status_code == 200:
             log(f"API error {warc_download.status_code}: can't download {warc}",
                 seed_df, row_index, "WARC_API_Errors")
-            errors = True
             continue
         else:
             log(f"Successfully downloaded {warc}", seed_df, row_index, "WARC_API_Errors")
 
-        # Saves the zipped WARC in the objects folder, keeping the original filename.
+        # Saves the zipped WARC in the seed folder, keeping the original filename.
         with open(warc_path, 'wb') as warc_file:
             warc_file.write(warc_download.content)
 
         # Calculates the md5 for the downloaded zipped WARC with md5deep.
-        md5deep_output = subprocess.run(f'"{c.MD5DEEP}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
+        md5deep_output = subprocess.run(f'"{c.md5deep}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
         try:
             regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
             downloaded_warc_md5 = regex_md5.group(1)
         except AttributeError:
             log(f"Fixity for {warc} cannot be extracted from md5deep output: {md5deep_output.stdout}",
                 seed_df, row_index, "WARC_Fixity_Errors")
-            errors = True
             continue
 
         # Compares the md5 of the downloaded zipped WARC to Archive-It metadata.
@@ -378,7 +375,6 @@ def download_warcs(seed, date_end, seed_df):
             os.remove(warc_path)
             log(f"Fixity for {warc} changed and it was deleted: {warc_md5} before, {downloaded_warc_md5} after",
                 seed_df, row_index, "WARC_Fixity_Errors")
-            errors = True
             continue
         else:
             log(f"Successfully verified {warc} fixity on {datetime.datetime.now()}",
@@ -387,68 +383,26 @@ def download_warcs(seed, date_end, seed_df):
         # Extracts the WARC from the gzip file.
         # Deletes the gzip file, unless 7zip had an error during unzipping.
         # 7zip errors include an error message (stderr) or unzipping creating a file with a .gz.open extension.
-        unzip_output = subprocess.run(f'"C:/Program Files/7-Zip/7z.exe" x "{warc_path}" -o"{seed.AIP_ID}/objects"',
+        unzip_output = subprocess.run(f'"C:/Program Files/7-Zip/7z.exe" x "{warc_path}" -o"{seed.AIP_ID}"',
                                       stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
         if unzip_output.stderr == b'':
-            if os.path.exists(f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/objects/{warc}.open'):
-                os.remove(f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/objects/{warc}.open')
+            if os.path.exists(f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/{warc}.open'):
+                os.remove(f'{c.script_output}/aips_{date_end}/{seed.AIP_ID}/{warc}.open')
                 log(f"Error unzipping {warc}: unzipped to '.gz.open' file", seed_df, row_index, "WARC_Unzip_Errors")
-                errors = True
             else:
                 os.remove(warc_path)
                 log(f"Successfully unzipped {warc}", seed_df, row_index, "WARC_Unzip_Errors")
         else:
             log(f"Error unzipping {warc}: {unzip_output.stderr.decode('utf-8')}",
                 seed_df, row_index, "WARC_Unzip_Errors")
-            errors = True
 
         # Wait 15 second to give the API a rest.
         time.sleep(15)
 
-    # Tests the log for errors and moves the aip to an error folder if any WARC had an error.
-    # It attempts to download all WARCs first since typically the AIP can be made from what is downloaded
-    # after the error is fixed, such as getting a new copy of one with changed fixity or
-    # unzipping ones with gzip errors using a Linux environment.
-    if errors:
-        a.move_error('download_warcs', seed.AIP_ID)
-
-
-def check_directory(aip):
-    """Identifies any AIPs with missing or empty objects or metadata folders and moves them to an error folder."""
-
-    # Checks if the objects folder doesn't exist or is empty.
-    # Moves to an error folder if either issue is detected and logs the result.
-    if not os.path.exists(f"{aip.directory}/{aip.id}/objects"):
-        aip.log["ObjectsError"] = "Objects folder is missing."
-        a.log(aip.log)
-        a.move_error('incomplete_directory', aip.id)
-        return
-    elif len(os.listdir(f"{aip.directory}/{aip.id}/objects")) == 0:
-        aip.log["ObjectsError"] = "Objects folder is empty."
-        a.log(aip.log)
-        a.move_error('incomplete_directory', aip.id)
-        return
-    else:
-        aip.log["ObjectsError"] = "Successfully created objects folder"
-
-    # Checks if the metadata folder doesn't exist or is empty.
-    # Moves to an error folder if either issue is detected and logs the result.
-    if not os.path.exists(f"{aip.directory}/{aip.id}/metadata"):
-        aip.log["MetadataError"] = "Metadata folder is missing."
-        a.log(aip.log)
-        a.move_error('incomplete_directory', aip.id)
-        return
-    elif len(os.listdir(f"{aip.directory}/{aip.id}/metadata")) == 0:
-        aip.log["MetadataError"] = "Metadata folder is empty."
-        a.log(aip.log)
-        a.move_error('incomplete_directory', aip.id)
-        return
-    else:
-        aip.log["MetadataError"] = "Successfully created metadata folder"
-
 
 def check_aips(date_end, date_start, seed_df, aips_directory):
-    """Verifies that all the expected AIPs for the download are complete and no unexpected AIPs were created.
+    """Verifies that all the expected seed folders for the download are complete
+    and no unexpected seed folders were created.
     Produces a csv named completeness_check with the results in the AIPs directory. """
 
     def aip_dictionary():
@@ -459,7 +413,7 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
         the AIP id, warc count, and url. """
 
         # Downloads the entire WARC list.
-        filters = {'page_size': 1000}
+        filters = {'page_size': 10000}
         warcs = requests.get(c.wasapi, params=filters, auth=(c.username, c.password))
 
         # If there was an API error, ends the function.
@@ -554,7 +508,7 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
         # Checks that the right number of WARCs were evaluated.
         if warcs_expected != warcs_include + warcs_exclude:
             print("Check AIPs did not review the expected number of WARCs.")
-            # raise ValueError
+            raise ValueError
 
         return aip_info
 
@@ -565,73 +519,51 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
         # Starts a list for the results, with the AIP id and website url to use for identification of the AIP.
         result = [aip_id, website_url]
 
-        # Tests if there is a folder for this AIP in the AIPs directory. If not, returns the result for this AIP and
-        # does not run the rest of the function's tests since there is no directory to check for completeness.
-        if f"{aip_id}_bag" in os.listdir(aips_directory):
+        # Tests if there is a folder for this seed in the AIPs directory.
+        # If not, returns the result for this AIP and does not run the rest of the function's tests.
+        if aip_id in os.listdir(aips_directory):
             result.append(True)
         else:
             result.extend([False, 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a'])
             return result
 
-        # Saves the file paths to the metadata and objects folders to variables, since they are long and reused.
-        objects = f'{aips_directory}/{aip_id}_bag/data/objects'
-        metadata = f'{aips_directory}/{aip_id}_bag/data/metadata'
-
         # Tests if each of the four Archive-It metadata reports that never repeat are present.
         # os.path.exists() returns True/False.
-        result.append(os.path.exists(f'{metadata}/{aip_id}_coll.csv'))
-        result.append(os.path.exists(f'{metadata}/{aip_id}_collscope.csv'))
-        result.append(os.path.exists(f'{metadata}/{aip_id}_seed.csv'))
-        result.append(os.path.exists(f'{metadata}/{aip_id}_seedscope.csv'))
+        result.append(os.path.exists(f'{aips_directory}/{aip_id}/{aip_id}_coll.csv'))
+        result.append(os.path.exists(f'{aips_directory}/{aip_id}/{aip_id}_collscope.csv'))
+        result.append(os.path.exists(f'{aips_directory}/{aip_id}/{aip_id}_seed.csv'))
+        result.append(os.path.exists(f'{aips_directory}/{aip_id}/{aip_id}_seedscope.csv'))
 
         # Counts the number of instances of the two Archive-It metadata reports than can repeat.
         # Compare to expected results in the WARC inventory.
-        result.append(len([file for file in os.listdir(metadata) if file.endswith('_crawldef.csv')]))
-        result.append(len([file for file in os.listdir(metadata) if file.endswith('_crawljob.csv')]))
-
-        # Tests if the preservation.xml file is present.
-        result.append(os.path.exists(f'{metadata}/{aip_id}_preservation.xml'))
+        result.append(len([file for file in os.listdir(f'{aips_directory}/{aip_id}') if file.endswith('_crawldef.csv')]))
+        result.append(len([file for file in os.listdir(f'{aips_directory}/{aip_id}') if file.endswith('_crawljob.csv')]))
 
         # Tests if the number of WARCs is correct. Compares the number of WARCs in the objects folder, calculated
         # with len(), to the number of WARCs expected from the API (warc_total).
-        warcs = len([file for file in os.listdir(objects) if file.endswith('.warc')])
+        warcs = len([file for file in os.listdir(f'{aips_directory}/{aip_id}') if file.endswith('.warc')])
         if warcs == warc_total:
             result.append(True)
         else:
             result.append(False)
 
-        # Tests if everything in the AIP's objects folder is a WARC. Starts with a value of True. If there is a file
-        # of a different format, based on the file extension, it updates the value to False.
-        result.append(True)
-        for file in os.listdir(objects):
-            if not file.endswith('.warc'):
-                result[-1] = False
-
-        # Tests if the number of FITS files is correct (one for each WARC). Compares the number of FITS files in the
-        # metadata folder, calculated with len(), to the number of WARCs in the objects folder, which was calculated
-        # earlier in this function.
-        fits = len([file for file in os.listdir(metadata) if file.endswith('_fits.xml')])
-        if fits == warcs:
-            result.append(True)
-        else:
-            result.append(False)
-
-        # Tests if everything in the AIP's metadata folder is an expected file type. Starts with a value of True. If
-        # there is a file of a different type, based on the end of the filename, it updates the value to False.
+        # Tests if everything in the seed folder is an expected metadata file or a WARC.
+        # Starts with a value of True and if there is a file of another type,
+        # based on the end of the filename, it updates the value to False.
         result.append(True)
         expected_endings = ('_coll.csv', '_collscope.csv', '_crawldef.csv', '_crawljob.csv', '_seed.csv',
-                            '_seedscope.csv', '_preservation.xml', '_fits.xml', '_del.csv')
-        for file in os.listdir(metadata):
+                            '_seedscope.csv', '.warc')
+        for file in os.listdir(f'{aips_directory}/{aip_id}'):
             if not file.endswith(expected_endings):
                 result[-1] = False
 
         return result
 
     def check_for_extra_aips():
-        """Looks for AIPs that were created during the last download but were not expected based on the API data. If
-        any are found, returns a list with the results ready to be added as a row to the results csv."""
+        """Looks for seed folders that were created but were not expected based on the API data.
+        If any are found, returns a list with the results ready to be added as a row to the results csv."""
 
-        # Starts a list for the results. The list elements will be one list per unexpected AIP.
+        # Starts a list for the results. The list elements will be one list per unexpected seed.
         extras = []
 
         # Iterates through the folder with the AIPs.
@@ -665,8 +597,8 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
         # Adds a header row to the csv.
         complete_write.writerow(
             ['AIP', 'URL', 'AIP Folder Made', 'coll.csv', 'collscope.csv', 'seed.csv',
-             'seedscope.csv', 'crawldef.csv count', 'crawljob.csv count', 'preservation.xml', 'WARC Count Correct',
-             'Objects is all WARCs', 'fits.xml Count Correct', 'No Extra Metadata'])
+             'seedscope.csv', 'crawldef.csv count', 'crawljob.csv count', 'WARC Count Correct',
+             'Objects is all WARCs', 'No Extra Metadata'])
 
         # Tests each AIP for completeness and saves the results.
         for seed in aips_metadata:
