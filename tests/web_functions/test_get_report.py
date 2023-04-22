@@ -101,8 +101,15 @@ class MyTestCase(unittest.TestCase):
         """
         csv_name = "magil-ggp-2783596-2022-11_collscope.csv"
         get_report(self.seed, self.seed_df, 0, "collection", "15678", "scope_rule", csv_name)
+
+        # Test that the file was not made.
         csv_path_exists = os.path.exists(os.path.join(os.getcwd(), self.seed.AIP_ID, csv_name))
-        self.assertEqual(csv_path_exists, False, "Problem with test for collection scope that is empty")
+        self.assertEqual(csv_path_exists, False, "Problem with test for collection scope is empty, is file made")
+
+        # Test that the log information in seed_df was updated.
+        actual_info = self.seed_df["Metadata_Report_Info"][0]
+        expected_info = f"Empty report {csv_name} not saved"
+        self.assertEqual(actual_info, expected_info, "Problem with test for seed scope is empty, log")
 
     def test_crawl_definition(self):
         """
@@ -193,8 +200,15 @@ class MyTestCase(unittest.TestCase):
         """
         csv_name = "magil-ggp-2783596-2022-11_seedscope.csv"
         get_report(self.seed, self.seed_df, 0, "seed", "2783596", "scope_rule", csv_name)
+
+        # Test that the file was not made.
         csv_path_exists = os.path.exists(os.path.join(os.getcwd(), self.seed.AIP_ID, csv_name))
-        self.assertEqual(csv_path_exists, False, "Problem with test for seed scope that is empty")
+        self.assertEqual(csv_path_exists, False, "Problem with test for seed scope is empty, is file made")
+
+        # Test that the log information in seed_df was updated.
+        actual_info = self.seed_df["Metadata_Report_Info"][0]
+        expected_info = f"Empty report {csv_name} not saved"
+        self.assertEqual(actual_info, expected_info, "Problem with test for seed scope is empty, log")
 
 
 if __name__ == '__main__':
