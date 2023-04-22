@@ -281,7 +281,7 @@ def redact_seed_report(seed, seed_df, row_index):
     if "login_password" in report_df.columns:
         report_df["login_username"] = "REDACTED"
         report_df["login_password"] = "REDACTED"
-        report_df.to_csv(f"{seed.AIP_ID}/{seed.AIP_ID}_seed.csv")
+        report_df.to_csv(f"{seed.AIP_ID}/{seed.AIP_ID}_seed.csv", index=False)
     else:
         log("Seed report does not have login columns to redact", seed_df, row_index, "Metadata_Report_Info")
 
