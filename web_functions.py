@@ -238,72 +238,95 @@ def reset_aip(aip_id, df):
     df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
 
 
+def get_report(seed, seed_df, row_index, filter_type, filter_value, report_type, report_name):
+    """
+    Downloads a single metadata report and saves it as a csv in the seed's folder.
+    Only saves if there is data of that type.
+
+    Parameters:
+    seed, seed_df, and row_index are used to update the log
+    filter_type and filter_value are used to filter the API call to the right AIP's report
+    report_type is the Archive-It name for the report
+    report_name is the name for the report saved in the AIP, including the ARCHive metadata code
+    """
+
+    # Builds the API call to get the report as a csv.
+    # Limit of -1 will return all matches. Default is only the first 100.
+    filters = {"limit": -1, filter_type: filter_value, "format": "csv"}
+    metadata_report = requests.get(f"{c.partner_api}/{report_type}", params=filters, auth=(c.username, c.password))
+
+    # Saves the metadata report if there were no API errors and there was data of this type (content isn't empty).
+    # For scope rules, it is common for one or both to not have data since these aren't required.
+    if metadata_report.status_code == 200:
+        if metadata_report.content == b"":
+            log(f"Empty report {report_name} not saved", seed_df, row_index, "Metadata_Report_Info")
+            return
+        else:
+            with open(f"{seed.AIP_ID}/{report_name}", "wb") as report_csv:
+                report_csv.write(metadata_report.content)
+    else:
+        log(f"{report_name} API Error {metadata_report.status_code}", seed_df, row_index, "Metadata_Report_Errors")
+        return
+
+
+def redact_seed_report(seed, seed_df, row_index):
+    """
+    Replaces the seed report with a redacted version of the file, removing login information if those columns
+    are present. Even if the columns are blank, replaces it with REDACTED. Since not all login information is
+    meaningful (some is from staff web browsers autofill information while viewing the metadata), knowing if
+    there was login information or not is misleading.
+    """
+
+    report_df = pd.read_csv(f"{seed.AIP_ID}/{seed.AIP_ID}_seed.csv")
+    if "login_password" in report_df.columns:
+        report_df["login_username"] = "REDACTED"
+        report_df["login_password"] = "REDACTED"
+        report_df.to_csv(f"{seed.AIP_ID}/{seed.AIP_ID}_seed.csv")
+    else:
+        log("Seed report does not have login columns to redact", seed_df, row_index, "Metadata_Report_Info")
+
+
+def download_job_and_definition(seed, seed_df, row_index):
+    """
+    Downloads each of the crawl job reports and its corresponding crawl definition report (if new).
+    If a seed has more than one, Job_ID has a comma-separated string of the IDs.
+    """
+
+    job_list = seed.Job_ID.split(",")
+    for job in job_list:
+        get_report(seed, seed_df, row_index, "id", job, "crawl_job", f"{seed.AIP_ID}_{job}_crawljob.csv")
+        try:
+            report_df = pd.read_csv(f"{seed.AIP_ID}/{seed.AIP_ID}_{job}_crawljob.csv", dtype="object")
+            crawl_def_id = report_df.loc[0, "crawl_definition"]
+            if not os.path.exists(f"{seed.AIP_ID}/{seed.AIP_ID}_{crawl_def_id}_crawldef.csv"):
+                get_report(seed, seed_df, row_index, "id", crawl_def_id, "crawl_definition", f"{seed.AIP_ID}_{crawl_def_id}_crawldef.csv")
+        except FileNotFoundError:
+            log("Crawl job was not downloaded so can't get crawl definition id", seed_df, row_index, "Metadata_Report_Errors")
+
+
 def download_metadata(seed, seed_df):
-    """Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
+    """
+    Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
     deletes any empty reports (meaning there was no data of that type for this seed),
     and redacts login information from the seed report.
-    Any errors are added to the seed dataframe and saved to the script log at the end of the function."""
-
-    def get_report(filter_type, filter_value, report_type, report_name):
-        """Downloads a single metadata report and saves it as a csv in the seed's folder.
-            Only saves if there is data of that type and also redacts the login info from the seed report.
-            filter_type and filter_value are used to filter the API call to the right AIP's report
-            report_type is the Archive-It name for the report
-            report_name is the name for the report saved in the AIP, including the ARCHive metadata code """
-
-        # Builds the API call to get the report as a csv.
-        # Limit of -1 will return all matches. Default is only the first 100.
-        filters = {"limit": -1, filter_type: filter_value, "format": "csv"}
-        metadata_report = requests.get(f"{c.partner_api}/{report_type}", params=filters, auth=(c.username, c.password))
-
-        # Saves the metadata report if there were no API errors and there was data of this type (content isn't empty).
-        # For scope rules, it is common for one or both to not have data since these aren't required.
-        if metadata_report.status_code == 200:
-            if metadata_report.content == b"":
-                log(f"Empty report {report_name} not saved", seed_df, row_index, "Metadata_Report_Info")
-                return
-            else:
-                with open(f"{seed.AIP_ID}/{report_name}", "wb") as report_csv:
-                    report_csv.write(metadata_report.content)
-        else:
-            log(f"{report_name} API Error {metadata_report.status_code}", seed_df, row_index, "Metadata_Report_Errors")
-            return
-
-        # Replaces the seed report with a redacted version of the file, removing login information if those columns
-        # are present. Even if the columns are blank, replaces it with REDACTED. Since not all login information is
-        # meaningful (some is from staff web browsers autofill information while viewing the metadata), knowing if
-        # there was login information or not is misleading. """
-        if report_type == "seed":
-            report_df = pd.read_csv(f"{seed.AIP_ID}/{report_name}")
-            if "login_password" in report_df.columns:
-                report_df["login_username"] = "REDACTED"
-                report_df["login_password"] = "REDACTED"
-                report_df.to_csv(f"{seed.AIP_ID}/{report_name}")
-            else:
-                log("Seed report does not have login columns to redact", seed_df, row_index, "Metadata_Report_Info")
+    Any errors are added to the seed dataframe and saved to the script log at the end of the function.
+    """
 
     # Row index for the seed being processed in the dataframe, to use for adding logging information.
     row_index = seed_df.index[seed_df["Seed_ID"] == seed.Seed_ID].tolist()[0]
 
     # Downloads four of the six metadata reports from Archive-It needed to understand the context of the WARC.
     # These are reports where there is only one report per seed or collection.
-    get_report("id", seed.Seed_ID, "seed", f"{seed.AIP_ID}_seed.csv")
-    get_report("seed", seed.Seed_ID, "scope_rule", f"{seed.AIP_ID}_seedscope.csv")
-    get_report("collection", seed.AIT_Collection, "scope_rule", f"{seed.AIP_ID}_collscope.csv")
-    get_report("id", seed.AIT_Collection, "collection", f"{seed.AIP_ID}_coll.csv")
+    get_report(seed, seed_df, row_index, "id", seed.Seed_ID, "seed", f"{seed.AIP_ID}_seed.csv")
+    get_report(seed, seed_df, row_index, "seed", seed.Seed_ID, "scope_rule", f"{seed.AIP_ID}_seedscope.csv")
+    get_report(seed, seed_df, row_index, "collection", seed.AIT_Collection, "scope_rule", f"{seed.AIP_ID}_collscope.csv")
+    get_report(seed, seed_df, row_index, "id", seed.AIT_Collection, "collection", f"{seed.AIP_ID}_coll.csv")
+
+    # Redacts login information from the seed report.
+    redact_seed_report(seed, seed_df, row_index)
 
     # Downloads each of the crawl job reports and its corresponding crawl definition report (if new).
-    # If a seed has more than one, Job_ID has a comma-separated string of the IDs.
-    job_list = seed.Job_ID.split(",")
-    for job in job_list:
-        get_report("id", job, "crawl_job", f"{seed.AIP_ID}_{job}_crawljob.csv")
-        try:
-            report_df = pd.read_csv(f"{seed.AIP_ID}/{seed.AIP_ID}_{job}_crawljob.csv", dtype="object")
-            crawl_def_id = report_df.loc[0, "crawl_definition"]
-            if not os.path.exists(f"{seed.AIP_ID}/{seed.AIP_ID}_{crawl_def_id}_crawldef.csv"):
-                get_report("id", crawl_def_id, "crawl_definition", f"{seed.AIP_ID}_{crawl_def_id}_crawldef.csv")
-        except FileNotFoundError:
-            log("Crawl job was not downloaded so can't get crawl definition id", seed_df, row_index, "Metadata_Report_Errors")
+    download_job_and_definition(seed, seed_df, row_index)
 
     # If there were no download errors (the dataframe still has no value in that cell), updates the log to show success.
     if pd.isnull(seed_df.at[row_index, "Metadata_Report_Errors"]):
