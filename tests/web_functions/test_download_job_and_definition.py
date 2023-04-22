@@ -35,6 +35,30 @@ class MyTestCase(unittest.TestCase):
             if os.path.exists(directory):
                 shutil.rmtree(os.path.join(os.getcwd(), directory))
 
+    def test_error_no_job(self):
+        """
+        Tests that the function updates the log when there is not crawl job report.
+        Causes the error by using a crawl job id that is not formatted correctly.
+        """
+        # Makes data needed as function input and runs the function.
+        seed_df = pd.DataFrame([[2202440, "harg-000-web-0001", "UGA Healthy Dawg - University Health Center",
+                                 "Hargrett Rare Book & Manuscript Library", 0000, 12181, "job-id-error", 1,
+                                 "name.warc.gz", "Successfully calculated seed metadata",
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, 1.0]],
+                               columns=["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection",
+                                        "AIT_Collection", "Job_ID", "WARCs", "WARC_Filenames", "Seed_Metadata_Errors",
+                                        "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors",
+                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"])
+        seed = [seed for seed in seed_df.itertuples()][0]
+        os.mkdir(seed.AIP_ID)
+        download_job_and_definition(seed, seed_df, 0)
+
+        # Test that the log was updated.
+        actual_errors = seed_df["Metadata_Report_Errors"][0]
+        expected_errors = f"{seed.AIP_ID}_job-id-error_crawljob.csv API Error 500; " \
+                          f"Crawl job was not downloaded so can't get crawl definition id"
+        self.assertEqual(actual_errors, expected_errors, "Problem with test for error/no job, log")
+
     def test_multi_id_different(self):
         """
         Tests that the function downloads the correct reports for a seed with
