@@ -269,7 +269,7 @@ def get_report(seed, seed_df, row_index, filter_type, filter_value, report_type,
         return
 
 
-def redact_seed_report(seed, seed_df, row_index):
+def redact_seed_report(aip_id, seed_df, row_index):
     """
     Replaces the seed report with a redacted version of the file, removing login information if those columns
     are present. Even if the columns are blank, replaces it with REDACTED. Since not all login information is
@@ -277,11 +277,11 @@ def redact_seed_report(seed, seed_df, row_index):
     there was login information or not is misleading.
     """
 
-    report_df = pd.read_csv(f"{seed.AIP_ID}/{seed.AIP_ID}_seed.csv")
+    report_df = pd.read_csv(f"{aip_id}/{aip_id}_seed.csv")
     if "login_password" in report_df.columns:
         report_df["login_username"] = "REDACTED"
         report_df["login_password"] = "REDACTED"
-        report_df.to_csv(f"{seed.AIP_ID}/{seed.AIP_ID}_seed.csv", index=False)
+        report_df.to_csv(f"{aip_id}/{aip_id}_seed.csv", index=False)
     else:
         log("Seed report does not have login columns to redact", seed_df, row_index, "Metadata_Report_Info")
 
@@ -323,7 +323,7 @@ def download_metadata(seed, seed_df):
     get_report(seed, seed_df, row_index, "id", seed.AIT_Collection, "collection", f"{seed.AIP_ID}_coll.csv")
 
     # Redacts login information from the seed report.
-    redact_seed_report(seed, seed_df, row_index)
+    redact_seed_report(seed.AIP_ID, seed_df, row_index)
 
     # Downloads each of the crawl job reports and its corresponding crawl definition report (if new).
     download_job_and_definition(seed, seed_df, row_index)
