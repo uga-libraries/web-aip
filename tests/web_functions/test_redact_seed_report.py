@@ -20,9 +20,9 @@ class MyTestCase(unittest.TestCase):
         """
         Deletes the seed folders, and the seed.csv files within them.
         """
-        for dir in (os.path.join(os.getcwd(), "redact_aip"), os.path.join(os.getcwd(), "no_redact_aip")):
-            if os.path.exists(dir):
-                shutil.rmtree(dir)
+        for directory in (os.path.join(os.getcwd(), "redact_aip"), os.path.join(os.getcwd(), "no_redact_aip")):
+            if os.path.exists(directory):
+                shutil.rmtree(directory)
 
     def test_no_redaction(self):
         """
