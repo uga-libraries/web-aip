@@ -289,19 +289,28 @@ def redact_seed_report(aip_id, seed_df, row_index):
 def download_job_and_definition(seed, seed_df, row_index):
     """
     Downloads each of the crawl job reports and its corresponding crawl definition report (if new).
-    If a seed has more than one, Job_ID has a comma-separated string of the IDs.
     """
 
+    # If a seed has more than one job, Job_ID has a comma-separated string of the IDs.
     job_list = seed.Job_ID.split(",")
+
     for job in job_list:
+
+        # Downloads the crawl job for report.
         get_report(seed, seed_df, row_index, "id", job, "crawl_job", f"{seed.AIP_ID}_{job}_crawljob.csv")
+
+        # Reads the crawl job to get the crawl definition ID.
+        # If reading the id is successful and the report isn't downloaded yet, downloads the crawl definition report.
+        # If the crawl job report wasn't downloaded, logs the error instead.
         try:
             report_df = pd.read_csv(f"{seed.AIP_ID}/{seed.AIP_ID}_{job}_crawljob.csv", dtype="object")
             crawl_def_id = report_df.loc[0, "crawl_definition"]
-            if not os.path.exists(f"{seed.AIP_ID}/{seed.AIP_ID}_{crawl_def_id}_crawldef.csv"):
-                get_report(seed, seed_df, row_index, "id", crawl_def_id, "crawl_definition", f"{seed.AIP_ID}_{crawl_def_id}_crawldef.csv")
+            crawL_def_report_name = f"{seed.AIP_ID}_{crawl_def_id}_crawldef.csv"
+            if not os.path.exists(f"{seed.AIP_ID}/{crawL_def_report_name}"):
+                get_report(seed, seed_df, row_index, "id", crawl_def_id, "crawl_definition", crawL_def_report_name)
         except FileNotFoundError:
-            log("Crawl job was not downloaded so can't get crawl definition id", seed_df, row_index, "Metadata_Report_Errors")
+            log("Crawl job was not downloaded so can't get crawl definition id",
+                seed_df, row_index, "Metadata_Report_Errors")
 
 
 def download_metadata(seed, seed_df):
