@@ -1,6 +1,9 @@
 """
 Tests for the verify_warc_fixity() function.
 It compares the fixity of the downloaded WARC to Archive-It and deletes the file if it does not match.
+
+To save time, fake data is supplied in seed_df for fields that are not used in these tests
+and seed_df only has the WARC being tested, not other WARCs for that seed.
 """
 import numpy as np
 import os
