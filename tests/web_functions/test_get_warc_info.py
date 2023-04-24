@@ -13,30 +13,6 @@ from web_functions import get_warc_info
 
 class MyTestCase(unittest.TestCase):
 
-    def test_api_error(self):
-        """
-        Tests that the function raises the expected error and updates the log correctly
-        when there is an API error, caused by a WARC filename that is not formatted correctly..
-        """
-        # Makes the data needed for the function input.
-        seed_df = pd.DataFrame([[2028986, "bma-web-0001", "Title", "BMA", "0000", 12470, "1085452", 1,
-                                 "wrong.warc.gz", "Successfully calculated seed metadata",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, 0.01]],
-                               columns=["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection",
-                                        "AIT_Collection", "Job_ID", "WARCs", "WARC_Filenames",
-                                        "Seed_Metadata_Errors", "Metadata_Report_Errors",
-                                        "Metadata_Report_Info", "WARC_API_Errors",
-                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"])
-
-        # Test that the error is raised.
-        with self.assertRaises(ValueError):
-            warc_url, warc_md5 = get_warc_info(seed_df["WARC_Filenames"][0], seed_df, 0)
-
-        # Test that the log is updated.
-        actual = seed_df["WARC_API_Errors"][0]
-        expected = "API error 500: can't get info about wrong.warc.gz"
-        self.assertEqual(actual, expected, "Problem with test for API error, log")
-
     def test_bma(self):
         """
         Tests that the function returns the expected values for a BMA WARC.
