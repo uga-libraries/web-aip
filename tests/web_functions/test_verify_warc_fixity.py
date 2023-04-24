@@ -1,5 +1,5 @@
 """
-Tests for verify_warc_fixity() function.
+Tests for the verify_warc_fixity() function.
 It compares the fixity of the downloaded WARC to Archive-It and deletes the file if it does not match.
 """
 import numpy as np
@@ -7,7 +7,7 @@ import os
 import pandas as pd
 import shutil
 import unittest
-from web_functions import get_warc_info, get_warc, verify_warc_fixity
+from web_functions import get_warc, verify_warc_fixity
 
 
 class MyTestCase(unittest.TestCase):
