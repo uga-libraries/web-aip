@@ -363,11 +363,16 @@ def get_warc_info(warc, seed_df, row_index):
             seed_df, row_index, "WARC_API_Errors")
         raise ValueError
 
-    # Gets and returns the two data points needed from the WASAPI results.
+    # Gets and returns the two data points needed from the WASAPI results, unless there is an error.
     py_warc = warc_data.json()
-    warc_url = py_warc["files"][0]["locations"][0]
-    warc_md5 = py_warc["files"][0]["checksums"]["md5"]
-    return warc_url, warc_md5
+    try:
+        warc_url = py_warc["files"][0]["locations"][0]
+        warc_md5 = py_warc["files"][0]["checksums"]["md5"]
+        return warc_url, warc_md5
+    except IndexError:
+        log(f"Index Error: cannot get the WARC URL or MD5 for {warc}",
+            seed_df, row_index, "WARC_API_Errors")
+        raise IndexError
 
 
 def get_warc(seed_df, row_index, warc_url, warc, warc_path):
@@ -467,7 +472,7 @@ def download_warcs(seed, date_end, seed_df):
         # If there was an API error, stops processing this WARC and starts the next.
         try:
             warc_url, warc_md5 = get_warc_info(warc, seed_df, row_index)
-        except ValueError:
+        except (ValueError, IndexError):
             continue
 
         # Downloads the WARC from Archive-It.
