@@ -135,12 +135,12 @@ def seed_data(date_start, date_end):
 
     # Saves the dataframe as a CSV in the script output folder for splitting or restarting a batch.
     # Returns the dataframe for when the entire group will be downloaded as one batch.
-    seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+    seed_df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
     return seed_df
 
 
 def log(message, df, row, column):
-    """Adds log information to the seeds dataframe and saves an updated version of seeds.csv."""
+    """Adds log information to the seeds dataframe and saves an updated version of seeds_log.csv."""
 
     # Updates the dataframe. Separates messages with a a semicolon if there is more than one.
     if pd.isnull(df.at[row, column]):
@@ -148,9 +148,9 @@ def log(message, df, row, column):
     else:
         df.loc[row, column] += "; " + message
 
-    # Saves a new version of seeds.csv with the updated information.
+    # Saves a new version of seeds_log.csv with the updated information.
     # The previous version of the file is overwritten.
-    df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+    df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
 
 
 def reset_aip(seed_id, df):
@@ -169,9 +169,9 @@ def reset_aip(seed_id, df):
     df.loc[row_index, 'WARC_Fixity_Errors'] = None
     df.loc[row_index, 'WARC_Unzip_Errors'] = None
 
-    # Saves a new version of seeds.csv with the updated information.
+    # Saves a new version of seeds_log.csv with the updated information.
     # The previous version of the file is overwritten.
-    df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+    df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
 
 
 def get_report(seed, seed_df, row_index, filter_type, filter_value, report_type, report_name):
@@ -276,13 +276,13 @@ def download_metadata(seed, seed_df):
     # If there were no download errors (the dataframe still has no value in that cell), updates the log to show success.
     if pd.isnull(seed_df.at[row_index, "Metadata_Report_Errors"]):
         seed_df.loc[row_index, "Metadata_Report_Errors"] = "Successfully downloaded all metadata reports"
-        seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+        seed_df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
 
     # If there is nothing in the report info field, updates the log with default text.
     # Can't assume that blank means success because it could mean API errors.
     if pd.isnull(seed_df.at[row_index, "Metadata_Report_Info"]):
         seed_df.loc[row_index, "Metadata_Report_Info"] = "No additional information"
-        seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+        seed_df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
 
 
 def get_warc_info(warc, seed_df, row_index):

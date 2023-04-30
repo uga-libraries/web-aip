@@ -17,7 +17,7 @@ class MyTestCase(unittest.TestCase):
         """
         Deletes the spreadsheet created by each test.
         """
-        os.remove(os.path.join(c.script_output, "seeds.csv"))
+        os.remove(os.path.join(c.script_output, "seeds_log.csv"))
 
     def test_error_no_metadata(self):
         """
@@ -39,7 +39,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(actual, expected, "Problem with test for error no metadata, dataframe values")
 
         # Test that the CSV was created.
-        csv_path_exists = os.path.exists(os.path.join(c.script_output, "seeds.csv"))
+        csv_path_exists = os.path.exists(os.path.join(c.script_output, "seeds_log.csv"))
         self.assertEqual(csv_path_exists, True, "Problem with test for error no metadata, CSV creation")
 
     def test_hargrett(self):
@@ -73,7 +73,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(actual, expected, "Problem with test for Hargrett, dataframe values")
 
         # Test that the CSV was created.
-        csv_path_exists = os.path.exists(os.path.join(c.script_output, "seeds.csv"))
+        csv_path_exists = os.path.exists(os.path.join(c.script_output, "seeds_log.csv"))
         self.assertEqual(csv_path_exists, True, "Problem with test for Hargrett, CSV creation")
 
     def test_magil(self):
@@ -120,7 +120,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(actual, expected, "Problem with test for MAGIL, dataframe values")
 
         # Test that the CSV was created.
-        csv_path_exists = os.path.exists(os.path.join(c.script_output, "seeds.csv"))
+        csv_path_exists = os.path.exists(os.path.join(c.script_output, "seeds_log.csv"))
         self.assertEqual(csv_path_exists, True, "Problem with test for MAGIL, CSV creation")
 
     def test_russell(self):
@@ -159,7 +159,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(actual, expected, "Problem with test for Russell, dataframe values")
 
         # Test that the CSV was created.
-        csv_path_exists = os.path.exists(os.path.join(c.script_output, "seeds.csv"))
+        csv_path_exists = os.path.exists(os.path.join(c.script_output, "seeds_log.csv"))
         self.assertEqual(csv_path_exists, True, "Problem with test for Russell, CSV creation")
 
 

@@ -32,13 +32,13 @@ class MyTestCase(unittest.TestCase):
                                              "Seed_Metadata_Errors", "Metadata_Report_Errors",
                                              "Metadata_Report_Info", "WARC_API_Errors",
                                              "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"])
-        self.seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+        self.seed_df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
 
     def tearDown(self):
         """
         Deletes the spreadsheet created by each test.
         """
-        os.remove(os.path.join(c.script_output, "seeds.csv"))
+        os.remove(os.path.join(c.script_output, "seeds_log.csv"))
 
     def test_first_message(self):
         """
@@ -65,7 +65,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(actual_dataframe, expected_dataframe, "Problem with test for first message, dataframe values")
 
         # Test that the CSV has the correct values.
-        csv_path = os.path.join(c.script_output, "seeds.csv")
+        csv_path = os.path.join(c.script_output, "seeds_log.csv")
         with open(csv_path, newline="") as open_file:
             reader = csv.reader(open_file)
             actual_csv = list(reader)
@@ -108,7 +108,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(actual_dataframe, expected_dataframe, "Problem with test for second message, dataframe values")
 
         # Test that the CSV has the correct values.
-        csv_path = os.path.join(c.script_output, "seeds.csv")
+        csv_path = os.path.join(c.script_output, "seeds_log.csv")
         with open(csv_path, newline="") as open_file:
             reader = csv.reader(open_file)
             actual_csv = list(reader)

@@ -30,8 +30,8 @@ class MyTestCase(unittest.TestCase):
         when there are no login columns to redact.
         """
         # Input needed for the test: seed_df has the progress of the script so far,
-        # a folder named with the AIP ID and a seeds.csv file inside the AIP folder.
-        # The seeds.csv file only has a few of the actual columns, since only logins are needed for testing.
+        # a folder named with the AIP ID and a seeds_log.csv file inside the AIP folder.
+        # The seeds_log.csv file only has a few of the actual columns, since only logins are needed for testing.
         seed_df = pd.DataFrame([["1234567", 123465, "900000", 0.01, 1, "ARCHIVEIT-1.warc.gz",
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
@@ -46,7 +46,7 @@ class MyTestCase(unittest.TestCase):
 
         redact_seed_report("1234567", seed_df, 0)
 
-        # Test that seeds.csv has not changed.
+        # Test that seeds_log.csv has not changed.
         report_df = pd.read_csv(seed_csv_path)
         actual = [report_df.columns.tolist()] + report_df.values.tolist()
         expected = [["canonical_url", "collection", "seed_type"],
@@ -63,8 +63,8 @@ class MyTestCase(unittest.TestCase):
         Tests that the function updates seed.csv when there are login columns to redact.
         """
         # Input needed for the test: seed_df has the progress of the script so far,
-        # a folder named with the AIP ID and a seeds.csv file inside the AIP folder.
-        # The seeds.csv file only has a few of the actual columns, since only logins are needed for testing.
+        # a folder named with the AIP ID and a seeds_log.csv file inside the AIP folder.
+        # The seeds_log.csv file only has a few of the actual columns, since only logins are needed for testing.
         seed_df = pd.DataFrame([["1234567", 123465, "900000", 0.01, 1, "ARCHIVEIT-1.warc.gz",
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
@@ -79,7 +79,7 @@ class MyTestCase(unittest.TestCase):
 
         redact_seed_report("1234567", seed_df, 0)
 
-        # Test that seeds.csv has not changed.
+        # Test that seeds_log.csv has not changed.
         report_df = pd.read_csv(seed_csv_path)
         actual = [report_df.columns.tolist()] + report_df.values.tolist()
         expected = [["canonical_url", "collection", "login_password", "login_username", "seed_type"],

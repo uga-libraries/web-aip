@@ -57,11 +57,11 @@ web.check_config()
 aips_directory = os.path.join(c.script_output, f"aips_{date_end}")
 
 # The script may be run repeatedly if there are interruptions, such as due to API connections.
-# If it has run, it will use the existing seeds.csv for seed_df and and skip seeds that were already done.
+# If it has run, it will use the existing seeds_log.csv for seed_df and and skip seeds that were already done.
 # Otherwise, it makes seed_df by getting data from the Archive-It APIs.
 if os.path.exists(aips_directory):
     os.chdir(aips_directory)
-    seed_df = pd.read_csv(os.path.join(c.script_output, "seeds.csv"), dtype="object")
+    seed_df = pd.read_csv(os.path.join(c.script_output, "seeds_log.csv"), dtype="object")
 else:
     os.makedirs(aips_directory)
     os.chdir(aips_directory)
@@ -81,7 +81,7 @@ for seed in seed_df[seed_df["WARC_Unzip_Errors"].isnull()].itertuples():
     print(f"\nStarting seed {current_seed} of {total_seeds}.")
 
     # If the seed already has a folder from an error in a previous iteration of the script,
-    # deletes the contents and anything in the seeds.csv from the previous iteration so it can be remade.
+    # deletes the contents and anything in the seeds_log.csv from the previous iteration so it can be remade.
     if os.path.exists(str(seed.Seed_ID)):
         web.reset_aip(seed.Seed_ID, seed_df)
 
@@ -93,7 +93,7 @@ for seed in seed_df[seed_df["WARC_Unzip_Errors"].isnull()].itertuples():
 
 # Saves the information in seed_df to a CSV as a record for the process.
 os.chdir(c.script_output)
-seed_df.to_csv("seeds.csv", index=False)
+seed_df.to_csv("seeds_log.csv", index=False)
 
 # Verifies the all expected seed folders are present and have all the expected metadata files and WARCs.
 # Saves the result as a csv in the folder with the downloaded AIPs.

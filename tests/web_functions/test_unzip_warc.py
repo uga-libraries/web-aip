@@ -18,12 +18,12 @@ class MyTestCase(unittest.TestCase):
 
     def tearDown(self):
         """
-        Deletes the script output directory and contents, if any, and seeds.csv produced by the tests.
+        Deletes the script output directory and contents, if any, and seeds_log.csv produced by the tests.
         The directory is changed first because aip_dir can't be deleted while it is the current working directory.
         """
         os.chdir("..")
         shutil.rmtree(os.path.join(c.script_output, "aips_2010-12"))
-        os.remove(os.path.join(c.script_output, "seeds.csv"))
+        os.remove(os.path.join(c.script_output, "seeds_log.csv"))
 
     def test_correct(self):
         """

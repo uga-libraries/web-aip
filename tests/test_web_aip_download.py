@@ -25,19 +25,19 @@ class MyTestCase(unittest.TestCase):
 
         #TODO: need to rework this function.
         # os.remove(os.path.join(c.script_output, "completeness_check.csv"))
-        os.remove(os.path.join(c.script_output, "seeds.csv"))
+        os.remove(os.path.join(c.script_output, "seeds_log.csv"))
 
     def test_multi_warc_seed(self):
         """
         Tests the full script with a data range that has 1 Hargrett seed with 3 WARCs and multiple crawl jobs.
-        Results for testing are the contents of seeds.csv and completeness_check.csv.
+        Results for testing are the contents of seeds_log.csv and completeness_check.csv.
         """
         script_path = os.path.join("..", "web_aip_download.py")
         subprocess.run(f"python {script_path} 2020-04-30 2020-05-15", shell=True)
 
-        # Test for seeds.csv
+        # Test for seeds_log.csv
         # Removes seed info about login columns and time stamps, which are not consistent for each test.
-        seeds_df = pd.read_csv(os.path.join(c.script_output, "seeds.csv"))
+        seeds_df = pd.read_csv(os.path.join(c.script_output, "seeds_log.csv"))
         info = "Empty report 2173769_seedscope.csv not saved"
         seeds_df.loc[seeds_df["Metadata_Report_Info"].str.startswith(info), "Metadata_Report_Info"] = info
         seeds_df.loc[seeds_df["Metadata_Report_Info"] == "Seed report does not have login columns to redact",
@@ -61,7 +61,7 @@ class MyTestCase(unittest.TestCase):
                          "Successfully unzipped ARCHIVEIT-12912-WEEKLY-JOB1154002-SEED2173769-20200513225747964-00000-h3.warc.gz; "
                          "Successfully unzipped ARCHIVEIT-12912-WEEKLY-JOB1148757-SEED2173769-20200506223640988-00000-h3.warc.gz; "
                          "Successfully unzipped ARCHIVEIT-12912-WEEKLY-JOB1143415-SEED2173769-20200430010118013-00000-h3.warc.gz"]]
-        self.assertEqual(expected_seeds, actual_seeds, "Problem with test for multi WARC seed, seeds.csv")
+        self.assertEqual(expected_seeds, actual_seeds, "Problem with test for multi WARC seed, seeds_log.csv")
 
         # TODO need to rework this function
         # # Test for completeness_check.csv
@@ -76,14 +76,14 @@ class MyTestCase(unittest.TestCase):
     def test_one_warc_seeds(self):
         """
         Tests the full script with a data range that has 2 Russell seeds, each with 1 WARC.
-        Results for testing are the contents of seeds.csv and completeness_check.csv.
+        Results for testing are the contents of seeds_log.csv and completeness_check.csv.
         """
         script_path = os.path.join("..", "web_aip_download.py")
         subprocess.run(f"python {script_path} 2019-07-12 2019-07-13", shell=True)
 
-        # Test for seeds.csv
+        # Test for seeds_log.csv
         # Removes seed info about login columns and time stamps, which are not consistent for each test.
-        seeds_df = pd.read_csv(os.path.join(c.script_output, "seeds.csv"))
+        seeds_df = pd.read_csv(os.path.join(c.script_output, "seeds_log.csv"))
         info = "Empty report 2027776_seedscope.csv not saved"
         seeds_df.loc[seeds_df["Metadata_Report_Info"].str.startswith(info), "Metadata_Report_Info"] = info
         seeds_df.loc[seeds_df["Metadata_Report_Info"] == "Seed report does not have login columns to redact",
@@ -108,7 +108,7 @@ class MyTestCase(unittest.TestCase):
                          "Successfully downloaded ARCHIVEIT-12264-TEST-JOB943446-SEED2027776-20190710131748634-00000-h3.warc.gz",
                          "Successfully verified ARCHIVEIT",
                          "Successfully unzipped ARCHIVEIT-12264-TEST-JOB943446-SEED2027776-20190710131748634-00000-h3.warc.gz"]]
-        self.assertEqual(expected_seeds, actual_seeds, "Problem with test for one WARC seeds, seeds.csv")
+        self.assertEqual(expected_seeds, actual_seeds, "Problem with test for one WARC seeds, seeds_log.csv")
 
         # TODO need to rework this function
         # # Test for completeness_check.csv

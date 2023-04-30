@@ -1,6 +1,6 @@
 """
 Test for the reset_aip() function.
-It deletes a seed folder and the information from that seed from seed_df and seeds.csv.
+It deletes a seed folder and the information from that seed from seed_df and seeds_log.csv.
 """
 import csv
 import os
@@ -37,22 +37,22 @@ class MyTestCase(unittest.TestCase):
                                              "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Info",
                                              "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
 
-        # Makes a log, seeds.csv, in the script output directory.
-        self.seed_df.to_csv(os.path.join(c.script_output, "seeds.csv"), index=False)
+        # Makes a log, seeds_log.csv, in the script output directory.
+        self.seed_df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
 
     def tearDown(self):
         """
-        Deletes the seed folder, if present, and the seeds.csv file.
+        Deletes the seed folder, if present, and the seeds_log.csv file.
         The function should delete the seed folder, but if there is an error with the function, it might not.
         """
         if os.path.exists(os.path.join(os.getcwd(), "2222222")):
             shutil.rmtree(os.path.join(os.getcwd(), "2222222"))
-        os.remove(os.path.join(c.script_output, "seeds.csv"))
+        os.remove(os.path.join(c.script_output, "seeds_log.csv"))
 
     def test_reset_aip(self):
         """
         Tests that the function correctly deletes the seed folder, updates seeds_df,
-        and updates seeds.csv.
+        and updates seeds_log.csv.
         """
         reset_aip("2222222", self.seed_df)
 
@@ -73,7 +73,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(actual_dataframe, expected_dataframe, "Problem with test for dataframe values")
 
         # Test that the CSV has the correct values.
-        csv_path = os.path.join(c.script_output, "seeds.csv")
+        csv_path = os.path.join(c.script_output, "seeds_log.csv")
         with open(csv_path, newline="") as open_file:
             reader = csv.reader(open_file)
             actual_csv = list(reader)
