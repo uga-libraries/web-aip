@@ -34,6 +34,26 @@ class MyTestCase(unittest.TestCase):
         expected_md5 = "60d789913d1f4dfb7e8c0c67a6a57505"
         self.assertEqual(warc_md5, expected_md5, "Problem with test for BMA, MD5")
 
+    def test_error(self):
+        """
+        Tests that the function raises an IndexError and updates the log for a WARC that is not in Archive-It
+        """
+        # Makes the data needed for the function input.
+        seed_df = pd.DataFrame([[2173769, 12912, "362980", 0.01, 1, "ARCHIVEIT-ERROR-SEED2173769.warc.gz",
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+
+        # Test for raising the error.
+        with self.assertRaises(IndexError):
+            get_warc_info(seed_df["WARC_Filenames"][0], seed_df, 0)
+
+        # Test for the log.
+        actual = seed_df.at[0, 'WARC_API_Errors']
+        expected = "Index Error: cannot get the WARC URL or MD5 for ARCHIVEIT-ERROR-SEED2173769.warc.gz"
+        self.assertEqual(actual, expected, "Problem with error, log")
+
     def test_hargrett(self):
         """
         Tests that the function returns the expected values for a Hargrett WARC.
