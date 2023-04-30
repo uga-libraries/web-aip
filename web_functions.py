@@ -439,7 +439,7 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
         the AIP id, warc count, and url. """
 
         # Downloads the entire WARC list.
-        filters = {'page_size': 1000}
+        filters = {'page_size': 10000}
         warcs = requests.get(c.wasapi, params=filters, auth=(c.username, c.password))
 
         # If there was an API error, ends the function.
