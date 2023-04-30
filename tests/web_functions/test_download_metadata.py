@@ -30,10 +30,10 @@ class MyTestCase(unittest.TestCase):
         """
         # Makes the data needed for the function input and runs the function.
         seed_df = pd.DataFrame([[2187482, 12181, "1177700", 3.62, 3, "name0.warc.gz;name1.warc.gz;name2.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                                        "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors",
-                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2187482")
         download_metadata(seed, seed_df)
@@ -56,9 +56,9 @@ class MyTestCase(unittest.TestCase):
         expected_errors = "Successfully downloaded all metadata reports"
         self.assertEqual(actual_errors, expected_errors, "Problem with test for Hargrett, log errors")
 
-        # Test that the log has the correct information for additional metadata information.
-        actual_info = seed_df["Metadata_Report_Info"][0]
-        expected_info = "No additional information"
+        # Test that the log has the correct information for empty reports.
+        actual_info = seed_df["Metadata_Report_Empty"][0]
+        expected_info = "No empty reports"
         self.assertEqual(actual_info, expected_info, "Problem with test for Hargrett, log info")
 
     def test_magil(self):
@@ -68,10 +68,10 @@ class MyTestCase(unittest.TestCase):
         """
         # Makes the data needed for the function input and runs the function.
         seed_df = pd.DataFrame([[2529685, 15678, "1594228", 0.36, 1, "name.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                                        "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors",
-                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2529685")
         download_metadata(seed, seed_df)
@@ -92,10 +92,9 @@ class MyTestCase(unittest.TestCase):
         expected_errors = "Successfully downloaded all metadata reports"
         self.assertEqual(actual_errors, expected_errors, "Problem with test for MAGIL, log errors")
 
-        # Test that the log has the correct information for additional metadata information.
-        actual_info = seed_df["Metadata_Report_Info"][0]
-        expected_info = "Empty report 2529685_seedscope.csv not saved; " \
-                        "Empty report 2529685_collscope.csv not saved"
+        # Test that the log has the correct information for empty reports.
+        actual_info = seed_df["Metadata_Report_Empty"][0]
+        expected_info = "2529685_seedscope.csv; 2529685_collscope.csv"
         self.assertEqual(actual_info, expected_info, "Problem with test for MAGIL, log info")
 
     def test_russell(self):
@@ -105,10 +104,11 @@ class MyTestCase(unittest.TestCase):
         """
         # Makes the data needed for the function input and runs the function.
         seed_df = pd.DataFrame([[2547528, 12265, "1436714;1718490", 0.72, 3,
-                                 "name0.warc.gz;name1.warc.gz;name2.warc.gz", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 "name0.warc.gz;name1.warc.gz;name2.warc.gz",
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                                        "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors",
-                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2547528")
         download_metadata(seed, seed_df)
@@ -133,9 +133,9 @@ class MyTestCase(unittest.TestCase):
         expected_errors = "Successfully downloaded all metadata reports"
         self.assertEqual(actual_errors, expected_errors, "Problem with test for Russell, log errors")
 
-        # Test that the log has the correct information for additional metadata information.
-        actual_info = seed_df["Metadata_Report_Info"][0]
-        expected_info = "No additional information"
+        # Test that the log has the correct information for empty reports.
+        actual_info = seed_df["Metadata_Report_Empty"][0]
+        expected_info = "No empty reports"
         self.assertEqual(actual_info, expected_info, "Problem with test for Russell, log info")
 
 

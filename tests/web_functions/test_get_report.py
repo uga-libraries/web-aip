@@ -40,10 +40,11 @@ class MyTestCase(unittest.TestCase):
         """
         self.seed_df = pd.DataFrame([["2027707", 12265, "943048", 0.01, 1,
                                       "ARCHIVEIT-12265-TEST-JOB943048-SEED2027707-20190709144234143-00000-h3.warc.gz",
-                                      np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                      np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                     columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
-                                             "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Info",
-                                             "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                             "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
+                                             "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                             "WARC_Unzip_Errors"])
         for seed in self.seed_df.itertuples():
             self.seed = seed
             os.mkdir("2027707")
@@ -60,7 +61,7 @@ class MyTestCase(unittest.TestCase):
         The error is caused by giving it improperly formatted collection number.
         """
         get_report(self.seed, self.seed_df, 0, "collection", "abc-coll", "scope_rule", "2783596_collscope.csv")
-        actual_error = self.seed_df["Metadata_Report_Errors"][0]
+        actual_error = self.seed_df['Metadata_Report_Errors'][0]
         expected_error = "2783596_collscope.csv API Error 500"
         self.assertEqual(actual_error, expected_error, "Problem with test for API error")
 
@@ -112,7 +113,6 @@ class MyTestCase(unittest.TestCase):
         Tests that the function does not download an empty collection scope report.
         This is one of two reports (the other is seed scope) that does not always have data.
         """
-        csv_name = "2783596_collscope.csv"
         get_report(self.seed, self.seed_df, 0, "collection", "15678", "scope_rule", "2783596_collscope.csv")
 
         # Test that the file was not made.
@@ -120,8 +120,8 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(csv_path_exists, False, "Problem with test for collection scope is empty, is file made")
 
         # Test that the log information in seed_df was updated.
-        actual_info = self.seed_df["Metadata_Report_Info"][0]
-        expected_info = "Empty report 2783596_collscope.csv not saved"
+        actual_info = self.seed_df['Metadata_Report_Empty'][0]
+        expected_info = "2783596_collscope.csv"
         self.assertEqual(actual_info, expected_info, "Problem with test for seed scope is empty, log")
 
     def test_crawl_definition(self):
@@ -212,8 +212,8 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(csv_path_exists, False, "Problem with test for seed scope is empty, is file made")
 
         # Test that the log information in seed_df was updated.
-        actual_info = self.seed_df["Metadata_Report_Info"][0]
-        expected_info = "Empty report 2783596_seedscope.csv not saved"
+        actual_info = self.seed_df['Metadata_Report_Empty'][0]
+        expected_info = "2783596_seedscope.csv"
         self.assertEqual(actual_info, expected_info, "Problem with test for seed scope is empty, log")
 
 

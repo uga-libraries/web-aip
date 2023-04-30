@@ -22,18 +22,18 @@ class MyTestCase(unittest.TestCase):
         and makes the AIP folder the current working directory so that the unzipped WARC saves to the right place.
         """
         columns = ["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                   "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors",
-                   "WARC_Fixity_Errors", "WARC_Unzip_Errors"]
+                   "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                   "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"]
         error = [2018086, 12264, "921631", 0.01, 2,
                  "error.warc.gz;ARCHIVEIT-12264-TEST-JOB921631-SEED2018086-20190607140142542-00000-h3.warc.gz",
-                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
         harg = [2173769, 12912, "1415330", 0.01, 1,
                 "ARCHIVEIT-12912-WEEKLY-JOB1415330-SEED2173769-20210519233828683-00001-h3.warc.gz",
-                np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+                np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
         rbrl = [2485678, 12265, "718490", 0.02, 2,
                 "ARCHIVEIT-12265-MONTHLY-JOB1718490-SEED2485678-20221203180441653-00001-h3.warc.gz;"
                 "ARCHIVEIT-12265-MONTHLY-JOB1718490-SEED2485678-20221202160754903-00000-h3.warc.gz",
-                np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+                np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
         self.seed_df = pd.DataFrame([error, harg, rbrl], columns=columns)
 
         self.aip_dir = os.path.join(c.script_output, "aips_2000-01")

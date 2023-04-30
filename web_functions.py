@@ -129,8 +129,8 @@ def seed_data(date_start, date_end):
     seed_df = seed_df.reset_index()
 
     # Adds columns for logging the workflow steps.
-    log_columns = ["Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors", "WARC_Fixity_Errors",
-                   "WARC_Unzip_Errors"]
+    log_columns = ["Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_API_Errors",
+                   "WARC_Fixity_Errors", "WARC_Unzip_Errors"]
     seed_df = seed_df.reindex(columns=seed_df.columns.tolist() + log_columns)
 
     # Saves the dataframe as a CSV in the script output folder for splitting or restarting a batch.
@@ -164,7 +164,8 @@ def reset_aip(seed_id, df):
     # from the failed attempt.
     row_index = df.index[df['Seed_ID'] == seed_id].tolist()[0]
     df.loc[row_index, 'Metadata_Report_Errors'] = None
-    df.loc[row_index, 'Metadata_Report_Info'] = None
+    df.loc[row_index, 'Metadata_Report_Empty'] = None
+    df.loc[row_index, 'Seed_Report_Redaction'] = None
     df.loc[row_index, 'WARC_API_Errors'] = None
     df.loc[row_index, 'WARC_Fixity_Errors'] = None
     df.loc[row_index, 'WARC_Unzip_Errors'] = None
@@ -195,7 +196,7 @@ def get_report(seed, seed_df, row_index, filter_type, filter_value, report_type,
     # For scope rules, it is common for one or both to not have data since these aren't required.
     if metadata_report.status_code == 200:
         if metadata_report.content == b"":
-            log(f"Empty report {report_name} not saved", seed_df, row_index, "Metadata_Report_Info")
+            log(report_name, seed_df, row_index, "Metadata_Report_Empty")
             return
         else:
             with open(f"{seed.Seed_ID}/{report_name}", "wb") as report_csv:
@@ -218,8 +219,9 @@ def redact_seed_report(seed_id, seed_df, row_index):
         report_df["login_username"] = "REDACTED"
         report_df["login_password"] = "REDACTED"
         report_df.to_csv(f"{seed_id}/{seed_id}_seed.csv", index=False)
+        log("Successfully redacted", seed_df, row_index, "Seed_Report_Redaction")
     else:
-        log("Seed report does not have login columns to redact", seed_df, row_index, "Metadata_Report_Info")
+        log("No login columns to redact", seed_df, row_index, "Seed_Report_Redaction")
 
 
 def download_job_and_definition(seed, seed_df, row_index):
@@ -278,10 +280,9 @@ def download_metadata(seed, seed_df):
         seed_df.loc[row_index, "Metadata_Report_Errors"] = "Successfully downloaded all metadata reports"
         seed_df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
 
-    # If there is nothing in the report info field, updates the log with default text.
-    # Can't assume that blank means success because it could mean API errors.
-    if pd.isnull(seed_df.at[row_index, "Metadata_Report_Info"]):
-        seed_df.loc[row_index, "Metadata_Report_Info"] = "No additional information"
+    # If there were no deleted empty reports (the dataframe still has not value in that cell), updates the log.
+    if pd.isnull(seed_df.at[row_index, "Metadata_Report_Empty"]):
+        seed_df.loc[row_index, "Metadata_Report_Empty"] = "No empty reports"
         seed_df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
 
 

@@ -18,15 +18,12 @@ class MyTestCase(unittest.TestCase):
         Tests that the function returns the expected values for a BMA WARC.
         """
         # Makes the data needed for the function input and runs the function.
-        seed_df = pd.DataFrame([[2028986, "bma-web-0001", "Title", "BMA", "0000", 12470, "1085452", 1,
+        seed_df = pd.DataFrame([[2028986, 12470, "1085452", 0.01, 1,
                                  "ARCHIVEIT-12470-TEST-JOB1085452-SEED2028986-20200129213514425-00000-h3.warc.gz",
-                                 "Successfully calculated seed metadata",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, 0.01]],
-                               columns=["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection",
-                                        "AIT_Collection", "Job_ID", "WARCs", "WARC_Filenames",
-                                        "Seed_Metadata_Errors", "Metadata_Report_Errors",
-                                        "Metadata_Report_Info", "WARC_API_Errors",
-                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"])
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
         warc_url, warc_md5 = get_warc_info(seed_df["WARC_Filenames"][0], seed_df, 0)
 
         # Test for the URL.
@@ -42,15 +39,12 @@ class MyTestCase(unittest.TestCase):
         Tests that the function returns the expected values for a Hargrett WARC.
         """
         # Makes the data needed for the function input and runs the function.
-        seed_df = pd.DataFrame([[2173769, "harg-web-0001", "Title", "Hargrett", "0000", 12912, "362980", 1,
+        seed_df = pd.DataFrame([[2173769, 12912, "362980", 0.01, 1,
                                  "ARCHIVEIT-12912-WEEKLY-JOB1362980-SEED2173769-20210210221704177-00000-h3.warc.gz",
-                                 "Successfully calculated seed metadata",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, 0.01]],
-                               columns=["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection",
-                                        "AIT_Collection", "Job_ID", "WARCs", "WARC_Filenames",
-                                        "Seed_Metadata_Errors", "Metadata_Report_Errors",
-                                        "Metadata_Report_Info", "WARC_API_Errors",
-                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"])
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
         warc_url, warc_md5 = get_warc_info(seed_df["WARC_Filenames"][0], seed_df, 0)
 
         # Test for the URL.
@@ -66,15 +60,12 @@ class MyTestCase(unittest.TestCase):
         Tests that the function returns the expected values for a MAGIL WARC.
         """
         # Makes the data needed for the function input and runs the function.
-        seed_df = pd.DataFrame([[2529646, "magil-web-0001", "Title", "MAGIL", "0000", 15678, "1585231", 1,
+        seed_df = pd.DataFrame([[2529646, 15678, "1585231", 0.01, 1,
                                  "ARCHIVEIT-15678-TEST-JOB1585231-SEED2529646-20220406065532448-00002-h3.warc.gz",
-                                 "Successfully calculated seed metadata",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, 0.01]],
-                               columns=["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection",
-                                        "AIT_Collection", "Job_ID", "WARCs", "WARC_Filenames",
-                                        "Seed_Metadata_Errors", "Metadata_Report_Errors",
-                                        "Metadata_Report_Info", "WARC_API_Errors",
-                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"])
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
         warc_url, warc_md5 = get_warc_info(seed_df["WARC_Filenames"][0], seed_df, 0)
 
         # Test for the URL.
@@ -90,15 +81,12 @@ class MyTestCase(unittest.TestCase):
         Tests that the function returns the expected values for a Russell WARC.
         """
         # Makes the data needed for the function input and runs the function.
-        seed_df = pd.DataFrame([[2027713, "rbrl-web-0001", "Title", "Russell", "0000", 12264, "943066", 1,
+        seed_df = pd.DataFrame([[2027713, 12264, "943066", 0.01, 1,
                                  "ARCHIVEIT-12264-TEST-JOB943066-SEED2027713-20190709150720209-00000-h3.warc.gz",
-                                 "Successfully calculated seed metadata",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, 0.01]],
-                               columns=["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection",
-                                        "AIT_Collection", "Job_ID", "WARCs", "WARC_Filenames",
-                                        "Seed_Metadata_Errors", "Metadata_Report_Errors",
-                                        "Metadata_Report_Info", "WARC_API_Errors",
-                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"])
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
         warc_url, warc_md5 = get_warc_info(seed_df["WARC_Filenames"][0], seed_df, 0)
 
         # Test for the URL.

@@ -37,10 +37,10 @@ class MyTestCase(unittest.TestCase):
         warc = "ARCHIVEIT-12912-WEEKLY-JOB1215043-SEED2173769-20200625025209518-00000-h3.warc.gz"
         warc_path = os.path.join(aip_dir, "2173769", warc)
         seed_df = pd.DataFrame([[2173769, 12912, "1215043", 0.01, 1, warc,
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                                        "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors",
-                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
         get_warc(seed_df, 0, f"https://warcs.archive-it.org/webdatafile/{warc}", warc, warc_path)
         unzip_warc(seed_df, 0, warc_path, warc, "2173769", "2010-12")
 
@@ -70,10 +70,10 @@ class MyTestCase(unittest.TestCase):
         warc = "ARCHIVEIT-ERROR.warc.gz"
         warc_path = os.path.join(aip_dir, "0000000", warc)
         seed_df = pd.DataFrame([[0000000, 00000, "0000000", 0.01, 1, warc,
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                                        "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors",
-                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
         unzip_warc(seed_df, 0, warc_path, warc, "0000000", "2010-12")
 
         # Test the log is updated correctly.
@@ -94,10 +94,10 @@ class MyTestCase(unittest.TestCase):
         warc = "ARCHIVEIT-12263-TEST-JOB1695540-0-SEED2912235-20221021155449526-00000-upoygm6a.warc.gz"
         warc_path = os.path.join(aip_dir, "2912235", warc)
         seed_df = pd.DataFrame([[2912235, 12263, "1695540", 0.01, 1, warc,
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                                        "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors",
-                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
         get_warc(seed_df, 0, f"https://warcs.archive-it.org/webdatafile/{warc}", warc, warc_path)
         unzip_warc(seed_df, 0, warc_path, warc, "2912235", "2010-12")
 

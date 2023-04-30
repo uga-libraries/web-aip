@@ -19,11 +19,8 @@ class MyTestCase(unittest.TestCase):
         """
         Deletes the seed directory and contents, if any, produced by the tests.
         """
-        if os.path.exists(os.path.join(os.getcwd(), "correct-aip")):
-            shutil.rmtree(os.path.join(os.getcwd(), "correct-aip"))
-
-        if os.path.exists(os.path.join(os.getcwd(), "error-aip")):
-            shutil.rmtree(os.path.join(os.getcwd(), "error-aip"))
+        if os.path.exists(os.path.join(os.getcwd(), "2529656")):
+            shutil.rmtree(os.path.join(os.getcwd(), "2529656"))
 
     def test_correct(self):
         """
@@ -32,19 +29,16 @@ class MyTestCase(unittest.TestCase):
         """
         # Makes the data needed for the function input and runs the function.
         warc = "ARCHIVEIT-15678-TEST-JOB1594318-0-SEED2529656-20220420025307556-00000-k3n6tj0y.warc.gz"
-        seed_df = pd.DataFrame([[2529656, "correct-aip", "Title", "MAGIL", "0000", 15678, "1594318", 1,
-                                 warc, "Successfully calculated seed metadata",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, 0.01]],
-                               columns=["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection",
-                                        "AIT_Collection", "Job_ID", "WARCs", "WARC_Filenames",
-                                        "Seed_Metadata_Errors", "Metadata_Report_Errors",
-                                        "Metadata_Report_Info", "WARC_API_Errors",
-                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"])
-        os.mkdir("correct-aip")
-        get_warc(seed_df, 0, f"https://warcs.archive-it.org/webdatafile/{warc}", warc, f"correct-aip/{warc}")
+        seed_df = pd.DataFrame([[2529656, 15678, "1594318", 0.01, 1, warc,
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+        os.mkdir("2529656")
+        get_warc(seed_df, 0, f"https://warcs.archive-it.org/webdatafile/{warc}", warc, f"2529656/{warc}")
 
         # Test the WARC was downloaded.
-        warc_downloaded = os.path.exists(os.path.join(os.getcwd(), "correct-aip", warc))
+        warc_downloaded = os.path.exists(os.path.join(os.getcwd(), "2529656", warc))
         self.assertEqual(warc_downloaded, True, "Problem with test for correct, WARC download")
 
         # Test the log is updated correctly.
@@ -59,21 +53,18 @@ class MyTestCase(unittest.TestCase):
         """
         # Makes the data needed for the function input and runs the function.
         warc = "ARCHIVEIT-error.warc.gz"
-        seed_df = pd.DataFrame([[2529656, "error-aip", "Title", "MAGIL", "0000", 15678, "1594318", 1,
-                                 warc, "Successfully calculated seed metadata",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, 0.01]],
-                               columns=["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection",
-                                        "AIT_Collection", "Job_ID", "WARCs", "WARC_Filenames",
-                                        "Seed_Metadata_Errors", "Metadata_Report_Errors",
-                                        "Metadata_Report_Info", "WARC_API_Errors",
-                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"])
-        os.mkdir("error-aip")
+        seed_df = pd.DataFrame([[2529656, 15678, "1594318", 0.01, 1, warc,
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+        os.mkdir("2529656")
 
         with self.assertRaises(ValueError):
             get_warc(seed_df, 0, f"https://warcs.archive-it.org/webdatafile/{warc}", warc, f"error-aip/{warc}")
 
         # Test the WARC was not downloaded.
-        warc_downloaded = os.path.exists(os.path.join(os.getcwd(), "error-aip", warc))
+        warc_downloaded = os.path.exists(os.path.join(os.getcwd(), "2529656", warc))
         self.assertEqual(warc_downloaded, False, "Problem with test for error, WARC download")
 
         # Test the log is updated correctly.

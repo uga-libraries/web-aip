@@ -36,24 +36,19 @@ class MyTestCase(unittest.TestCase):
         subprocess.run(f"python {script_path} 2020-04-30 2020-05-15", shell=True)
 
         # Test for seeds_log.csv
-        # Removes seed info about login columns and time stamps, which are not consistent for each test.
+        # Changes column with time stamps to allow comparison to consistent expected values.
         seeds_df = pd.read_csv(os.path.join(c.script_output, "seeds_log.csv"))
-        info = "Empty report 2173769_seedscope.csv not saved"
-        seeds_df.loc[seeds_df["Metadata_Report_Info"].str.startswith(info), "Metadata_Report_Info"] = info
-        seeds_df.loc[seeds_df["Metadata_Report_Info"] == "Seed report does not have login columns to redact",
-                     "Metadata_Report_Info"] = "No additional information"
         seeds_df["WARC_Fixity_Errors"] = seeds_df["WARC_Fixity_Errors"].str.count("Successfully")
         expected_seeds = [seeds_df.columns.tolist()] + seeds_df.values.tolist()
 
         actual_seeds = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                         "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors", "WARC_Fixity_Errors",
-                         "WARC_Unzip_Errors"],
+                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                         "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"],
                         [2173769, 12912, "1154002;1148757;1143415", 0.007, 3,
                          "ARCHIVEIT-12912-WEEKLY-JOB1154002-SEED2173769-20200513225747964-00000-h3.warc.gz;"
                          "ARCHIVEIT-12912-WEEKLY-JOB1148757-SEED2173769-20200506223640988-00000-h3.warc.gz;"
                          "ARCHIVEIT-12912-WEEKLY-JOB1143415-SEED2173769-20200430010118013-00000-h3.warc.gz",
-                         "Successfully downloaded all metadata reports",
-                         "Empty report 2173769_seedscope.csv not saved",
+                         "Successfully downloaded all metadata reports", "2173769_seedscope.csv", "Successfully redacted",
                          "Successfully downloaded ARCHIVEIT-12912-WEEKLY-JOB1154002-SEED2173769-20200513225747964-00000-h3.warc.gz; "
                          "Successfully downloaded ARCHIVEIT-12912-WEEKLY-JOB1148757-SEED2173769-20200506223640988-00000-h3.warc.gz; "
                          "Successfully downloaded ARCHIVEIT-12912-WEEKLY-JOB1143415-SEED2173769-20200430010118013-00000-h3.warc.gz",
@@ -82,29 +77,24 @@ class MyTestCase(unittest.TestCase):
         subprocess.run(f"python {script_path} 2019-07-12 2019-07-13", shell=True)
 
         # Test for seeds_log.csv
-        # Removes seed info about login columns and time stamps, which are not consistent for each test.
+        # Changes column with time stamps to allow comparison to consistent expected values.
         seeds_df = pd.read_csv(os.path.join(c.script_output, "seeds_log.csv"))
-        info = "Empty report 2027776_seedscope.csv not saved"
-        seeds_df.loc[seeds_df["Metadata_Report_Info"].str.startswith(info), "Metadata_Report_Info"] = info
-        seeds_df.loc[seeds_df["Metadata_Report_Info"] == "Seed report does not have login columns to redact",
-                     "Metadata_Report_Info"] = "No additional information"
         fixity = "Successfully verified ARCHIVEIT"
         seeds_df.loc[seeds_df["WARC_Fixity_Errors"].str.startswith(fixity), "WARC_Fixity_Errors"] = fixity
         expected_seeds = [seeds_df.columns.tolist()] + seeds_df.values.tolist()
 
         actual_seeds = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                         "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors", "WARC_Fixity_Errors",
-                         "WARC_Unzip_Errors"],
+                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                         "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"],
                         [2027707, 12265, 943048, 0.007, 1,
                          "ARCHIVEIT-12265-TEST-JOB943048-SEED2027707-20190709144234143-00000-h3.warc.gz",
-                         "Successfully downloaded all metadata reports", "No additional information",
+                         "Successfully downloaded all metadata reports", "No empty reports", "Successfully redacted",
                          "Successfully downloaded ARCHIVEIT-12265-TEST-JOB943048-SEED2027707-20190709144234143-00000-h3.warc.gz",
                          "Successfully verified ARCHIVEIT",
                          "Successfully unzipped ARCHIVEIT-12265-TEST-JOB943048-SEED2027707-20190709144234143-00000-h3.warc.gz"],
                         [2027776, 12264, 943446, 0.096, 1,
                          "ARCHIVEIT-12264-TEST-JOB943446-SEED2027776-20190710131748634-00000-h3.warc.gz",
-                         "Successfully downloaded all metadata reports",
-                         "Empty report 2027776_seedscope.csv not saved",
+                         "Successfully downloaded all metadata reports", "2027776_seedscope.csv", "Successfully redacted",
                          "Successfully downloaded ARCHIVEIT-12264-TEST-JOB943446-SEED2027776-20190710131748634-00000-h3.warc.gz",
                          "Successfully verified ARCHIVEIT",
                          "Successfully unzipped ARCHIVEIT-12264-TEST-JOB943446-SEED2027776-20190710131748634-00000-h3.warc.gz"]]
@@ -121,6 +111,7 @@ class MyTestCase(unittest.TestCase):
         #              ["rbrl-498-web-201907-0001", "https://openrecords.podbean.com/",
         #               True, True, True, True, True, 1, 1, True, True]]
         # self.assertEqual(expected_cc, actual_cc, "Problem with test for one WARC seeds, completeness_check.csv")
+
 
 if __name__ == '__main__':
     unittest.main()
