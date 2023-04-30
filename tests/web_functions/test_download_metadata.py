@@ -19,7 +19,7 @@ class MyTestCase(unittest.TestCase):
         """
         Deletes the seed folders and any contents from the tests.
         """
-        for seed_folder in ("error-000-web-0001", "harg-000-web-0001", "magil-000-web-0001", "rbrl-000-web-0001"):
+        for seed_folder in ("2187482", "2529685", "2547528"):
             if os.path.exists(seed_folder):
                 shutil.rmtree(os.path.join(os.getcwd(), seed_folder))
 
@@ -29,29 +29,26 @@ class MyTestCase(unittest.TestCase):
         for a Hargrett seed with one each of all six of the report types.
         """
         # Makes the data needed for the function input and runs the function.
-        seed_df = pd.DataFrame([[2187482, "harg-000-web-0001", "Student Government Association Facebook",
-                                 "Hargrett Rare Book & Manuscript Library", "0000", 12181, "1177700", 3,
-                                 "name0.warc.gz,name1.warc.gz,name2.warc.gz", "Successfully calculated seed metadata",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, 3.62]],
-                               columns=["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection",
-                                        "AIT_Collection", "Job_ID", "WARCs", "WARC_Filenames", "Seed_Metadata_Errors",
+        seed_df = pd.DataFrame([[2187482, 12181, "1177700", 3.62, 3, "name0.warc.gz;name1.warc.gz;name2.warc.gz",
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                         "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors",
-                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"])
+                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
         seed = [seed for seed in seed_df.itertuples()][0]
-        os.mkdir("harg-000-web-0001")
+        os.mkdir("2187482")
         download_metadata(seed, seed_df)
 
         # Test that the correct metadata reports were downloaded.
         actual = []
-        for filename in os.listdir("harg-000-web-0001"):
+        for filename in os.listdir("2187482"):
             actual.append(filename)
         actual.sort()
-        expected = ["harg-000-web-0001_1177700_crawljob.csv",
-                    "harg-000-web-0001_31104333391_crawldef.csv",
-                    "harg-000-web-0001_coll.csv",
-                    "harg-000-web-0001_collscope.csv",
-                    "harg-000-web-0001_seed.csv",
-                    "harg-000-web-0001_seedscope.csv"]
+        expected = ["2187482_1177700_crawljob.csv",
+                    "2187482_31104333391_crawldef.csv",
+                    "2187482_coll.csv",
+                    "2187482_collscope.csv",
+                    "2187482_seed.csv",
+                    "2187482_seedscope.csv"]
         self.assertEqual(actual, expected, "Problem with test for Hargrett, downloaded files")
 
         # Test that the log has the correct information for metadata errors.
@@ -70,27 +67,24 @@ class MyTestCase(unittest.TestCase):
         for a MAGIL seed with one each of the four report types which always have data.
         """
         # Makes the data needed for the function input and runs the function.
-        seed_df = pd.DataFrame([[2529685, "magil-000-web-0001", "Teachers Retirement System of Georgia",
-                                 "Map and Government Information Library", "0000", 15678, "1594228", 1,
-                                 "name.warc.gz", "Successfully calculated seed metadata",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, 0.36]],
-                               columns=["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection",
-                                        "AIT_Collection", "Job_ID", "WARCs", "WARC_Filenames", "Seed_Metadata_Errors",
+        seed_df = pd.DataFrame([[2529685, 15678, "1594228", 0.36, 1, "name.warc.gz",
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                         "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors",
-                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"])
+                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
         seed = [seed for seed in seed_df.itertuples()][0]
-        os.mkdir("magil-000-web-0001")
+        os.mkdir("2529685")
         download_metadata(seed, seed_df)
 
         # Test that the correct metadata reports were downloaded.
         actual = []
-        for filename in os.listdir("magil-000-web-0001"):
+        for filename in os.listdir("2529685"):
             actual.append(filename)
         actual.sort()
-        expected = ["magil-000-web-0001_1594228_crawljob.csv",
-                    "magil-000-web-0001_31104546937_crawldef.csv",
-                    "magil-000-web-0001_coll.csv",
-                    "magil-000-web-0001_seed.csv"]
+        expected = ["2529685_1594228_crawljob.csv",
+                    "2529685_31104546937_crawldef.csv",
+                    "2529685_coll.csv",
+                    "2529685_seed.csv"]
         self.assertEqual(actual, expected, "Problem with test for MAGIL, downloaded files")
 
         # Test that the log has the correct information for metadata errors.
@@ -100,8 +94,8 @@ class MyTestCase(unittest.TestCase):
 
         # Test that the log has the correct information for additional metadata information.
         actual_info = seed_df["Metadata_Report_Info"][0]
-        expected_info = "Empty report magil-000-web-0001_seedscope.csv not saved; " \
-                        "Empty report magil-000-web-0001_collscope.csv not saved"
+        expected_info = "Empty report 2529685_seedscope.csv not saved; " \
+                        "Empty report 2529685_collscope.csv not saved"
         self.assertEqual(actual_info, expected_info, "Problem with test for MAGIL, log info")
 
     def test_russell(self):
@@ -110,31 +104,28 @@ class MyTestCase(unittest.TestCase):
         for a Russell two each of the scope report types and one each of the other four report types.
         """
         # Makes the data needed for the function input and runs the function.
-        seed_df = pd.DataFrame([[2547528, "rbrl-000-web-0001", "Latina South Podcast - Posts | Facebook",
-                                 "Map and Government Information Library", "0000", 12265, "1436714,1718490", 3,
-                                 "name0.warc.gz,name1.warc.gz,name2.warc.gz", "Successfully calculated seed metadata",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, 0.72]],
-                               columns=["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection",
-                                        "AIT_Collection", "Job_ID", "WARCs", "WARC_Filenames", "Seed_Metadata_Errors",
+        seed_df = pd.DataFrame([[2547528, 12265, "1436714;1718490", 0.72, 3,
+                                 "name0.warc.gz;name1.warc.gz;name2.warc.gz", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                         "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors",
-                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"])
+                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
         seed = [seed for seed in seed_df.itertuples()][0]
-        os.mkdir("rbrl-000-web-0001")
+        os.mkdir("2547528")
         download_metadata(seed, seed_df)
 
         # Test that the correct metadata reports were downloaded.
         actual = []
-        for filename in os.listdir("rbrl-000-web-0001"):
+        for filename in os.listdir("2547528"):
             actual.append(filename)
         actual.sort()
-        expected = ["rbrl-000-web-0001_1436714_crawljob.csv",
-                    "rbrl-000-web-0001_1718490_crawljob.csv",
-                    "rbrl-000-web-0001_31104392189_crawldef.csv",
-                    "rbrl-000-web-0001_31104463393_crawldef.csv",
-                    "rbrl-000-web-0001_coll.csv",
-                    "rbrl-000-web-0001_collscope.csv",
-                    "rbrl-000-web-0001_seed.csv",
-                    "rbrl-000-web-0001_seedscope.csv"]
+        expected = ["2547528_1436714_crawljob.csv",
+                    "2547528_1718490_crawljob.csv",
+                    "2547528_31104392189_crawldef.csv",
+                    "2547528_31104463393_crawldef.csv",
+                    "2547528_coll.csv",
+                    "2547528_collscope.csv",
+                    "2547528_seed.csv",
+                    "2547528_seedscope.csv"]
         self.assertEqual(actual, expected, "Problem with test for RussellL, downloaded files")
 
         # Test that the log has the correct information for metadata errors.

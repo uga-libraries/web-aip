@@ -29,14 +29,13 @@ class MyTestCase(unittest.TestCase):
         # Test that the dataframe has the correct values.
         seed_df = seed_df.fillna("BLANK")
         actual = [seed_df.columns.tolist()] + seed_df.values.tolist()
-        expected = [["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection", "AIT_Collection", "Job_ID",
-                     "WARCs", "WARC_Filenames", "Seed_Metadata_Errors", "Metadata_Report_Errors",
-                     "Metadata_Report_Info", "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"],
-                    ["2016223", "BLANK", "Testing", "BLANK", "BLANK", 12249, "918473,918474", 2,
-                     "ARCHIVEIT-12249-ONE_TIME-JOB918473-SEED2016223-20190603193416006-00000-h3.warc.gz,"
+        expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                     "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors", "WARC_Fixity_Errors",
+                     "WARC_Unzip_Errors"],
+                    ["2016223", "12249", "918473;918474", 0.001, 2,
+                     "ARCHIVEIT-12249-ONE_TIME-JOB918473-SEED2016223-20190603193416006-00000-h3.warc.gz;"
                      "ARCHIVEIT-12249-ONE_TIME-JOB918474-SEED2016223-20190603193421515-00000-h3.warc.gz",
-                     "Couldn't get all required metadata values from the seed report. Will not download files.",
-                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 0.0]]
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]]
         self.assertEqual(actual, expected, "Problem with test for error no metadata, dataframe values")
 
         # Test that the CSV was created.
@@ -53,28 +52,24 @@ class MyTestCase(unittest.TestCase):
         # Test that the dataframe has the correct values.
         seed_df = seed_df.fillna("BLANK")
         actual = [seed_df.columns.tolist()] + seed_df.values.tolist()
-        expected = [["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection", "AIT_Collection", "Job_ID",
-                     "WARCs", "WARC_Filenames", "Seed_Metadata_Errors", "Metadata_Report_Errors",
-                     "Metadata_Report_Info", "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"],
-                    ["2187482", "harg-0000-web-202006-0001", "Student Government Association Facebook",
-                     "hargrett", "0000", 12181, "1177700", 4,
-                     "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601191649570-00000-h3.warc.gz,"
-                     "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601195532797-00002-h3.warc.gz,"
-                     "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601194617707-00001-h3.warc.gz,"
-                     "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601200733748-00003-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 3.62],
-                    ["2030942", "harg-0000-web-202006-0002", "UGA NAACP Twitter",
-                     "hargrett", "0000", 12181, "1177700", 1,
+        expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                     "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors", "WARC_Fixity_Errors",
+                     "WARC_Unzip_Errors"],
+                    ["2030942", "12181", "1177700", 0.053, 1,
                      "ARCHIVEIT-12181-TEST-JOB1177700-SEED2030942-20200601191649636-00000-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 0.05],
-                    ["2084785", "harg-0000-web-202006-0003", "Zeta Pi Chapter of Alpha Phi Alpha Twitter",
-                     "hargrett", "0000", 12181, "1177700", 1,
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                    ["2084785", "12181", "1177700", 0.106, 1,
                      "ARCHIVEIT-12181-TEST-JOB1177700-SEED2084785-20200601191752355-00000-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 0.11],
-                    ["2270486", "harg-0000-web-202006-0004", "UGA Commencement",
-                     "hargrett", "0000", 12912, "1176433", 1,
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                    ["2187482", "12181", "1177700", 3.624, 4,
+                     "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601191649570-00000-h3.warc.gz;"
+                     "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601195532797-00002-h3.warc.gz;"
+                     "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601194617707-00001-h3.warc.gz;"
+                     "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601200733748-00003-h3.warc.gz",
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                    ["2270486", "12912", "1176433", 0.06, 1,
                      "ARCHIVEIT-12912-TEST-JOB1176433-SEED2270486-20200529202848582-00000-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 0.06]]
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]]
         self.assertEqual(actual, expected, "Problem with test for Hargrett, dataframe values")
 
         # Test that the CSV was created.
@@ -91,48 +86,37 @@ class MyTestCase(unittest.TestCase):
         # Test that the dataframe has the correct values.
         seed_df = seed_df.fillna("BLANK")
         actual = [seed_df.columns.tolist()] + seed_df.values.tolist()
-        expected = [["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection", "AIT_Collection", "Job_ID",
-                     "WARCs", "WARC_Filenames", "Seed_Metadata_Errors", "Metadata_Report_Errors",
-                     "Metadata_Report_Info", "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"],
-                    ["2527198", "magil-ggp-2527198-2022-10", "Georgia Technology Authority",
-                     "magil", "0000", 15678, "1691033", 1,
-                     "ARCHIVEIT-15678-TEST-JOB1691033-SEED2527198-20221014143741584-00000-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 0.02],
-                    ["2514060", "magil-ggp-2514060-2022-10", "Georgia Board of Health Care Workforce",
-                     "magil", "0000", 15678, "1691025", 1,
+        expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                     "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors", "WARC_Fixity_Errors",
+                     "WARC_Unzip_Errors"],
+                    ["2514060", "15678", "1691025", 0.012, 1,
                      "ARCHIVEIT-15678-TEST-JOB1691025-SEED2514060-20221014143847623-00000-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 0.01],
-                    ["2527200", "magil-ggp-2527200-2022-10", "Georgia Vocational Rehabilitation Agency",
-                     "magil", "0000", 15678, "1691026", 1,
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                    ["2527198", "15678", "1691033", 0.016, 1,
+                     "ARCHIVEIT-15678-TEST-JOB1691033-SEED2527198-20221014143741584-00000-h3.warc.gz",
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                    ["2527200", "15678", "1691026", 0.088, 1,
                      "ARCHIVEIT-15678-TEST-JOB1691026-SEED2527200-20221014140418701-00000-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 0.09],
-                    ["2529631", "magil-ggp-2529631-2022-10", "Georgia Commission on Equal Opportunity",
-                     "magil", "0000", 15678, "1676317", 1,
-                     "ARCHIVEIT-15678-TEST-JOB1676317-SEED2529631-20220919135146371-00000-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 0.18],
-                    ["2529629", "magil-ggp-2529629-2022-10", "Georgia Board of Pharmacy",
-                     "magil", "0000", 15678, "1676316", 1,
-                     "ARCHIVEIT-15678-TEST-JOB1676316-SEED2529629-20220919135032204-00000-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 0.66],
-                    ["2529627", "magil-ggp-2529627-2022-10", "Georgia Aviation Authority",
-                     "magil", "0000", 15678, "1676002", 1,
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                    ["2529627", "15678", "1676002", 0.085, 1,
                      "ARCHIVEIT-15678-TEST-JOB1676002-SEED2529627-20220918140010019-00000-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 0.09],
-                    ["2529660", "magil-ggp-2529660-2022-10",
-                     "Georgia Governor's Office of Disability Services Ombudsman",
-                     "magil", "0000", 15678, "1675831", 1,
-                     "ARCHIVEIT-15678-TEST-JOB1675831-SEED2529660-20220917193734423-00000-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 0.1],
-                    ["2529642", "magil-ggp-2529642-2022-10", "Georgia Department of Community Supervision",
-                     "magil", "0000", 15678, "1672436", 1,
-                     "ARCHIVEIT-15678-TEST-JOB1672436-SEED2529642-20220911194518522-00000-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 0.87],
-                    ["2529634", "magil-ggp-2529634-2022-10",
-                     "Georgia Office of Attorney General Consumer Protection Division",
-                     "magil", "0000", 15678, "1672420", 2,
-                     "ARCHIVEIT-15678-TEST-JOB1672420-SEED2529634-20220911193609257-00000-h3.warc.gz,"
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                    ["2529629", "15678", "1676316", 0.659, 1,
+                     "ARCHIVEIT-15678-TEST-JOB1676316-SEED2529629-20220919135032204-00000-h3.warc.gz",
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                    ["2529631", "15678", "1676317", 0.184, 1,
+                     "ARCHIVEIT-15678-TEST-JOB1676317-SEED2529631-20220919135146371-00000-h3.warc.gz",
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                    ["2529634", "15678", "1672420", 1.145, 2,
+                     "ARCHIVEIT-15678-TEST-JOB1672420-SEED2529634-20220911193609257-00000-h3.warc.gz;"
                      "ARCHIVEIT-15678-TEST-JOB1672420-SEED2529634-20220913205209833-00001-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 1.15]]
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                    ["2529642", "15678", "1672436", 0.874, 1,
+                     "ARCHIVEIT-15678-TEST-JOB1672436-SEED2529642-20220911194518522-00000-h3.warc.gz",
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                    ["2529660", "15678", "1675831", 0.1, 1,
+                     "ARCHIVEIT-15678-TEST-JOB1675831-SEED2529660-20220917193734423-00000-h3.warc.gz",
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]]
         self.assertEqual(actual, expected, "Problem with test for MAGIL, dataframe values")
 
         # Test that the CSV was created.
@@ -149,34 +133,29 @@ class MyTestCase(unittest.TestCase):
         # Test that the dataframe has the correct values.
         seed_df = seed_df.fillna("BLANK")
         actual = [seed_df.columns.tolist()] + seed_df.values.tolist()
-        expected = [["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection", "AIT_Collection", "Job_ID",
-                     "WARCs", "WARC_Filenames", "Seed_Metadata_Errors", "Metadata_Report_Errors",
-                     "Metadata_Report_Info", "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"],
-                    ["2481702", "rbrl-494-web-202104-0001", "Bob Trammell for State House - Posts | Facebook",
-                     "russell", "rbrl-494", 12265, "1365540", 2,
-                     "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481702-20210216163706632-00000-h3.warc.gz,"
-                     "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481702-20210219082614225-00001-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 1.14],
-                    ["2481701", "rbrl-494-web-202104-0002", "Bob Trammell for State House - Videos | Facebook",
-                     "russell", "rbrl-494", 12265, "1365540", 1,
-                     "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481701-20210216163428706-00000-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 0.78],
-                    ["2444045", "rbrl-494-web-202104-0003", "Bob Trammell for State House | Facebook", "russell",
-                     "rbrl-494", 12265, "1365540", 1,
+        expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                     "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors", "WARC_Fixity_Errors",
+                     "WARC_Unzip_Errors"],
+                    ["2444045", "12265", "1365540", 0.989, 1,
                      "ARCHIVEIT-12265-TEST-JOB1365540-SEED2444045-20210216160638068-00000-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 0.99],
-                    ["2481704", "rbrl-494-web-202104-0004", "Bob Trammell for State House - Photos | Facebook",
-                     "russell", "rbrl-494", 12265, "1365540", 1,
-                     "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481704-20210216165149447-00000-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 0.8],
-                    ["2481703", "rbrl-494-web-202104-0005", "Bob Trammell for State House - Events | Facebook",
-                     "russell", "rbrl-494", 12265, "1365540", 1,
-                     "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481703-20210216165052332-00000-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 0.77],
-                    ["2481700", "rbrl-494-web-202104-0006", "Bob Trammell for State House - About | Facebook",
-                     "russell", "rbrl-494", 12265, "1365540", 1,
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                    ["2481700", "12265", "1365540", 0.751, 1,
                      "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481700-20210216163119142-00000-h3.warc.gz",
-                     "Successfully calculated seed metadata", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", 0.75]]
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                    ["2481701", "12265", "1365540", 0.778, 1,
+                     "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481701-20210216163428706-00000-h3.warc.gz",
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                    ["2481702", "12265", "1365540", 1.143, 2,
+                     "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481702-20210216163706632-00000-h3.warc.gz;"
+                     "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481702-20210219082614225-00001-h3.warc.gz",
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                    ["2481703", "12265", "1365540", 0.774, 1,
+                     "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481703-20210216165052332-00000-h3.warc.gz",
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                    ["2481704", "12265", "1365540", 0.802, 1,
+                     "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481704-20210216165149447-00000-h3.warc.gz",
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+]
         self.assertEqual(actual, expected, "Problem with test for Russell, dataframe values")
 
         # Test that the CSV was created.

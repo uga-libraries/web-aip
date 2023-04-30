@@ -20,7 +20,7 @@ class MyTestCase(unittest.TestCase):
         """
         Deletes the seed folders, and the seed.csv files within them.
         """
-        for directory in (os.path.join(os.getcwd(), "redact_aip"), os.path.join(os.getcwd(), "no_redact_aip")):
+        for directory in (os.path.join(os.getcwd(), "redact_aip"), os.path.join(os.getcwd(), "1234567")):
             if os.path.exists(directory):
                 shutil.rmtree(directory)
 
@@ -32,22 +32,19 @@ class MyTestCase(unittest.TestCase):
         # Input needed for the test: seed_df has the progress of the script so far,
         # a folder named with the AIP ID and a seeds.csv file inside the AIP folder.
         # The seeds.csv file only has a few of the actual columns, since only logins are needed for testing.
-        seed_df = pd.DataFrame([["1234567", "no_redact_aip", "No Redaction", "test", "no_redact_aip", 123465,
-                                 "900000", 1, "ARCHIVEIT-1.warc.gz", "Successfully calculated seed metadata",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, 0.01]],
-                               columns=["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection",
-                                        "AIT_Collection", "Job_ID", "WARCs", "WARC_Filenames",
-                                        "Seed_Metadata_Errors", "Metadata_Report_Errors",
-                                        "Metadata_Report_Info", "WARC_API_Errors",
-                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"])
-        os.mkdir("no_redact_aip")
-        seed_csv_path = os.path.join(os.getcwd(), "no_redact_aip", "no_redact_aip_seed.csv")
+        seed_df = pd.DataFrame([["1234567", 123465, "900000", 0.01, 1, "ARCHIVEIT-1.warc.gz",
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                                        "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors",
+                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+        os.mkdir("1234567")
+        seed_csv_path = os.path.join(os.getcwd(), "1234567", "1234567_seed.csv")
         with open(seed_csv_path, "w", newline="") as file:
             writer = csv.writer(file)
             writer.writerow(["canonical_url", "collection", "seed_type"])
             writer.writerow(["www.noredact.com", 123456, "test"])
 
-        redact_seed_report("no_redact_aip", seed_df, 0)
+        redact_seed_report("1234567", seed_df, 0)
 
         # Test that seeds.csv has not changed.
         report_df = pd.read_csv(seed_csv_path)
@@ -68,22 +65,19 @@ class MyTestCase(unittest.TestCase):
         # Input needed for the test: seed_df has the progress of the script so far,
         # a folder named with the AIP ID and a seeds.csv file inside the AIP folder.
         # The seeds.csv file only has a few of the actual columns, since only logins are needed for testing.
-        seed_df = pd.DataFrame([["1234567", "redact_aip", "Redaction", "test", "redact_aip", 123465,
-                                 "900000", 1, "ARCHIVEIT-1.warc.gz", "Successfully calculated seed metadata",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, 0.01]],
-                               columns=["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection",
-                                        "AIT_Collection", "Job_ID", "WARCs", "WARC_Filenames",
-                                        "Seed_Metadata_Errors", "Metadata_Report_Errors",
-                                        "Metadata_Report_Info", "WARC_API_Errors",
-                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"])
-        os.mkdir("redact_aip")
-        seed_csv_path = os.path.join(os.getcwd(), "redact_aip", "redact_aip_seed.csv")
+        seed_df = pd.DataFrame([["1234567", 123465, "900000", 0.01, 1, "ARCHIVEIT-1.warc.gz",
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                                        "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors",
+                                        "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+        os.mkdir("1234567")
+        seed_csv_path = os.path.join(os.getcwd(), "1234567", "1234567_seed.csv")
         with open(seed_csv_path, "w", newline="") as file:
             writer = csv.writer(file)
             writer.writerow(["canonical_url", "collection", "login_password", "login_username", "seed_type"])
             writer.writerow(["www.noredact.com", 123456, "PASS", "USER", "test"])
 
-        redact_seed_report("redact_aip", seed_df, 0)
+        redact_seed_report("1234567", seed_df, 0)
 
         # Test that seeds.csv has not changed.
         report_df = pd.read_csv(seed_csv_path)

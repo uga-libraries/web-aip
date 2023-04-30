@@ -21,20 +21,20 @@ class MyTestCase(unittest.TestCase):
         Makes the seed dataframe and AIP folder that is used for every test,
         and makes the AIP folder the current working directory so that the unzipped WARC saves to the right place.
         """
-        columns = ["Seed_ID", "AIP_ID", "Title", "Department", "UGA_Collection", "AIT_Collection", "Job_ID", "WARCs",
-                   "WARC_Filenames", "Seed_Metadata_Errors", "Metadata_Report_Errors", "Metadata_Report_Info",
-                   "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Size_GB"]
-        error_1 = [2018086, "error-web-0001", "Title", "russell", "0000", 12264, "921631", 2,
-                   "error.warc.gz,ARCHIVEIT-12264-TEST-JOB921631-SEED2018086-20190607140142542-00000-h3.warc.gz",
-                   "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, 0.01]
-        harg_1 = [2173769, "harg-web-0001", "Title", "hargrett", "0000", 12912, "1415330", 1,
-                  "ARCHIVEIT-12912-WEEKLY-JOB1415330-SEED2173769-20210519233828683-00001-h3.warc.gz",
-                  "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, 0.01]
-        rbrl_1 = [2485678, "rbrl-web-0001", "Title", "russell", "0000", 12265, "718490", 2,
-                  "ARCHIVEIT-12265-MONTHLY-JOB1718490-SEED2485678-20221203180441653-00001-h3.warc.gz,"
-                  "ARCHIVEIT-12265-MONTHLY-JOB1718490-SEED2485678-20221202160754903-00000-h3.warc.gz",
-                  "Successfully calculated seed metadata", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, 0.02]
-        self.seed_df = pd.DataFrame([error_1, harg_1, rbrl_1], columns=columns)
+        columns = ["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                   "Metadata_Report_Errors", "Metadata_Report_Info", "WARC_API_Errors",
+                   "WARC_Fixity_Errors", "WARC_Unzip_Errors"]
+        error = [2018086, 12264, "921631", 0.01, 2,
+                 "error.warc.gz;ARCHIVEIT-12264-TEST-JOB921631-SEED2018086-20190607140142542-00000-h3.warc.gz",
+                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+        harg = [2173769, 12912, "1415330", 0.01, 1,
+                "ARCHIVEIT-12912-WEEKLY-JOB1415330-SEED2173769-20210519233828683-00001-h3.warc.gz",
+                np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+        rbrl = [2485678, 12265, "718490", 0.02, 2,
+                "ARCHIVEIT-12265-MONTHLY-JOB1718490-SEED2485678-20221203180441653-00001-h3.warc.gz;"
+                "ARCHIVEIT-12265-MONTHLY-JOB1718490-SEED2485678-20221202160754903-00000-h3.warc.gz",
+                np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+        self.seed_df = pd.DataFrame([error, harg, rbrl], columns=columns)
 
         self.aip_dir = os.path.join(c.script_output, "aips_2000-01")
         os.mkdir(self.aip_dir)
@@ -54,7 +54,7 @@ class MyTestCase(unittest.TestCase):
         Tests that the function can continue to download and unzip other WARCs after a WARC has an anticipated error.
         """
         # Makes the seed folder in the output directory and the seed object from the df and runs the function.
-        seed_path = os.path.join(self.aip_dir, "error-web-0001")
+        seed_path = os.path.join(self.aip_dir, "2018086")
         os.makedirs(seed_path)
         seed = [seed for seed in self.seed_df.itertuples()][0]
         download_warcs(seed, "2000-01", self.seed_df)
@@ -80,7 +80,7 @@ class MyTestCase(unittest.TestCase):
         for as seed with one WARC.
         """
         # Makes the seed folder in the output directory and the seed object from the df and runs the function.
-        seed_path = os.path.join(self.aip_dir, "harg-web-0001")
+        seed_path = os.path.join(self.aip_dir, "2173769")
         os.makedirs(seed_path)
         seed = [seed for seed in self.seed_df.itertuples()][1]
         download_warcs(seed, "2000-01", self.seed_df)
@@ -104,7 +104,7 @@ class MyTestCase(unittest.TestCase):
         for as seed with two WARCs.
         """
         # Makes the seed folder in the output directory and the seed object from the df and runs the function.
-        seed_path = os.path.join(self.aip_dir, "rbrl-web-0001")
+        seed_path = os.path.join(self.aip_dir, "2485678")
         os.makedirs(seed_path)
         seed = [seed for seed in self.seed_df.itertuples()][2]
         download_warcs(seed, "2000-01", self.seed_df)

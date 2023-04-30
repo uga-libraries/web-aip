@@ -70,27 +70,24 @@ else:
 # Starts counter for tracking script progress.
 # Some processes are slow, so this shows the script is still working and how much remains.
 current_seed = 0
-total_seeds = len(seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfully"))
-                          & (seed_df["WARC_Unzip_Errors"].isnull())])
+total_seeds = len(seed_df[seed_df["WARC_Unzip_Errors"].isnull()])
 
 # Iterates through information about each seed, downloading metadata and WARC files from Archive-It.
-# Filtered for no data in the Seed_Metadata_Errors to skip seeds without the required metadata in Archive-It.
-# Filtered for no data in the WARC_Fixity_Errors column to skip seeds done earlier if this is a restart.
-for seed in seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfully"))
-                    & (seed_df["WARC_Unzip_Errors"].isnull())].itertuples():
+# Filtered for no data in the WARC_Unzip_Errors (last log column) to skip seeds done earlier if this is a restart.
+for seed in seed_df[seed_df["WARC_Unzip_Errors"].isnull()].itertuples():
 
     # Updates the current seed number and displays the script progress.
     current_seed += 1
     print(f"\nStarting seed {current_seed} of {total_seeds}.")
 
-    # If the seed already has an AIP directory from an error in a previous iteration of the script,
-    # deletes the contents and anything in the seeds.csv from the previous step so it can be remade.
-    if os.path.exists(seed.AIP_ID):
-        web.reset_aip(seed.AIP_ID, seed_df)
+    # If the seed already has a folder from an error in a previous iteration of the script,
+    # deletes the contents and anything in the seeds.csv from the previous iteration so it can be remade.
+    if os.path.exists(str(seed.Seed_ID)):
+        web.reset_aip(seed.Seed_ID, seed_df)
 
     # Makes a folder for the seed in the AIP directory,
     # and downloads the metadata and WARC files to that seed folder.
-    os.mkdir(seed.AIP_ID)
+    os.mkdir(str(seed.Seed_ID))
     web.download_metadata(seed, seed_df)
     web.download_warcs(seed, date_end, seed_df)
 
@@ -100,4 +97,5 @@ seed_df.to_csv("seeds.csv", index=False)
 
 # Verifies the all expected seed folders are present and have all the expected metadata files and WARCs.
 # Saves the result as a csv in the folder with the downloaded AIPs.
-web.check_aips(date_end, date_start, seed_df, aips_directory)
+# TODO: Make this work with change to Seed ID instead of AIP ID, once decide when to calculate AIP ID.
+# web.check_aips(date_end, date_start, seed_df, aips_directory)
