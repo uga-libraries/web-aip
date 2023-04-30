@@ -33,7 +33,7 @@ import web_functions as web
 
 
 # PART ONE: TEST SCRIPT INPUTS AND MAKE OTHER GLOBAL VARIABLES
-# This is web_aip_download.py but without making script output folders or the AIP log.
+# This is warc_download.py but without making script output folders or the AIP log.
 
 # Tests the script arguments (start and end date, which should be formatted YYYY-MM-DD).
 try:
@@ -77,7 +77,7 @@ total_seeds = len(seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Succe
                           & (seed_df["WARC_Unzip_Errors"].isnull())])
 
 # PART TWO: CREATE AIPS THAT ARE READY FOR INGEST INTO ARCHIVE FROM EACH AIP FOLDER
-# This is like the loop in web_aip_download.py but without making the AIP directory or downloading files.
+# This is like the loop in warc_download.py but without making the AIP directory or downloading files.
 for seed in seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfully"))
                     & (seed_df["WARC_Unzip_Errors"].isnull())].itertuples():
 
@@ -116,7 +116,7 @@ for seed in seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfull
         a.manifest(aip)
 
 # PART THREE: UPDATE LOG, VERIFY AIP COMPLETENESS, AND CLEAN UP DIRECTORY
-# This is the same as web_aip_download.py except for the optional fixity check with the unzip log.
+# This is the same as warc_download.py except for the optional fixity check with the unzip log.
 
 # Adds the information from aip_log.csv to seeds.csv and deletes aip_log.csv
 # to have one spreadsheet the documents the entire process.
