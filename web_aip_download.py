@@ -3,8 +3,14 @@ Purpose: Downloads archived web content (WARCs) and associated metadata for a gr
 their APIs and prepares them to be converted into AIPs with the general-aip.py script for long-term preservation.
 At UGA, this script is run every three months to download content for all crawls saved that quarter.
 
-There will be one AIP per seed, even if that seed was crawled multiple times in the same quarter.
-A seed may have multiple AIPs in the system, as a new AIP is made for every quarter's crawls.
+The download combines all WARCs saved within a quarter for a seed, even if that seed was crawled multiple times.
+It also includes six of the metadata reports:
+    * Collection
+    * Collection Scope (not downloaded if no scope rules for the collection)
+    * Crawl Definition (may be more than one)
+    * Crawl Job (may be more than one)
+    * Seed
+    * Seed Scope (not downloaded if not scope rules for the seed)
 
 Prior to the preservation download, all seed metadata should be entered into Archive-It.
 Use the seed_metadata_report.py script to verify all required fields are present.
