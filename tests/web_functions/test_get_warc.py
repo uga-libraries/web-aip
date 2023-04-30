@@ -61,7 +61,7 @@ class MyTestCase(unittest.TestCase):
         os.mkdir("2529656")
 
         with self.assertRaises(ValueError):
-            get_warc(seed_df, 0, f"https://warcs.archive-it.org/webdatafile/{warc}", warc, f"error-aip/{warc}")
+            get_warc(seed_df, 0, f"https://warcs.archive-it.org/webdatafile/{warc}", warc, f"2529656/{warc}")
 
         # Test the WARC was not downloaded.
         warc_downloaded = os.path.exists(os.path.join(os.getcwd(), "2529656", warc))

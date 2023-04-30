@@ -36,17 +36,17 @@ class MyTestCase(unittest.TestCase):
                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
         self.seed_df = pd.DataFrame([error, harg, rbrl], columns=columns)
 
-        self.aip_dir = os.path.join(c.script_output, "aips_2000-01")
-        os.mkdir(self.aip_dir)
-        os.chdir(self.aip_dir)
+        self.seeds_dir = os.path.join(c.script_output, "preservation_download")
+        os.mkdir(self.seeds_dir)
+        os.chdir(self.seeds_dir)
 
     def tearDown(self):
         """
         Deletes the script output directory and contents, if any, and seeds_log.csv produced by the tests.
-        The directory is changed first because aip_dir can't be deleted while it is the current working directory.
+        The directory is changed first because seeds_dir can't be deleted while it is the current working directory.
         """
         os.chdir("..")
-        shutil.rmtree(self.aip_dir)
+        shutil.rmtree(self.seeds_dir)
         os.remove(os.path.join(c.script_output, "seeds_log.csv"))
 
     def test_error_handling(self):
@@ -54,10 +54,10 @@ class MyTestCase(unittest.TestCase):
         Tests that the function can continue to download and unzip other WARCs after a WARC has an anticipated error.
         """
         # Makes the seed folder in the output directory and the seed object from the df and runs the function.
-        seed_path = os.path.join(self.aip_dir, "2018086")
+        seed_path = os.path.join(self.seeds_dir, "2018086")
         os.makedirs(seed_path)
         seed = [seed for seed in self.seed_df.itertuples()][0]
-        download_warcs(seed, "2000-01", self.seed_df)
+        download_warcs(seed, self.seed_df)
 
         # Test for the WARC download.
         warc = "ARCHIVEIT-12264-TEST-JOB921631-SEED2018086-20190607140142542-00000-h3.warc"
@@ -80,10 +80,10 @@ class MyTestCase(unittest.TestCase):
         for as seed with one WARC.
         """
         # Makes the seed folder in the output directory and the seed object from the df and runs the function.
-        seed_path = os.path.join(self.aip_dir, "2173769")
+        seed_path = os.path.join(self.seeds_dir, "2173769")
         os.makedirs(seed_path)
         seed = [seed for seed in self.seed_df.itertuples()][1]
-        download_warcs(seed, "2000-01", self.seed_df)
+        download_warcs(seed, self.seed_df)
 
         # Test for the WARC download.
         warc = "ARCHIVEIT-12912-WEEKLY-JOB1415330-SEED2173769-20210519233828683-00001-h3.warc"
@@ -104,10 +104,10 @@ class MyTestCase(unittest.TestCase):
         for as seed with two WARCs.
         """
         # Makes the seed folder in the output directory and the seed object from the df and runs the function.
-        seed_path = os.path.join(self.aip_dir, "2485678")
+        seed_path = os.path.join(self.seeds_dir, "2485678")
         os.makedirs(seed_path)
         seed = [seed for seed in self.seed_df.itertuples()][2]
-        download_warcs(seed, "2000-01", self.seed_df)
+        download_warcs(seed, self.seed_df)
 
         # Test for the WARCs download.
         warc1 = "ARCHIVEIT-12265-MONTHLY-JOB1718490-SEED2485678-20221203180441653-00001-h3.warc"

@@ -362,7 +362,7 @@ def verify_warc_fixity(seed_df, row_index, warc_path, warc, warc_md5):
         raise ValueError
 
 
-def unzip_warc(seed_df, row_index, warc_path, warc, seed_id, date_end):
+def unzip_warc(seed_df, row_index, warc_path, warc, seed_id):
     """
     Unzips the WARC, which is downloaded as a gzip file.
     If it unzipped correctly, deletes the zip file.
@@ -376,8 +376,8 @@ def unzip_warc(seed_df, row_index, warc_path, warc, seed_id, date_end):
     # Checks for and logs any 7-Zip errors.
     if unzip_output.stderr == b'':
         # A filename (warc.open) is an error from a known gzip bug. Deletes the erroneous unzipped file.
-        if os.path.exists(f'{c.script_output}/aips_{date_end}/{seed_id}/{warc}.open'):
-            os.remove(f'{c.script_output}/aips_{date_end}/{seed_id}/{warc}.open')
+        if os.path.exists(f'{c.script_output}/preservation_download/{seed_id}/{warc}.open'):
+            os.remove(f'{c.script_output}/preservation_download/{seed_id}/{warc}.open')
             log(f"Error unzipping {warc}: unzipped to '.gz.open' file", seed_df, row_index, "WARC_Unzip_Errors")
         # If it unzipped correctly, deletes the zip file.
         else:
@@ -388,7 +388,7 @@ def unzip_warc(seed_df, row_index, warc_path, warc, seed_id, date_end):
             seed_df, row_index, "WARC_Unzip_Errors")
 
 
-def download_warcs(seed, date_end, seed_df):
+def download_warcs(seed, seed_df):
     """Downloads every WARC file and verifies that fixity is unchanged after downloading.
     Unzips each WARC."""
 
@@ -403,7 +403,7 @@ def download_warcs(seed, date_end, seed_df):
     for warc in warc_names:
 
         # The path for where the WARC will be saved on the local machine.
-        warc_path = f'{c.script_output}/aips_{date_end}/{seed.Seed_ID}/{warc}'
+        warc_path = f'{c.script_output}/preservation_download/{seed.Seed_ID}/{warc}'
 
         # Gets URL for downloading the WARC and WARC MD5 from Archive-It using WASAPI.
         # If there was an API error, stops processing this WARC and starts the next.
@@ -426,7 +426,7 @@ def download_warcs(seed, date_end, seed_df):
             continue
 
         # Unzips the WARC and handles any errors.
-        unzip_warc(seed_df, row_index, warc_path, warc, seed.Seed_ID, date_end)
+        unzip_warc(seed_df, row_index, warc_path, warc, seed.Seed_ID)
 
         # Waits 15 second to give the API a rest.
         time.sleep(15)

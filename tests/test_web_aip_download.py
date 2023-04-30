@@ -15,15 +15,11 @@ class MyTestCase(unittest.TestCase):
 
     def tearDown(self):
         """
-        Deletes the AIP directories, their contents, and the CSV files created by the tests.
+        Deletes the preservation folder with all the downloaded seed contents and the CSV files created by the tests.
         """
-        for directory in (os.path.join(c.script_output, "aips_2019-07-13"),
-                          os.path.join(c.script_output, "aips_2020-02-20"),
-                          os.path.join(c.script_output, "aips_2020-05-15")):
-            if os.path.exists(directory):
-                shutil.rmtree(directory)
+        shutil.rmtree(os.path.join(c.script_output, "preservation_download"))
 
-        #TODO: need to rework this function.
+        # TODO: need to rework this function.
         # os.remove(os.path.join(c.script_output, "completeness_check.csv"))
         os.remove(os.path.join(c.script_output, "seeds_log.csv"))
 

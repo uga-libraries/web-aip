@@ -25,7 +25,7 @@ except ModuleNotFoundError:
     print("\nScript cannot run without a configuration file in the local copy of the GitHub repo.")
     print("Make a file named configuration.py using configuration_template.py and run the script again.")
     sys.exit()
-import web_functions as web
+import web_functions as fun
 
 # The preservation download is limited to warcs created during a particular time frame.
 # UGA downloads every quarter (2/1-4/30, 5/1-7/31, 8/1-10/31, 11/1-1/31)
@@ -50,22 +50,22 @@ if date_start > date_end:
     exit()
 
 # Verifies the configuration file has the correct values, and quits the script if not.
-web.check_config()
+fun.check_config()
 
 # Path to the folder in the script output directory (defined in the configuration file)
 # where everything related to this download will be saved.
-aips_directory = os.path.join(c.script_output, f"aips_{date_end}")
+seeds_directory = os.path.join(c.script_output, "preservation_download")
 
 # The script may be run repeatedly if there are interruptions, such as due to API connections.
 # If it has run, it will use the existing seeds_log.csv for seed_df and and skip seeds that were already done.
 # Otherwise, it makes seed_df by getting data from the Archive-It APIs.
-if os.path.exists(aips_directory):
-    os.chdir(aips_directory)
+if os.path.exists(seeds_directory):
+    os.chdir(seeds_directory)
     seed_df = pd.read_csv(os.path.join(c.script_output, "seeds_log.csv"), dtype="object")
 else:
-    os.makedirs(aips_directory)
-    os.chdir(aips_directory)
-    seed_df = web.seed_data(date_start, date_end)
+    os.makedirs(seeds_directory)
+    os.chdir(seeds_directory)
+    seed_df = fun.seed_data(date_start, date_end)
 
 # Starts counter for tracking script progress.
 # Some processes are slow, so this shows the script is still working and how much remains.
@@ -83,13 +83,13 @@ for seed in seed_df[seed_df["WARC_Unzip_Errors"].isnull()].itertuples():
     # If the seed already has a folder from an error in a previous iteration of the script,
     # deletes the contents and anything in the seeds_log.csv from the previous iteration so it can be remade.
     if os.path.exists(str(seed.Seed_ID)):
-        web.reset_aip(seed.Seed_ID, seed_df)
+        fun.reset_aip(seed.Seed_ID, seed_df)
 
     # Makes a folder for the seed in the AIP directory,
     # and downloads the metadata and WARC files to that seed folder.
     os.mkdir(str(seed.Seed_ID))
-    web.download_metadata(seed, seed_df)
-    web.download_warcs(seed, date_end, seed_df)
+    fun.download_metadata(seed, seed_df)
+    fun.download_warcs(seed, seed_df)
 
 # Saves the information in seed_df to a CSV as a record for the process.
 os.chdir(c.script_output)
