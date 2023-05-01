@@ -498,6 +498,109 @@ def log(message, df, row, column):
     df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
 
 
+def metadata_csv(seeds_list, date_end):
+    """
+    Makes a spreadsheet named metadata.csv in the preservation_download folder
+    using the Partner API to get the seed reports.
+    This spreadsheet is required by the general-aip.py script.
+    """
+
+    # Makes a dataframe for storing all the seed data.
+    df = pd.DataFrame(columns=["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"])
+
+    # Gets the data from the Archive-It seed report for each seed on the list.
+    # Each seed will be one row in the df and CSV.
+    for seed_id in seeds_list:
+
+        row_list = []
+
+        # Uses the Partner API to get the seed report.
+        # If the connection fails, logs an error and adds a row to the df so it is clear more work is needed.
+        api_result = requests.get(f"{c.partner_api}/seed?id={seed_id}", auth=(c.username, c.password))
+        if not api_result.status_code == 200:
+            row_list = [f"API error {api_result.status_code}", "TBD", seed_id, "TBD", "TBD", 1]
+            df.loc[len(df)] = row_list
+            continue
+        seed_report = api_result.json()
+
+        # Adds the department code, which is based on Collector from the seed report.
+        # Supplies a default value if the collector is not an expected value so it is clear more work is needed.
+        try:
+            collector = seed_report[0]['metadata']['Collector'][0]['value']
+            collector_to_dept = {"Hargrett Rare Book & Manuscript Library": "hargrett",
+                                 "Map and Government Information Library": "magil",
+                                 "Richard B. Russell Library for Political Research and Studies": "russell"}
+            department = collector_to_dept.get(collector, "TBD: unexpected collector value")
+        except (KeyError, IndexError):
+            department = "TBD: no collector in Archive-It"
+        row_list.append(department)
+
+        # Adds the related archival collection number, which is based on Relation from the seed report.
+        # Regular expressions are used to extract the number from the relation information if present,
+        # and otherwise a department-specific default value is supplied.
+        if department == "hargrett":
+            try:
+                relation = seed_report[0]['metadata']['Relation'][0]['value']
+                collection_id = re.match("^Hargrett (.*):", relation)[1]
+                collection = f"harg-{collection_id}"
+            except (KeyError, AttributeError):
+                collection = "harg-0000"
+        elif department == "magil":
+            collection = "magil-0000"
+        elif department == "russell":
+            try:
+                relation = seed_report[0]['metadata']['Relation'][0]['value']
+                collection_id = re.match("^RBRL/(\d{3})", relation)[1]
+                collection = f"rbrl-{collection_id}"
+            except (KeyError, AttributeError):
+                collection = "rbrl-000"
+        else:
+            collection = "TBD: unexpected department value"
+        row_list.append(collection)
+
+        # Adds the folder with the contents to be made into AIPs, which is the seed_id.
+        row_list.append(seed_id)
+
+        # Adds a placeholder for the AIP_ID, which will be made once all the seed report data is in the dataframe.
+        row_list.append("AIP_ID TBD")
+
+        # Adds the title, which is Title from the seed report, unless that fields is missing.
+        try:
+            row_list.append(seed_report[0]['metadata']['Title'][0]['value'])
+        except (KeyError, IndexError):
+            row_list.append("TBD: could not get title from Archive-It")
+
+        # Adds the version number, which is always 1 for web preservation downloads.
+        # Each download is considered a new AIP, even if other WARCs were downloaded for that seed previously,
+        # since the WARCs are new.
+        row_list.append("1")
+
+        # Adds the completed row of information available in the seed report (everything by AIP ID)
+        # to the end of the dataframe.
+        df.loc[len(df)] = row_list
+
+    # Calculates the AIP_ID for each seed and adds it to the dataframe.
+    # Identifiers are department-specific and may use collection, download date, and a sequential number.
+    # The sequential number (number of seeds in a collection) is temporarily added to the dataframe.
+    # IDs with different patterns are made in one dataframe per pattern, before combining them back together.
+
+    year, month, day = date_end.split("-")
+    df['Sequential'] = df.groupby('Collection').cumcount() + 1
+    df['Sequential'] = df['Sequential'].astype(str).str.zfill(4)
+
+    df_magil = df[df['Department'] == 'magil'].copy()
+    df_magil['AIP_ID'] = "magil-ggp-" + df_magil['Folder'] + "-" + year + "-" + month
+
+    df_rest = df[df['Department'] != 'magil'].copy()
+    df_rest['AIP_ID'] = df_rest['Collection'] + "-web-" + year + month + "-" + df_rest['Sequential']
+
+    # Combines the department dataframes, removes the temporary column Sequential,
+    # and saves the completed dataframe to a CSV.
+    df = pd.concat([df_magil, df_rest])
+    df = df.drop(['Sequential'], axis=1)
+    df.to_csv(os.path.join(c.script_output, "preservation_download", "metadata.csv"), index=False)
+
+
 def redact_seed_report(seed_id, seed_df, row_index):
     """
     Replaces the seed report with a redacted version of the file, removing login information if those columns

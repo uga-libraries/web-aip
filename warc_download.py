@@ -72,6 +72,7 @@ else:
     os.makedirs(seeds_directory)
     os.chdir(seeds_directory)
     seed_df = fun.seed_data(date_start, date_end)
+    fun.metadata_csv(seed_df['Seed_ID'].values.tolist(), date_end)
 
 # Starts counter for tracking script progress.
 # Some processes are slow, so this shows the script is still working and how much remains.

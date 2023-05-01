@@ -26,10 +26,18 @@ class MyTestCase(unittest.TestCase):
     def test_multi_warc_seed(self):
         """
         Tests the full script with a data range that has 1 Hargrett seed with 3 WARCs and multiple crawl jobs.
-        Results for testing are the contents of seeds_log.csv and completeness_check.csv.
+        Results for testing are the contents of the three CSVs made by the script.
         """
         script_path = os.path.join("..", "warc_download.py")
         subprocess.run(f"python {script_path} 2020-04-30 2020-05-15", shell=True)
+
+        # Test for metadata.csv
+        metadata_df = pd.read_csv(os.path.join(c.script_output, "preservation_download", "metadata.csv"))
+        actual_metadata = [metadata_df.columns.tolist()] + metadata_df.values.tolist()
+        expected_metadata = [["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"],
+                             ["hargrett", "harg-0000", 2173769, "harg-0000-web-202005-0001",
+                              "Coronavirus (COVID-19) Information and Resources website", 1]]
+        self.assertEqual(actual_metadata, expected_metadata, "Problem with test for multi WARC seed, metadata.csv")
 
         # Test for seeds_log.csv
         # Changes column with time stamps to allow comparison to consistent expected values.
@@ -67,19 +75,30 @@ class MyTestCase(unittest.TestCase):
     def test_one_warc_seeds(self):
         """
         Tests the full script with a data range that has 2 Russell seeds, each with 1 WARC.
-        Results for testing are the contents of seeds_log.csv and completeness_check.csv.
+        Results for testing are the contents of the three CSVs made by the script.
         """
         script_path = os.path.join("..", "warc_download.py")
         subprocess.run(f"python {script_path} 2019-07-12 2019-07-13", shell=True)
+
+        # Test for metadata.csv
+        metadata_df = pd.read_csv(os.path.join(c.script_output, "preservation_download", "metadata.csv"))
+        actual_metadata = [metadata_df.columns.tolist()] + metadata_df.values.tolist()
+        expected_metadata = [["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"],
+                             ["russell", "rbrl-498", 2027707, "rbrl-498-web-201907-0001",
+                              "Open Records with Deborah Gonzalez", 1],
+                             ["russell", "rbrl-377", 2027776, "rbrl-377-web-201907-0001",
+                              "Southeast ADA Center: Your Regional Resource for the "
+                              "Americans with Disabilities Act (ADA)", 1]]
+        self.assertEqual(actual_metadata, expected_metadata, "Problem with test for one WARC seeds, metadata.csv")
 
         # Test for seeds_log.csv
         # Changes column with time stamps to allow comparison to consistent expected values.
         seeds_df = pd.read_csv(os.path.join(c.script_output, "seeds_log.csv"))
         fixity = "Successfully verified ARCHIVEIT"
         seeds_df.loc[seeds_df["WARC_Fixity_Errors"].str.startswith(fixity), "WARC_Fixity_Errors"] = fixity
-        expected_seeds = [seeds_df.columns.tolist()] + seeds_df.values.tolist()
+        actual_seeds = [seeds_df.columns.tolist()] + seeds_df.values.tolist()
 
-        actual_seeds = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+        expected_seeds = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                          "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
                          "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"],
                         [2027707, 12265, 943048, 0.007, 1,
@@ -94,7 +113,7 @@ class MyTestCase(unittest.TestCase):
                          "Successfully downloaded ARCHIVEIT-12264-TEST-JOB943446-SEED2027776-20190710131748634-00000-h3.warc.gz",
                          "Successfully verified ARCHIVEIT",
                          "Successfully unzipped ARCHIVEIT-12264-TEST-JOB943446-SEED2027776-20190710131748634-00000-h3.warc.gz"]]
-        self.assertEqual(expected_seeds, actual_seeds, "Problem with test for one WARC seeds, seeds_log.csv")
+        self.assertEqual(actual_seeds, expected_seeds, "Problem with test for one WARC seeds, seeds_log.csv")
 
         # TODO need to rework this function
         # # Test for completeness_check.csv
