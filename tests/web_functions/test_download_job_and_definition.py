@@ -40,18 +40,19 @@ class MyTestCase(unittest.TestCase):
         Causes the error by using a crawl job id that is not formatted correctly.
         """
         # Makes data needed as function input and runs the function.
-        seed_df = pd.DataFrame([[2202440, 12181, "job-id-error", 1.0, 1,  "name.warc.gz",
+        seed_df = pd.DataFrame([["harg-0000-web-0001", 2202440, 12181, "job-id-error", 1.0, 1,  "name.warc.gz",
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
+                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
+                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
+                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "WARC_Unzip_Errors", "Complete"])
         seed = [seed for seed in seed_df.itertuples()][0]
-        os.mkdir(str(seed.Seed_ID))
+        os.mkdir("2202440")
         download_job_and_definition(seed, seed_df, 0)
 
         # Test that the log was updated.
         actual_errors = seed_df['Metadata_Report_Errors'][0]
-        expected_errors = f"{seed.Seed_ID}_job-id-error_crawljob.csv API Error 500; " \
+        expected_errors = f"{seed.AIP_ID}_job-id-error_crawljob.csv API Error 500; " \
                           f"Error: crawl job was not downloaded so can't get crawl definition id"
         self.assertEqual(actual_errors, expected_errors, "Problem with test for error/no job, log")
 
@@ -61,18 +62,19 @@ class MyTestCase(unittest.TestCase):
         multiple crawl job ids, each of which has a different crawl definition id.
         """
         # Makes data needed as function input and runs the function.
-        seed_df = pd.DataFrame([[2027776, 12264, "1718467;943446", 1.0, 1, "name.warc.gz",
+        seed_df = pd.DataFrame([["rbrl-0000-web-0001", 2027776, 12264, "1718467;943446", 1.0, 1, "name.warc.gz",
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
+                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
+                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
+                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "WARC_Unzip_Errors", "Complete"])
         seed = [seed for seed in seed_df.itertuples()][0]
-        os.mkdir(str(seed.Seed_ID))
+        os.mkdir("2027776")
         download_job_and_definition(seed, seed_df, 0)
 
         # Test that the crawl job reports have the expected values.
-        actual_job = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.Seed_ID}_1718467_crawljob.csv"),
-                                   os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.Seed_ID}_943446_crawljob.csv")])
+        actual_job = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_1718467_crawljob.csv"),
+                                   os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_943446_crawljob.csv")])
         expected_job = [["account", "brozzler", "collection", "crawl_definition", "doc_rate", "downloaded_count",
                          "duplicate_bytes", "duplicate_count", "elapsed_ms", "end_date", "id", "novel_bytes",
                          "novel_count", "original_start_date", "status", "test_crawl_save_date", "test_crawl_state",
@@ -93,8 +95,8 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(actual_job, expected_job, "Problem with test for multi id/different, job report")
 
         # Test that the crawl definition reports have the expected values.
-        actual_def = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.Seed_ID}_31104519042_crawldef.csv"),
-                                   os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.Seed_ID}_31104250884_crawldef.csv")])
+        actual_def = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104519042_crawldef.csv"),
+                                   os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104250884_crawldef.csv")])
         expected_def = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                          "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
                          "recurrence_type", "test", "time_limit"],
@@ -111,19 +113,20 @@ class MyTestCase(unittest.TestCase):
         multiple crawl job ids, some with a different crawl definition id and some with the same.
         """
         # Makes data needed as function input and runs the function.
-        seed_df = pd.DataFrame([[2467332, 12265, "1360420;1365539;1718490", 1.0, 1, "name.warc.gz",
+        seed_df = pd.DataFrame([["rbrl-0000-web-0001", 2467332, 12265, "1360420;1365539;1718490", 1.0, 1, "name.warc.gz",
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
+                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
+                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
+                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "WARC_Unzip_Errors", "Complete"])
         seed = [seed for seed in seed_df.itertuples()][0]
-        os.mkdir(str(seed.Seed_ID))
+        os.mkdir("2467332")
         download_job_and_definition(seed, seed_df, 0)
 
         # Test that the crawl job reports have the expected values.
-        actual_job = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.Seed_ID}_1360420_crawljob.csv"),
-                                   os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.Seed_ID}_1365539_crawljob.csv"),
-                                   os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.Seed_ID}_1718490_crawljob.csv")])
+        actual_job = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_1360420_crawljob.csv"),
+                                   os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_1365539_crawljob.csv"),
+                                   os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_1718490_crawljob.csv")])
         expected_job = [["account", "brozzler", "collection", "crawl_definition", "doc_rate", "downloaded_count",
                          "duplicate_bytes", "duplicate_count", "elapsed_ms", "end_date", "id", "novel_bytes",
                          "novel_count", "original_start_date", "status", "test_crawl_save_date", "test_crawl_state",
@@ -153,8 +156,8 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(actual_job, expected_job, "Problem with test for multi id/different and same, job report")
 
         # Test that the crawl definition reports have the expected values.
-        actual_def = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.Seed_ID}_31104392189_crawldef.csv"),
-                                   os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.Seed_ID}_31104419857_crawldef.csv")])
+        actual_def = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104392189_crawldef.csv"),
+                                   os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104419857_crawldef.csv")])
         expected_def = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                          "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
                          "recurrence_type", "test", "time_limit"],
@@ -171,18 +174,19 @@ class MyTestCase(unittest.TestCase):
         multiple crawl jobs ids, all with the same crawl definition id.
         """
         # Makes data needed as function input and runs the function.
-        seed_df = pd.DataFrame([[2016223, 12249, "918473;918474", 1.0, 1, "name.warc.gz",
+        seed_df = pd.DataFrame([["harg-0000-web-0001", 2016223, 12249, "918473;918474", 1.0, 1, "name.warc.gz",
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
+                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
+                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
+                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "WARC_Unzip_Errors", "Complete"])
         seed = [seed for seed in seed_df.itertuples()][0]
-        os.mkdir(str(seed.Seed_ID))
+        os.mkdir("2016223")
         download_job_and_definition(seed, seed_df, 0)
 
         # Test that the crawl job report has the expected values.
-        actual_job = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.Seed_ID}_918473_crawljob.csv"),
-                                   os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.Seed_ID}_918474_crawljob.csv")])
+        actual_job = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_918473_crawljob.csv"),
+                                   os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_918474_crawljob.csv")])
         expected_job = [["account", "brozzler", "collection", "crawl_definition", "doc_rate", "downloaded_count",
                          "duplicate_bytes", "duplicate_count", "elapsed_ms", "end_date", "id", "novel_bytes",
                          "novel_count", "original_start_date", "status", "test_crawl_save_date", "test_crawl_state",
@@ -202,7 +206,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(actual_job, expected_job, "Problem with test for multi id/same, job report")
 
         # Test that the crawl definition report has the expected values.
-        actual_def = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.Seed_ID}_31104242954_crawldef.csv")])
+        actual_def = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104242954_crawldef.csv")])
         expected_def = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                          "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
                          "recurrence_type", "test", "time_limit"],
@@ -216,17 +220,18 @@ class MyTestCase(unittest.TestCase):
         one crawl job id, which has one crawl definition id.
         """
         # Makes data needed as function input and runs the function.
-        seed_df = pd.DataFrame([[2202440, 12181, "1137665", 1.0, 1, "name.warc.gz",
+        seed_df = pd.DataFrame([["harg-0000-web-0001", 2202440, 12181, "1137665", 1.0, 1, "name.warc.gz",
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
+                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
+                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
+                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "WARC_Unzip_Errors", "Complete"])
         seed = [seed for seed in seed_df.itertuples()][0]
-        os.mkdir(str(seed.Seed_ID))
+        os.mkdir("2202440")
         download_job_and_definition(seed, seed_df, 0)
 
         # Test that the crawl job report has the expected values.
-        actual_job = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.Seed_ID}_1137665_crawljob.csv")])
+        actual_job = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_1137665_crawljob.csv")])
         expected_job = [["account", "brozzler", "collection", "crawl_definition", "doc_rate", "downloaded_count",
                          "duplicate_bytes", "duplicate_count", "elapsed_ms", "end_date", "id", "novel_bytes",
                          "novel_count", "original_start_date", "status", "test_crawl_save_date", "test_crawl_state",
@@ -239,7 +244,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(actual_job, expected_job, "Problem with test for one id, job report")
 
         # Test that the crawl definition report has the expected values.
-        actual_def = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.Seed_ID}_31104315076_crawldef.csv")])
+        actual_def = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104315076_crawldef.csv")])
         expected_def = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                          "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
                          "recurrence_type", "test", "time_limit"],

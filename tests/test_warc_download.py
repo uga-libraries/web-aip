@@ -45,14 +45,15 @@ class MyTestCase(unittest.TestCase):
         seeds_df["WARC_Fixity_Errors"] = seeds_df["WARC_Fixity_Errors"].str.count("Successfully")
         expected_seeds = [seeds_df.columns.tolist()] + seeds_df.values.tolist()
 
-        actual_seeds = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+        actual_seeds = [["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                          "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
                          "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
-                        [2173769, 12912, "1154002;1148757;1143415", 0.007, 3,
+                        ["harg-0000-web-202005-0001", 2173769, 12912, "1154002;1148757;1143415", 0.007, 3,
                          "ARCHIVEIT-12912-WEEKLY-JOB1154002-SEED2173769-20200513225747964-00000-h3.warc.gz;"
                          "ARCHIVEIT-12912-WEEKLY-JOB1148757-SEED2173769-20200506223640988-00000-h3.warc.gz;"
                          "ARCHIVEIT-12912-WEEKLY-JOB1143415-SEED2173769-20200430010118013-00000-h3.warc.gz",
-                         "Successfully downloaded all metadata reports", "2173769_seedscope.csv", "Successfully redacted",
+                         "Successfully downloaded all metadata reports", "harg-0000-web-202005-0001_seedscope.csv",
+                         "Successfully redacted",
                          "Successfully downloaded ARCHIVEIT-12912-WEEKLY-JOB1154002-SEED2173769-20200513225747964-00000-h3.warc.gz; "
                          "Successfully downloaded ARCHIVEIT-12912-WEEKLY-JOB1148757-SEED2173769-20200506223640988-00000-h3.warc.gz; "
                          "Successfully downloaded ARCHIVEIT-12912-WEEKLY-JOB1143415-SEED2173769-20200430010118013-00000-h3.warc.gz",
@@ -99,19 +100,20 @@ class MyTestCase(unittest.TestCase):
         seeds_df.loc[seeds_df["WARC_Fixity_Errors"].str.startswith(fixity), "WARC_Fixity_Errors"] = fixity
         actual_seeds = [seeds_df.columns.tolist()] + seeds_df.values.tolist()
 
-        expected_seeds = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+        expected_seeds = [["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                          "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
                          "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
-                        [2027707, 12265, 943048, 0.007, 1,
+                        ["rbrl-498-web-201907-0001", 2027707, 12265, 943048, 0.007, 1,
                          "ARCHIVEIT-12265-TEST-JOB943048-SEED2027707-20190709144234143-00000-h3.warc.gz",
                          "Successfully downloaded all metadata reports", "No empty reports", "Successfully redacted",
                          "Successfully downloaded ARCHIVEIT-12265-TEST-JOB943048-SEED2027707-20190709144234143-00000-h3.warc.gz",
                          "Successfully verified ARCHIVEIT",
                          "Successfully unzipped ARCHIVEIT-12265-TEST-JOB943048-SEED2027707-20190709144234143-00000-h3.warc.gz",
                          "Successfully completed"],
-                        [2027776, 12264, 943446, 0.096, 1,
+                        ["rbrl-377-web-201907-0001", 2027776, 12264, 943446, 0.096, 1,
                          "ARCHIVEIT-12264-TEST-JOB943446-SEED2027776-20190710131748634-00000-h3.warc.gz",
-                         "Successfully downloaded all metadata reports", "2027776_seedscope.csv", "Successfully redacted",
+                         "Successfully downloaded all metadata reports", "rbrl-377-web-201907-0001_seedscope.csv",
+                         "Successfully redacted",
                          "Successfully downloaded ARCHIVEIT-12264-TEST-JOB943446-SEED2027776-20190710131748634-00000-h3.warc.gz",
                          "Successfully verified ARCHIVEIT",
                          "Successfully unzipped ARCHIVEIT-12264-TEST-JOB943446-SEED2027776-20190710131748634-00000-h3.warc.gz",

@@ -38,16 +38,15 @@ class MyTestCase(unittest.TestCase):
         Makes a dataframe, seed folder, and seed (has metadata for the one row in the dataframe)
         to use as a starting point for each test.
         """
-        self.seed_df = pd.DataFrame([["2027707", 12265, "943048", 0.01, 1,
+        self.seed_df = pd.DataFrame([["rbrl-1", "2027707", 12265, "943048", 0.01, 1,
                                       "ARCHIVEIT-12265-TEST-JOB943048-SEED2027707-20190709144234143-00000-h3.warc.gz",
                                       np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                                    columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
+                                    columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                              "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
                                              "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
                                              "WARC_Unzip_Errors", "Complete"])
-        for seed in self.seed_df.itertuples():
-            self.seed = seed
-            os.mkdir("2027707")
+        self.seed = [seed for seed in self.seed_df.itertuples()][0]
+        os.mkdir("2027707")
 
     def tearDown(self):
         """
@@ -60,9 +59,9 @@ class MyTestCase(unittest.TestCase):
         Tests that the function updates the log if there is an API error.
         The error is caused by giving it improperly formatted collection number.
         """
-        get_report(self.seed, self.seed_df, 0, "collection", "abc-coll", "scope_rule", "2783596_collscope.csv")
+        get_report(self.seed, self.seed_df, 0, "collection", "abc-coll", "scope_rule", "rbrl-1_collscope.csv")
         actual_error = self.seed_df['Metadata_Report_Errors'][0]
-        expected_error = "2783596_collscope.csv API Error 500"
+        expected_error = "rbrl-1_collscope.csv API Error 500"
         self.assertEqual(actual_error, expected_error, "Problem with test for API error")
 
     def test_collection(self):
@@ -70,8 +69,8 @@ class MyTestCase(unittest.TestCase):
         Tests that the function downloads the correct collection report.
         The result for testing is the contents of the report.
         """
-        get_report(self.seed, self.seed_df, 0, "id", "12265", "collection", "2027707_coll.csv")
-        actual = csv_list(os.path.join(os.getcwd(), "2027707", "2027707_coll.csv"))
+        get_report(self.seed, self.seed_df, 0, "id", "12265", "collection", "rbrl-1_coll.csv")
+        actual = csv_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_coll.csv"))
         expected = [["account", "created_by", "created_date", "deleted", "id", "image", "last_updated_by",
                      "last_updated_date", "metadata.Collector.0.id", "metadata.Collector.0.value",
                      "metadata.Date.0.id", "metadata.Date.0.value", "metadata.Description.0.id",
@@ -94,8 +93,8 @@ class MyTestCase(unittest.TestCase):
         Tests that the function downloads the correct collection scope report.
         The result for testing is the contents of the report.
         """
-        get_report(self.seed, self.seed_df, 0, "collection", "12265", "scope_rule", "2027707_collscope.csv")
-        actual = csv_list(os.path.join(os.getcwd(), "2027707", "2027707_collscope.csv"))
+        get_report(self.seed, self.seed_df, 0, "collection", "12265", "scope_rule", "rbrl-1_collscope.csv")
+        actual = csv_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_collscope.csv"))
         expected = [["abstract_scope_rule", "account", "collection", "created_by", "created_date", "enabled",
                      "host", "id", "last_updated_by", "last_updated_date", "scope_rule_template", "seed", "type",
                      "url_match", "value"],
@@ -113,15 +112,15 @@ class MyTestCase(unittest.TestCase):
         Tests that the function does not download an empty collection scope report.
         This is one of two reports (the other is seed scope) that does not always have data.
         """
-        get_report(self.seed, self.seed_df, 0, "collection", "15678", "scope_rule", "2783596_collscope.csv")
+        get_report(self.seed, self.seed_df, 0, "collection", "15678", "scope_rule", "magil-1_collscope.csv")
 
         # Test that the file was not made.
-        csv_path_exists = os.path.exists(os.path.join(os.getcwd(), "2027707", "2783596_collscope.csv"))
+        csv_path_exists = os.path.exists(os.path.join(os.getcwd(), "2027707", "magil-1_collscope.csv"))
         self.assertEqual(csv_path_exists, False, "Problem with test for collection scope is empty, is file made")
 
         # Test that the log information in seed_df was updated.
         actual_info = self.seed_df['Metadata_Report_Empty'][0]
-        expected_info = "2783596_collscope.csv"
+        expected_info = "magil-1_collscope.csv"
         self.assertEqual(actual_info, expected_info, "Problem with test for seed scope is empty, log")
 
     def test_crawl_definition(self):
@@ -129,8 +128,8 @@ class MyTestCase(unittest.TestCase):
         Tests that the function downloads the correct crawl definition report.
         The result for testing is the contents of the report.
         """
-        get_report(self.seed, self.seed_df, 0, "id", "31104250630", "crawl_definition", "2027707_31104250630_crawldef.csv")
-        actual = csv_list(os.path.join(os.getcwd(), "2027707", "2027707_31104250630_crawldef.csv"))
+        get_report(self.seed, self.seed_df, 0, "id", "31104250630", "crawl_definition", "rbrl-1_31104250630_crawldef.csv")
+        actual = csv_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_31104250630_crawldef.csv"))
         expected = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                      "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only", "recurrence_type",
                      "test","time_limit"],
@@ -142,8 +141,8 @@ class MyTestCase(unittest.TestCase):
         Tests that the function downloads the correct crawl job report.
         The result for testing is the contents of the report.
         """
-        get_report(self.seed, self.seed_df, 0, "id", "943048", "crawl_job", "2027707_943048_crawljob.csv")
-        actual = csv_list(os.path.join(os.getcwd(), "2027707", "2027707_943048_crawljob.csv"))
+        get_report(self.seed, self.seed_df, 0, "id", "943048", "crawl_job", "rbrl-1_943048_crawljob.csv")
+        actual = csv_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_943048_crawljob.csv"))
         expected = [["account", "brozzler", "collection", "crawl_definition", "doc_rate", "downloaded_count",
                      "duplicate_bytes", "duplicate_count", "elapsed_ms", "end_date", "id", "novel_bytes",
                      "novel_count", "original_start_date", "status", "test_crawl_save_date", "test_crawl_state",
@@ -159,8 +158,8 @@ class MyTestCase(unittest.TestCase):
         Tests that the function downloads the correct seed report.
         The result for testing is the contents of the report.
         """
-        get_report(self.seed, self.seed_df, 0, "id", "2027707", "seed", "2027707_seed.csv")
-        actual = csv_list(os.path.join(os.getcwd(), "2027707", "2027707_seed.csv"))
+        get_report(self.seed, self.seed_df, 0, "id", "2027707", "seed", "rbrl-1_seed.csv")
+        actual = csv_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_seed.csv"))
         expected = [["active", "canonical_url", "collection", "crawl_definition", "created_by", "created_date",
                      "deleted", "http_response_code", "id", "last_checked_http_response_code", "last_updated_by",
                      "last_updated_date", "metadata.Collector.0.id",
@@ -190,8 +189,8 @@ class MyTestCase(unittest.TestCase):
         Tests that the function downloads the correct seed scope report.
         The result for testing is the contents of the report.
         """
-        get_report(self.seed, self.seed_df, 0, "seed", "2027707", "scope_rule", "2027707_seedscope.csv")
-        actual = csv_list(os.path.join(os.getcwd(), "2027707", "2027707_seedscope.csv"))
+        get_report(self.seed, self.seed_df, 0, "seed", "2027707", "scope_rule", "rbrl-1_seedscope.csv")
+        actual = csv_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_seedscope.csv"))
         expected = [["abstract_scope_rule", "account", "collection", "created_by", "created_date", "enabled",
                      "host", "id", "last_updated_by", "last_updated_date", "scope_rule_template", "seed",
                      "type", "url_match", "value"],
@@ -205,7 +204,7 @@ class MyTestCase(unittest.TestCase):
         Tests that the function does not download an empty seed scope report.
         This is one of two reports (the other is collection scope) that does not always have data.
         """
-        get_report(self.seed, self.seed_df, 0, "seed", "2783596", "scope_rule", "2783596_seedscope.csv")
+        get_report(self.seed, self.seed_df, 0, "seed", "2783596", "scope_rule", "magil-1_seedscope.csv")
 
         # Test that the file was not made.
         csv_path_exists = os.path.exists(os.path.join(os.getcwd(), "2027707", "2783596_seedscope.csv"))
@@ -213,7 +212,7 @@ class MyTestCase(unittest.TestCase):
 
         # Test that the log information in seed_df was updated.
         actual_info = self.seed_df['Metadata_Report_Empty'][0]
-        expected_info = "2783596_seedscope.csv"
+        expected_info = "magil-1_seedscope.csv"
         self.assertEqual(actual_info, expected_info, "Problem with test for seed scope is empty, log")
 
 

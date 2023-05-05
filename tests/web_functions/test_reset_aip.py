@@ -30,12 +30,13 @@ class MyTestCase(unittest.TestCase):
             warc1.write("WARC unzip error placeholder")
 
         # Makes seed_df with one completed seed and one that was in progress (later logging fields have no data).
-        self.seed_df = pd.DataFrame([["1111111", "12345", "1000000", 0.521, 1, "ARCHIVEIT.warc.gz",
+        self.seed_df = pd.DataFrame([["aip-1", "1111111", "12345", "1000000", 0.521, 1, "ARCHIVEIT.warc.gz",
                                       "Success", "No empty reports", "Success", "Success", "Success",
                                       "Success", np.NaN],
-                                     ["2222222", "12345", "2000000", 0.522, 2, "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
+                                     ["aip-2", "2222222", "12345", "2000000", 0.522, 2,
+                                      "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
                                       "Success", "seed.csv", "Success", "Success", "Success", "Error", np.NaN]],
-                                    columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
+                                    columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                              "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
                                              "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
                                              "WARC_Unzip_Errors", "Complete"])
@@ -66,12 +67,13 @@ class MyTestCase(unittest.TestCase):
         # Test that the dataframe has the correct values.
         self.seed_df = self.seed_df.fillna("BLANK")
         actual_dataframe = [self.seed_df.columns.tolist()] + self.seed_df.values.tolist()
-        expected_dataframe = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+        expected_dataframe = [["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
                                "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
-                              ["1111111", "12345", "1000000", 0.521, 1, "ARCHIVEIT.warc.gz",
+                              ["aip-1", "1111111", "12345", "1000000", 0.521, 1, "ARCHIVEIT.warc.gz",
                                "Success", "No empty reports", "Success", "Success", "Success", "Success", "BLANK"],
-                              ["2222222", "12345", "2000000", 0.522, 2, "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
+                              ["aip-2", "2222222", "12345", "2000000", 0.522, 2,
+                               "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
                                "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]]
         self.assertEqual(actual_dataframe, expected_dataframe, "Problem with test for dataframe values")
 
@@ -80,12 +82,12 @@ class MyTestCase(unittest.TestCase):
         with open(csv_path, newline="") as open_file:
             reader = csv.reader(open_file)
             actual_csv = list(reader)
-        expected_csv = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+        expected_csv = [["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                          "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_API_Errors",
                          "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
-                        ["1111111", "12345", "1000000", "0.521", "1", "ARCHIVEIT.warc.gz",
+                        ["aip-1", "1111111", "12345", "1000000", "0.521", "1", "ARCHIVEIT.warc.gz",
                          "Success", "No empty reports", "Success", "Success", "Success", "Success", ""],
-                        ["2222222", "12345", "2000000", "0.522", "2", "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
+                        ["aip-2", "2222222", "12345", "2000000", "0.522", "2", "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
                          "", "", "", "", "", "", ""]]
         self.assertEqual(actual_csv, expected_csv, "Problem with test for CSV values")
 

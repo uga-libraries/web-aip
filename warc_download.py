@@ -64,7 +64,8 @@ seeds_directory = os.path.join(c.script_output, "preservation_download")
 
 # The script may be run repeatedly if there are interruptions, such as due to API connections.
 # If it has run, it will use the existing seeds_log.csv for seed_df and and skip seeds that were already done.
-# Otherwise, it makes seed_df by getting data from the Archive-It APIs.
+# Otherwise, it makes seed_df and metadata_csv by getting data from the Archive-It APIs
+# and add the AIP_ID from metadata_csv to be the first column of seed_df.
 if os.path.exists(seeds_directory):
     os.chdir(seeds_directory)
     seed_df = pd.read_csv(os.path.join(c.script_output, "seeds_log.csv"), dtype="object")
@@ -72,7 +73,9 @@ else:
     os.makedirs(seeds_directory)
     os.chdir(seeds_directory)
     seed_df = fun.seed_data(date_start, date_end)
-    fun.metadata_csv(seed_df['Seed_ID'].values.tolist(), date_end)
+    aip_id_df = fun.metadata_csv(seed_df['Seed_ID'].values.tolist(), date_end)
+    seed_df = pd.merge(seed_df, aip_id_df, how="left")
+    seed_df.insert(0, "AIP_ID", seed_df.pop('AIP_ID'))
 
 # Starts counter for tracking script progress.
 # Some processes are slow, so this shows the script is still working and how much remains.

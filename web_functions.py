@@ -7,7 +7,6 @@ Dependencies:
 
 import csv
 import datetime
-import numpy as np
 import os
 import pandas as pd
 import re
@@ -339,15 +338,15 @@ def download_job_and_definition(seed, seed_df, row_index):
     for job in job_list:
 
         # Downloads the crawl job for report.
-        get_report(seed, seed_df, row_index, "id", job, "crawl_job", f"{seed.Seed_ID}_{job}_crawljob.csv")
+        get_report(seed, seed_df, row_index, "id", job, "crawl_job", f"{seed.AIP_ID}_{job}_crawljob.csv")
 
         # Reads the crawl job to get the crawl definition ID.
         # If reading the id is successful and the report isn't downloaded yet, downloads the crawl definition report.
         # If the crawl job report wasn't downloaded, logs the error instead.
         try:
-            report_df = pd.read_csv(f"{seed.Seed_ID}/{seed.Seed_ID}_{job}_crawljob.csv", dtype="object")
+            report_df = pd.read_csv(f"{seed.Seed_ID}/{seed.AIP_ID}_{job}_crawljob.csv", dtype="object")
             crawl_def_id = report_df.loc[0, "crawl_definition"]
-            crawL_def_report_name = f"{seed.Seed_ID}_{crawl_def_id}_crawldef.csv"
+            crawL_def_report_name = f"{seed.AIP_ID}_{crawl_def_id}_crawldef.csv"
             if not os.path.exists(f"{seed.Seed_ID}/{crawL_def_report_name}"):
                 get_report(seed, seed_df, row_index, "id", crawl_def_id, "crawl_definition", crawL_def_report_name)
         except FileNotFoundError:
@@ -365,13 +364,13 @@ def download_metadata(seed, row_index, seed_df):
 
     # Downloads four of the six metadata reports from Archive-It needed to understand the context of the WARC.
     # These are reports where there is only one report per seed or collection.
-    get_report(seed, seed_df, row_index, "id", seed.Seed_ID, "seed", f"{seed.Seed_ID}_seed.csv")
-    get_report(seed, seed_df, row_index, "seed", seed.Seed_ID, "scope_rule", f"{seed.Seed_ID}_seedscope.csv")
-    get_report(seed, seed_df, row_index, "collection", seed.AIT_Collection, "scope_rule", f"{seed.Seed_ID}_collscope.csv")
-    get_report(seed, seed_df, row_index, "id", seed.AIT_Collection, "collection", f"{seed.Seed_ID}_coll.csv")
+    get_report(seed, seed_df, row_index, "id", seed.Seed_ID, "seed", f"{seed.AIP_ID}_seed.csv")
+    get_report(seed, seed_df, row_index, "seed", seed.Seed_ID, "scope_rule", f"{seed.AIP_ID}_seedscope.csv")
+    get_report(seed, seed_df, row_index, "collection", seed.AIT_Collection, "scope_rule", f"{seed.AIP_ID}_collscope.csv")
+    get_report(seed, seed_df, row_index, "id", seed.AIT_Collection, "collection", f"{seed.AIP_ID}_coll.csv")
 
     # Redacts login information from the seed report.
-    redact_seed_report(seed.Seed_ID, seed_df, row_index)
+    redact_seed_report(seed.Seed_ID, seed.AIP_ID, seed_df, row_index)
 
     # Downloads each of the crawl job reports and its corresponding crawl definition report (if new).
     download_job_and_definition(seed, seed_df, row_index)
@@ -623,8 +622,13 @@ def metadata_csv(seeds_list, date_end):
     df = df.drop(['Sequential'], axis=1)
     df.to_csv(os.path.join(c.script_output, "preservation_download", "metadata.csv"), index=False)
 
+    # Returns a dataframe with the Seed ID (Folder) and AIP ID so the AIP ID can be added to seed_df.
+    aip_df = df[['Folder', 'AIP_ID']].copy()
+    aip_df.rename(columns={"Folder": "Seed_ID"}, inplace=True)
+    return aip_df
 
-def redact_seed_report(seed_id, seed_df, row_index):
+
+def redact_seed_report(seed_id, aip_id, seed_df, row_index):
     """
     Replaces the seed report with a redacted version of the file, removing login information if those columns
     are present. Even if the columns are blank, replaces it with REDACTED. Since not all login information is
@@ -632,11 +636,11 @@ def redact_seed_report(seed_id, seed_df, row_index):
     there was login information or not is misleading.
     """
 
-    report_df = pd.read_csv(f"{seed_id}/{seed_id}_seed.csv")
+    report_df = pd.read_csv(f"{seed_id}/{aip_id}_seed.csv")
     if "login_password" in report_df.columns:
         report_df["login_username"] = "REDACTED"
         report_df["login_password"] = "REDACTED"
-        report_df.to_csv(f"{seed_id}/{seed_id}_seed.csv", index=False)
+        report_df.to_csv(f"{seed_id}/{aip_id}_seed.csv", index=False)
         log("Successfully redacted", seed_df, row_index, "Seed_Report_Redaction")
     else:
         log("No login columns to redact", seed_df, row_index, "Seed_Report_Redaction")

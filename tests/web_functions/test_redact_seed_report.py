@@ -31,19 +31,20 @@ class MyTestCase(unittest.TestCase):
         # Input needed for the test: seed_df has the progress of the script so far,
         # a folder named with the AIP ID and a seeds_log.csv file inside the AIP folder.
         # The seeds_log.csv file only has a few of the actual columns, since only logins are needed for testing.
-        seed_df = pd.DataFrame([["1234567", 123465, "900000", 0.01, 1, "ARCHIVEIT-1.warc.gz",
+        seed_df = pd.DataFrame([["aip-1", "1234567", 123465, "900000", 0.01, 1, "ARCHIVEIT-1.warc.gz",
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
+                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
+                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
+                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "WARC_Unzip_Errors", "Complete"])
         os.mkdir("1234567")
-        seed_csv_path = os.path.join(os.getcwd(), "1234567", "1234567_seed.csv")
+        seed_csv_path = os.path.join(os.getcwd(), "1234567", "aip-1_seed.csv")
         with open(seed_csv_path, "w", newline="") as file:
             writer = csv.writer(file)
             writer.writerow(["canonical_url", "collection", "seed_type"])
             writer.writerow(["www.noredact.com", 123456, "test"])
 
-        redact_seed_report("1234567", seed_df, 0)
+        redact_seed_report("1234567", "aip-1", seed_df, 0)
 
         # Test that seed report has not changed.
         report_df = pd.read_csv(seed_csv_path)
@@ -64,19 +65,20 @@ class MyTestCase(unittest.TestCase):
         # Input needed for the test: seed_df has the progress of the script so far,
         # a folder named with the AIP ID and a seeds_log.csv file inside the AIP folder.
         # The seeds_log.csv file only has a few of the actual columns, since only logins are needed for testing.
-        seed_df = pd.DataFrame([["1234567", 123465, "900000", 0.01, 1, "ARCHIVEIT-1.warc.gz",
+        seed_df = pd.DataFrame([["aip-1", "1234567", 123465, "900000", 0.01, 1, "ARCHIVEIT-1.warc.gz",
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
+                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
+                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
+                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "WARC_Unzip_Errors", "Complete"])
         os.mkdir("1234567")
-        seed_csv_path = os.path.join(os.getcwd(), "1234567", "1234567_seed.csv")
+        seed_csv_path = os.path.join(os.getcwd(), "1234567", "aip-1_seed.csv")
         with open(seed_csv_path, "w", newline="") as file:
             writer = csv.writer(file)
             writer.writerow(["canonical_url", "collection", "login_password", "login_username", "seed_type"])
             writer.writerow(["www.noredact.com", 123456, "PASS", "USER", "test"])
 
-        redact_seed_report("1234567", seed_df, 0)
+        redact_seed_report("1234567", "aip-1", seed_df, 0)
 
         # Test that seed report has changed.
         report_df = pd.read_csv(seed_csv_path)
