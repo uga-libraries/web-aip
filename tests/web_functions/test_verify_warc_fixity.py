@@ -32,10 +32,10 @@ class MyTestCase(unittest.TestCase):
         warc = "ARCHIVEIT-12265-MONTHLY-JOB1718490-SEED2444051-20221203041251087-00001-h3.warc.gz"
         warc_path = os.path.join(os.getcwd(), "2444051", warc)
         seed_df = pd.DataFrame([[2444051, 12265, "1718490", 0.01, 1, warc,
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
         os.mkdir("2444051")
         get_warc(seed_df, 0,  f"https://warcs.archive-it.org/webdatafile/{warc}", warc, warc_path)
         verify_warc_fixity(seed_df, 0, warc_path, warc, "7f0c9f11a27b06271b4137d99946fc52")
@@ -58,10 +58,10 @@ class MyTestCase(unittest.TestCase):
         warc = "ARCHIVEIT-12912-TEST-JOB1115532-SEED2173769-20200326213812038-00000-h3.warc.gz"
         warc_path = os.path.join(os.getcwd(), "2173769", warc)
         seed_df = pd.DataFrame([[2173769, 12912, "1115532", 0.01, 1, warc,
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
         os.mkdir("2173769")
         get_warc(seed_df, 0,  f"https://warcs.archive-it.org/webdatafile/{warc}", warc, warc_path)
         with self.assertRaises(ValueError):
@@ -73,7 +73,7 @@ class MyTestCase(unittest.TestCase):
 
         # Test the log is updated correctly.
         actual = seed_df["WARC_Fixity_Errors"][0]
-        expected = f"Fixity for {warc} changed and it was deleted: " \
+        expected = f"Error: fixity for {warc} changed and it was deleted: " \
                    f"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx before, 422c2c674cac30a015120483c2fa25cd after"
         self.assertEqual(actual, expected, "Problem with test for correct, log")
 
@@ -86,10 +86,10 @@ class MyTestCase(unittest.TestCase):
         warc = "ARCHIVEIT-12265-TEST-JOB1365541-SEED2454528-20210217005857702-00002-h3.warc.gz"
         warc_path = os.path.join(os.getcwd(), "2454528", warc)
         seed_df = pd.DataFrame([[2454528, 12265, "1365541", 0.01, 1, warc,
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
         os.mkdir("2454528")
         get_warc(seed_df, 0,  f"https://warcs.archive-it.org/webdatafile/{warc}", warc, warc_path)
         with self.assertRaises(AttributeError):
@@ -102,7 +102,7 @@ class MyTestCase(unittest.TestCase):
 
         # Test the log is updated correctly.
         actual = seed_df["WARC_Fixity_Errors"][0]
-        expected = f"Fixity for {warc} cannot be extracted from md5deep output: b''"
+        expected = f"Error: fixity for {warc} cannot be extracted from md5deep output: b''"
         self.assertEqual(actual, expected, "Problem with test for correct, log")
 
 

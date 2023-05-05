@@ -3,6 +3,7 @@ Test for the reset_aip() function.
 It deletes a seed folder and the information from that seed from seed_df and seeds_log.csv.
 """
 import csv
+import numpy as np
 import os
 import pandas as pd
 import shutil
@@ -30,13 +31,14 @@ class MyTestCase(unittest.TestCase):
 
         # Makes seed_df with one completed seed and one that was in progress (later logging fields have no data).
         self.seed_df = pd.DataFrame([["1111111", "12345", "1000000", 0.521, 1, "ARCHIVEIT.warc.gz",
-                                      "Success", "No empty reports", "Success", "Success", "Success", "Success"],
+                                      "Success", "No empty reports", "Success", "Success", "Success",
+                                      "Success", np.NaN],
                                      ["2222222", "12345", "2000000", 0.522, 2, "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
-                                      "Success", "seed.csv", "Success", "Success", "Success", "Error"]],
+                                      "Success", "seed.csv", "Success", "Success", "Success", "Error", np.NaN]],
                                     columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                              "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
                                              "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
-                                             "WARC_Unzip_Errors"])
+                                             "WARC_Unzip_Errors", "Complete"])
 
         # Makes a log, seeds_log.csv, in the script output directory.
         self.seed_df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
@@ -66,11 +68,11 @@ class MyTestCase(unittest.TestCase):
         actual_dataframe = [self.seed_df.columns.tolist()] + self.seed_df.values.tolist()
         expected_dataframe = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                               "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"],
+                               "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                               ["1111111", "12345", "1000000", 0.521, 1, "ARCHIVEIT.warc.gz",
-                               "Success", "No empty reports", "Success", "Success", "Success", "Success"],
+                               "Success", "No empty reports", "Success", "Success", "Success", "Success", "BLANK"],
                               ["2222222", "12345", "2000000", 0.522, 2, "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
-                               "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]]
+                               "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]]
         self.assertEqual(actual_dataframe, expected_dataframe, "Problem with test for dataframe values")
 
         # Test that the CSV has the correct values.
@@ -80,11 +82,11 @@ class MyTestCase(unittest.TestCase):
             actual_csv = list(reader)
         expected_csv = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                          "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_API_Errors",
-                         "WARC_Fixity_Errors", "WARC_Unzip_Errors"],
+                         "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                         ["1111111", "12345", "1000000", "0.521", "1", "ARCHIVEIT.warc.gz",
-                         "Success", "No empty reports", "Success", "Success", "Success", "Success"],
+                         "Success", "No empty reports", "Success", "Success", "Success", "Success", ""],
                         ["2222222", "12345", "2000000", "0.522", "2", "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
-                         "", "", "", "", "", ""]]
+                         "", "", "", "", "", "", ""]]
         self.assertEqual(actual_csv, expected_csv, "Problem with test for CSV values")
 
 

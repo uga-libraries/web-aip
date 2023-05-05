@@ -40,11 +40,11 @@ class MyTestCase(unittest.TestCase):
         """
         self.seed_df = pd.DataFrame([["2027707", 12265, "943048", 0.01, 1,
                                       "ARCHIVEIT-12265-TEST-JOB943048-SEED2027707-20190709144234143-00000-h3.warc.gz",
-                                      np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                      np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                     columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                              "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
                                              "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
-                                             "WARC_Unzip_Errors"])
+                                             "WARC_Unzip_Errors", "Complete"])
         for seed in self.seed_df.itertuples():
             self.seed = seed
             os.mkdir("2027707")

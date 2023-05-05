@@ -23,17 +23,17 @@ class MyTestCase(unittest.TestCase):
         """
         columns = ["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                    "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                   "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"]
+                   "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"]
         error = [2018086, 12264, "921631", 0.01, 2,
                  "error.warc.gz;ARCHIVEIT-12264-TEST-JOB921631-SEED2018086-20190607140142542-00000-h3.warc.gz",
-                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
         harg = [2173769, 12912, "1415330", 0.01, 1,
                 "ARCHIVEIT-12912-WEEKLY-JOB1415330-SEED2173769-20210519233828683-00001-h3.warc.gz",
-                np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+                np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
         rbrl = [2485678, 12265, "718490", 0.02, 2,
                 "ARCHIVEIT-12265-MONTHLY-JOB1718490-SEED2485678-20221203180441653-00001-h3.warc.gz;"
                 "ARCHIVEIT-12265-MONTHLY-JOB1718490-SEED2485678-20221202160754903-00000-h3.warc.gz",
-                np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
+                np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
         self.seed_df = pd.DataFrame([error, harg, rbrl], columns=columns)
 
         self.seeds_dir = os.path.join(c.script_output, "preservation_download")
@@ -57,7 +57,7 @@ class MyTestCase(unittest.TestCase):
         seed_path = os.path.join(self.seeds_dir, "2018086")
         os.makedirs(seed_path)
         seed = [seed for seed in self.seed_df.itertuples()][0]
-        download_warcs(seed, self.seed_df)
+        download_warcs(seed, 0, self.seed_df)
 
         # Test for the WARC download.
         warc = "ARCHIVEIT-12264-TEST-JOB921631-SEED2018086-20190607140142542-00000-h3.warc"
@@ -83,7 +83,7 @@ class MyTestCase(unittest.TestCase):
         seed_path = os.path.join(self.seeds_dir, "2173769")
         os.makedirs(seed_path)
         seed = [seed for seed in self.seed_df.itertuples()][1]
-        download_warcs(seed, self.seed_df)
+        download_warcs(seed, 1, self.seed_df)
 
         # Test for the WARC download.
         warc = "ARCHIVEIT-12912-WEEKLY-JOB1415330-SEED2173769-20210519233828683-00001-h3.warc"
@@ -107,7 +107,7 @@ class MyTestCase(unittest.TestCase):
         seed_path = os.path.join(self.seeds_dir, "2485678")
         os.makedirs(seed_path)
         seed = [seed for seed in self.seed_df.itertuples()][2]
-        download_warcs(seed, self.seed_df)
+        download_warcs(seed, 2, self.seed_df)
 
         # Test for the WARCs download.
         warc1 = "ARCHIVEIT-12265-MONTHLY-JOB1718490-SEED2485678-20221203180441653-00001-h3.warc"

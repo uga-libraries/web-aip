@@ -30,13 +30,13 @@ class MyTestCase(unittest.TestCase):
         """
         # Makes the data needed for the function input and runs the function.
         seed_df = pd.DataFrame([[2187482, 12181, "1177700", 3.62, 3, "name0.warc.gz;name1.warc.gz;name2.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2187482")
-        download_metadata(seed, seed_df)
+        download_metadata(seed, 0, seed_df)
 
         # Test that the correct metadata reports were downloaded.
         actual = []
@@ -68,13 +68,13 @@ class MyTestCase(unittest.TestCase):
         """
         # Makes the data needed for the function input and runs the function.
         seed_df = pd.DataFrame([[2529685, 15678, "1594228", 0.36, 1, "name.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2529685")
-        download_metadata(seed, seed_df)
+        download_metadata(seed, 0, seed_df)
 
         # Test that the correct metadata reports were downloaded.
         actual = []
@@ -105,13 +105,13 @@ class MyTestCase(unittest.TestCase):
         # Makes the data needed for the function input and runs the function.
         seed_df = pd.DataFrame([[2547528, 12265, "1436714;1718490", 0.72, 3,
                                  "name0.warc.gz;name1.warc.gz;name2.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2547528")
-        download_metadata(seed, seed_df)
+        download_metadata(seed, 0, seed_df)
 
         # Test that the correct metadata reports were downloaded.
         actual = []

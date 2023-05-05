@@ -19,15 +19,15 @@ class MyTestCase(unittest.TestCase):
         """
         self.seed_df = pd.DataFrame([[1111111, 12345, "1100000", 0.52, 1,
                                       "ARCHIVEIT.warc.gz", "Successfully downloaded all metadata reports",
-                                      "No empty reports", np.NaN, np.NaN, np.NaN, np.NaN],
+                                      "No empty reports", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
                                      [2222222, 12345, "2200000", 1.52, 2,
                                       "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
                                       "Successfully downloaded all metadata reports", "2222222_seedscope.csv",
-                                      np.NaN, np.NaN, np.NaN, np.NaN]],
+                                      np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                     columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                              "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
                                              "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
-                                             "WARC_Unzip_Errors"])
+                                             "WARC_Unzip_Errors", "Complete"])
         self.seed_df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
 
     def tearDown(self):
@@ -48,14 +48,14 @@ class MyTestCase(unittest.TestCase):
         actual_dataframe = [self.seed_df.columns.tolist()] + self.seed_df.values.tolist()
         expected_dataframe = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                               "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"],
+                               "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                               [1111111, 12345, "1100000", 0.52, 1, "ARCHIVEIT.warc.gz",
                                "Successfully downloaded all metadata reports",
                                "No empty reports", "BLANK", "Successfully downloaded ARCHIVEIT.warc.gz",
-                               "BLANK", "BLANK"],
+                               "BLANK", "BLANK", "BLANK"],
                               [2222222, 12345, "2200000", 1.52, 2, "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
                                "Successfully downloaded all metadata reports", "2222222_seedscope.csv",
-                               "BLANK", "BLANK", "BLANK", "BLANK"]]
+                               "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]]
         self.assertEqual(actual_dataframe, expected_dataframe, "Problem with test for first message, dataframe values")
 
         # Test that the CSV has the correct values.
@@ -65,12 +65,12 @@ class MyTestCase(unittest.TestCase):
             actual_csv = list(reader)
         expected_csv = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                          "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                         "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"],
+                         "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                         ["1111111", "12345", "1100000", "0.52", "1", "ARCHIVEIT.warc.gz",
                          "Successfully downloaded all metadata reports", "No empty reports",
-                         "", "Successfully downloaded ARCHIVEIT.warc.gz", "", ""],
+                         "", "Successfully downloaded ARCHIVEIT.warc.gz", "", "", ""],
                         ["2222222", "12345", "2200000", "1.52", "2", "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
-                         "Successfully downloaded all metadata reports", "2222222_seedscope.csv", "", "", "", ""]]
+                         "Successfully downloaded all metadata reports", "2222222_seedscope.csv", "", "", "", "", ""]]
         self.assertEqual(actual_csv, expected_csv, "Problem with test for first message, CSV values")
 
     def test_second_message(self):
@@ -85,13 +85,14 @@ class MyTestCase(unittest.TestCase):
         actual_dataframe = [self.seed_df.columns.tolist()] + self.seed_df.values.tolist()
         expected_dataframe = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                               "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"],
+                               "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                               [1111111, 12345, "1100000", 0.52, 1, "ARCHIVEIT.warc.gz",
                                "Successfully downloaded all metadata reports", "No empty reports",
-                               "BLANK", "BLANK", "BLANK", "BLANK"],
+                               "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
                               [2222222, 12345, "2200000", 1.52, 2, "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
                                "Successfully downloaded all metadata reports",
-                               "2222222_seedscope.csv; 2222222_collscope.csv", "BLANK", "BLANK", "BLANK", "BLANK"]]
+                               "2222222_seedscope.csv; 2222222_collscope.csv",
+                               "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]]
         self.assertEqual(actual_dataframe, expected_dataframe, "Problem with test for second message, dataframe values")
 
         # Test that the CSV has the correct values.
@@ -101,12 +102,12 @@ class MyTestCase(unittest.TestCase):
             actual_csv = list(reader)
         expected_csv = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                          "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                         "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"],
+                         "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                         ["1111111", "12345", "1100000", "0.52", "1", "ARCHIVEIT.warc.gz",
-                         "Successfully downloaded all metadata reports", "No empty reports", "", "", "", ""],
+                         "Successfully downloaded all metadata reports", "No empty reports", "", "", "", "", ""],
                         ["2222222", "12345", "2200000", "1.52", "2", "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
                          "Successfully downloaded all metadata reports",
-                         "2222222_seedscope.csv; 2222222_collscope.csv", "", "", "", ""]]
+                         "2222222_seedscope.csv; 2222222_collscope.csv", "", "", "", "", ""]]
         self.assertEqual(actual_csv, expected_csv, "Problem with test for second message, CSV values")
 
 

@@ -30,10 +30,10 @@ class MyTestCase(unittest.TestCase):
         # Makes the data needed for the function input and runs the function.
         warc = "ARCHIVEIT-15678-TEST-JOB1594318-0-SEED2529656-20220420025307556-00000-k3n6tj0y.warc.gz"
         seed_df = pd.DataFrame([[2529656, 15678, "1594318", 0.01, 1, warc,
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
         os.mkdir("2529656")
         get_warc(seed_df, 0, f"https://warcs.archive-it.org/webdatafile/{warc}", warc, f"2529656/{warc}")
 
@@ -54,10 +54,10 @@ class MyTestCase(unittest.TestCase):
         # Makes the data needed for the function input and runs the function.
         warc = "ARCHIVEIT-error.warc.gz"
         seed_df = pd.DataFrame([[2529656, 15678, "1594318", 0.01, 1, warc,
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
         os.mkdir("2529656")
 
         with self.assertRaises(ValueError):
@@ -69,7 +69,7 @@ class MyTestCase(unittest.TestCase):
 
         # Test the log is updated correctly.
         actual = seed_df["WARC_API_Errors"][0]
-        expected = f"API error 404: can't download ARCHIVEIT-error.warc.gz"
+        expected = f"API Error 404: can't download ARCHIVEIT-error.warc.gz"
         self.assertEqual(actual, expected, "Problem with test for error, log")
 
 

@@ -32,10 +32,10 @@ class MyTestCase(unittest.TestCase):
         # a folder named with the AIP ID and a seeds_log.csv file inside the AIP folder.
         # The seeds_log.csv file only has a few of the actual columns, since only logins are needed for testing.
         seed_df = pd.DataFrame([["1234567", 123465, "900000", 0.01, 1, "ARCHIVEIT-1.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
         os.mkdir("1234567")
         seed_csv_path = os.path.join(os.getcwd(), "1234567", "1234567_seed.csv")
         with open(seed_csv_path, "w", newline="") as file:
@@ -65,10 +65,10 @@ class MyTestCase(unittest.TestCase):
         # a folder named with the AIP ID and a seeds_log.csv file inside the AIP folder.
         # The seeds_log.csv file only has a few of the actual columns, since only logins are needed for testing.
         seed_df = pd.DataFrame([["1234567", 123465, "900000", 0.01, 1, "ARCHIVEIT-1.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
         os.mkdir("1234567")
         seed_csv_path = os.path.join(os.getcwd(), "1234567", "1234567_seed.csv")
         with open(seed_csv_path, "w", newline="") as file:

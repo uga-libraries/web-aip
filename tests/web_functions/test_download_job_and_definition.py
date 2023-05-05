@@ -41,10 +41,10 @@ class MyTestCase(unittest.TestCase):
         """
         # Makes data needed as function input and runs the function.
         seed_df = pd.DataFrame([[2202440, 12181, "job-id-error", 1.0, 1,  "name.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir(str(seed.Seed_ID))
         download_job_and_definition(seed, seed_df, 0)
@@ -52,7 +52,7 @@ class MyTestCase(unittest.TestCase):
         # Test that the log was updated.
         actual_errors = seed_df['Metadata_Report_Errors'][0]
         expected_errors = f"{seed.Seed_ID}_job-id-error_crawljob.csv API Error 500; " \
-                          f"Crawl job was not downloaded so can't get crawl definition id"
+                          f"Error: crawl job was not downloaded so can't get crawl definition id"
         self.assertEqual(actual_errors, expected_errors, "Problem with test for error/no job, log")
 
     def test_multi_id_different(self):
@@ -62,10 +62,10 @@ class MyTestCase(unittest.TestCase):
         """
         # Makes data needed as function input and runs the function.
         seed_df = pd.DataFrame([[2027776, 12264, "1718467;943446", 1.0, 1, "name.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir(str(seed.Seed_ID))
         download_job_and_definition(seed, seed_df, 0)
@@ -112,10 +112,10 @@ class MyTestCase(unittest.TestCase):
         """
         # Makes data needed as function input and runs the function.
         seed_df = pd.DataFrame([[2467332, 12265, "1360420;1365539;1718490", 1.0, 1, "name.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir(str(seed.Seed_ID))
         download_job_and_definition(seed, seed_df, 0)
@@ -172,10 +172,10 @@ class MyTestCase(unittest.TestCase):
         """
         # Makes data needed as function input and runs the function.
         seed_df = pd.DataFrame([[2016223, 12249, "918473;918474", 1.0, 1, "name.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir(str(seed.Seed_ID))
         download_job_and_definition(seed, seed_df, 0)
@@ -217,10 +217,10 @@ class MyTestCase(unittest.TestCase):
         """
         # Makes data needed as function input and runs the function.
         seed_df = pd.DataFrame([[2202440, 12181, "1137665", 1.0, 1, "name.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors"])
+                                        "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir(str(seed.Seed_ID))
         download_job_and_definition(seed, seed_df, 0)

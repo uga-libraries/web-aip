@@ -7,6 +7,7 @@ Dependencies:
 
 import csv
 import datetime
+import numpy as np
 import os
 import pandas as pd
 import re
@@ -18,6 +19,34 @@ import time
 
 # Import constant variables and functions from another UGA preservation script.
 import configuration as c
+
+
+def add_completeness(row_index, seed_df):
+    """
+    Uses the information already in the seed dataframe to log the types of errors for a seed
+    or if it completed downloading without detecting any errors.
+    This will eventually be updated to include a summary of the error types.
+    """
+    # Adds errors from Metadata_Report_Errors.
+    if "Error" in seed_df.at[row_index, 'Metadata_Report_Errors']:
+        log("Metadata_Report_Errors", seed_df, row_index, "Complete")
+
+    # Adds errors from WARC_API_Errors.
+    if "Error" in seed_df.at[row_index, 'WARC_API_Errors']:
+        log("WARC_API_Errors", seed_df, row_index, "Complete")
+
+    # Adds errors from WARC_Fixity_Errors.
+    if "Error" in seed_df.at[row_index, 'WARC_Fixity_Errors']:
+        log("WARC_Fixity_Errors", seed_df, row_index, "Complete")
+
+    # Adds errors from WARC_Unzip_Errors.
+    if "Error" in seed_df.at[row_index, 'WARC_Unzip_Errors']:
+        log("WARC_Unzip_Errors", seed_df, row_index, "Complete")
+
+    # If none of the previous columns had errors, so the Complete column does not have a string with the error types,
+    # adds default text for no errors.
+    if type(seed_df.at[row_index, 'Complete']) is not str:
+        log("Successfully completed", seed_df, row_index, "Complete")
 
 
 def check_aips(date_end, date_start, seed_df, aips_directory):
@@ -322,20 +351,17 @@ def download_job_and_definition(seed, seed_df, row_index):
             if not os.path.exists(f"{seed.Seed_ID}/{crawL_def_report_name}"):
                 get_report(seed, seed_df, row_index, "id", crawl_def_id, "crawl_definition", crawL_def_report_name)
         except FileNotFoundError:
-            log("Crawl job was not downloaded so can't get crawl definition id",
+            log("Error: crawl job was not downloaded so can't get crawl definition id",
                 seed_df, row_index, "Metadata_Report_Errors")
 
 
-def download_metadata(seed, seed_df):
+def download_metadata(seed, row_index, seed_df):
     """
     Uses the Partner API to download six metadata reports to include in the AIPs for archived websites,
     deletes any empty reports (meaning there was no data of that type for this seed),
     and redacts login information from the seed report.
     Any errors are added to the seed dataframe and saved to the script log at the end of the function.
     """
-
-    # Row index for the seed being processed in the dataframe, to use for adding logging information.
-    row_index = seed_df.index[seed_df["Seed_ID"] == seed.Seed_ID].tolist()[0]
 
     # Downloads four of the six metadata reports from Archive-It needed to understand the context of the WARC.
     # These are reports where there is only one report per seed or collection.
@@ -361,12 +387,9 @@ def download_metadata(seed, seed_df):
         seed_df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
 
 
-def download_warcs(seed, seed_df):
+def download_warcs(seed, row_index, seed_df):
     """Downloads every WARC file and verifies that fixity is unchanged after downloading.
     Unzips each WARC."""
-
-    # Row index for the seed being processed in the dataframe, to use for adding logging information.
-    row_index = seed_df.index[seed_df["Seed_ID"] == seed.Seed_ID].tolist()[0]
 
     # Makes a list of the filenames for all WARCs for this seed.
     warc_names = seed.WARC_Filenames.split(";")
@@ -449,7 +472,7 @@ def get_warc(seed_df, row_index, warc_url, warc, warc_path):
     if warc_download.status_code == 200:
         log(f"Successfully downloaded {warc}", seed_df, row_index, "WARC_API_Errors")
     else:
-        log(f"API error {warc_download.status_code}: can't download {warc}",
+        log(f"API Error {warc_download.status_code}: can't download {warc}",
             seed_df, row_index, "WARC_API_Errors")
         raise ValueError
 
@@ -468,7 +491,7 @@ def get_warc_info(warc, seed_df, row_index):
 
     # If there is an API error, updates the log and raises an error to skip the rest of the steps for this WARC.
     if not warc_data.status_code == 200:
-        log(f"API error {warc_data.status_code}: can't get info about {warc}",
+        log(f"API Error {warc_data.status_code}: can't get info about {warc}",
             seed_df, row_index, "WARC_API_Errors")
         raise ValueError
 
@@ -688,7 +711,7 @@ def seed_data(date_start, date_end):
 
     # Adds columns for logging the workflow steps.
     log_columns = ["Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_API_Errors",
-                   "WARC_Fixity_Errors", "WARC_Unzip_Errors"]
+                   "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"]
     seed_df = seed_df.reindex(columns=seed_df.columns.tolist() + log_columns)
 
     # Saves the dataframe as a CSV in the script output folder for splitting or restarting a batch.
@@ -735,7 +758,7 @@ def verify_warc_fixity(seed_df, row_index, warc_path, warc, warc_md5):
         regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
         downloaded_warc_md5 = regex_md5.group(1)
     except AttributeError:
-        log(f"Fixity for {warc} cannot be extracted from md5deep output: {md5deep_output.stdout}",
+        log(f"Error: fixity for {warc} cannot be extracted from md5deep output: {md5deep_output.stdout}",
             seed_df, row_index, "WARC_Fixity_Errors")
         raise AttributeError
 
@@ -746,6 +769,6 @@ def verify_warc_fixity(seed_df, row_index, warc_path, warc, warc_md5):
             seed_df, row_index, "WARC_Fixity_Errors")
     else:
         os.remove(warc_path)
-        log(f"Fixity for {warc} changed and it was deleted: {warc_md5} before, {downloaded_warc_md5} after",
+        log(f"Error: fixity for {warc} changed and it was deleted: {warc_md5} before, {downloaded_warc_md5} after",
             seed_df, row_index, "WARC_Fixity_Errors")
         raise ValueError

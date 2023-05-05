@@ -77,15 +77,18 @@ else:
 # Starts counter for tracking script progress.
 # Some processes are slow, so this shows the script is still working and how much remains.
 current_seed = 0
-total_seeds = len(seed_df[seed_df["WARC_Unzip_Errors"].isnull()])
+total_seeds = len(seed_df[seed_df["Complete"].isnull()])
 
 # Iterates through information about each seed, downloading metadata and WARC files from Archive-It.
 # Filtered for no data in the WARC_Unzip_Errors (last log column) to skip seeds done earlier if this is a restart.
-for seed in seed_df[seed_df["WARC_Unzip_Errors"].isnull()].itertuples():
+for seed in seed_df[seed_df["Complete"].isnull()].itertuples():
 
     # Updates the current seed number and displays the script progress.
     current_seed += 1
     print(f"\nStarting seed {current_seed} of {total_seeds}.")
+
+    # Row index for the seed being processed in the dataframe, to use for adding logging information.
+    row_index = seed_df.index[seed_df["Seed_ID"] == seed.Seed_ID].tolist()[0]
 
     # If the seed already has a folder from an error in a previous iteration of the script,
     # deletes the contents and anything in the seeds_log.csv from the previous iteration so it can be remade.
@@ -95,12 +98,11 @@ for seed in seed_df[seed_df["WARC_Unzip_Errors"].isnull()].itertuples():
     # Makes a folder for the seed in the AIP directory,
     # and downloads the metadata and WARC files to that seed folder.
     os.mkdir(str(seed.Seed_ID))
-    fun.download_metadata(seed, seed_df)
-    fun.download_warcs(seed, seed_df)
+    fun.download_metadata(seed, row_index, seed_df)
+    fun.download_warcs(seed, row_index, seed_df)
 
-# Saves the information in seed_df to a CSV as a record for the process.
-os.chdir(c.script_output)
-seed_df.to_csv("seeds_log.csv", index=False)
+    # Updates the Complete column with a summary of error types or that the seed processed successfully.
+    fun.add_completeness(row_index, seed_df)
 
 # Verifies the all expected seed folders are present and have all the expected metadata files and WARCs.
 # Saves the result as a csv in the folder with the downloaded AIPs.
