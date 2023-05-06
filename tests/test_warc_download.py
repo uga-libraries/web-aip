@@ -18,9 +18,7 @@ class MyTestCase(unittest.TestCase):
         Deletes the preservation folder with all the downloaded seed contents and the CSV files created by the tests.
         """
         shutil.rmtree(os.path.join(c.script_output, "preservation_download"))
-
-        # TODO: need to rework this function.
-        # os.remove(os.path.join(c.script_output, "completeness_check.csv"))
+        os.remove(os.path.join(c.script_output, "completeness_check.csv"))
         os.remove(os.path.join(c.script_output, "seeds_log.csv"))
 
     def test_multi_warc_seed(self):
@@ -64,15 +62,13 @@ class MyTestCase(unittest.TestCase):
                          "Successfully completed"]]
         self.assertEqual(expected_seeds, actual_seeds, "Problem with test for multi WARC seed, seeds_log.csv")
 
-        # TODO need to rework this function
-        # # Test for completeness_check.csv
-        # cc_df = pd.read_csv(os.path.join(c.script_output, "completeness_check.csv"))
-        # expected_cc = [cc_df.columns.tolist()] + cc_df.values.tolist()
-        # actual_cc = [["AIP", "URL", "AIP Folder Made", "coll.csv", "collscope.csv", "seed.csv", "seedscope.csv",
-        #               "crawldef.csv count", "crawljob.csv count", "WARC Count Correct", "All Expected File Types"],
-        #              ["harg-0000-web-202005-0001", "https://www.uga.edu/coronavirus/",
-        #               True, True, True, True, False, 1, 3, True, True]]
-        # self.assertEqual(expected_cc, actual_cc, "Problem with test for multi WARC seed, completeness_check.csv")
+        # Test for completeness_check.csv
+        cc_df = pd.read_csv(os.path.join(c.script_output, "completeness_check.csv"))
+        expected_cc = [cc_df.columns.tolist()] + cc_df.values.tolist()
+        actual_cc = [["Seed", "AIP", "Seed Folder Made", "coll.csv", "collscope.csv", "seed.csv", "seedscope.csv",
+                      "crawldef.csv count", "crawljob.csv count", "WARC Count Correct", "All Expected File Types"],
+                     [2173769, "harg-0000-web-202005-0001", True, True, True, True, False, 1, 3, True, True]]
+        self.assertEqual(expected_cc, actual_cc, "Problem with test for multi WARC seed, completeness_check.csv")
 
     def test_one_warc_seeds(self):
         """
@@ -120,17 +116,14 @@ class MyTestCase(unittest.TestCase):
                          "Successfully completed"]]
         self.assertEqual(actual_seeds, expected_seeds, "Problem with test for one WARC seeds, seeds_log.csv")
 
-        # TODO need to rework this function
-        # # Test for completeness_check.csv
-        # cc_df = pd.read_csv(os.path.join(c.script_output, "completeness_check.csv"))
-        # expected_cc = [cc_df.columns.tolist()] + cc_df.values.tolist()
-        # actual_cc = [["AIP", "URL", "AIP Folder Made", "coll.csv", "collscope.csv", "seed.csv", "seedscope.csv",
-        #               "crawldef.csv count", "crawljob.csv count", "WARC Count Correct", "All Expected File Types"],
-        #              ["rbrl-377-web-201907-0001", "http://adasoutheast.org/",
-        #               True, True, True, True, False, 1, 1, True, True],
-        #              ["rbrl-498-web-201907-0001", "https://openrecords.podbean.com/",
-        #               True, True, True, True, True, 1, 1, True, True]]
-        # self.assertEqual(expected_cc, actual_cc, "Problem with test for one WARC seeds, completeness_check.csv")
+        # Test for completeness_check.csv
+        cc_df = pd.read_csv(os.path.join(c.script_output, "completeness_check.csv"))
+        expected_cc = [cc_df.columns.tolist()] + cc_df.values.tolist()
+        actual_cc = [["Seed", "AIP", "Seed Folder Made", "coll.csv", "collscope.csv", "seed.csv", "seedscope.csv",
+                      "crawldef.csv count", "crawljob.csv count", "WARC Count Correct", "All Expected File Types"],
+                     [2027776, "rbrl-377-web-201907-0001", True, True, True, True, False, 1, 1, True, True],
+                     [2027707, "rbrl-498-web-201907-0001", True, True, True, True, True, 1, 1, True, True]]
+        self.assertEqual(expected_cc, actual_cc, "Problem with test for one WARC seeds, completeness_check.csv")
 
 
 if __name__ == '__main__':

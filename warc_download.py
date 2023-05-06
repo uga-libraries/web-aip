@@ -109,5 +109,4 @@ for seed in seed_df[seed_df["Complete"].isnull()].itertuples():
 
 # Verifies the all expected seed folders are present and have all the expected metadata files and WARCs.
 # Saves the result as a csv in the folder with the downloaded AIPs.
-# TODO: Make this work with change to Seed ID instead of AIP ID, once decide when to calculate AIP ID.
-# web.check_aips(date_end, date_start, seed_df, aips_directory)
+fun.check_aips(date_end, date_start, seed_df, seeds_directory)

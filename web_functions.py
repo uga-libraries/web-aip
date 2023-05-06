@@ -48,17 +48,17 @@ def add_completeness(row_index, seed_df):
         log("Successfully completed", seed_df, row_index, "Complete")
 
 
-def check_aips(date_end, date_start, seed_df, aips_directory):
+def check_aips(date_end, date_start, seed_df, seeds_directory):
     """Verifies that all the expected seed folders for the download are complete
     and no unexpected seed folders were created.
     Produces a csv named completeness_check with the results in the AIPs directory. """
 
-    def aip_dictionary():
-        """Uses the Archive-It APIs and Python filters to gather information about the expected AIPs. Using Python
-        instead of the API to filter the results for a more independent analysis of expected AIPs. All WARC
-        information is downloaded, filtered with Python to those expected in this preservation download, and the WARC
-        information is aggregated into a dictionary organized by seed/AIP. The key is the seed id and the values are
-        the AIP id, warc count, and url. """
+    def seed_dictionary():
+        """Uses the Archive-It APIs and Python filters to gather information about the expected seeds.
+        Using Python instead of the API to filter the results for a more independent analysis of expected AIPs.
+        All WARC information is downloaded, filtered with Python to those expected in this preservation download,
+        and the WARC information is aggregated into a dictionary organized by seed.
+        The key is the seed id and the values are the AIP id and warc count. """
 
         # Downloads the entire WARC list.
         filters = {'page_size': 10000}
@@ -80,7 +80,7 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
         warcs_exclude = 0
 
         # Starts the dictionary for the AIP metadata generated from the WARC metadata.
-        aip_info = {}
+        seed_info = {}
 
         # Iterates over the metadata for each WARC.
         for warc_info in py_warcs['files']:
@@ -109,43 +109,15 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
                 warcs_exclude += 1
                 continue
 
-            # Checks if another WARC from this seed has been processed, meaning there is data in the aip_info
-            # dictionary. If so, updates the WARC count in the dictionary and starts processing the next WARC. If
-            # not, continues processing this WARC.
+            # Checks if another WARC from this seed has been processed (there is data in seed_info. 
+            # If so, updates the WARC count in the dictionary and starts processing the next WARC. 
+            # If not, adds the seed to the dictionary.
             try:
-                aip_info[seed_identifier][1] += 1
+                seed_info[seed_identifier][1] += 1
                 warcs_include += 1
-
-            # Filter two: only includes the WARC in the dictionary if the repository is Hargrett, MAGIL, or Russell.
-            # The repository is in the seed report.
             except (KeyError, IndexError):
-
-                # Gets the seed report for this seed.
-                seed_report = requests.get(f'{c.partner_api}/seed?id={seed_identifier}', auth=(c.username, c.password))
-                json_seed = seed_report.json()
-
-                # If there was an API error, ends the function.
-                if seed_report.status_code != 200:
-                    print(f"Unable to get seed report for seed {seed_identifier}. Status {seed_report.status_code}.")
-                    raise ValueError
-
-                # Gets the repository from the seed report, if present. If not, this WARC is not included.
                 try:
-                    repository = json_seed[0]['metadata']['Collector'][0]['value']
-                except (KeyError, IndexError):
-                    warcs_exclude += 1
-                    continue
-
-                # Does not include the WARC in the dictionary if the repository is not Hargrett, MAGIL, or Russell.
-                if not repository.startswith(('Hargrett', 'Map', 'Richard B. Russell')):
-                    warcs_exclude += 1
-                    continue
-
-                # Saves data about the WARC to the dictionary (AIP id, WARC count, URL). If the seed is not in
-                # seed_df, it is an unexpected seed and cannot be added to the dictionary.
-                try:
-                    aip_info[seed_identifier] = [seed_df.loc[seed_df["Seed_ID"] == seed_identifier]["AIP_ID"].item(),
-                                                 1, json_seed[0]['url']]
+                    seed_info[seed_identifier] = [seed_df.loc[seed_df["Seed_ID"] == seed_identifier]["AIP_ID"].item(), 1]
                 except (KeyError, ValueError, IndexError):
                     print(f"Seed {seed_identifier} is not in seeds_df")
                     warcs_exclude += 1
@@ -153,23 +125,23 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
 
                 warcs_include += 1
 
-        # Checks that the right number of WARCs were evaluated.
+        # Checks that the right number of WARCs were evaluated and prints a warning if not.
+        # It still returns because this happens when downloads are in batches and still get some useful info.
         if warcs_expected != warcs_include + warcs_exclude:
             print("Check AIPs did not review the expected number of WARCs.")
-            raise ValueError
 
-        return aip_info
+        return seed_info
 
-    def check_completeness(aip_id, warc_total, website_url):
+    def check_completeness(seed_id, aip_id, warc_total):
         """Verifies a single AIP is complete, checking the contents of the metadata and objects folders. Returns a
         list with the results ready to be added as a row to the completeness check csv. """
 
-        # Starts a list for the results, with the AIP id and website url to use for identification of the AIP.
-        result = [aip_id, website_url]
+        # Starts a list for the results, with the Seed ID and AIP ID.
+        result = [seed_id, aip_id]
 
         # Tests if there is a folder for this seed in the AIPs directory.
         # If not, returns the result for this AIP and does not run the rest of the function's tests.
-        if aip_id in os.listdir(aips_directory):
+        if seed_id in os.listdir(seeds_directory):
             result.append(True)
         else:
             result.extend([False, 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a'])
@@ -177,21 +149,21 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
 
         # Tests if each of the four Archive-It metadata reports that never repeat are present.
         # os.path.exists() returns True/False.
-        result.append(os.path.exists(f'{aips_directory}/{aip_id}/{aip_id}_coll.csv'))
-        result.append(os.path.exists(f'{aips_directory}/{aip_id}/{aip_id}_collscope.csv'))
-        result.append(os.path.exists(f'{aips_directory}/{aip_id}/{aip_id}_seed.csv'))
-        result.append(os.path.exists(f'{aips_directory}/{aip_id}/{aip_id}_seedscope.csv'))
+        result.append(os.path.exists(f'{seeds_directory}/{seed_id}/{aip_id}_coll.csv'))
+        result.append(os.path.exists(f'{seeds_directory}/{seed_id}/{aip_id}_collscope.csv'))
+        result.append(os.path.exists(f'{seeds_directory}/{seed_id}/{aip_id}_seed.csv'))
+        result.append(os.path.exists(f'{seeds_directory}/{seed_id}/{aip_id}_seedscope.csv'))
 
         # Counts the number of instances of the two Archive-It metadata reports than can repeat.
         # Compare to expected results in the WARC inventory.
         result.append(
-            len([file for file in os.listdir(f'{aips_directory}/{aip_id}') if file.endswith('_crawldef.csv')]))
+            len([file for file in os.listdir(f'{seeds_directory}/{seed_id}') if file.endswith('_crawldef.csv')]))
         result.append(
-            len([file for file in os.listdir(f'{aips_directory}/{aip_id}') if file.endswith('_crawljob.csv')]))
+            len([file for file in os.listdir(f'{seeds_directory}/{seed_id}') if file.endswith('_crawljob.csv')]))
 
         # Tests if the number of WARCs is correct. Compares the number of WARCs in the objects folder, calculated
         # with len(), to the number of WARCs expected from the API (warc_total).
-        warcs = len([file for file in os.listdir(f'{aips_directory}/{aip_id}') if file.endswith('.warc')])
+        warcs = len([file for file in os.listdir(f'{seeds_directory}/{seed_id}') if file.endswith('.warc')])
         if warcs == warc_total:
             result.append(True)
         else:
@@ -203,40 +175,40 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
         result.append(True)
         expected_endings = ('_coll.csv', '_collscope.csv', '_crawldef.csv', '_crawljob.csv', '_seed.csv',
                             '_seedscope.csv', '.warc')
-        for file in os.listdir(f'{aips_directory}/{aip_id}'):
+        for file in os.listdir(f'{seeds_directory}/{seed_id}'):
             if not file.endswith(expected_endings):
                 result[-1] = False
 
         return result
 
-    def check_for_extra_aips():
+    def check_for_extra_seeds():
         """Looks for seed folders that were created but were not expected based on the API data.
         If any are found, returns a list with the results ready to be added as a row to the results csv."""
 
         # Starts a list for the results. The list elements will be one list per unexpected seed.
         extras = []
 
-        # Iterates through the folder with the AIPs.
-        for aip_directory in os.listdir(aips_directory):
+        # Iterates through the folder with the seeds.
+        for seed_folder in os.listdir(seeds_directory):
 
-            # Creates a tuple of the expected AIPs, which are the values in the AIP_ID row in the seed dataframe.
-            # Does not include blanks from any seeds where the AIP ID was not calculated.
-            expected_aip_ids = tuple(seed_df[seed_df["AIP_ID"].notnull()]["AIP_ID"].to_list())
+            # Creates a tuple of the expected seeds, which are the values in the Seed_ID row in the seed dataframe.
+            # and adds metadata.csv to the list, which will also be in the folder.
+            expected_seed_ids = seed_df["Seed_ID"].values.tolist()
+            expected_seed_ids.append("metadata.csv")
 
-            # If there is an AIP that does not start with one of the expected AIP ids, adds a list with the values
-            # for that AIP's row in the completeness check csv to the extras list.
-            if not aip_directory.startswith(expected_aip_ids):
-                extras.append([aip_directory, 'n/a', 'Not expected', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a',
-                               'n/a', 'n/a'])
+            # If there is a seed folder that is not named with one of the expected seed ids,
+            # adds a list with the values for that seed's row in the completeness check csv to the extras list.
+            if seed_folder not in expected_seed_ids:
+                extras.append([seed_folder, 'n/a', 'Not expected', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a'])
 
-        # Only returns the extras list if at least one unexpected AIP was found.
+        # Only returns the extras list if at least one unexpected seed was found.
         if len(extras) > 0:
             return extras
 
     try:
-        aips_metadata = aip_dictionary()
+        seeds_metadata = seed_dictionary()
     except (ValueError, IndexError, KeyError):
-        print("Unable to make aip dictionary and cannot check for completeness.")
+        print("Unable to make seed dictionary and cannot check for completeness.")
         return
 
     # Starts a csv for the results of the quality review.
@@ -246,21 +218,21 @@ def check_aips(date_end, date_start, seed_df, aips_directory):
 
         # Adds a header row to the csv.
         complete_write.writerow(
-            ['AIP', 'URL', 'AIP Folder Made', 'coll.csv', 'collscope.csv', 'seed.csv',
+            ['Seed', 'AIP', 'Seed Folder Made', 'coll.csv', 'collscope.csv', 'seed.csv',
              'seedscope.csv', 'crawldef.csv count', 'crawljob.csv count', 'WARC Count Correct',
              'All Expected File Types'])
 
         # Tests each AIP for completeness and saves the results.
-        for seed in aips_metadata:
-            aip_identifier, warc_count, website = aips_metadata[seed]
-            row = check_completeness(aip_identifier, warc_count, website)
+        for seed in seeds_metadata:
+            aip_identifier, warc_count = seeds_metadata[seed]
+            row = check_completeness(seed, aip_identifier, warc_count)
             complete_write.writerow(row)
 
         # Tests if there are folders in the AIP's directory that were not expected, and if so adds them to the
         # completeness check csv. The function only returns a value if there is at least one unexpected AIP.
-        extra_aips = check_for_extra_aips()
-        if extra_aips:
-            for extra in extra_aips:
+        extra_seeds = check_for_extra_seeds()
+        if extra_seeds:
+            for extra in extra_seeds:
                 complete_write.writerow(extra)
 
 
