@@ -104,7 +104,7 @@ class MyTestCase(unittest.TestCase):
     def test_russell(self):
         """
         Tests that the function downloads the correct reports, and correctly updates the log,
-        for a Russell two each of the scope report types and one each of the other four report types.
+        for a Russell two each of the crawl job and definition reports and one each of the other four report types.
         """
         # Makes the data needed for the function input and runs the function.
         seed_df = pd.DataFrame([["rbrl-1", 2547528, 12265, "1436714|1718490", 0.72, 3,
