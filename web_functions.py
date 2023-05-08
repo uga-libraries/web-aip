@@ -243,7 +243,7 @@ def check_config():
     """
     errors = []
 
-    # Checks if the path in script_output exists on the local machine.
+    # Checks that the path in script_output exists on the local machine.
     try:
         if not os.path.exists(c.script_output):
             errors.append(f"Variable path '{c.script_output}' is not correct.")
@@ -289,6 +289,16 @@ def check_config():
                           "Check if the partner_api, username, and/or password variables have errors.")
     except AttributeError:
         errors.append("Variables 'partner_api', 'username', and/or 'password' are missing from the configuration file.")
+
+    # Checks that the path in md5deep exists on the local machine
+    # and uses the correct direction of slashes (\).
+    try:
+        if not os.path.exists(c.md5deep):
+            errors.append(f"Variable path '{c.md5deep}' is not correct.")
+        elif "/" in c.md5deep:
+            errors.append(f"Path '{c.md5deep}' must use \ for md5deep to work correctly.")
+    except AttributeError:
+        errors.append("Variable 'md5deep' is missing from the configuration file.")
 
     # If there were errors, prints them and exits the script.
     if len(errors) > 0:
