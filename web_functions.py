@@ -617,7 +617,16 @@ def redact_seed_report(seed_id, aip_id, seed_df, row_index):
     there was login information or not is misleading.
     """
 
-    report_df = pd.read_csv(f"{seed_id}/{aip_id}_seed.csv")
+    # Reads the seeds.csv into a dataframe for editing.
+    # If it is not present, logs the error and ends this function.
+    try:
+        report_df = pd.read_csv(f"{seed_id}/{aip_id}_seed.csv")
+    except FileNotFoundError:
+        log("No seeds.csv to redact", seed_df, row_index, "Seed_Report_Redaction")
+        return
+
+    # If the login columns exist, replaces the values with REDACTED and updates the log.
+    # If they do not exist, just updates the log.
     if "login_password" in report_df.columns:
         report_df["login_username"] = "REDACTED"
         report_df["login_password"] = "REDACTED"

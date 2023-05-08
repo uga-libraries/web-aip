@@ -25,13 +25,35 @@ class MyTestCase(unittest.TestCase):
             shutil.rmtree(os.path.join(os.getcwd(), "1234567"))
         os.remove(os.path.join(c.script_output, "seeds_log.csv"))
 
+    def test_error_no_report(self):
+        """
+        Tests that the function correctly updates the log when there is no seeds.csv report.
+        This only happens if there was an error with downloading seeds.csv.
+        """
+        # Input needed for the test: seed_df has the progress of the script so far,
+        # and a folder named with the seed ID.
+        seed_df = pd.DataFrame([["aip-1", "1234567", 123465, "900000", 0.01, 1, "ARCHIVEIT-1.warc.gz",
+                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
+                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
+                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "WARC_Unzip_Errors", "Complete"])
+        os.mkdir("1234567")
+
+        redact_seed_report("1234567", "aip-1", seed_df, 0)
+
+        # Test that the log has been updated.
+        actual = seed_df["Seed_Report_Redaction"][0]
+        expected = "No seeds.csv to redact"
+        self.assertEqual(actual, expected, "Problem with test for error: no report")
+
     def test_no_redaction(self):
         """
         Tests that the function does not change seed.csv, and updates the log,
         when there are no login columns to redact.
         """
         # Input needed for the test: seed_df has the progress of the script so far,
-        # a folder named with the AIP ID and a seeds_log.csv file inside the AIP folder.
+        # a folder named with the Seed ID and a seeds_log.csv file inside the AIP folder.
         # The seeds_log.csv file only has a few of the actual columns, since only logins are needed for testing.
         seed_df = pd.DataFrame([["aip-1", "1234567", 123465, "900000", 0.01, 1, "ARCHIVEIT-1.warc.gz",
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
@@ -65,7 +87,7 @@ class MyTestCase(unittest.TestCase):
         Tests that the function updates seed.csv when there are login columns to redact.
         """
         # Input needed for the test: seed_df has the progress of the script so far,
-        # a folder named with the AIP ID and a seeds_log.csv file inside the AIP folder.
+        # a folder named with the Seed ID and a seeds_log.csv file inside the AIP folder.
         # The seeds_log.csv file only has a few of the actual columns, since only logins are needed for testing.
         seed_df = pd.DataFrame([["aip-1", "1234567", 123465, "900000", 0.01, 1, "ARCHIVEIT-1.warc.gz",
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
