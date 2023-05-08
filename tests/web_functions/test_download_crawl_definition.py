@@ -7,6 +7,7 @@ import os
 import pandas as pd
 import shutil
 import unittest
+import configuration as c
 from web_functions import download_crawl_definition, get_report
 
 
@@ -28,11 +29,18 @@ class MyTestCase(unittest.TestCase):
 
     def tearDown(self):
         """
-        Deletes the seed folders and any reports within them.
+        Deletes the seed folders and any reports within them,
+        and the seeds_log.csv if it was made.
         """
+        # Seed folders
         for directory in ("2027776", "2016223", "2202440", "2467332"):
             if os.path.exists(directory):
                 shutil.rmtree(os.path.join(os.getcwd(), directory))
+
+        # Seeds log
+        log_path = os.path.join(c.script_output, "seeds_log.csv")
+        if os.path.exists(log_path):
+            os.remove(log_path)
 
     def test_error_no_job(self):
         """

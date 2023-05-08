@@ -10,6 +10,7 @@ import os
 import pandas as pd
 import shutil
 import unittest
+import configuration as c
 from web_functions import get_warc, verify_warc_fixity
 
 
@@ -17,11 +18,12 @@ class MyTestCase(unittest.TestCase):
 
     def tearDown(self):
         """
-        Deletes the seed folder and its contents, if any, produced by the tests.
+        Deletes the seed folder and its contents, if any, and the seeds_log.csv produced by the tests.
         """
         for seed_folder in ("2173769", "2444051", "2454528"):
             if os.path.exists(seed_folder):
                 shutil.rmtree(os.path.join(os.getcwd(), seed_folder))
+        os.remove(os.path.join(c.script_output, "seeds_log.csv"))
 
     def test_correct(self):
         """

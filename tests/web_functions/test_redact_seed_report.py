@@ -11,6 +11,7 @@ import os
 import pandas as pd
 import shutil
 import unittest
+import configuration as c
 from web_functions import redact_seed_report
 
 
@@ -18,10 +19,11 @@ class MyTestCase(unittest.TestCase):
 
     def tearDown(self):
         """
-        Deletes the seed folders, and the seed.csv files within them.
+        Deletes the seed folders, the seed.csv files within them, and the seeds_log.csv.
         """
         if os.path.exists(os.path.join(os.getcwd(), "1234567")):
             shutil.rmtree(os.path.join(os.getcwd(), "1234567"))
+        os.remove(os.path.join(c.script_output, "seeds_log.csv"))
 
     def test_no_redaction(self):
         """

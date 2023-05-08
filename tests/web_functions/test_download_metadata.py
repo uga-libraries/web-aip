@@ -11,6 +11,7 @@ import os
 import pandas as pd
 import shutil
 import unittest
+import configuration as c
 from web_functions import download_metadata
 
 
@@ -18,11 +19,12 @@ class MyTestCase(unittest.TestCase):
 
     def tearDown(self):
         """
-        Deletes the seed folders and any contents from the tests.
+        Deletes the seed folders and any contents from the tests and the seeds_log.csv.
         """
         for seed_folder in ("2187482", "2529685", "2547528"):
             if os.path.exists(seed_folder):
                 shutil.rmtree(os.path.join(os.getcwd(), seed_folder))
+        os.remove(os.path.join(c.script_output, "seeds_log.csv"))
 
     def test_hargrett(self):
         """

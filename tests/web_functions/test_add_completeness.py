@@ -6,12 +6,20 @@ To save time, fake data is supplied in seed_df for fields that are not used in t
 and errors are combined which would not be given the workflow so the combinations can be tested all at once.
 """
 import numpy as np
+import os
 import pandas as pd
 import unittest
+import configuration as c
 from web_functions import add_completeness
 
 
 class MyTestCase(unittest.TestCase):
+
+    def tearDown(self):
+        """
+        Deletes the seeds_log.csv made by each test.
+        """
+        os.remove(os.path.join(c.script_output, "seeds_log.csv"))
 
     def test_all_correct(self):
         """

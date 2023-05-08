@@ -7,6 +7,7 @@ import os
 import pandas as pd
 import shutil
 import unittest
+import configuration as c
 from web_functions import get_report
 
 
@@ -50,9 +51,13 @@ class MyTestCase(unittest.TestCase):
 
     def tearDown(self):
         """
-        Deletes the seed folder and any of its contents from the tests.
+        Deletes the seed folder and any of its contents from the tests
+        and the seeds_log.csv if it was made.
         """
         shutil.rmtree(os.path.join(os.getcwd(), "2027707"))
+        log_path = os.path.join(c.script_output, "seeds_log.csv")
+        if os.path.exists(log_path):
+            os.remove(log_path)
 
     def test_api_error(self):
         """

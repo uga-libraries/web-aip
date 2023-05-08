@@ -6,12 +6,22 @@ To save time, fake data is supplied in seed_df for fields that are not used in t
 and seed_df only has the WARC being tested, not other WARCs for that seed.
 """
 import numpy as np
+import os
 import pandas as pd
 import unittest
+import configuration as c
 from web_functions import get_warc_info
 
 
 class MyTestCase(unittest.TestCase):
+
+    def tearDown(self):
+        """
+        Deletes the seeds_log.csv, if it was made by the test.
+        """
+        log_path = os.path.join(c.script_output, "seeds_log.csv")
+        if os.path.exists(log_path):
+            os.remove(log_path)
 
     def test_bma(self):
         """
