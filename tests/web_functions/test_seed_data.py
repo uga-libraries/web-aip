@@ -32,8 +32,8 @@ class MyTestCase(unittest.TestCase):
         expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                      "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_API_Errors",
                      "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
-                    ["2016223", "12249", "918473;918474", 0.001, 2,
-                     "ARCHIVEIT-12249-ONE_TIME-JOB918473-SEED2016223-20190603193416006-00000-h3.warc.gz;"
+                    ["2016223", "12249", "918473|918474", 0.001, 2,
+                     "ARCHIVEIT-12249-ONE_TIME-JOB918473-SEED2016223-20190603193416006-00000-h3.warc.gz|"
                      "ARCHIVEIT-12249-ONE_TIME-JOB918474-SEED2016223-20190603193421515-00000-h3.warc.gz",
                      "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]]
         self.assertEqual(actual, expected, "Problem with test for error no metadata, dataframe values")
@@ -62,9 +62,9 @@ class MyTestCase(unittest.TestCase):
                      "ARCHIVEIT-12181-TEST-JOB1177700-SEED2084785-20200601191752355-00000-h3.warc.gz",
                      "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
                     ["2187482", "12181", "1177700", 3.624, 4,
-                     "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601191649570-00000-h3.warc.gz;"
-                     "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601195532797-00002-h3.warc.gz;"
-                     "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601194617707-00001-h3.warc.gz;"
+                     "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601191649570-00000-h3.warc.gz|"
+                     "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601195532797-00002-h3.warc.gz|"
+                     "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601194617707-00001-h3.warc.gz|"
                      "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601200733748-00003-h3.warc.gz",
                      "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
                     ["2270486", "12912", "1176433", 0.06, 1,
@@ -108,7 +108,7 @@ class MyTestCase(unittest.TestCase):
                      "ARCHIVEIT-15678-TEST-JOB1676317-SEED2529631-20220919135146371-00000-h3.warc.gz",
                      "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
                     ["2529634", "15678", "1672420", 1.145, 2,
-                     "ARCHIVEIT-15678-TEST-JOB1672420-SEED2529634-20220911193609257-00000-h3.warc.gz;"
+                     "ARCHIVEIT-15678-TEST-JOB1672420-SEED2529634-20220911193609257-00000-h3.warc.gz|"
                      "ARCHIVEIT-15678-TEST-JOB1672420-SEED2529634-20220913205209833-00001-h3.warc.gz",
                      "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
                     ["2529642", "15678", "1672436", 0.874, 1,
@@ -146,7 +146,7 @@ class MyTestCase(unittest.TestCase):
                      "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481701-20210216163428706-00000-h3.warc.gz",
                      "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
                     ["2481702", "12265", "1365540", 1.143, 2,
-                     "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481702-20210216163706632-00000-h3.warc.gz;"
+                     "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481702-20210216163706632-00000-h3.warc.gz|"
                      "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481702-20210219082614225-00001-h3.warc.gz",
                      "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
                     ["2481703", "12265", "1365540", 0.774, 1,

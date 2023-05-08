@@ -19,7 +19,7 @@ class MyTestCase(unittest.TestCase):
         if there are no errors.
         """
         # Makes data needed as function input and runs the function.
-        seed_df = pd.DataFrame([["aip-id", 1000000, 12345, "1234567", 2.0, 2, "name.warc.gz;name2.warc.gz",
+        seed_df = pd.DataFrame([["aip-id", 1000000, 12345, "1234567", 2.0, 2, "name.warc.gz|name2.warc.gz",
                                  "Successfully downloaded all metadata reports",
                                  "No empty reports", "Successfully redacted",
                                  "Successfully downloaded name.warc.gz; Successfully downloaded name2.warc.gz",

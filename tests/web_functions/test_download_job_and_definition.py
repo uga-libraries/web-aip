@@ -62,7 +62,7 @@ class MyTestCase(unittest.TestCase):
         multiple crawl job ids, each of which has a different crawl definition id.
         """
         # Makes data needed as function input and runs the function.
-        seed_df = pd.DataFrame([["rbrl-0000-web-0001", 2027776, 12264, "1718467;943446", 1.0, 1, "name.warc.gz",
+        seed_df = pd.DataFrame([["rbrl-0000-web-0001", 2027776, 12264, "1718467|943446", 1.0, 1, "name.warc.gz",
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
@@ -113,7 +113,7 @@ class MyTestCase(unittest.TestCase):
         multiple crawl job ids, some with a different crawl definition id and some with the same.
         """
         # Makes data needed as function input and runs the function.
-        seed_df = pd.DataFrame([["rbrl-0000-web-0001", 2467332, 12265, "1360420;1365539;1718490", 1.0, 1, "name.warc.gz",
+        seed_df = pd.DataFrame([["rbrl-0000-web-0001", 2467332, 12265, "1360420|1365539|1718490", 1.0, 1, "name.warc.gz",
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
@@ -174,7 +174,7 @@ class MyTestCase(unittest.TestCase):
         multiple crawl jobs ids, all with the same crawl definition id.
         """
         # Makes data needed as function input and runs the function.
-        seed_df = pd.DataFrame([["harg-0000-web-0001", 2016223, 12249, "918473;918474", 1.0, 1, "name.warc.gz",
+        seed_df = pd.DataFrame([["harg-0000-web-0001", 2016223, 12249, "918473|918474", 1.0, 1, "name.warc.gz",
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",

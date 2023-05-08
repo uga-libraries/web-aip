@@ -46,9 +46,9 @@ class MyTestCase(unittest.TestCase):
         actual_seeds = [["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                          "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
                          "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
-                        ["harg-0000-web-202005-0001", 2173769, 12912, "1154002;1148757;1143415", 0.007, 3,
-                         "ARCHIVEIT-12912-WEEKLY-JOB1154002-SEED2173769-20200513225747964-00000-h3.warc.gz;"
-                         "ARCHIVEIT-12912-WEEKLY-JOB1148757-SEED2173769-20200506223640988-00000-h3.warc.gz;"
+                        ["harg-0000-web-202005-0001", 2173769, 12912, "1154002|1148757|1143415", 0.007, 3,
+                         "ARCHIVEIT-12912-WEEKLY-JOB1154002-SEED2173769-20200513225747964-00000-h3.warc.gz|"
+                         "ARCHIVEIT-12912-WEEKLY-JOB1148757-SEED2173769-20200506223640988-00000-h3.warc.gz|"
                          "ARCHIVEIT-12912-WEEKLY-JOB1143415-SEED2173769-20200430010118013-00000-h3.warc.gz",
                          "Successfully downloaded all metadata reports", "harg-0000-web-202005-0001_seedscope.csv",
                          "Successfully redacted",

@@ -305,7 +305,7 @@ def download_job_and_definition(seed, seed_df, row_index):
     """
 
     # If a seed has more than one job, Job_ID has a comma-separated string of the IDs.
-    job_list = seed.Job_ID.split(";")
+    job_list = seed.Job_ID.split("|")
 
     for job in job_list:
 
@@ -363,7 +363,7 @@ def download_warcs(seed, row_index, seed_df):
     Unzips each WARC."""
 
     # Makes a list of the filenames for all WARCs for this seed.
-    warc_names = seed.WARC_Filenames.split(";")
+    warc_names = seed.WARC_Filenames.split("|")
 
     # Downloads and validates every WARC.
     # If an error is caught at any point, logs the error and starts the next WARC.
@@ -667,19 +667,19 @@ def seed_data(date_start, date_end):
     coll_df = warc_df[['Seed_ID', 'AIT_Collection']].copy()
     coll_df = coll_df.drop_duplicates()
     coll_df['AIT_Collection'] = coll_df['AIT_Collection'].astype(str)
-    coll_by_seed = coll_df.groupby(['Seed_ID'])['AIT_Collection'].apply(';'.join)
+    coll_by_seed = coll_df.groupby(['Seed_ID'])['AIT_Collection'].apply('|'.join)
 
     job_df = warc_df[['Seed_ID', 'Job_ID']].copy()
     job_df = job_df.drop_duplicates()
     job_df['Job_ID'] = job_df['Job_ID'].astype(str)
-    jobs_by_seed = job_df.groupby(['Seed_ID'])['Job_ID'].apply(';'.join)
+    jobs_by_seed = job_df.groupby(['Seed_ID'])['Job_ID'].apply('|'.join)
 
     warc_df['Size_GB'] = warc_df['Size']/1000000000
     gb_by_seed = warc_df.groupby(['Seed_ID'])['Size_GB'].sum().round(3)
 
     count_by_seed = warc_df.groupby('Seed_ID')['Seed_ID'].count()
 
-    warc_names = warc_df.groupby(['Seed_ID'])['WARC_Filename'].apply(';'.join)
+    warc_names = warc_df.groupby(['Seed_ID'])['WARC_Filename'].apply('|'.join)
 
     seed_df = pd.concat([coll_by_seed, jobs_by_seed, gb_by_seed, count_by_seed, warc_names], axis=1)
     seed_df.columns = ["AIT_Collection", "Job_ID", "Size_GB", 'WARCs', "WARC_Filenames"]

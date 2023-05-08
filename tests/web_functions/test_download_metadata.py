@@ -31,7 +31,7 @@ class MyTestCase(unittest.TestCase):
         """
         # Makes the data needed for the function input and runs the function.
         seed_df = pd.DataFrame([["harg-1", 2187482, 12181, "1177700", 3.62, 3,
-                                 "name0.warc.gz;name1.warc.gz;name2.warc.gz",
+                                 "name0.warc.gz|name1.warc.gz|name2.warc.gz",
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
@@ -107,8 +107,8 @@ class MyTestCase(unittest.TestCase):
         for a Russell two each of the scope report types and one each of the other four report types.
         """
         # Makes the data needed for the function input and runs the function.
-        seed_df = pd.DataFrame([["rbrl-1", 2547528, 12265, "1436714;1718490", 0.72, 3,
-                                 "name0.warc.gz;name1.warc.gz;name2.warc.gz",
+        seed_df = pd.DataFrame([["rbrl-1", 2547528, 12265, "1436714|1718490", 0.72, 3,
+                                 "name0.warc.gz|name1.warc.gz|name2.warc.gz",
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",

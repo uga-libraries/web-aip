@@ -21,7 +21,7 @@ class MyTestCase(unittest.TestCase):
                                       "ARCHIVEIT.warc.gz", "Successfully downloaded all metadata reports",
                                       "No empty reports", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
                                      [2222222, 12345, "2200000", 1.52, 2,
-                                      "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
+                                      "ARCHIVEIT.warc.gz|ARCHIVEIT-1.warc.gz",
                                       "Successfully downloaded all metadata reports", "2222222_seedscope.csv",
                                       np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                     columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
@@ -53,7 +53,7 @@ class MyTestCase(unittest.TestCase):
                                "Successfully downloaded all metadata reports",
                                "No empty reports", "BLANK", "Successfully downloaded ARCHIVEIT.warc.gz",
                                "BLANK", "BLANK", "BLANK"],
-                              [2222222, 12345, "2200000", 1.52, 2, "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
+                              [2222222, 12345, "2200000", 1.52, 2, "ARCHIVEIT.warc.gz|ARCHIVEIT-1.warc.gz",
                                "Successfully downloaded all metadata reports", "2222222_seedscope.csv",
                                "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]]
         self.assertEqual(actual_dataframe, expected_dataframe, "Problem with test for first message, dataframe values")
@@ -69,7 +69,7 @@ class MyTestCase(unittest.TestCase):
                         ["1111111", "12345", "1100000", "0.52", "1", "ARCHIVEIT.warc.gz",
                          "Successfully downloaded all metadata reports", "No empty reports",
                          "", "Successfully downloaded ARCHIVEIT.warc.gz", "", "", ""],
-                        ["2222222", "12345", "2200000", "1.52", "2", "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
+                        ["2222222", "12345", "2200000", "1.52", "2", "ARCHIVEIT.warc.gz|ARCHIVEIT-1.warc.gz",
                          "Successfully downloaded all metadata reports", "2222222_seedscope.csv", "", "", "", "", ""]]
         self.assertEqual(actual_csv, expected_csv, "Problem with test for first message, CSV values")
 
@@ -89,7 +89,7 @@ class MyTestCase(unittest.TestCase):
                               [1111111, 12345, "1100000", 0.52, 1, "ARCHIVEIT.warc.gz",
                                "Successfully downloaded all metadata reports", "No empty reports",
                                "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
-                              [2222222, 12345, "2200000", 1.52, 2, "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
+                              [2222222, 12345, "2200000", 1.52, 2, "ARCHIVEIT.warc.gz|ARCHIVEIT-1.warc.gz",
                                "Successfully downloaded all metadata reports",
                                "2222222_seedscope.csv; 2222222_collscope.csv",
                                "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]]
@@ -105,7 +105,7 @@ class MyTestCase(unittest.TestCase):
                          "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                         ["1111111", "12345", "1100000", "0.52", "1", "ARCHIVEIT.warc.gz",
                          "Successfully downloaded all metadata reports", "No empty reports", "", "", "", "", ""],
-                        ["2222222", "12345", "2200000", "1.52", "2", "ARCHIVEIT.warc.gz;ARCHIVEIT-1.warc.gz",
+                        ["2222222", "12345", "2200000", "1.52", "2", "ARCHIVEIT.warc.gz|ARCHIVEIT-1.warc.gz",
                          "Successfully downloaded all metadata reports",
                          "2222222_seedscope.csv; 2222222_collscope.csv", "", "", "", "", ""]]
         self.assertEqual(actual_csv, expected_csv, "Problem with test for second message, CSV values")
