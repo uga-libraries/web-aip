@@ -11,17 +11,14 @@ import configuration as c
 from web_functions import download_crawl_definition, get_report
 
 
-def csvs_to_list(csv_path_list):
+def csv_to_list(csv_path):
     """
     Returns a list of lists, where each list is a row in a csv.
-    If there is more than one CSV, all rows are combined into a single list, including repeating the header.
+    Fills na with string "BLANK" for easier comparison.
     """
-    row_list = []
-    for csv_path in csv_path_list:
-        df = pd.read_csv(csv_path)
-        df = df.fillna("")
-        row_list.append(df.columns.tolist())
-        row_list.extend(df.values.tolist())
+    df = pd.read_csv(csv_path)
+    df = df.fillna("BLANK")
+    row_list = [df.columns.tolist()] + df.values.tolist()
     return row_list
 
 
@@ -85,18 +82,23 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         download_crawl_definition("1718467", seed, seed_df, 0)
         download_crawl_definition("943446", seed, seed_df, 0)
 
-        # Test that the crawl definition reports have the expected values.
-        actual = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104519042_crawldef.csv"),
-                                   os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104250884_crawldef.csv")])
-        expected = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
-                     "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
-                     "recurrence_type", "test", "time_limit"],
-                    [1468, False, "", 12264, "", 31104519042, "", "", "", False, False, "ANNUAL", False, 432000],
-                    ["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
-                     "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
-                     "recurrence_type", "test", "time_limit"],
-                    [1468, False, "", 12264, "", 31104250884, "", "TEST", "", False, False, "NONE", True, 259200]]
-        self.assertEqual(actual, expected, "Problem with test for multi id/different")
+        # Test that the crawl definition 31104519042 report has the expected values.
+        actual1 = csv_to_list(os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104519042_crawldef.csv"))
+        expected1 = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
+                      "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
+                      "recurrence_type", "test", "time_limit"],
+                     [1468, False, "BLANK", 12264, "BLANK", 31104519042, "BLANK", "BLANK", "BLANK", False, False,
+                      "ANNUAL", False, 432000]]
+        self.assertEqual(actual1, expected1, "Problem with test for multi id/different, -9042")
+
+        # Test that the crawl definition 31104250884 report have the expected values.
+        actual2 = csv_to_list(os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104250884_crawldef.csv"))
+        expected2 = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
+                      "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
+                      "recurrence_type", "test", "time_limit"],
+                     [1468, False, "BLANK", 12264, "BLANK", 31104250884, "BLANK", "TEST", "BLANK", False, False,
+                      "NONE", True, 259200]]
+        self.assertEqual(actual2, expected2, "Problem with test for multi id/different, -0884")
 
     def test_multi_id_different_and_same(self):
         """
@@ -105,8 +107,8 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         """
         # Makes data needed as function input,
         # including downloading the crawl job reports which are read by this function.
-        seed_df = pd.DataFrame([["rbrl-0000-web-0001", 2467332, 12265, "1360420|1365539|1718490", 1.0, 1, "name.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
+        seed_df = pd.DataFrame([["rbrl-0000-web-0001", 2467332, 12265, "1360420|1365539|1718490", 1.0, 1,
+                                 "name.warc.gz", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
                                         "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
@@ -122,18 +124,23 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         download_crawl_definition("1365539", seed, seed_df, 0)
         download_crawl_definition("1718490", seed, seed_df, 0)
 
-        # Test that the crawl definition reports have the expected values.
-        actual = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104392189_crawldef.csv"),
-                                   os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104419857_crawldef.csv")])
-        expected = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
-                     "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
-                     "recurrence_type", "test", "time_limit"],
-                    [1468, False, "", 12265, "", 31104392189, "", "", "", False, False, "MONTHLY", False, 259200],
-                    ["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
-                     "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
-                     "recurrence_type", "test", "time_limit"],
-                    [1468, False, "", 12265, "", 31104419857, "", "TEST", "", False, False, "NONE", True, 259200]]
-        self.assertEqual(actual, expected, "Problem with test for multi id/different and same")
+        # Test that the crawl definition 31104392189 report has the expected values.
+        actual1 = csv_to_list(os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104392189_crawldef.csv"))
+        expected1 = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
+                      "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
+                      "recurrence_type", "test", "time_limit"],
+                     [1468, False, "BLANK", 12265, "BLANK", 31104392189, "BLANK", "BLANK", "BLANK", False, False,
+                      "MONTHLY", False, 259200]]
+        self.assertEqual(actual1, expected1, "Problem with test for multi id/different and same, -2189")
+
+        # Test that the crawl definition 31104419857 report has the expected values.
+        actual2 = csv_to_list(os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104419857_crawldef.csv"))
+        expected2 = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
+                      "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
+                      "recurrence_type", "test", "time_limit"],
+                     [1468, False, "BLANK", 12265, "BLANK", 31104419857, "BLANK", "TEST", "BLANK", False, False,
+                      "NONE", True, 259200]]
+        self.assertEqual(actual2, expected2, "Problem with test for multi id/different and same, -9857")
 
     def test_multi_id_same(self):
         """
@@ -158,11 +165,12 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         download_crawl_definition("918474", seed, seed_df, 0)
 
         # Test that the crawl definition report has the expected values.
-        actual = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104242954_crawldef.csv")])
+        actual = csv_to_list(os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104242954_crawldef.csv"))
         expected = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                      "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
                      "recurrence_type", "test", "time_limit"],
-                    [1468, False, "", 12249, "", 31104242954, "", "ONE_TIME", "", False, False, "NONE", False, 86400]]
+                    [1468, False, "BLANK", 12249, "BLANK", 31104242954, "BLANK", "ONE_TIME", "BLANK", False, False,
+                     "NONE", False, 86400]]
         self.assertEqual(actual, expected, "Problem with test for multi id/same")
 
     def test_one_id(self):
@@ -183,11 +191,12 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         download_crawl_definition("1137665", seed, seed_df, 0)
 
         # Test that the crawl definition report has the expected values.
-        actual = csvs_to_list([os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104315076_crawldef.csv")])
+        actual = csv_to_list(os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104315076_crawldef.csv"))
         expected = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                      "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
                      "recurrence_type", "test", "time_limit"],
-                    [1468, False, "", 12181, "", 31104315076, "", "TEST", "", False, False, "NONE", True, 86400]]
+                    [1468, False, "BLANK", 12181, "BLANK", 31104315076, "BLANK", "TEST", "BLANK", False, False,
+                     "NONE", True, 86400]]
         self.assertEqual(actual, expected, "Problem with test for one id")
 
 
