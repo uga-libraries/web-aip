@@ -12,7 +12,7 @@ import configuration as c
 from web_functions import reset_aip
 
 
-class MyTestCase(unittest.TestCase):
+class TestResetAIP(unittest.TestCase):
 
     def setUp(self):
         """

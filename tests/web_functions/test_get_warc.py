@@ -14,7 +14,7 @@ import configuration as c
 from web_functions import get_warc
 
 
-class MyTestCase(unittest.TestCase):
+class TestGetWarc(unittest.TestCase):
 
     def tearDown(self):
         """

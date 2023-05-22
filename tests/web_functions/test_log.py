@@ -11,7 +11,7 @@ import configuration as c
 from web_functions import log
 
 
-class MyTestCase(unittest.TestCase):
+class TestLog(unittest.TestCase):
 
     def setUp(self):
         """

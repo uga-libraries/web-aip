@@ -10,7 +10,7 @@ import configuration as c
 from web_functions import metadata_csv
 
 
-class MyTestCase(unittest.TestCase):
+class TestMetadataCSV(unittest.TestCase):
 
     def setUp(self):
         """

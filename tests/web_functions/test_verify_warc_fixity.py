@@ -14,7 +14,7 @@ import configuration as c
 from web_functions import get_warc, verify_warc_fixity
 
 
-class MyTestCase(unittest.TestCase):
+class TestVerifyWarcFixity(unittest.TestCase):
 
     def tearDown(self):
         """

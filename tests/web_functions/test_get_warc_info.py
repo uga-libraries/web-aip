@@ -13,7 +13,7 @@ import configuration as c
 from web_functions import get_warc_info
 
 
-class MyTestCase(unittest.TestCase):
+class TestGetWarcInfo(unittest.TestCase):
 
     def tearDown(self):
         """

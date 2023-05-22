@@ -13,7 +13,7 @@ import configuration as c
 from web_functions import add_completeness
 
 
-class MyTestCase(unittest.TestCase):
+class TestAddCompleteness(unittest.TestCase):
 
     def tearDown(self):
         """

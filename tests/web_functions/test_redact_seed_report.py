@@ -15,7 +15,7 @@ import configuration as c
 from web_functions import redact_seed_report
 
 
-class MyTestCase(unittest.TestCase):
+class TestRedactSeedReport(unittest.TestCase):
 
     def tearDown(self):
         """

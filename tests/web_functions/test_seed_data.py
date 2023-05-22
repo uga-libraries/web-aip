@@ -11,7 +11,7 @@ import configuration as c
 from web_functions import seed_data
 
 
-class MyTestCase(unittest.TestCase):
+class TestSeedData(unittest.TestCase):
 
     def tearDown(self):
         """

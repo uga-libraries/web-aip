@@ -14,7 +14,7 @@ import configuration as c
 from web_functions import download_warcs
 
 
-class MyTestCase(unittest.TestCase):
+class TestDownloadWarcs(unittest.TestCase):
 
     def setUp(self):
         """

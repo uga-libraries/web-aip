@@ -25,7 +25,7 @@ def csvs_to_list(csv_path_list):
     return row_list
 
 
-class MyTestCase(unittest.TestCase):
+class TestDownloadCrawlDefinition(unittest.TestCase):
 
     def tearDown(self):
         """

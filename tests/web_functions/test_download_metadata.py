@@ -15,7 +15,7 @@ import configuration as c
 from web_functions import download_metadata
 
 
-class MyTestCase(unittest.TestCase):
+class TestDownloadMetadata(unittest.TestCase):
 
     def tearDown(self):
         """

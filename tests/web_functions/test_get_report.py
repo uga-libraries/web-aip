@@ -32,7 +32,7 @@ def csv_list(csv_path):
     return row_list
 
 
-class MyTestCase(unittest.TestCase):
+class TestGetReport(unittest.TestCase):
 
     def setUp(self):
         """
