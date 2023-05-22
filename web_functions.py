@@ -521,7 +521,7 @@ def metadata_csv(seeds_list, date_end):
         # If the connection fails, logs an error and adds a row to the df so it is clear more work is needed.
         api_result = requests.get(f"{c.partner_api}/seed?id={seed_id}", auth=(c.username, c.password))
         if not api_result.status_code == 200:
-            row_list = [f"API error {api_result.status_code}", "TBD", seed_id, "TBD", "TBD", 1]
+            row_list = [f"TBD: API error {api_result.status_code}", "TBD", seed_id, "TBD", "TBD", 1]
             df.loc[len(df)] = row_list
             continue
         seed_report = api_result.json()
@@ -594,12 +594,15 @@ def metadata_csv(seeds_list, date_end):
     df_magil = df[df['Department'] == 'magil'].copy()
     df_magil['AIP_ID'] = "magil-ggp-" + df_magil['Folder'] + "-" + year + "-" + month
 
-    df_rest = df[df['Department'] != 'magil'].copy()
-    df_rest['AIP_ID'] = df_rest['Collection'] + "-web-" + year + month + "-" + df_rest['Sequential']
+    df_harg_rbrl = df[df['Department'].isin(['hargrett', 'russell'])].copy()
+    df_harg_rbrl['AIP_ID'] = df_harg_rbrl['Collection'] + "-web-" + year + month + "-" + df_harg_rbrl['Sequential']
+
+    df_tbd = df[df['Department'].str.startswith("TBD")].copy()
+    df_tbd['AIP_ID'] = "TBD"
 
     # Combines the department dataframes, removes the temporary column Sequential,
     # and saves the completed dataframe to a CSV.
-    df = pd.concat([df_magil, df_rest])
+    df = pd.concat([df_magil, df_harg_rbrl, df_tbd])
     df = df.drop(['Sequential'], axis=1)
     df.to_csv(os.path.join(c.script_output, "preservation_download", "metadata.csv"), index=False)
 

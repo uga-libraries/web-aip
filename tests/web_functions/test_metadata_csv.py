@@ -35,15 +35,15 @@ class TestMetadataCSV(unittest.TestCase):
         actual_csv_df = pd.read_csv(os.path.join(c.script_output, "preservation_download", "metadata.csv"))
         actual_csv = [actual_csv_df.columns.tolist()] + actual_csv_df.values.tolist()
         expected_csv = [["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"],
-                        ["API error 500", "TBD", "error-one", "TBD-web-201901-0001", "TBD", 1],
-                        ["API error 500", "TBD", "error-two", "TBD-web-201901-0002", "TBD", 1]]
+                        ["TBD: API error 500", "TBD", "error-one", "TBD", "TBD", 1],
+                        ["TBD: API error 500", "TBD", "error-two", "TBD", "TBD", 1]]
         self.assertEqual(actual_csv, expected_csv, "Problem with test for API error, all errors, metadata.csv")
         
         # Test for the returned dataframe.
         actual_aip = [aip_df.columns.tolist()] + aip_df.values.tolist()
         expected_aip = [["Seed_ID", "AIP_ID"],
-                        ["error-one", "TBD-web-201901-0001"],
-                        ["error-two", "TBD-web-201901-0002"]]
+                        ["error-one", "TBD"],
+                        ["error-two", "TBD"]]
         self.assertEqual(actual_aip, expected_aip, "Problem with test for API error, all errors, aip")
 
     def test_api_error_one(self):
@@ -59,14 +59,14 @@ class TestMetadataCSV(unittest.TestCase):
         expected_csv = [["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"],
                         ["magil", "magil-0000", "2529685", "magil-ggp-2529685-2019-01",
                          "Teachers Retirement System of Georgia", 1],
-                        ["API error 500", "TBD", "error-one", "TBD-web-201901-0001", "TBD", 1]]
+                        ["TBD: API error 500", "TBD", "error-one", "TBD", "TBD", 1]]
         self.assertEqual(actual_csv, expected_csv, "Problem with test for API, one error and one correct, metadata.csv")
 
         # Test for the returned dataframe.
         actual_aip = [aip_df.columns.tolist()] + aip_df.values.tolist()
         expected_aip = [["Seed_ID", "AIP_ID"],
                         ["2529685", "magil-ggp-2529685-2019-01"],
-                        ["error-one", "TBD-web-201901-0001"]]
+                        ["error-one", "TBD"]]
         self.assertEqual(actual_aip, expected_aip, "Problem with test for API, one error and one correct, aip")
 
     def test_diff_collector(self):
@@ -81,14 +81,13 @@ class TestMetadataCSV(unittest.TestCase):
         actual_csv = [actual_csv_df.columns.tolist()] + actual_csv_df.values.tolist()
         expected_csv = [["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"],
                         ["TBD: unexpected collector value", "TBD: unexpected department value", 2141624,
-                         "TBD: unexpected department value-web-201901-0001",
-                         "TBD: could not get title from Archive-It", 1]]
+                         "TBD", "TBD: could not get title from Archive-It", 1]]
         self.assertEqual(actual_csv, expected_csv, "Problem with test for different collector, metadata.csv")
 
         # Test for the returned dataframe.
         actual_aip = [aip_df.columns.tolist()] + aip_df.values.tolist()
         expected_aip = [["Seed_ID", "AIP_ID"],
-                        ["2141624", "TBD: unexpected department value-web-201901-0001"]]
+                        ["2141624", "TBD"]]
         self.assertEqual(actual_aip, expected_aip, "Problem with test for different collector, aip")
 
     def test_multiple_collection(self):
@@ -132,14 +131,13 @@ class TestMetadataCSV(unittest.TestCase):
         actual_csv = [actual_csv_df.columns.tolist()] + actual_csv_df.values.tolist()
         expected_csv = [["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"],
                         ["TBD: no collector in Archive-It", "TBD: unexpected department value", 2503951,
-                         "TBD: unexpected department value-web-201901-0001",
-                         "TBD: could not get title from Archive-It", 1]]
+                         "TBD", "TBD: could not get title from Archive-It", 1]]
         self.assertEqual(actual_csv, expected_csv, "Problem with test for no collector or title, metadata.csv")
 
         # Test for the returned dataframe.
         actual_aip = [aip_df.columns.tolist()] + aip_df.values.tolist()
         expected_aip = [["Seed_ID", "AIP_ID"],
-                        ["2503951", "TBD: unexpected department value-web-201901-0001"]]
+                        ["2503951", "TBD"]]
         self.assertEqual(actual_aip, expected_aip, "Problem with test for no collector or title, aip")
 
     def test_no_relation(self):
