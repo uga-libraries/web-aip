@@ -59,20 +59,31 @@ class TestDownloadWarcs(unittest.TestCase):
         seed = [seed for seed in self.seed_df.itertuples()][0]
         download_warcs(seed, 0, self.seed_df)
 
-        # Test for the WARC download.
-        warc = "ARCHIVEIT-12264-TEST-JOB921631-SEED2018086-20190607140142542-00000-h3.warc"
-        downloaded = (os.path.exists(os.path.join(seed_path, "error.warc.gz")),
-                      os.path.exists(os.path.join(seed_path, warc)))
-        self.assertEqual(downloaded, (False, True), "Problem with test for error handling, WARC download")
+        # Test for the WARC download, error file not made.
+        downloaded1 = os.path.exists(os.path.join(seed_path, "error.warc.gz"))
+        self.assertEqual(downloaded1, False, "Problem with test for error handling, WARC download: error")
 
-        # Test for the three log fields related to WARC downloading.
-        # WARC_Fixity_Errors includes a time stamp, so can only test for what it starts with.
-        actual_log = (self.seed_df.at[0, "WARC_API_Errors"],
-                      self.seed_df.at[0, "WARC_Fixity_Errors"].startswith(f"Successfully verified {warc}.gz fixity"),
-                      self.seed_df.at[0, "WARC_Unzip_Errors"])
-        expected_log = (f"Index Error: cannot get the WARC URL or MD5 for error.warc.gz; "
-                        f"Successfully downloaded {warc}.gz", True, f"Successfully unzipped {warc}.gz")
-        self.assertEqual(actual_log, expected_log, "Problem with test for error handling, log")
+        # Test for the WARC download, correct WARC downloaded.
+        warc = "ARCHIVEIT-12264-TEST-JOB921631-SEED2018086-20190607140142542-00000-h3.warc"
+        downloaded2 = os.path.exists(os.path.join(seed_path, warc))
+        self.assertEqual(downloaded2, True, "Problem with test for error handling, WARC download: correct")
+
+        # Test for the log field WARC_API_Errors.
+        actual_log1 = self.seed_df.at[0, "WARC_API_Errors"]
+        expected_log1 = f"Index Error: cannot get the WARC URL or MD5 for error.warc.gz; " \
+                        f"Successfully downloaded {warc}.gz"
+        self.assertEqual(actual_log1, expected_log1, "Problem with test for error handling, log: WARC_API_Errors")
+
+        # Test for the log field WARC_Fixity_Errors.
+        # WARC_Fixity_Errors includes a time stamp, so the test cannot be for an exact match.
+        actual_log2 = self.seed_df.at[0, "WARC_Fixity_Errors"]
+        expected_log2 = f"Successfully verified {warc}.gz fixity"
+        self.assertIn(expected_log2, actual_log2, "Problem with test for error handling, log: WARC_Fixity_Errors")
+
+        # Test for the log field WARC_Unzip_Errors.
+        actual_log3 = self.seed_df.at[0, "WARC_Unzip_Errors"]
+        expected_log3 = f"Successfully unzipped {warc}.gz"
+        self.assertEqual(actual_log3, expected_log3, "Problem with test for error handling, log: WARC_Unzip_Errors")
 
     def test_one_warc(self):
         """
@@ -90,13 +101,24 @@ class TestDownloadWarcs(unittest.TestCase):
         downloaded = os.path.exists(os.path.join(seed_path, warc))
         self.assertEqual(downloaded, True, "Problem with test for seed with one WARC, WARC download")
 
-        # Test for the three log fields related to WARC downloading.
-        # WARC_Fixity_Errors includes a time stamp, so can only test for what it starts with.
-        actual_log = (self.seed_df.at[1, "WARC_API_Errors"],
-                      self.seed_df.at[1, "WARC_Fixity_Errors"].startswith(f"Successfully verified {warc}.gz fixity"),
-                      self.seed_df.at[1, "WARC_Unzip_Errors"])
-        expected_log = (f"Successfully downloaded {warc}.gz", True, f"Successfully unzipped {warc}.gz")
-        self.assertEqual(actual_log, expected_log, "Problem with test for seed with one WARC, log")
+        # Test for the log field WARC_API_Errors.
+        actual_log1 = self.seed_df.at[1, "WARC_API_Errors"]
+        expected_log1 = f"Successfully downloaded {warc}.gz"
+        self.assertEqual(actual_log1, expected_log1,
+                         "Problem with test for seed with one WARC, log: WARC_API_Errors")
+
+        # Test for the log field WARC_Fixity_Errors.
+        # WARC_Fixity_Errors includes a time stamp, so the test cannot be for an exact match.
+        actual_log2 = self.seed_df.at[1, "WARC_Fixity_Errors"]
+        expected_log2 = f"Successfully verified {warc}.gz fixity"
+        self.assertIn(expected_log2, actual_log2,
+                      "Problem with test for seed with one WARC, log: WARC_Fixity_Errors")
+
+        # Test for the log field WARC_Unzip_Errors.
+        actual_log3 = self.seed_df.at[1, "WARC_Unzip_Errors"]
+        expected_log3 = f"Successfully unzipped {warc}.gz"
+        self.assertEqual(actual_log3, expected_log3,
+                         "Problem with test for seed with one WARC, log: WARC_Unzip_Errors")
 
     def test_two_warcs(self):
         """
@@ -109,22 +131,37 @@ class TestDownloadWarcs(unittest.TestCase):
         seed = [seed for seed in self.seed_df.itertuples()][2]
         download_warcs(seed, 2, self.seed_df)
 
-        # Test for the WARCs download.
+        # Test for the first WARC's download.
         warc1 = "ARCHIVEIT-12265-MONTHLY-JOB1718490-SEED2485678-20221203180441653-00001-h3.warc"
-        warc2 = "ARCHIVEIT-12265-MONTHLY-JOB1718490-SEED2485678-20221202160754903-00000-h3.warc"
-        first = os.path.exists(os.path.join(seed_path, warc1))
-        second = os.path.exists(os.path.join(seed_path, warc2))
-        downloaded = (first, second)
-        self.assertEqual(downloaded, (True, True), "Problem with test for seed with twp WARCs, WARC download")
+        downloaded1 = os.path.exists(os.path.join(seed_path, warc1))
+        self.assertEqual(downloaded1, True, "Problem with test for seed with two WARCs, first WARC download")
 
-        # Test for the three log fields related to WARC downloading.
-        # WARC_Fixity_Errors includes a time stamp, so can only test for what it starts with.
-        actual_log = (self.seed_df.at[2, "WARC_API_Errors"],
-                      self.seed_df.at[2, "WARC_Fixity_Errors"].startswith(f"Successfully verified {warc1}.gz fixity"),
-                      self.seed_df.at[2, "WARC_Unzip_Errors"])
-        expected_log = (f"Successfully downloaded {warc1}.gz; Successfully downloaded {warc2}.gz", True,
-                        f"Successfully unzipped {warc1}.gz; Successfully unzipped {warc2}.gz")
-        self.assertEqual(actual_log, expected_log, "Problem with test for seed with one WARC, log")
+        # Test for the second WARC's download.
+        warc2 = "ARCHIVEIT-12265-MONTHLY-JOB1718490-SEED2485678-20221202160754903-00000-h3.warc"
+        downloaded2 = os.path.exists(os.path.join(seed_path, warc2))
+        self.assertEqual(downloaded2, True, "Problem with test for seed with two WARCs, WARC download")
+
+        # Test for the log field WARC_API_Errors.
+        actual_log1 = self.seed_df.at[2, "WARC_API_Errors"]
+        expected_log1 = f"Successfully downloaded {warc1}.gz; Successfully downloaded {warc2}.gz"
+        self.assertEqual(actual_log1, expected_log1,
+                         "Problem with test for seed with two WARCs, log: WARC_API_Errors")
+
+        # Test for the log field WARC_Fixity_Errors.
+        # WARC_Fixity_Errors includes a time stamp, so the test cannot be for an exact match.
+        actual_log2 = self.seed_df.at[2, "WARC_Fixity_Errors"]
+        expected_log2a = f"Successfully verified {warc1}.gz fixity"
+        expected_log2b = f"Successfully verified {warc2}.gz fixity"
+        self.assertIn(expected_log2a, actual_log2,
+                      "Problem with test for seed with two WARCs, log: WARC_Fixity_Errors WARC 1")
+        self.assertIn(expected_log2b, actual_log2,
+                      "Problem with test for seed with two WARCs, log: WARC_Fixity_Errors WARC 2")
+
+        # Test for the log field WARC_Unzip_Errors.
+        actual_log3 = self.seed_df.at[2, "WARC_Unzip_Errors"]
+        expected_log3 = f"Successfully unzipped {warc1}.gz; Successfully unzipped {warc2}.gz"
+        self.assertEqual(actual_log3, expected_log3,
+                         "Problem with test for seed with two WARCs, log: WARC_Unzip_Errors")
 
 
 if __name__ == '__main__':
