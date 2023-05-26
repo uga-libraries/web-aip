@@ -26,7 +26,7 @@ class TestLog(unittest.TestCase):
                                       np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                     columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                              "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                             "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                             "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                              "WARC_Unzip_Errors", "Complete"])
         self.seed_df.to_csv(os.path.join(config.script_output, "seeds_log.csv"), index=False)
 
@@ -41,14 +41,14 @@ class TestLog(unittest.TestCase):
         Tests that the function returns the correct dataframe and correctly updates the CSV
         when there is not already a message of this type in the dataframe.
         """
-        log("Successfully downloaded ARCHIVEIT.warc.gz", self.seed_df, 0, "WARC_API_Errors")
+        log("Successfully downloaded ARCHIVEIT.warc.gz", self.seed_df, 0, "WARC_Download_Errors")
         self.seed_df = self.seed_df.fillna("BLANK")
 
         # Test that the dataframe has the correct values.
         actual_dataframe = [self.seed_df.columns.tolist()] + self.seed_df.values.tolist()
         expected_dataframe = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                               "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
+                               "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                               [1111111, 12345, "1100000", 0.52, 1, "ARCHIVEIT.warc.gz",
                                "Successfully downloaded all metadata reports",
                                "No empty reports", "BLANK", "Successfully downloaded ARCHIVEIT.warc.gz",
@@ -65,7 +65,7 @@ class TestLog(unittest.TestCase):
             actual_csv = list(reader)
         expected_csv = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                          "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                         "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
+                         "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                         ["1111111", "12345", "1100000", "0.52", "1", "ARCHIVEIT.warc.gz",
                          "Successfully downloaded all metadata reports", "No empty reports",
                          "", "Successfully downloaded ARCHIVEIT.warc.gz", "", "", ""],
@@ -85,7 +85,7 @@ class TestLog(unittest.TestCase):
         actual_dataframe = [self.seed_df.columns.tolist()] + self.seed_df.values.tolist()
         expected_dataframe = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                               "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
+                               "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                               [1111111, 12345, "1100000", 0.52, 1, "ARCHIVEIT.warc.gz",
                                "Successfully downloaded all metadata reports", "No empty reports",
                                "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
@@ -102,7 +102,7 @@ class TestLog(unittest.TestCase):
             actual_csv = list(reader)
         expected_csv = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                          "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                         "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
+                         "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                         ["1111111", "12345", "1100000", "0.52", "1", "ARCHIVEIT.warc.gz",
                          "Successfully downloaded all metadata reports", "No empty reports", "", "", "", "", ""],
                         ["2222222", "12345", "2200000", "1.52", "2", "ARCHIVEIT.warc.gz|ARCHIVEIT-1.warc.gz",

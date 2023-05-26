@@ -38,7 +38,7 @@ class TestResetSeed(unittest.TestCase):
                                       "Success", "seed.csv", "Success", "Success", "Success", "Error", np.NaN]],
                                     columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                              "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                             "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                             "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                              "WARC_Unzip_Errors", "Complete"])
 
         # Makes a log, seeds_log.csv, in the script output directory.
@@ -69,7 +69,7 @@ class TestResetSeed(unittest.TestCase):
         actual_dataframe = [self.seed_df.columns.tolist()] + self.seed_df.values.tolist()
         expected_dataframe = [["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                                "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
-                               "WARC_API_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
+                               "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                               ["aip-1", "1111111", "12345", "1000000", 0.521, 1, "ARCHIVEIT.warc.gz",
                                "Success", "No empty reports", "Success", "Success", "Success", "Success", "BLANK"],
                               ["aip-2", "2222222", "12345", "2000000", 0.522, 2,
@@ -83,8 +83,8 @@ class TestResetSeed(unittest.TestCase):
             reader = csv.reader(open_file)
             actual_csv = list(reader)
         expected_csv = [["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_API_Errors",
-                         "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
+                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                         "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                         ["aip-1", "1111111", "12345", "1000000", "0.521", "1", "ARCHIVEIT.warc.gz",
                          "Success", "No empty reports", "Success", "Success", "Success", "Success", ""],
                         ["aip-2", "2222222", "12345", "2000000", "0.522", "2", "ARCHIVEIT.warc.gz|ARCHIVEIT-1.warc.gz",

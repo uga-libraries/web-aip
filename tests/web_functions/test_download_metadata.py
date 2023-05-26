@@ -37,7 +37,7 @@ class TestDownloadMetadata(unittest.TestCase):
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2187482")
@@ -76,7 +76,7 @@ class TestDownloadMetadata(unittest.TestCase):
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2529685")
@@ -114,7 +114,7 @@ class TestDownloadMetadata(unittest.TestCase):
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2547528")

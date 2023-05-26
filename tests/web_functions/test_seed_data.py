@@ -30,7 +30,7 @@ class TestSeedData(unittest.TestCase):
         seed_df = seed_df.fillna("BLANK")
         actual = [seed_df.columns.tolist()] + seed_df.values.tolist()
         expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_API_Errors",
+                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_Download_Errors",
                      "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                     ["2016223", "12249", "918473|918474", 0.001, 2,
                      "ARCHIVEIT-12249-ONE_TIME-JOB918473-SEED2016223-20190603193416006-00000-h3.warc.gz|"
@@ -53,7 +53,7 @@ class TestSeedData(unittest.TestCase):
         seed_df = seed_df.fillna("BLANK")
         actual = [seed_df.columns.tolist()] + seed_df.values.tolist()
         expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_API_Errors",
+                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_Download_Errors",
                      "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                     ["2030942", "12181", "1177700", 0.053, 1,
                      "ARCHIVEIT-12181-TEST-JOB1177700-SEED2030942-20200601191649636-00000-h3.warc.gz",
@@ -87,7 +87,7 @@ class TestSeedData(unittest.TestCase):
         seed_df = seed_df.fillna("BLANK")
         actual = [seed_df.columns.tolist()] + seed_df.values.tolist()
         expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_API_Errors",
+                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_Download_Errors",
                      "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                     ["2514060", "15678", "1691025", 0.012, 1,
                      "ARCHIVEIT-15678-TEST-JOB1691025-SEED2514060-20221014143847623-00000-h3.warc.gz",
@@ -134,7 +134,7 @@ class TestSeedData(unittest.TestCase):
         seed_df = seed_df.fillna("BLANK")
         actual = [seed_df.columns.tolist()] + seed_df.values.tolist()
         expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_API_Errors",
+                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_Download_Errors",
                      "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                     ["2444045", "12265", "1365540", 0.989, 1,
                      "ARCHIVEIT-12265-TEST-JOB1365540-SEED2444045-20210216160638068-00000-h3.warc.gz",
@@ -154,8 +154,7 @@ class TestSeedData(unittest.TestCase):
                      "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
                     ["2481704", "12265", "1365540", 0.802, 1,
                      "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481704-20210216165149447-00000-h3.warc.gz",
-                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
-]
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]]
         self.assertEqual(actual, expected, "Problem with test for Russell, dataframe values")
 
         # Test that the CSV was created.

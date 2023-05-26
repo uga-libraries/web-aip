@@ -36,7 +36,7 @@ class TestRedactSeedReport(unittest.TestCase):
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         os.mkdir("1234567")
 
@@ -59,7 +59,7 @@ class TestRedactSeedReport(unittest.TestCase):
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         os.mkdir("1234567")
         seed_csv_path = os.path.join(os.getcwd(), "1234567", "aip-1_seed.csv")
@@ -93,7 +93,7 @@ class TestRedactSeedReport(unittest.TestCase):
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         os.mkdir("1234567")
         seed_csv_path = os.path.join(os.getcwd(), "1234567", "aip-1_seed.csv")

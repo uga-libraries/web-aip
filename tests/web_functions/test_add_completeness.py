@@ -36,7 +36,7 @@ class TestAddCompleteness(unittest.TestCase):
                                  "Successfully unzipped name.warc.gz; Successfully unzipped name2.warc.gz", np.nan]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         
         add_completeness(0, seed_df)
@@ -65,13 +65,13 @@ class TestAddCompleteness(unittest.TestCase):
                                  "Error unzipping name.warc.gz: unzipped to '.gz.open' file", np.nan]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         add_completeness(0, seed_df)
 
         # Tests that Complete was updated.
         actual = seed_df.at[0, 'Complete']
-        expected = "Metadata_Report_Errors; WARC_API_Errors; WARC_Fixity_Errors; WARC_Unzip_Errors"
+        expected = "Metadata_Report_Errors; WARC_Download_Errors; WARC_Fixity_Errors; WARC_Unzip_Errors"
         self.assertEqual(actual, expected, "Problem with test for all four error types")
 
     def test_metadata_api(self):
@@ -88,7 +88,7 @@ class TestAddCompleteness(unittest.TestCase):
                                  "Successfully unzipped name.warc.gz", np.nan]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         add_completeness(0, seed_df)
 
@@ -111,7 +111,7 @@ class TestAddCompleteness(unittest.TestCase):
                                  "Successfully unzipped name.warc.gz", np.nan]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         add_completeness(0, seed_df)
 
@@ -123,7 +123,7 @@ class TestAddCompleteness(unittest.TestCase):
     def test_warc_api_download(self):
         """
         Tests that the function updates the Complete column of the log correctly
-        if there is an API error from downloading in WARC_API_Errors.
+        if there is an API error from downloading in WARC_Download_Errors.
         """
         # Makes data needed as function input and runs the function.
         seed_df = pd.DataFrame([["aip-id", 1000000, 12345, "1234567", 1.0, 1, "name.warc.gz",
@@ -134,19 +134,19 @@ class TestAddCompleteness(unittest.TestCase):
                                  "Successfully unzipped name.warc.gz", np.nan]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         add_completeness(0, seed_df)
 
         # Tests that Complete was updated.
         actual = seed_df.at[0, 'Complete']
-        expected = "WARC_API_Errors"
-        self.assertEqual(actual, expected, "Problem with test for WARC_API_Errors, API error from download")
+        expected = "WARC_Download_Errors"
+        self.assertEqual(actual, expected, "Problem with test for WARC_Download_Errors, API error from download")
 
     def test_warc_api_index(self):
         """
         Tests that the function updates the Complete column of the log correctly
-        if there is an index error from get_info() in WARC_API_Errors.
+        if there is an index error from get_info() in WARC_Download_Errors.
         """
         # Makes data needed as function input and runs the function.
         seed_df = pd.DataFrame([["aip-id", 1000000, 12345, "1234567", 1.0, 1, "name.warc.gz",
@@ -157,19 +157,19 @@ class TestAddCompleteness(unittest.TestCase):
                                  "Successfully unzipped name.warc.gz", np.nan]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         add_completeness(0, seed_df)
 
         # Tests that Complete was updated.
         actual = seed_df.at[0, 'Complete']
-        expected = "WARC_API_Errors"
-        self.assertEqual(actual, expected, "Problem with test for WARC_API_Errors, index error during get info")
+        expected = "WARC_Download_Errors"
+        self.assertEqual(actual, expected, "Problem with test for WARC_Download_Errors, index error during get info")
 
     def test_warc_api_info(self):
         """
         Tests that the function updates the Complete column of the log correctly
-        if there is an API error from get_info() in WARC_API_Errors.
+        if there is an API error from get_info() in WARC_Download_Errors.
         """
         # Makes data needed as function input and runs the function.
         seed_df = pd.DataFrame([["aip-id", 1000000, 12345, "1234567", 1.0, 1, "name.warc.gz",
@@ -180,14 +180,14 @@ class TestAddCompleteness(unittest.TestCase):
                                  "Successfully unzipped name.warc.gz", np.nan]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         add_completeness(0, seed_df)
 
         # Tests that Complete was updated.
         actual = seed_df.at[0, 'Complete']
-        expected = "WARC_API_Errors"
-        self.assertEqual(actual, expected, "Problem with test for WARC_API_Errors, API error during get info")
+        expected = "WARC_Download_Errors"
+        self.assertEqual(actual, expected, "Problem with test for WARC_Download_Errors, API error during get info")
 
     def test_warc_fixity_change(self):
         """
@@ -203,7 +203,7 @@ class TestAddCompleteness(unittest.TestCase):
                                  "Successfully unzipped name.warc.gz", np.nan]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         add_completeness(0, seed_df)
 
@@ -226,7 +226,7 @@ class TestAddCompleteness(unittest.TestCase):
                                  "Successfully unzipped name.warc.gz", np.nan]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         add_completeness(0, seed_df)
 
@@ -249,7 +249,7 @@ class TestAddCompleteness(unittest.TestCase):
                                  "Error unzipping name.warc.gz: unzipped to '.gz.open' file", np.nan]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         add_completeness(0, seed_df)
 
@@ -272,7 +272,7 @@ class TestAddCompleteness(unittest.TestCase):
                                  "Error unzipping name.warc.gz: file not found", np.nan]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         add_completeness(0, seed_df)
 

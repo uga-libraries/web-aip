@@ -30,9 +30,9 @@ def add_completeness(row_index, seed_df):
     if "Error" in seed_df.at[row_index, 'Metadata_Report_Errors']:
         log("Metadata_Report_Errors", seed_df, row_index, "Complete")
 
-    # Adds errors from WARC_API_Errors.
-    if "Error" in seed_df.at[row_index, 'WARC_API_Errors']:
-        log("WARC_API_Errors", seed_df, row_index, "Complete")
+    # Adds errors from WARC_Download_Errors.
+    if "Error" in seed_df.at[row_index, 'WARC_Download_Errors']:
+        log("WARC_Download_Errors", seed_df, row_index, "Complete")
 
     # Adds errors from WARC_Fixity_Errors.
     if "Error" in seed_df.at[row_index, 'WARC_Fixity_Errors']:
@@ -452,10 +452,10 @@ def get_warc(seed_df, row_index, warc_url, warc, warc_path):
     # Updates the log with the success or error from the download.
     # If there was an error, raises an error to skip the rest of the steps for this WARC.
     if warc_download.status_code == 200:
-        log(f"Successfully downloaded {warc}", seed_df, row_index, "WARC_API_Errors")
+        log(f"Successfully downloaded {warc}", seed_df, row_index, "WARC_Download_Errors")
     else:
         log(f"API Error {warc_download.status_code}: can't download {warc}",
-            seed_df, row_index, "WARC_API_Errors")
+            seed_df, row_index, "WARC_Download_Errors")
         raise ValueError
 
     # Saves the zipped WARC in the seed folder, keeping the original filename.
@@ -474,7 +474,7 @@ def get_warc_info(warc, seed_df, row_index):
     # If there is an API error, updates the log and raises an error to skip the rest of the steps for this WARC.
     if not warc_data.status_code == 200:
         log(f"API Error {warc_data.status_code}: can't get info about {warc}",
-            seed_df, row_index, "WARC_API_Errors")
+            seed_df, row_index, "WARC_Download_Errors")
         raise ValueError
 
     # Gets and returns the two data points needed from the WASAPI results, unless there is an error.
@@ -485,7 +485,7 @@ def get_warc_info(warc, seed_df, row_index):
         return warc_url, warc_md5
     except IndexError:
         log(f"Index Error: cannot get the WARC URL or MD5 for {warc}",
-            seed_df, row_index, "WARC_API_Errors")
+            seed_df, row_index, "WARC_Download_Errors")
         raise IndexError
 
 
@@ -654,7 +654,7 @@ def reset_seed(seed_id, df):
     df.loc[row_index, 'Metadata_Report_Errors'] = None
     df.loc[row_index, 'Metadata_Report_Empty'] = None
     df.loc[row_index, 'Seed_Report_Redaction'] = None
-    df.loc[row_index, 'WARC_API_Errors'] = None
+    df.loc[row_index, 'WARC_Download_Errors'] = None
     df.loc[row_index, 'WARC_Fixity_Errors'] = None
     df.loc[row_index, 'WARC_Unzip_Errors'] = None
 
@@ -709,7 +709,7 @@ def seed_data(date_start, date_end):
     seed_df = seed_df.reset_index()
 
     # Adds columns for logging the workflow steps.
-    log_columns = ["Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_API_Errors",
+    log_columns = ["Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_Download_Errors",
                    "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"]
     seed_df = seed_df.reindex(columns=seed_df.columns.tolist() + log_columns)
 

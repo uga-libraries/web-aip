@@ -35,7 +35,7 @@ class TestGetWarc(unittest.TestCase):
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         os.mkdir("2529656")
         get_warc(seed_df, 0, f"https://warcs.archive-it.org/webdatafile/{warc}", warc, f"2529656/{warc}")
@@ -45,7 +45,7 @@ class TestGetWarc(unittest.TestCase):
         self.assertEqual(warc_downloaded, True, "Problem with test for correct, WARC download")
 
         # Test the log is updated correctly.
-        actual = seed_df.at[0, 'WARC_API_Errors']
+        actual = seed_df.at[0, 'WARC_Download_Errors']
         expected = f"Successfully downloaded {warc}"
         self.assertEqual(actual, expected, "Problem with test for correct, log")
 
@@ -60,7 +60,7 @@ class TestGetWarc(unittest.TestCase):
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         os.mkdir("2529656")
 
@@ -72,7 +72,7 @@ class TestGetWarc(unittest.TestCase):
         self.assertEqual(warc_downloaded, False, "Problem with test for error, WARC download")
 
         # Test the log is updated correctly.
-        actual = seed_df.at[0, 'WARC_API_Errors']
+        actual = seed_df.at[0, 'WARC_Download_Errors']
         expected = f"API Error 404: can't download ARCHIVEIT-error.warc.gz"
         self.assertEqual(actual, expected, "Problem with test for error, log")
 

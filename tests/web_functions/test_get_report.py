@@ -44,7 +44,7 @@ class TestGetReport(unittest.TestCase):
                                       np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                     columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                              "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                             "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                             "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                              "WARC_Unzip_Errors", "Complete"])
         self.seed = [seed for seed in self.seed_df.itertuples()][0]
         os.mkdir("2027707")
@@ -137,7 +137,7 @@ class TestGetReport(unittest.TestCase):
         actual = csv_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_31104250630_crawldef.csv"))
         expected = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                      "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only", "recurrence_type",
-                     "test","time_limit"],
+                     "test", "time_limit"],
                     [1468, False, "", 12265, "", 31104250630, "", "TEST", "", False, False, "NONE", True, 259200]]
         self.assertEqual(actual, expected, "Problem with test for crawl definition")
 

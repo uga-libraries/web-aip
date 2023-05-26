@@ -33,7 +33,7 @@ class TestGetWarcInfo(unittest.TestCase):
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         warc_url, warc_md5 = get_warc_info(seed_df.at[0, 'WARC_Filenames'], seed_df, 0)
 
@@ -54,7 +54,7 @@ class TestGetWarcInfo(unittest.TestCase):
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
 
         # Test for raising the error.
@@ -62,7 +62,7 @@ class TestGetWarcInfo(unittest.TestCase):
             get_warc_info(seed_df.at[0, 'WARC_Filenames'], seed_df, 0)
 
         # Test for the log.
-        actual = seed_df.at[0, 'WARC_API_Errors']
+        actual = seed_df.at[0, 'WARC_Download_Errors']
         expected = "Index Error: cannot get the WARC URL or MD5 for ARCHIVEIT-ERROR-SEED2173769.warc.gz"
         self.assertEqual(actual, expected, "Problem with error, log")
 
@@ -76,7 +76,7 @@ class TestGetWarcInfo(unittest.TestCase):
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         warc_url, warc_md5 = get_warc_info(seed_df.at[0, 'WARC_Filenames'], seed_df, 0)
 
@@ -98,7 +98,7 @@ class TestGetWarcInfo(unittest.TestCase):
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         warc_url, warc_md5 = get_warc_info(seed_df.at[0, 'WARC_Filenames'], seed_df, 0)
 
@@ -120,7 +120,7 @@ class TestGetWarcInfo(unittest.TestCase):
                                  np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
                                columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
+                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
         warc_url, warc_md5 = get_warc_info(seed_df.at[0, 'WARC_Filenames'], seed_df, 0)
 
