@@ -10,7 +10,7 @@ import os
 import pandas as pd
 import shutil
 import unittest
-import configuration as c
+import configuration as config
 from web_functions import download_warcs
 
 
@@ -36,7 +36,7 @@ class TestDownloadWarcs(unittest.TestCase):
                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]
         self.seed_df = pd.DataFrame([error, harg, rbrl], columns=columns)
 
-        self.seeds_dir = os.path.join(c.script_output, "preservation_download")
+        self.seeds_dir = os.path.join(config.script_output, "preservation_download")
         os.mkdir(self.seeds_dir)
         os.chdir(self.seeds_dir)
 
@@ -47,7 +47,7 @@ class TestDownloadWarcs(unittest.TestCase):
         """
         os.chdir("..")
         shutil.rmtree(self.seeds_dir)
-        os.remove(os.path.join(c.script_output, "seeds_log.csv"))
+        os.remove(os.path.join(config.script_output, "seeds_log.csv"))
 
     def test_error_handling(self):
         """

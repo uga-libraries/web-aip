@@ -17,7 +17,7 @@ import sys
 import time
 
 # Import constant variables and functions from another UGA preservation script.
-import configuration as c
+import configuration as config
 
 
 def add_completeness(row_index, seed_df):
@@ -62,7 +62,7 @@ def check_aips(date_end, date_start, seed_df, seeds_directory):
 
         # Downloads the entire WARC list.
         filters = {'page_size': 10000}
-        warcs = requests.get(c.wasapi, params=filters, auth=(c.username, c.password))
+        warcs = requests.get(config.wasapi, params=filters, auth=(config.username, config.password))
 
         # If there was an API error, ends the function.
         if warcs.status_code != 200:
@@ -212,7 +212,7 @@ def check_aips(date_end, date_start, seed_df, seeds_directory):
         return
 
     # Starts a csv for the results of the quality review.
-    csv_path = f'{c.script_output}/completeness_check.csv'
+    csv_path = f'{config.script_output}/completeness_check.csv'
     with open(csv_path, 'w', newline='') as complete_csv:
         complete_write = csv.writer(complete_csv)
 
@@ -245,26 +245,26 @@ def check_config():
 
     # Checks that the path in script_output exists on the local machine.
     try:
-        if not os.path.exists(c.script_output):
-            errors.append(f"Variable path '{c.script_output}' is not correct.")
+        if not os.path.exists(config.script_output):
+            errors.append(f"Variable path '{config.script_output}' is not correct.")
     except AttributeError:
         errors.append("Variable 'script_output' is missing from the configuration file.")
 
     # Checks that the API URLs, which are consistent values, are correct.
     try:
-        if c.partner_api != 'https://partner.archive-it.org/api':
+        if config.partner_api != 'https://partner.archive-it.org/api':
             errors.append("Partner API path is not correct.")
     except AttributeError:
         errors.append("Variable 'partner_api' is missing from the configuration file.")
     try:
-        if c.wasapi != 'https://warcs.archive-it.org/wasapi/v1/webdata':
+        if config.wasapi != 'https://warcs.archive-it.org/wasapi/v1/webdata':
             errors.append("WASAPI path is not correct.")
     except AttributeError:
         errors.append("Variable 'wasapi' is missing from the configuration file.")
 
     # Checks that the institution page exists.
     try:
-        response = requests.get(c.inst_page)
+        response = requests.get(config.inst_page)
         if response.status_code != 200:
             errors.append("Institution Page URL is not correct.")
     except AttributeError:
@@ -272,18 +272,18 @@ def check_config():
 
     # Checks that the username and password are present.
     try:
-        c.username
+        config.username
     except AttributeError:
         errors.append("Variable 'username' is missing from the configuration file.")
     try:
-        c.password
+        config.password
     except AttributeError:
         errors.append("Variable 'password' is missing from the configuration file.")
 
     # Checks that the Archive-It username and password are correct by using them with an API call.
     # This only works if the partner_api variable is in the configuration file.
     try:
-        response = requests.get(f'{c.partner_api}/seed?limit=5', auth=(c.username, c.password))
+        response = requests.get(f'{config.partner_api}/seed?limit=5', auth=(config.username, config.password))
         if response.status_code != 200:
             errors.append("Could not access Partner API with provided credentials. "
                           "Check if the partner_api, username, and/or password variables have errors.")
@@ -293,10 +293,10 @@ def check_config():
     # Checks that the path in md5deep exists on the local machine
     # and uses the correct direction of slashes (\).
     try:
-        if not os.path.exists(c.md5deep):
-            errors.append(f"Variable path '{c.md5deep}' is not correct.")
-        elif "/" in c.md5deep:
-            errors.append(f"Path '{c.md5deep}' must use \ for md5deep to work correctly.")
+        if not os.path.exists(config.md5deep):
+            errors.append(f"Variable path '{config.md5deep}' is not correct.")
+        elif "/" in config.md5deep:
+            errors.append(f"Path '{config.md5deep}' must use \ for md5deep to work correctly.")
     except AttributeError:
         errors.append("Variable 'md5deep' is missing from the configuration file.")
 
@@ -359,12 +359,12 @@ def download_metadata(seed, row_index, seed_df):
     # If there were no download errors (the dataframe still has no value in that cell), updates the log to show success.
     if pd.isnull(seed_df.at[row_index, "Metadata_Report_Errors"]):
         seed_df.loc[row_index, "Metadata_Report_Errors"] = "Successfully downloaded all metadata reports"
-        seed_df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
+        seed_df.to_csv(os.path.join(config.script_output, "seeds_log.csv"), index=False)
 
     # If there were no deleted empty reports (the dataframe still has not value in that cell), updates the log.
     if pd.isnull(seed_df.at[row_index, "Metadata_Report_Empty"]):
         seed_df.loc[row_index, "Metadata_Report_Empty"] = "No empty reports"
-        seed_df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
+        seed_df.to_csv(os.path.join(config.script_output, "seeds_log.csv"), index=False)
 
 
 def download_warcs(seed, row_index, seed_df):
@@ -379,7 +379,7 @@ def download_warcs(seed, row_index, seed_df):
     for warc in warc_names:
 
         # The path for where the WARC will be saved on the local machine.
-        warc_path = f'{c.script_output}/preservation_download/{seed.Seed_ID}/{warc}'
+        warc_path = f'{config.script_output}/preservation_download/{seed.Seed_ID}/{warc}'
 
         # Gets URL for downloading the WARC and WARC MD5 from Archive-It using WASAPI.
         # If there was an API error, stops processing this WARC and starts the next.
@@ -423,7 +423,7 @@ def get_report(seed, seed_df, row_index, filter_type, filter_value, report_type,
     # Builds the API call to get the report as a csv.
     # Limit of -1 will return all matches. Default is only the first 100.
     filters = {"limit": -1, filter_type: filter_value, "format": "csv"}
-    metadata_report = requests.get(f"{c.partner_api}/{report_type}", params=filters, auth=(c.username, c.password))
+    metadata_report = requests.get(f"{config.partner_api}/{report_type}", params=filters, auth=(config.username, config.password))
 
     # Saves the metadata report if there were no API errors and there was data of this type (content isn't empty).
     # For scope rules, it is common for one or both to not have data since these aren't required.
@@ -445,7 +445,7 @@ def get_warc(seed_df, row_index, warc_url, warc, warc_path):
     """
 
     # Downloads the WARC, which will be zipped.
-    warc_download = requests.get(f"{warc_url}", auth=(c.username, c.password))
+    warc_download = requests.get(f"{warc_url}", auth=(config.username, config.password))
 
     # Updates the log with the success or error from the download.
     # If there was an error, raises an error to skip the rest of the steps for this WARC.
@@ -467,7 +467,7 @@ def get_warc_info(warc, seed_df, row_index):
     """
 
     # WASAPI call to get all data related to this WARC.
-    warc_data = requests.get(f'{c.wasapi}?filename={warc}', auth=(c.username, c.password))
+    warc_data = requests.get(f'{config.wasapi}?filename={warc}', auth=(config.username, config.password))
 
     # If there is an API error, updates the log and raises an error to skip the rest of the steps for this WARC.
     if not warc_data.status_code == 200:
@@ -498,7 +498,7 @@ def log(message, df, row, column):
 
     # Saves a new version of seeds_log.csv with the updated information.
     # The previous version of the file is overwritten.
-    df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
+    df.to_csv(os.path.join(config.script_output, "seeds_log.csv"), index=False)
 
 
 def metadata_csv(seeds_list, date_end):
@@ -519,7 +519,7 @@ def metadata_csv(seeds_list, date_end):
 
         # Uses the Partner API to get the seed report.
         # If the connection fails, logs an error and adds a row to the df so it is clear more work is needed.
-        api_result = requests.get(f"{c.partner_api}/seed?id={seed_id}", auth=(c.username, c.password))
+        api_result = requests.get(f"{config.partner_api}/seed?id={seed_id}", auth=(config.username, config.password))
         if not api_result.status_code == 200:
             row_list = [f"TBD: API error {api_result.status_code}", "TBD", seed_id, "TBD", "TBD", 1]
             df.loc[len(df)] = row_list
@@ -604,7 +604,7 @@ def metadata_csv(seeds_list, date_end):
     # and saves the completed dataframe to a CSV.
     df = pd.concat([df_magil, df_harg_rbrl, df_tbd])
     df = df.drop(['Sequential'], axis=1)
-    df.to_csv(os.path.join(c.script_output, "preservation_download", "metadata.csv"), index=False)
+    df.to_csv(os.path.join(config.script_output, "preservation_download", "metadata.csv"), index=False)
 
     # Returns a dataframe with the Seed ID (Folder) and AIP ID so the AIP ID can be added to seed_df.
     aip_df = df[['Folder', 'AIP_ID']].copy()
@@ -658,7 +658,7 @@ def reset_aip(seed_id, df):
 
     # Saves a new version of seeds_log.csv with the updated information.
     # The previous version of the file is overwritten.
-    df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
+    df.to_csv(os.path.join(config.script_output, "seeds_log.csv"), index=False)
 
 
 def seed_data(date_start, date_end):
@@ -669,7 +669,7 @@ def seed_data(date_start, date_end):
     # Uses WASAPI to get information about all WARCs in this download, based on the date limits.
     # WASAPI is the only API that allows limiting by date.
     filters = {"store-time-after": date_start, "store-time-before": date_end, "page_size": 10000}
-    warcs = requests.get(c.wasapi, params=filters, auth=(c.username, c.password))
+    warcs = requests.get(config.wasapi, params=filters, auth=(config.username, config.password))
 
     # If there was an error with the API call, quits the script.
     if not warcs.status_code == 200:
@@ -713,7 +713,7 @@ def seed_data(date_start, date_end):
 
     # Saves the dataframe as a CSV in the script output folder for splitting or restarting a batch.
     # Returns the dataframe for when the entire group will be downloaded as one batch.
-    seed_df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
+    seed_df.to_csv(os.path.join(config.script_output, "seeds_log.csv"), index=False)
     return seed_df
 
 
@@ -731,8 +731,8 @@ def unzip_warc(seed_df, row_index, warc_path, warc, seed_id):
     # Checks for and logs any 7-Zip errors.
     if unzip_output.stderr == b'':
         # A filename (warc.open) is an error from a known gzip bug. Deletes the erroneous unzipped file.
-        if os.path.exists(f'{c.script_output}/preservation_download/{seed_id}/{warc}.open'):
-            os.remove(f'{c.script_output}/preservation_download/{seed_id}/{warc}.open')
+        if os.path.exists(f'{config.script_output}/preservation_download/{seed_id}/{warc}.open'):
+            os.remove(f'{config.script_output}/preservation_download/{seed_id}/{warc}.open')
             log(f"Error unzipping {warc}: unzipped to '.gz.open' file", seed_df, row_index, "WARC_Unzip_Errors")
         # If it unzipped correctly, deletes the zip file.
         else:
@@ -750,7 +750,7 @@ def verify_warc_fixity(seed_df, row_index, warc_path, warc, warc_md5):
     """
 
     # Calculates the md5 for the downloaded zipped WARC with md5deep.
-    md5deep_output = subprocess.run(f'"{c.md5deep}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
+    md5deep_output = subprocess.run(f'"{config.md5deep}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
     try:
         regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
         downloaded_warc_md5 = regex_md5.group(1)

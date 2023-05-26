@@ -8,7 +8,7 @@ import os
 import shutil
 import subprocess
 import unittest
-import configuration as c
+import configuration as config
 
 
 class MyTestCase(unittest.TestCase):
@@ -17,9 +17,9 @@ class MyTestCase(unittest.TestCase):
         """
         Deletes the preservation folder with all the downloaded seed contents and the CSV files created by the tests.
         """
-        shutil.rmtree(os.path.join(c.script_output, "preservation_download"))
-        os.remove(os.path.join(c.script_output, "completeness_check.csv"))
-        os.remove(os.path.join(c.script_output, "seeds_log.csv"))
+        shutil.rmtree(os.path.join(config.script_output, "preservation_download"))
+        os.remove(os.path.join(config.script_output, "completeness_check.csv"))
+        os.remove(os.path.join(config.script_output, "seeds_log.csv"))
 
     def test_multi_warc_seed(self):
         """
@@ -30,7 +30,7 @@ class MyTestCase(unittest.TestCase):
         subprocess.run(f"python {script_path} 2020-04-30 2020-05-15", shell=True)
 
         # Test for metadata.csv
-        metadata_df = pd.read_csv(os.path.join(c.script_output, "preservation_download", "metadata.csv"))
+        metadata_df = pd.read_csv(os.path.join(config.script_output, "preservation_download", "metadata.csv"))
         actual_metadata = [metadata_df.columns.tolist()] + metadata_df.values.tolist()
         expected_metadata = [["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"],
                              ["hargrett", "harg-0000", 2173769, "harg-0000-web-202005-0001",
@@ -39,7 +39,7 @@ class MyTestCase(unittest.TestCase):
 
         # Test for seeds_log.csv
         # Changes column with time stamps to allow comparison to consistent expected values.
-        seeds_df = pd.read_csv(os.path.join(c.script_output, "seeds_log.csv"))
+        seeds_df = pd.read_csv(os.path.join(config.script_output, "seeds_log.csv"))
         seeds_df["WARC_Fixity_Errors"] = seeds_df["WARC_Fixity_Errors"].str.count("Successfully")
         expected_seeds = [seeds_df.columns.tolist()] + seeds_df.values.tolist()
 
@@ -63,7 +63,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected_seeds, actual_seeds, "Problem with test for multi WARC seed, seeds_log.csv")
 
         # Test for completeness_check.csv
-        cc_df = pd.read_csv(os.path.join(c.script_output, "completeness_check.csv"))
+        cc_df = pd.read_csv(os.path.join(config.script_output, "completeness_check.csv"))
         expected_cc = [cc_df.columns.tolist()] + cc_df.values.tolist()
         actual_cc = [["Seed", "AIP", "Seed Folder Made", "coll.csv", "collscope.csv", "seed.csv", "seedscope.csv",
                       "crawldef.csv count", "crawljob.csv count", "WARC Count Correct", "All Expected File Types"],
@@ -79,7 +79,7 @@ class MyTestCase(unittest.TestCase):
         subprocess.run(f"python {script_path} 2019-07-12 2019-07-13", shell=True)
 
         # Test for metadata.csv
-        metadata_df = pd.read_csv(os.path.join(c.script_output, "preservation_download", "metadata.csv"))
+        metadata_df = pd.read_csv(os.path.join(config.script_output, "preservation_download", "metadata.csv"))
         actual_metadata = [metadata_df.columns.tolist()] + metadata_df.values.tolist()
         expected_metadata = [["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"],
                              ["russell", "rbrl-498", 2027707, "rbrl-498-web-201907-0001",
@@ -91,7 +91,7 @@ class MyTestCase(unittest.TestCase):
 
         # Test for seeds_log.csv
         # Changes column with time stamps to allow comparison to consistent expected values.
-        seeds_df = pd.read_csv(os.path.join(c.script_output, "seeds_log.csv"))
+        seeds_df = pd.read_csv(os.path.join(config.script_output, "seeds_log.csv"))
         fixity = "Successfully verified ARCHIVEIT"
         seeds_df.loc[seeds_df["WARC_Fixity_Errors"].str.startswith(fixity), "WARC_Fixity_Errors"] = fixity
         actual_seeds = [seeds_df.columns.tolist()] + seeds_df.values.tolist()
@@ -117,7 +117,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(actual_seeds, expected_seeds, "Problem with test for one WARC seeds, seeds_log.csv")
 
         # Test for completeness_check.csv
-        cc_df = pd.read_csv(os.path.join(c.script_output, "completeness_check.csv"))
+        cc_df = pd.read_csv(os.path.join(config.script_output, "completeness_check.csv"))
         expected_cc = [cc_df.columns.tolist()] + cc_df.values.tolist()
         actual_cc = [["Seed", "AIP", "Seed Folder Made", "coll.csv", "collscope.csv", "seed.csv", "seedscope.csv",
                       "crawldef.csv count", "crawljob.csv count", "WARC Count Correct", "All Expected File Types"],

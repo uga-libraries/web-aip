@@ -10,7 +10,7 @@ import os
 import pandas as pd
 import shutil
 import unittest
-import configuration as c
+import configuration as config
 from web_functions import get_warc
 
 
@@ -22,7 +22,7 @@ class TestGetWarc(unittest.TestCase):
         """
         if os.path.exists(os.path.join(os.getcwd(), "2529656")):
             shutil.rmtree(os.path.join(os.getcwd(), "2529656"))
-        os.remove(os.path.join(c.script_output, "seeds_log.csv"))
+        os.remove(os.path.join(config.script_output, "seeds_log.csv"))
 
     def test_correct(self):
         """

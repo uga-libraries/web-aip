@@ -11,7 +11,7 @@ import os
 import pandas as pd
 import shutil
 import unittest
-import configuration as c
+import configuration as config
 from web_functions import redact_seed_report
 
 
@@ -23,7 +23,7 @@ class TestRedactSeedReport(unittest.TestCase):
         """
         if os.path.exists(os.path.join(os.getcwd(), "1234567")):
             shutil.rmtree(os.path.join(os.getcwd(), "1234567"))
-        os.remove(os.path.join(c.script_output, "seeds_log.csv"))
+        os.remove(os.path.join(config.script_output, "seeds_log.csv"))
 
     def test_error_no_report(self):
         """

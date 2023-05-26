@@ -9,7 +9,7 @@ import numpy as np
 import os
 import pandas as pd
 import unittest
-import configuration as c
+import configuration as config
 from web_functions import get_warc_info
 
 
@@ -19,7 +19,7 @@ class TestGetWarcInfo(unittest.TestCase):
         """
         Deletes the seeds_log.csv, if it was made by the test.
         """
-        log_path = os.path.join(c.script_output, "seeds_log.csv")
+        log_path = os.path.join(config.script_output, "seeds_log.csv")
         if os.path.exists(log_path):
             os.remove(log_path)
 

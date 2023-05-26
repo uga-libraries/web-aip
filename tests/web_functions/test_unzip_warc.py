@@ -10,7 +10,7 @@ import os
 import pandas as pd
 import shutil
 import unittest
-import configuration as c
+import configuration as config
 from web_functions import get_warc, unzip_warc
 
 
@@ -22,8 +22,8 @@ class TestUnzipWarc(unittest.TestCase):
         The directory is changed first because seed_dir can't be deleted while it is the current working directory.
         """
         os.chdir("..")
-        shutil.rmtree(os.path.join(c.script_output, "preservation_download"))
-        os.remove(os.path.join(c.script_output, "seeds_log.csv"))
+        shutil.rmtree(os.path.join(config.script_output, "preservation_download"))
+        os.remove(os.path.join(config.script_output, "seeds_log.csv"))
 
     def test_correct(self):
         """
@@ -31,7 +31,7 @@ class TestUnzipWarc(unittest.TestCase):
         when the WARC is able to be unzipped.
         """
         # Makes the data needed for the function input and runs the function.
-        seed_dir = os.path.join(c.script_output, "preservation_download")
+        seed_dir = os.path.join(config.script_output, "preservation_download")
         os.makedirs(os.path.join(seed_dir, "2173769"))
         os.chdir(seed_dir)
         warc = "ARCHIVEIT-12912-WEEKLY-JOB1215043-SEED2173769-20200625025209518-00000-h3.warc.gz"
@@ -65,7 +65,7 @@ class TestUnzipWarc(unittest.TestCase):
         The error is caused by not downloading the AIP to be unzipped.
         """
         # Makes the data needed for the function input and runs the function.
-        seed_dir = os.path.join(c.script_output, "preservation_download")
+        seed_dir = os.path.join(config.script_output, "preservation_download")
         os.makedirs(os.path.join(seed_dir, "0000000"))
         os.chdir(seed_dir)
         warc = "ARCHIVEIT-ERROR.warc.gz"
@@ -90,7 +90,7 @@ class TestUnzipWarc(unittest.TestCase):
         when the WARC does not unzip correctly due to the Windows bug with gzip.
         """
         # Makes the data needed for the function input and runs the function.
-        seed_dir = os.path.join(c.script_output, "preservation_download")
+        seed_dir = os.path.join(config.script_output, "preservation_download")
         os.makedirs(os.path.join(seed_dir, "2912235"))
         os.chdir(seed_dir)
         warc = "ARCHIVEIT-12263-TEST-JOB1695540-0-SEED2912235-20221021155449526-00000-upoygm6a.warc.gz"

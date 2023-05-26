@@ -6,7 +6,7 @@ import os
 import pandas as pd
 import shutil
 import unittest
-import configuration as c
+import configuration as config
 from web_functions import metadata_csv
 
 
@@ -16,13 +16,13 @@ class TestMetadataCSV(unittest.TestCase):
         """
         Makes the preservation_download directory where the metadata.csv file should be saved.
         """
-        os.mkdir(os.path.join(c.script_output, "preservation_download"))
+        os.mkdir(os.path.join(config.script_output, "preservation_download"))
 
     def tearDown(self):
         """
         Deletes the preservation_download directory and the metadata.csv file it contains.
         """
-        shutil.rmtree(os.path.join(c.script_output, "preservation_download"))
+        shutil.rmtree(os.path.join(config.script_output, "preservation_download"))
 
     def test_api_error_all(self):
         """
@@ -32,7 +32,7 @@ class TestMetadataCSV(unittest.TestCase):
         aip_df = metadata_csv(["error-one", "error-two"], "2019-01-02")
 
         # Test for the contents of metadata.csv
-        actual_csv_df = pd.read_csv(os.path.join(c.script_output, "preservation_download", "metadata.csv"))
+        actual_csv_df = pd.read_csv(os.path.join(config.script_output, "preservation_download", "metadata.csv"))
         actual_csv = [actual_csv_df.columns.tolist()] + actual_csv_df.values.tolist()
         expected_csv = [["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"],
                         ["TBD: API error 500", "TBD", "error-one", "TBD", "TBD", 1],
@@ -54,7 +54,7 @@ class TestMetadataCSV(unittest.TestCase):
         aip_df = metadata_csv(["error-one", "2529685"], "2019-01-02")
 
         # Test for the contents of metadata.csv
-        actual_csv_df = pd.read_csv(os.path.join(c.script_output, "preservation_download", "metadata.csv"))
+        actual_csv_df = pd.read_csv(os.path.join(config.script_output, "preservation_download", "metadata.csv"))
         actual_csv = [actual_csv_df.columns.tolist()] + actual_csv_df.values.tolist()
         expected_csv = [["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"],
                         ["magil", "magil-0000", "2529685", "magil-ggp-2529685-2019-01",
@@ -77,7 +77,7 @@ class TestMetadataCSV(unittest.TestCase):
         aip_df = metadata_csv(["2141624"], "2019-01-02")
 
         # Test for the contents of metadata.csv
-        actual_csv_df = pd.read_csv(os.path.join(c.script_output, "preservation_download", "metadata.csv"))
+        actual_csv_df = pd.read_csv(os.path.join(config.script_output, "preservation_download", "metadata.csv"))
         actual_csv = [actual_csv_df.columns.tolist()] + actual_csv_df.values.tolist()
         expected_csv = [["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"],
                         ["TBD: unexpected collector value", "TBD: unexpected department value", 2141624,
@@ -98,7 +98,7 @@ class TestMetadataCSV(unittest.TestCase):
         aip_df = metadata_csv(["2184360", "2184592", "2912234", "2912237", "2912238"], "2019-01-02")
 
         # Test for the contents of metadata.csv
-        actual_csv_df = pd.read_csv(os.path.join(c.script_output, "preservation_download", "metadata.csv"))
+        actual_csv_df = pd.read_csv(os.path.join(config.script_output, "preservation_download", "metadata.csv"))
         actual_csv = [actual_csv_df.columns.tolist()] + actual_csv_df.values.tolist()
         expected_csv = [["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"],
                         ["hargrett", "harg-0000", 2184360, "harg-0000-web-201901-0001", "UGA Today", 1],
@@ -127,7 +127,7 @@ class TestMetadataCSV(unittest.TestCase):
         aip_df = metadata_csv(["2503951"], "2019-01-02")
 
         # Test for the contents of metadata.csv
-        actual_csv_df = pd.read_csv(os.path.join(c.script_output, "preservation_download", "metadata.csv"))
+        actual_csv_df = pd.read_csv(os.path.join(config.script_output, "preservation_download", "metadata.csv"))
         actual_csv = [actual_csv_df.columns.tolist()] + actual_csv_df.values.tolist()
         expected_csv = [["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"],
                         ["TBD: no collector in Archive-It", "TBD: unexpected department value", 2503951,
@@ -148,7 +148,7 @@ class TestMetadataCSV(unittest.TestCase):
         aip_df = metadata_csv(["2030942", "2527198", "2912227"], "2019-01-02")
 
         # Test for the contents of metadata.csv
-        actual_csv_df = pd.read_csv(os.path.join(c.script_output, "preservation_download", "metadata.csv"))
+        actual_csv_df = pd.read_csv(os.path.join(config.script_output, "preservation_download", "metadata.csv"))
         actual_csv = [actual_csv_df.columns.tolist()] + actual_csv_df.values.tolist()
         expected_csv = [["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"],
                         ["magil", "magil-0000", 2527198, "magil-ggp-2527198-2019-01", "Georgia Technology Authority", 1],
@@ -172,7 +172,7 @@ class TestMetadataCSV(unittest.TestCase):
         aip_df = metadata_csv(["2024247"], "2019-01-02")
 
         # Test for the contents of metadata.csv
-        actual_csv_df = pd.read_csv(os.path.join(c.script_output, "preservation_download", "metadata.csv"))
+        actual_csv_df = pd.read_csv(os.path.join(config.script_output, "preservation_download", "metadata.csv"))
         actual_csv = [actual_csv_df.columns.tolist()] + actual_csv_df.values.tolist()
         expected_csv = [["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"],
                         ["hargrett", "harg-0000", 2024247, "harg-0000-web-201901-0001", "Infusion Magazine website", 1]]
@@ -192,7 +192,7 @@ class TestMetadataCSV(unittest.TestCase):
         aip_df = metadata_csv(["2018084", "2028466"], "2019-01-02")
 
         # Test for the contents of metadata.csv
-        actual_csv_df = pd.read_csv(os.path.join(c.script_output, "preservation_download", "metadata.csv"))
+        actual_csv_df = pd.read_csv(os.path.join(config.script_output, "preservation_download", "metadata.csv"))
         actual_csv = [actual_csv_df.columns.tolist()] + actual_csv_df.values.tolist()
         expected_csv = [["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"],
                         ["russell", "rbrl-447", 2018084, "rbrl-447-web-201901-0001",

@@ -10,7 +10,7 @@ import os
 import pandas as pd
 import shutil
 import unittest
-import configuration as c
+import configuration as config
 from web_functions import get_warc, verify_warc_fixity
 
 
@@ -23,7 +23,7 @@ class TestVerifyWarcFixity(unittest.TestCase):
         for seed_folder in ("2173769", "2444051", "2454528"):
             if os.path.exists(seed_folder):
                 shutil.rmtree(os.path.join(os.getcwd(), seed_folder))
-        os.remove(os.path.join(c.script_output, "seeds_log.csv"))
+        os.remove(os.path.join(config.script_output, "seeds_log.csv"))
 
     def test_correct(self):
         """

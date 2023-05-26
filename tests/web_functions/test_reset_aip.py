@@ -8,7 +8,7 @@ import os
 import pandas as pd
 import shutil
 import unittest
-import configuration as c
+import configuration as config
 from web_functions import reset_aip
 
 
@@ -42,7 +42,7 @@ class TestResetAIP(unittest.TestCase):
                                              "WARC_Unzip_Errors", "Complete"])
 
         # Makes a log, seeds_log.csv, in the script output directory.
-        self.seed_df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
+        self.seed_df.to_csv(os.path.join(config.script_output, "seeds_log.csv"), index=False)
 
     def tearDown(self):
         """
@@ -51,7 +51,7 @@ class TestResetAIP(unittest.TestCase):
         """
         if os.path.exists(os.path.join(os.getcwd(), "2222222")):
             shutil.rmtree(os.path.join(os.getcwd(), "2222222"))
-        os.remove(os.path.join(c.script_output, "seeds_log.csv"))
+        os.remove(os.path.join(config.script_output, "seeds_log.csv"))
 
     def test_reset_aip(self):
         """
@@ -78,7 +78,7 @@ class TestResetAIP(unittest.TestCase):
         self.assertEqual(actual_dataframe, expected_dataframe, "Problem with test for dataframe values")
 
         # Test that the CSV has the correct values.
-        csv_path = os.path.join(c.script_output, "seeds_log.csv")
+        csv_path = os.path.join(config.script_output, "seeds_log.csv")
         with open(csv_path, newline="") as open_file:
             reader = csv.reader(open_file)
             actual_csv = list(reader)

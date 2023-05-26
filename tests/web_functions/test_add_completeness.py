@@ -9,7 +9,7 @@ import numpy as np
 import os
 import pandas as pd
 import unittest
-import configuration as c
+import configuration as config
 from web_functions import add_completeness
 
 
@@ -19,7 +19,7 @@ class TestAddCompleteness(unittest.TestCase):
         """
         Deletes the seeds_log.csv made by each test.
         """
-        os.remove(os.path.join(c.script_output, "seeds_log.csv"))
+        os.remove(os.path.join(config.script_output, "seeds_log.csv"))
 
     def test_all_correct(self):
         """

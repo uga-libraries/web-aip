@@ -7,7 +7,7 @@ import os
 import numpy as np
 import pandas as pd
 import unittest
-import configuration as c
+import configuration as config
 from web_functions import log
 
 
@@ -28,13 +28,13 @@ class TestLog(unittest.TestCase):
                                              "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
                                              "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
                                              "WARC_Unzip_Errors", "Complete"])
-        self.seed_df.to_csv(os.path.join(c.script_output, "seeds_log.csv"), index=False)
+        self.seed_df.to_csv(os.path.join(config.script_output, "seeds_log.csv"), index=False)
 
     def tearDown(self):
         """
         Deletes the spreadsheet created by each test.
         """
-        os.remove(os.path.join(c.script_output, "seeds_log.csv"))
+        os.remove(os.path.join(config.script_output, "seeds_log.csv"))
 
     def test_first_message(self):
         """
@@ -59,7 +59,7 @@ class TestLog(unittest.TestCase):
         self.assertEqual(actual_dataframe, expected_dataframe, "Problem with test for first message, dataframe values")
 
         # Test that the CSV has the correct values.
-        csv_path = os.path.join(c.script_output, "seeds_log.csv")
+        csv_path = os.path.join(config.script_output, "seeds_log.csv")
         with open(csv_path, newline="") as open_file:
             reader = csv.reader(open_file)
             actual_csv = list(reader)
@@ -96,7 +96,7 @@ class TestLog(unittest.TestCase):
         self.assertEqual(actual_dataframe, expected_dataframe, "Problem with test for second message, dataframe values")
 
         # Test that the CSV has the correct values.
-        csv_path = os.path.join(c.script_output, "seeds_log.csv")
+        csv_path = os.path.join(config.script_output, "seeds_log.csv")
         with open(csv_path, newline="") as open_file:
             reader = csv.reader(open_file)
             actual_csv = list(reader)

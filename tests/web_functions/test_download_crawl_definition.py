@@ -7,7 +7,7 @@ import os
 import pandas as pd
 import shutil
 import unittest
-import configuration as c
+import configuration as config
 from web_functions import download_crawl_definition, get_report
 
 
@@ -35,7 +35,7 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
                 shutil.rmtree(os.path.join(os.getcwd(), directory))
 
         # Seeds log
-        log_path = os.path.join(c.script_output, "seeds_log.csv")
+        log_path = os.path.join(config.script_output, "seeds_log.csv")
         if os.path.exists(log_path):
             os.remove(log_path)
 
