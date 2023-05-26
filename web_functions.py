@@ -61,7 +61,7 @@ def check_aips(date_end, date_start, seed_df, seeds_directory):
         The key is the seed id and the values are the AIP id and warc count. """
 
         # Downloads the entire WARC list.
-        filters = {'page_size': 10000}
+        filters = {"page_size": 10000}
         warcs = requests.get(config.wasapi, params=filters, auth=(config.username, config.password))
 
         # If there was an API error, ends the function.
@@ -117,7 +117,7 @@ def check_aips(date_end, date_start, seed_df, seeds_directory):
                 warcs_include += 1
             except (KeyError, IndexError):
                 try:
-                    seed_info[seed_identifier] = [seed_df.loc[seed_df["Seed_ID"] == seed_identifier]["AIP_ID"].item(), 1]
+                    seed_info[seed_identifier] = [seed_df.loc[seed_df['Seed_ID'] == seed_identifier]['AIP_ID'].item(), 1]
                 except (KeyError, ValueError, IndexError):
                     print(f"Seed {seed_identifier} is not in seeds_df")
                     warcs_exclude += 1
@@ -144,26 +144,27 @@ def check_aips(date_end, date_start, seed_df, seeds_directory):
         if seed_id in os.listdir(seeds_directory):
             result.append(True)
         else:
-            result.extend([False, 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a'])
+            result.extend([False, "n/a", "n/a", "n/a", "n/a", "n/a", "n/a", "n/a", "n/a", "n/a"])
             return result
 
+        # Folder referenced frequently through the rest of the function.
+        seed_folder = os.path.join(seeds_directory, str(seed_id))
+        
         # Tests if each of the four Archive-It metadata reports that never repeat are present.
         # os.path.exists() returns True/False.
-        result.append(os.path.exists(f'{seeds_directory}/{seed_id}/{aip_id}_coll.csv'))
-        result.append(os.path.exists(f'{seeds_directory}/{seed_id}/{aip_id}_collscope.csv'))
-        result.append(os.path.exists(f'{seeds_directory}/{seed_id}/{aip_id}_seed.csv'))
-        result.append(os.path.exists(f'{seeds_directory}/{seed_id}/{aip_id}_seedscope.csv'))
+        result.append(os.path.exists(os.path.join(seed_folder, f"{aip_id}_coll.csv")))
+        result.append(os.path.exists(os.path.join(seed_folder, f"{aip_id}_collscope.csv")))
+        result.append(os.path.exists(os.path.join(seed_folder, f"{aip_id}_seed.csv")))
+        result.append(os.path.exists(os.path.join(seed_folder, f"{aip_id}_seedscope.csv")))
 
         # Counts the number of instances of the two Archive-It metadata reports than can repeat.
         # Compare to expected results in the WARC inventory.
-        result.append(
-            len([file for file in os.listdir(f'{seeds_directory}/{seed_id}') if file.endswith('_crawldef.csv')]))
-        result.append(
-            len([file for file in os.listdir(f'{seeds_directory}/{seed_id}') if file.endswith('_crawljob.csv')]))
+        result.append(len([file for file in os.listdir(seed_folder) if file.endswith("_crawldef.csv")]))
+        result.append(len([file for file in os.listdir(seed_folder) if file.endswith("_crawljob.csv")]))
 
         # Tests if the number of WARCs is correct. Compares the number of WARCs in the objects folder, calculated
         # with len(), to the number of WARCs expected from the API (warc_total).
-        warcs = len([file for file in os.listdir(f'{seeds_directory}/{seed_id}') if file.endswith('.warc')])
+        warcs = len([file for file in os.listdir(seed_folder) if file.endswith(".warc")])
         if warcs == warc_total:
             result.append(True)
         else:
@@ -173,9 +174,9 @@ def check_aips(date_end, date_start, seed_df, seeds_directory):
         # Starts with a value of True and if there is a file of another type,
         # based on the end of the filename, it updates the value to False.
         result.append(True)
-        expected_endings = ('_coll.csv', '_collscope.csv', '_crawldef.csv', '_crawljob.csv', '_seed.csv',
-                            '_seedscope.csv', '.warc')
-        for file in os.listdir(f'{seeds_directory}/{seed_id}'):
+        expected_endings = ("_coll.csv", "_collscope.csv", "_crawldef.csv", "_crawljob.csv",
+                            "_seed.csv", "_seedscope.csv", ".warc")
+        for file in os.listdir(seed_folder):
             if not file.endswith(expected_endings):
                 result[-1] = False
 
@@ -193,13 +194,14 @@ def check_aips(date_end, date_start, seed_df, seeds_directory):
 
             # Creates a tuple of the expected seeds, which are the values in the Seed_ID row in the seed dataframe.
             # and adds metadata.csv to the list, which will also be in the folder.
-            expected_seed_ids = seed_df["Seed_ID"].values.tolist()
+            expected_seed_ids = seed_df['Seed_ID'].values.tolist()
             expected_seed_ids.append("metadata.csv")
 
             # If there is a seed folder that is not named with one of the expected seed ids,
             # adds a list with the values for that seed's row in the completeness check csv to the extras list.
             if seed_folder not in expected_seed_ids:
-                extras.append([seed_folder, 'n/a', 'Not expected', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a', 'n/a'])
+                extras.append([seed_folder, "n/a", "Not expected", "n/a", "n/a", "n/a", "n/a", "n/a", "n/a",
+                               "n/a", "n/a"])
 
         # Only returns the extras list if at least one unexpected seed was found.
         if len(extras) > 0:
@@ -212,15 +214,14 @@ def check_aips(date_end, date_start, seed_df, seeds_directory):
         return
 
     # Starts a csv for the results of the quality review.
-    csv_path = f'{config.script_output}/completeness_check.csv'
-    with open(csv_path, 'w', newline='') as complete_csv:
+    csv_path = os.path.join(config.script_output, "completeness_check.csv")
+    with open(csv_path, "w", newline="") as complete_csv:
         complete_write = csv.writer(complete_csv)
 
         # Adds a header row to the csv.
-        complete_write.writerow(
-            ['Seed', 'AIP', 'Seed Folder Made', 'coll.csv', 'collscope.csv', 'seed.csv',
-             'seedscope.csv', 'crawldef.csv count', 'crawljob.csv count', 'WARC Count Correct',
-             'All Expected File Types'])
+        complete_write.writerow(["Seed", "AIP", "Seed Folder Made", "coll.csv", "collscope.csv", "seed.csv",
+                                 "seedscope.csv", "crawldef.csv count", "crawljob.csv count", "WARC Count Correct",
+                                 "All Expected File Types"])
 
         # Tests each AIP for completeness and saves the results.
         for seed in seeds_metadata:
@@ -283,7 +284,7 @@ def check_config():
     # Checks that the Archive-It username and password are correct by using them with an API call.
     # This only works if the partner_api variable is in the configuration file.
     try:
-        response = requests.get(f'{config.partner_api}/seed?limit=5', auth=(config.username, config.password))
+        response = requests.get(f"{config.partner_api}/seed?limit=5", auth=(config.username, config.password))
         if response.status_code != 200:
             errors.append("Could not access Partner API with provided credentials. "
                           "Check if the partner_api, username, and/or password variables have errors.")
@@ -296,7 +297,7 @@ def check_config():
         if not os.path.exists(config.md5deep):
             errors.append(f"Variable path '{config.md5deep}' is not correct.")
         elif "/" in config.md5deep:
-            errors.append(f"Path '{config.md5deep}' must use \ for md5deep to work correctly.")
+            errors.append(fr"Path '{config.md5deep}' must use \ for md5deep to work correctly.")
     except AttributeError:
         errors.append("Variable 'md5deep' is missing from the configuration file.")
 
@@ -317,13 +318,13 @@ def download_crawl_definition(job_id, seed, seed_df, row_index):
 
     try:
         # If the crawl job report is present, reads it for the crawl definition id.
-        job_df = pd.read_csv(f"{seed.Seed_ID}/{seed.AIP_ID}_{job_id}_crawljob.csv", dtype="object")
+        job_df = pd.read_csv(os.path.join(str(seed.Seed_ID), f"{seed.AIP_ID}_{job_id}_crawljob.csv"), dtype="object")
         crawl_def = job_df.loc[0, "crawl_definition"]
 
         # If the crawl definition report hasn't been downloaded yet, downloads the report.
         # Multiple jobs can have the same crawl definition, so it could already be downloaded.
         report_name = f"{seed.AIP_ID}_{crawl_def}_crawldef.csv"
-        if not os.path.exists(f"{seed.Seed_ID}/{report_name}"):
+        if not os.path.exists(os.path.join(str(seed.Seed_ID), report_name)):
             get_report(seed, seed_df, row_index, "id", crawl_def, "crawl_definition", report_name)
 
     # If the crawl job report wasn't downloaded due to an error, logs the error instead.
@@ -379,7 +380,7 @@ def download_warcs(seed, row_index, seed_df):
     for warc in warc_names:
 
         # The path for where the WARC will be saved on the local machine.
-        warc_path = f'{config.script_output}/preservation_download/{seed.Seed_ID}/{warc}'
+        warc_path = os.path.join(config.script_output, "preservation_download", str(seed.Seed_ID), warc)
 
         # Gets URL for downloading the WARC and WARC MD5 from Archive-It using WASAPI.
         # If there was an API error, stops processing this WARC and starts the next.
@@ -423,7 +424,8 @@ def get_report(seed, seed_df, row_index, filter_type, filter_value, report_type,
     # Builds the API call to get the report as a csv.
     # Limit of -1 will return all matches. Default is only the first 100.
     filters = {"limit": -1, filter_type: filter_value, "format": "csv"}
-    metadata_report = requests.get(f"{config.partner_api}/{report_type}", params=filters, auth=(config.username, config.password))
+    metadata_report = requests.get(f"{config.partner_api}/{report_type}",
+                                   params=filters, auth=(config.username, config.password))
 
     # Saves the metadata report if there were no API errors and there was data of this type (content isn't empty).
     # For scope rules, it is common for one or both to not have data since these aren't required.
@@ -432,7 +434,7 @@ def get_report(seed, seed_df, row_index, filter_type, filter_value, report_type,
             log(report_name, seed_df, row_index, "Metadata_Report_Empty")
             return
         else:
-            with open(f"{seed.Seed_ID}/{report_name}", "wb") as report_csv:
+            with open(os.path.join(str(seed.Seed_ID), report_name), "wb") as report_csv:
                 report_csv.write(metadata_report.content)
     else:
         log(f"{report_name} API Error {metadata_report.status_code}", seed_df, row_index, "Metadata_Report_Errors")
@@ -457,7 +459,7 @@ def get_warc(seed_df, row_index, warc_url, warc, warc_path):
         raise ValueError
 
     # Saves the zipped WARC in the seed folder, keeping the original filename.
-    with open(warc_path, 'wb') as warc_file:
+    with open(warc_path, "wb") as warc_file:
         warc_file.write(warc_download.content)
 
 
@@ -467,7 +469,7 @@ def get_warc_info(warc, seed_df, row_index):
     """
 
     # WASAPI call to get all data related to this WARC.
-    warc_data = requests.get(f'{config.wasapi}?filename={warc}', auth=(config.username, config.password))
+    warc_data = requests.get(f"{config.wasapi}?filename={warc}", auth=(config.username, config.password))
 
     # If there is an API error, updates the log and raises an error to skip the rest of the steps for this WARC.
     if not warc_data.status_code == 200:
@@ -478,8 +480,8 @@ def get_warc_info(warc, seed_df, row_index):
     # Gets and returns the two data points needed from the WASAPI results, unless there is an error.
     py_warc = warc_data.json()
     try:
-        warc_url = py_warc["files"][0]["locations"][0]
-        warc_md5 = py_warc["files"][0]["checksums"]["md5"]
+        warc_url = py_warc['files'][0]['locations'][0]
+        warc_md5 = py_warc['files'][0]['checksums']['md5']
         return warc_url, warc_md5
     except IndexError:
         log(f"Index Error: cannot get the WARC URL or MD5 for {warc}",
@@ -591,10 +593,10 @@ def metadata_csv(seeds_list, date_end):
     df['Sequential'] = df.groupby('Collection').cumcount() + 1
     df['Sequential'] = df['Sequential'].astype(str).str.zfill(4)
 
-    df_magil = df[df['Department'] == 'magil'].copy()
+    df_magil = df[df['Department'] == "magil"].copy()
     df_magil['AIP_ID'] = "magil-ggp-" + df_magil['Folder'] + "-" + year + "-" + month
 
-    df_harg_rbrl = df[df['Department'].isin(['hargrett', 'russell'])].copy()
+    df_harg_rbrl = df[df['Department'].isin(["hargrett", "russell"])].copy()
     df_harg_rbrl['AIP_ID'] = df_harg_rbrl['Collection'] + "-web-" + year + month + "-" + df_harg_rbrl['Sequential']
 
     df_tbd = df[df['Department'].str.startswith("TBD")].copy()
@@ -623,7 +625,7 @@ def redact_seed_report(seed_id, aip_id, seed_df, row_index):
     # Reads the seeds.csv into a dataframe for editing.
     # If it is not present, logs the error and ends this function.
     try:
-        report_df = pd.read_csv(f"{seed_id}/{aip_id}_seed.csv")
+        report_df = pd.read_csv(os.path.join(str(seed_id), f"{aip_id}_seed.csv"))
     except FileNotFoundError:
         log("No seeds.csv to redact", seed_df, row_index, "Seed_Report_Redaction")
         return
@@ -631,9 +633,9 @@ def redact_seed_report(seed_id, aip_id, seed_df, row_index):
     # If the login columns exist, replaces the values with REDACTED and updates the log.
     # If they do not exist, just updates the log.
     if "login_password" in report_df.columns:
-        report_df["login_username"] = "REDACTED"
-        report_df["login_password"] = "REDACTED"
-        report_df.to_csv(f"{seed_id}/{aip_id}_seed.csv", index=False)
+        report_df['login_username'] = "REDACTED"
+        report_df['login_password'] = "REDACTED"
+        report_df.to_csv(os.path.join(str(seed_id), f"{aip_id}_seed.csv"), index=False)
         log("Successfully redacted", seed_df, row_index, "Seed_Report_Redaction")
     else:
         log("No login columns to redact", seed_df, row_index, "Seed_Report_Redaction")
@@ -688,19 +690,19 @@ def seed_data(date_start, date_end):
     coll_df = warc_df[['Seed_ID', 'AIT_Collection']].copy()
     coll_df = coll_df.drop_duplicates()
     coll_df['AIT_Collection'] = coll_df['AIT_Collection'].astype(str)
-    coll_by_seed = coll_df.groupby(['Seed_ID'])['AIT_Collection'].apply('|'.join)
+    coll_by_seed = coll_df.groupby(['Seed_ID'])['AIT_Collection'].apply("|".join)
 
     job_df = warc_df[['Seed_ID', 'Job_ID']].copy()
     job_df = job_df.drop_duplicates()
     job_df['Job_ID'] = job_df['Job_ID'].astype(str)
-    jobs_by_seed = job_df.groupby(['Seed_ID'])['Job_ID'].apply('|'.join)
+    jobs_by_seed = job_df.groupby(['Seed_ID'])['Job_ID'].apply("|".join)
 
     warc_df['Size_GB'] = warc_df['Size']/1000000000
     gb_by_seed = warc_df.groupby(['Seed_ID'])['Size_GB'].sum().round(3)
 
     count_by_seed = warc_df.groupby('Seed_ID')['Seed_ID'].count()
 
-    warc_names = warc_df.groupby(['Seed_ID'])['WARC_Filename'].apply('|'.join)
+    warc_names = warc_df.groupby(['Seed_ID'])['WARC_Filename'].apply("|".join)
 
     seed_df = pd.concat([coll_by_seed, jobs_by_seed, gb_by_seed, count_by_seed, warc_names], axis=1)
     seed_df.columns = ["AIT_Collection", "Job_ID", "Size_GB", 'WARCs', "WARC_Filenames"]
@@ -731,8 +733,9 @@ def unzip_warc(seed_df, row_index, warc_path, warc, seed_id):
     # Checks for and logs any 7-Zip errors.
     if unzip_output.stderr == b'':
         # A filename (warc.open) is an error from a known gzip bug. Deletes the erroneous unzipped file.
-        if os.path.exists(f'{config.script_output}/preservation_download/{seed_id}/{warc}.open'):
-            os.remove(f'{config.script_output}/preservation_download/{seed_id}/{warc}.open')
+        warc_open_path = os.path.join(config.script_output, "preservation_download", str(seed_id), f"{warc}.open")
+        if os.path.exists(warc_open_path):
+            os.remove(warc_open_path)
             log(f"Error unzipping {warc}: unzipped to '.gz.open' file", seed_df, row_index, "WARC_Unzip_Errors")
         # If it unzipped correctly, deletes the zip file.
         else:
