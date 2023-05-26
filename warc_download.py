@@ -96,7 +96,7 @@ for seed in seed_df[seed_df["Complete"].isnull()].itertuples():
     # If the seed already has a folder from an error in a previous iteration of the script,
     # deletes the contents and anything in the seeds_log.csv from the previous iteration so it can be remade.
     if os.path.exists(str(seed.Seed_ID)):
-        fun.reset_aip(seed.Seed_ID, seed_df)
+        fun.reset_seed(seed.Seed_ID, seed_df)
 
     # Makes a folder for the seed in the AIP directory,
     # and downloads the metadata and WARC files to that seed folder.
@@ -109,4 +109,4 @@ for seed in seed_df[seed_df["Complete"].isnull()].itertuples():
 
 # Verifies the all expected seed folders are present and have all the expected metadata files and WARCs.
 # Saves the result as a csv in the folder with the downloaded AIPs.
-fun.check_aips(date_end, date_start, seed_df, seeds_directory)
+fun.check_seeds(date_end, date_start, seed_df, seeds_directory)

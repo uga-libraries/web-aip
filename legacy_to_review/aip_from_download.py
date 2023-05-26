@@ -130,7 +130,7 @@ os.remove("aip_log.csv")
 # Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
 # errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
 print('\nStarting completeness check.')
-web.check_aips(date_end, date_start, seed_df, aips_directory)
+web.check_seeds(date_end, date_start, seed_df, aips_directory)
 
 # If there is a warc_unzip_log.csv, verifies the fixity matches what is in the bag manifests.
 if os.path.exists("warc_unzip_log.csv"):

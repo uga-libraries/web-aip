@@ -842,7 +842,7 @@ for seed in seed_df[(seed_df["Seed_Metadata_Errors"].str.startswith("Successfull
     # If the seed already has an AIP directory from an error in a previous iteration of the script,
     # deletes the contents and anything in the seeds.csv from the previous step so it can be remade.
     if os.path.exists(seed.AIP_ID):
-        web.reset_aip(seed.AIP_ID, seed_df)
+        web.reset_seed(seed.AIP_ID, seed_df)
         reset = True
     os.makedirs(os.path.join(seed.AIP_ID, "metadata"))
     os.makedirs(os.path.join(seed.AIP_ID, "objects"))
@@ -918,7 +918,7 @@ os.remove("aip_log.csv")
 # Verifies the AIPs are complete and no extra AIPs were created. Does not look at the errors folder, so any AIPs with
 # errors will show as missing. Saves the result as a csv in the folder with the downloaded AIPs.
 print('\nStarting completeness check.')
-web.check_aips(date_end, date_start, seed_df, aips_directory)
+web.check_seeds(date_end, date_start, seed_df, aips_directory)
 
 # Moves script output folders (aips-to-ingest, errors, fits-xml, and preservation-xml) and logs into the AIPs folder
 # to keep everything together if another set is downloaded before these are deleted.

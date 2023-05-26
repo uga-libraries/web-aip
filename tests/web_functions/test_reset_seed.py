@@ -1,5 +1,5 @@
 """
-Test for the reset_aip() function.
+Test for the reset_seed() function.
 It deletes a seed folder and the information from that seed from seed_df and seeds_log.csv.
 """
 import csv
@@ -9,10 +9,10 @@ import pandas as pd
 import shutil
 import unittest
 import configuration as config
-from web_functions import reset_aip
+from web_functions import reset_seed
 
 
-class TestResetAIP(unittest.TestCase):
+class TestResetSeed(unittest.TestCase):
 
     def setUp(self):
         """
@@ -53,12 +53,12 @@ class TestResetAIP(unittest.TestCase):
             shutil.rmtree(os.path.join(os.getcwd(), "2222222"))
         os.remove(os.path.join(config.script_output, "seeds_log.csv"))
 
-    def test_reset_aip(self):
+    def test_reset_seed(self):
         """
         Tests that the function correctly deletes the seed folder, updates seeds_df,
         and updates seeds_log.csv.
         """
-        reset_aip("2222222", self.seed_df)
+        reset_seed("2222222", self.seed_df)
 
         # Test that the seed folder was deleted.
         seed_path = os.path.exists(os.path.join(os.getcwd(), "2222222"))

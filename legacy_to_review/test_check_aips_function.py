@@ -123,7 +123,7 @@ os.makedirs("magil-ggp-extra2-2022-03_bag")
 
 # Runs the function being tested by this script.
 # It verifies the AIPs are complete and no extra AIPs were created, and saves the results to a csv.
-web.check_aips(date_end, date_start, seed_df, aips_directory)
+web.check_seeds(date_end, date_start, seed_df, aips_directory)
 
 # Compares the results from the script (read from the script CSV output) to the expected results.
 os.chdir(c.script_output)

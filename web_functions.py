@@ -48,7 +48,7 @@ def add_completeness(row_index, seed_df):
         log("Successfully completed", seed_df, row_index, "Complete")
 
 
-def check_aips(date_end, date_start, seed_df, seeds_directory):
+def check_seeds(date_end, date_start, seed_df, seeds_directory):
     """Verifies that all the expected seed folders for the download are complete
     and no unexpected seed folders were created.
     Produces a csv named completeness_check with the results in the AIPs directory. """
@@ -641,7 +641,7 @@ def redact_seed_report(seed_id, aip_id, seed_df, row_index):
         log("No login columns to redact", seed_df, row_index, "Seed_Report_Redaction")
 
 
-def reset_aip(seed_id, df):
+def reset_seed(seed_id, df):
     """Deletes the directories and log information for a seed
     that was partially completed when the script broke so it can be remade."""
 
