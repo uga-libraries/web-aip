@@ -55,7 +55,7 @@ class TestUnzipWarc(unittest.TestCase):
         self.assertEqual(warc_unzip, True, "Problem with test for correct, unzipped WARC")
 
         # Test the log is updated correctly.
-        actual = seed_df.at[0, "WARC_Unzip_Errors"]
+        actual = seed_df.at[0, 'WARC_Unzip_Errors']
         expected = f"Successfully unzipped {warc}"
         self.assertEqual(actual, expected, "Problem with test for correct, log")
 
@@ -79,7 +79,7 @@ class TestUnzipWarc(unittest.TestCase):
         unzip_warc(seed_df, 0, warc_path, warc, "0000000")
 
         # Test the log is updated correctly.
-        actual = seed_df.at[0, "WARC_Unzip_Errors"]
+        actual = seed_df.at[0, 'WARC_Unzip_Errors']
         expected = f"Error unzipping {warc}: \r\nERROR: The system cannot find the file specified.\r\n{warc_path}" \
                    f"\r\n\r\n\r\n\r\nSystem ERROR:\r\nThe system cannot find the file specified.\r\n"
         self.assertEqual(actual, expected, "Problem with test for error: 7-Zip, log")
@@ -113,7 +113,7 @@ class TestUnzipWarc(unittest.TestCase):
         self.assertEqual(warc_unzip, False, "Problem with test for error: unzips to open, unzipped WARC")
 
         # Test the log is updated correctly.
-        actual = seed_df.at[0, "WARC_Unzip_Errors"]
+        actual = seed_df.at[0, 'WARC_Unzip_Errors']
         expected = f"Error unzipping {warc}: unzipped to '.gz.open' file"
         self.assertEqual(actual, expected, "Problem with test for error: unzips to open, log")
 

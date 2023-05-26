@@ -35,10 +35,10 @@ class TestGetWarcInfo(unittest.TestCase):
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
                                         "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
-        warc_url, warc_md5 = get_warc_info(seed_df["WARC_Filenames"][0], seed_df, 0)
+        warc_url, warc_md5 = get_warc_info(seed_df.at[0, 'WARC_Filenames'], seed_df, 0)
 
         # Test for the URL.
-        expected_url = f"https://warcs.archive-it.org/webdatafile/{seed_df['WARC_Filenames'][0]}"
+        expected_url = f"https://warcs.archive-it.org/webdatafile/{seed_df.at[0, 'WARC_Filenames']}"
         self.assertEqual(warc_url, expected_url, "Problem with test for BMA, URL")
 
         # Test for the MD5.
@@ -59,7 +59,7 @@ class TestGetWarcInfo(unittest.TestCase):
 
         # Test for raising the error.
         with self.assertRaises(IndexError):
-            get_warc_info(seed_df["WARC_Filenames"][0], seed_df, 0)
+            get_warc_info(seed_df.at[0, 'WARC_Filenames'], seed_df, 0)
 
         # Test for the log.
         actual = seed_df.at[0, 'WARC_API_Errors']
@@ -78,10 +78,10 @@ class TestGetWarcInfo(unittest.TestCase):
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
                                         "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
-        warc_url, warc_md5 = get_warc_info(seed_df["WARC_Filenames"][0], seed_df, 0)
+        warc_url, warc_md5 = get_warc_info(seed_df.at[0, 'WARC_Filenames'], seed_df, 0)
 
         # Test for the URL.
-        expected_url = f"https://warcs.archive-it.org/webdatafile/{seed_df['WARC_Filenames'][0]}"
+        expected_url = f"https://warcs.archive-it.org/webdatafile/{seed_df.at[0, 'WARC_Filenames']}"
         self.assertEqual(warc_url, expected_url, "Problem with test for Hargrett, URL")
 
         # Test for the MD5.
@@ -100,10 +100,10 @@ class TestGetWarcInfo(unittest.TestCase):
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
                                         "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
-        warc_url, warc_md5 = get_warc_info(seed_df["WARC_Filenames"][0], seed_df, 0)
+        warc_url, warc_md5 = get_warc_info(seed_df.at[0, 'WARC_Filenames'], seed_df, 0)
 
         # Test for the URL.
-        expected_url = f"https://warcs.archive-it.org/webdatafile/{seed_df['WARC_Filenames'][0]}"
+        expected_url = f"https://warcs.archive-it.org/webdatafile/{seed_df.at[0, 'WARC_Filenames']}"
         self.assertEqual(warc_url, expected_url, "Problem with test for MAGIL, URL")
 
         # Test for the MD5.
@@ -122,10 +122,10 @@ class TestGetWarcInfo(unittest.TestCase):
                                         "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
                                         "Seed_Report_Redaction", "WARC_API_Errors", "WARC_Fixity_Errors",
                                         "WARC_Unzip_Errors", "Complete"])
-        warc_url, warc_md5 = get_warc_info(seed_df["WARC_Filenames"][0], seed_df, 0)
+        warc_url, warc_md5 = get_warc_info(seed_df.at[0, 'WARC_Filenames'], seed_df, 0)
 
         # Test for the URL.
-        expected_url = f"https://warcs.archive-it.org/webdatafile/{seed_df['WARC_Filenames'][0]}"
+        expected_url = f"https://warcs.archive-it.org/webdatafile/{seed_df.at[0, 'WARC_Filenames']}"
         self.assertEqual(warc_url, expected_url, "Problem with test for Hargrett, URL")
 
         # Test for the MD5.

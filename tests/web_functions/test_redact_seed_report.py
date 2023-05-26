@@ -43,7 +43,7 @@ class TestRedactSeedReport(unittest.TestCase):
         redact_seed_report("1234567", "aip-1", seed_df, 0)
 
         # Test that the log has been updated.
-        actual = seed_df["Seed_Report_Redaction"][0]
+        actual = seed_df.at[0, 'Seed_Report_Redaction']
         expected = "No seeds.csv to redact"
         self.assertEqual(actual, expected, "Problem with test for error: no report")
 
@@ -78,7 +78,7 @@ class TestRedactSeedReport(unittest.TestCase):
         self.assertEqual(actual, expected, "Problem with test for no redaction, seed report")
 
         # Test that the log has been updated.
-        actual_info = seed_df["Seed_Report_Redaction"][0]
+        actual_info = seed_df.at[0, 'Seed_Report_Redaction']
         expected_info = "No login columns to redact"
         self.assertEqual(actual_info, expected_info, "Problem with test for no redaction, log")
 
@@ -112,7 +112,7 @@ class TestRedactSeedReport(unittest.TestCase):
         self.assertEqual(actual, expected, "Problem with test for redaction, seed report")
 
         # Test that the log has been updated.
-        actual_info = seed_df["Seed_Report_Redaction"][0]
+        actual_info = seed_df.at[0, 'Seed_Report_Redaction']
         expected_info = "Successfully redacted"
         self.assertEqual(actual_info, expected_info, "Problem with test for redaction, log")
 
