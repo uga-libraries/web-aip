@@ -57,12 +57,12 @@ class TestDownloadMetadata(unittest.TestCase):
         self.assertEqual(actual, expected, "Problem with test for Hargrett, downloaded files")
 
         # Test that the log has the correct information for metadata errors.
-        actual_errors = seed_df["Metadata_Report_Errors"][0]
+        actual_errors = seed_df.at[0, 'Metadata_Report_Errors']
         expected_errors = "Successfully downloaded all metadata reports"
         self.assertEqual(actual_errors, expected_errors, "Problem with test for Hargrett, log errors")
 
         # Test that the log has the correct information for empty reports.
-        actual_info = seed_df["Metadata_Report_Empty"][0]
+        actual_info = seed_df.at[0, 'Metadata_Report_Empty']
         expected_info = "No empty reports"
         self.assertEqual(actual_info, expected_info, "Problem with test for Hargrett, log info")
 
@@ -94,12 +94,12 @@ class TestDownloadMetadata(unittest.TestCase):
         self.assertEqual(actual, expected, "Problem with test for MAGIL, downloaded files")
 
         # Test that the log has the correct information for metadata errors.
-        actual_errors = seed_df["Metadata_Report_Errors"][0]
+        actual_errors = seed_df.at[0, 'Metadata_Report_Errors']
         expected_errors = "Successfully downloaded all metadata reports"
         self.assertEqual(actual_errors, expected_errors, "Problem with test for MAGIL, log errors")
 
         # Test that the log has the correct information for empty reports.
-        actual_info = seed_df["Metadata_Report_Empty"][0]
+        actual_info = seed_df.at[0, 'Metadata_Report_Empty']
         expected_info = "magil-1_seedscope.csv; magil-1_collscope.csv"
         self.assertEqual(actual_info, expected_info, "Problem with test for MAGIL, log info")
 
@@ -136,12 +136,12 @@ class TestDownloadMetadata(unittest.TestCase):
         self.assertEqual(actual, expected, "Problem with test for RussellL, downloaded files")
 
         # Test that the log has the correct information for metadata errors.
-        actual_errors = seed_df["Metadata_Report_Errors"][0]
+        actual_errors = seed_df.at[0, 'Metadata_Report_Errors']
         expected_errors = "Successfully downloaded all metadata reports"
         self.assertEqual(actual_errors, expected_errors, "Problem with test for Russell, log errors")
 
         # Test that the log has the correct information for empty reports.
-        actual_info = seed_df["Metadata_Report_Empty"][0]
+        actual_info = seed_df.at[0, 'Metadata_Report_Empty']
         expected_info = "No empty reports"
         self.assertEqual(actual_info, expected_info, "Problem with test for Russell, log info")
 

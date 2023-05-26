@@ -45,7 +45,7 @@ class TestGetWarc(unittest.TestCase):
         self.assertEqual(warc_downloaded, True, "Problem with test for correct, WARC download")
 
         # Test the log is updated correctly.
-        actual = seed_df["WARC_API_Errors"][0]
+        actual = seed_df.at[0, 'WARC_API_Errors']
         expected = f"Successfully downloaded {warc}"
         self.assertEqual(actual, expected, "Problem with test for correct, log")
 
@@ -72,7 +72,7 @@ class TestGetWarc(unittest.TestCase):
         self.assertEqual(warc_downloaded, False, "Problem with test for error, WARC download")
 
         # Test the log is updated correctly.
-        actual = seed_df["WARC_API_Errors"][0]
+        actual = seed_df.at[0, 'WARC_API_Errors']
         expected = f"API Error 404: can't download ARCHIVEIT-error.warc.gz"
         self.assertEqual(actual, expected, "Problem with test for error, log")
 

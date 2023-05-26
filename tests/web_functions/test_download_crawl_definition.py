@@ -56,7 +56,7 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         download_crawl_definition("1137665", seed, seed_df, 0)
 
         # Test that the log was updated.
-        actual = seed_df['Metadata_Report_Errors'][0]
+        actual = seed_df.at[0, 'Metadata_Report_Errors']
         expected = f"Error: crawl job 1137665 was not downloaded so can't get crawl definition id"
         self.assertEqual(actual, expected, "Problem with test for error/no job")
 

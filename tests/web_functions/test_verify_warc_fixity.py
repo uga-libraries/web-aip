@@ -49,7 +49,7 @@ class TestVerifyWarcFixity(unittest.TestCase):
 
         # Test the log is updated correctly.
         # Just tests for what it starts with, since the end of the log is the time stamp of the fixity check.
-        actual = seed_df["WARC_Fixity_Errors"][0].startswith(f"Successfully verified {warc} fixity on ")
+        actual = seed_df.at[0, 'WARC_Fixity_Errors'].startswith(f"Successfully verified {warc} fixity on ")
         self.assertEqual(actual, True, "Problem with test for correct, log")
 
     def test_error_fixity(self):
@@ -76,7 +76,7 @@ class TestVerifyWarcFixity(unittest.TestCase):
         self.assertEqual(warc_downloaded, False, "Problem with test for correct, WARC deletion")
 
         # Test the log is updated correctly.
-        actual = seed_df["WARC_Fixity_Errors"][0]
+        actual = seed_df.at[0, 'WARC_Fixity_Errors']
         expected = f"Error: fixity for {warc} changed and it was deleted: " \
                    f"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx before, 422c2c674cac30a015120483c2fa25cd after"
         self.assertEqual(actual, expected, "Problem with test for correct, log")
@@ -106,7 +106,7 @@ class TestVerifyWarcFixity(unittest.TestCase):
         self.assertEqual(warc_downloaded, True, "Problem with test for correct, WARC deletion")
 
         # Test the log is updated correctly.
-        actual = seed_df["WARC_Fixity_Errors"][0]
+        actual = seed_df.at[0, 'WARC_Fixity_Errors']
         expected = f"Error: fixity for {warc} cannot be extracted from md5deep output: b''"
         self.assertEqual(actual, expected, "Problem with test for correct, log")
 

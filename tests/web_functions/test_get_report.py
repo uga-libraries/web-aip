@@ -65,7 +65,7 @@ class TestGetReport(unittest.TestCase):
         The error is caused by giving it improperly formatted collection number.
         """
         get_report(self.seed, self.seed_df, 0, "collection", "abc-coll", "scope_rule", "rbrl-1_collscope.csv")
-        actual_error = self.seed_df['Metadata_Report_Errors'][0]
+        actual_error = self.seed_df.at[0, 'Metadata_Report_Errors']
         expected_error = "rbrl-1_collscope.csv API Error 500"
         self.assertEqual(actual_error, expected_error, "Problem with test for API error")
 
@@ -124,7 +124,7 @@ class TestGetReport(unittest.TestCase):
         self.assertEqual(csv_path_exists, False, "Problem with test for collection scope is empty, is file made")
 
         # Test that the log information in seed_df was updated.
-        actual_info = self.seed_df['Metadata_Report_Empty'][0]
+        actual_info = self.seed_df.at[0, 'Metadata_Report_Empty']
         expected_info = "magil-1_collscope.csv"
         self.assertEqual(actual_info, expected_info, "Problem with test for seed scope is empty, log")
 
@@ -216,7 +216,7 @@ class TestGetReport(unittest.TestCase):
         self.assertEqual(csv_path_exists, False, "Problem with test for seed scope is empty, is file made")
 
         # Test that the log information in seed_df was updated.
-        actual_info = self.seed_df['Metadata_Report_Empty'][0]
+        actual_info = self.seed_df.at[0, 'Metadata_Report_Empty']
         expected_info = "magil-1_seedscope.csv"
         self.assertEqual(actual_info, expected_info, "Problem with test for seed scope is empty, log")
 

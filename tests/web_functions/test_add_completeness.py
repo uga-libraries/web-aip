@@ -42,7 +42,7 @@ class TestAddCompleteness(unittest.TestCase):
         add_completeness(0, seed_df)
 
         # Tests that Complete was updated.
-        actual = seed_df['Complete'][0]
+        actual = seed_df.at[0, 'Complete']
         expected = "Successfully completed"
         self.assertEqual(actual, expected, "Problem with test for all correct")
 
@@ -70,7 +70,7 @@ class TestAddCompleteness(unittest.TestCase):
         add_completeness(0, seed_df)
 
         # Tests that Complete was updated.
-        actual = seed_df['Complete'][0]
+        actual = seed_df.at[0, 'Complete']
         expected = "Metadata_Report_Errors; WARC_API_Errors; WARC_Fixity_Errors; WARC_Unzip_Errors"
         self.assertEqual(actual, expected, "Problem with test for all four error types")
 
@@ -93,7 +93,7 @@ class TestAddCompleteness(unittest.TestCase):
         add_completeness(0, seed_df)
 
         # Tests that Complete was updated.
-        actual = seed_df['Complete'][0]
+        actual = seed_df.at[0, 'Complete']
         expected = "Metadata_Report_Errors"
         self.assertEqual(actual, expected, "Problem with test for Metadata_Report_Errors, API")
 
@@ -116,7 +116,7 @@ class TestAddCompleteness(unittest.TestCase):
         add_completeness(0, seed_df)
 
         # Tests that Complete was updated.
-        actual = seed_df['Complete'][0]
+        actual = seed_df.at[0, 'Complete']
         expected = "Metadata_Report_Errors"
         self.assertEqual(actual, expected, "Problem with test for Metadata_Report_Errors, crawl definition id")
 
@@ -139,7 +139,7 @@ class TestAddCompleteness(unittest.TestCase):
         add_completeness(0, seed_df)
 
         # Tests that Complete was updated.
-        actual = seed_df['Complete'][0]
+        actual = seed_df.at[0, 'Complete']
         expected = "WARC_API_Errors"
         self.assertEqual(actual, expected, "Problem with test for WARC_API_Errors, API error from download")
 
@@ -162,7 +162,7 @@ class TestAddCompleteness(unittest.TestCase):
         add_completeness(0, seed_df)
 
         # Tests that Complete was updated.
-        actual = seed_df['Complete'][0]
+        actual = seed_df.at[0, 'Complete']
         expected = "WARC_API_Errors"
         self.assertEqual(actual, expected, "Problem with test for WARC_API_Errors, index error during get info")
 
@@ -185,7 +185,7 @@ class TestAddCompleteness(unittest.TestCase):
         add_completeness(0, seed_df)
 
         # Tests that Complete was updated.
-        actual = seed_df['Complete'][0]
+        actual = seed_df.at[0, 'Complete']
         expected = "WARC_API_Errors"
         self.assertEqual(actual, expected, "Problem with test for WARC_API_Errors, API error during get info")
 
@@ -208,7 +208,7 @@ class TestAddCompleteness(unittest.TestCase):
         add_completeness(0, seed_df)
 
         # Tests that Complete was updated.
-        actual = seed_df['Complete'][0]
+        actual = seed_df.at[0, 'Complete']
         expected = "WARC_Fixity_Errors"
         self.assertEqual(actual, expected, "Problem with test for WARC_Fixity_Errors, change in fixity")
 
@@ -231,7 +231,7 @@ class TestAddCompleteness(unittest.TestCase):
         add_completeness(0, seed_df)
 
         # Tests that Complete was updated.
-        actual = seed_df['Complete'][0]
+        actual = seed_df.at[0, 'Complete']
         expected = "WARC_Fixity_Errors"
         self.assertEqual(actual, expected, "Problem with test for WARC_Fixity_Errors, can't extract from MD5deep")
 
@@ -254,7 +254,7 @@ class TestAddCompleteness(unittest.TestCase):
         add_completeness(0, seed_df)
 
         # Tests that Complete was updated.
-        actual = seed_df['Complete'][0]
+        actual = seed_df.at[0, 'Complete']
         expected = "WARC_Unzip_Errors"
         self.assertEqual(actual, expected, "Problem with test for WARC_Unzip_Errors, unzipped to .gz.open")
 
@@ -277,7 +277,7 @@ class TestAddCompleteness(unittest.TestCase):
         add_completeness(0, seed_df)
 
         # Tests that Complete was updated.
-        actual = seed_df['Complete'][0]
+        actual = seed_df.at[0, 'Complete']
         expected = "WARC_Unzip_Errors"
         self.assertEqual(actual, expected, "Problem with test for WARC_Unzip_Errors, error from unzipping tool")
 
