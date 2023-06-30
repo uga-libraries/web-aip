@@ -1,6 +1,4 @@
 .idea
 configuration.py
-aip_functions.py
 _pycache_
 *.pyc
-test_files
