@@ -11,7 +11,7 @@ which prepares them for UGA's digital preservation system (ARCHive).
 UGA downloads web content using this script on a quarterly basis.  
 
 # Script usage
-python warc_download.py date_start date_end
+`python warc_download.py date_start date_end`
 
    * dates: the store date range for WARCs to be downloaded.
    * date_start is inclusive: the download will include WARCs stored on date_start.
@@ -44,7 +44,7 @@ The script output is saved in the script output folder, defined in the configura
    4. Redacts login information from the seed report.
    5. Downloads each WARC and verifies the fixity against the MD5 in Archive-It.
    6. Unzips each WARC.      
-   7. Saves a summary of the errors, if any, of the seed to the log (seeds_log.csv).
+   7. Saves a summary of the errors, if any, to the log (seeds_log.csv).
 
    
 3. Checks if everything expected was downloaded and makes a log (completeness_check.csv).
