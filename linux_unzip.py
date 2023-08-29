@@ -35,22 +35,26 @@ log_write.writerow(["AIP", "WARC", "Zip_MD5", "Fixity_Comparison", "Unzipping_Re
 # Processes each AIP.
 for aip in os.listdir("."):
 
-    # Skips the log.
-    if aip == "warc_unzip_log.csv":
+    # Skips metadata files.
+    if aip == "warc_unzip_log.csv" or aip == "metadata.csv":
         continue
 
     # Prints the script progress.
     print(f"Starting on {aip}")
 
-    # Processes each WARC, which are in the AIP's objects folder.
-    objects_path = os.path.join(aip, "objects")
-    for warc in os.listdir(objects_path):
+    # Processes each WARC, which are in the AIP folder.
+    # This folder also contains metadata files.
+    for warc in os.listdir(aip):
+
+        # Skips the metadata files (do not have the zipped WARC file extension).
+        if not warc.endswith(".warc.gz"):
+            continue
 
         # Starts a list with log information.
         log_row = [aip, warc]
 
         # Calculates the MD5 for the downloaded (zipped) WARC.
-        warc_path = os.path.join(objects_path, warc)
+        warc_path = os.path.join(aip, warc)
         output = subprocess.run(f"md5deep {warc_path}", stdout=subprocess.PIPE, shell=True)
         try:
             regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(output.stdout))
