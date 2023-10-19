@@ -50,8 +50,8 @@ The script output is saved in the script output folder, defined in the configura
 
 2. For each seed in the download:
    1. Makes a folder named with the seed id.
-   2. Downloads the metadata reports collection, collection scope, crawl definition, crawl job, seed, and seed scope.
-   3. Deletes metadata reports that are size 0 (have no metadata of that type).
+   2. Downloads the metadata reports.
+   3. Deletes empty metadata reports (there is no metadata of that type in Archive-It).
    4. Redacts login information from the seed report.
    5. Downloads each WARC and verifies the fixity against the MD5 in Archive-It.
    6. Unzips each WARC.      
