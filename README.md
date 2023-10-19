@@ -27,7 +27,6 @@ It is a known bug that Windows zip programs sometimes results in errors for gzip
 ## Dependencies
 
 * Archive-It login credentials
-* Python Library: requests `pip install requests`
 * md5deep (https://github.com/jessek/hashdeep)
 * 7-Zip (Windows only) (https://www.7-zip.org/download.html)
 
