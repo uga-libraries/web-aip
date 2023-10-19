@@ -2,7 +2,8 @@
 
 # Overview
 Downloads WARCs and six metadata reports for crawls saved during a specified time period 
-from the Archive-It web archiving service to use for creating a preservation backup of web crawls.
+from the Archive-It web archiving service to use for creating a preservation copy of web crawls.
+
 The downloaded content is saved to folders organized by seed.
 The metadata reports are collection, collection scope, crawl definition, crawl job, seed, and seed scope. 
 After the script is complete, the folders are ready to use as input for the [UGA Libraries' General AIP Script](https://github.com/uga-libraries/general-aip), 
@@ -10,11 +11,15 @@ which prepares them for UGA's digital preservation system (ARCHive).
 
 UGA downloads web content using this script on a quarterly basis.  
 
+Script usage: `python warc_download.py date_start date_end`
+
+   * dates: the store date range for WARCs to be downloaded.
+   * date_start is inclusive: the download will include WARCs stored on date_start.
+   * date_end is exclusive: the download will not include WARCs stored on date_end.
+
 Additional script: linux_unzip.py
 Script usage: `python linux_unzip.py aips_directory`
-Checks the zipped WARC fixity, unzips the WARC using the gunzip command, and calculates the MD5 of the unzipped WARC.
-Must be run in a Linux environment.
-Use when 7zip or other Windows zip programs have errors while unzipping the gzipped WARCs.
+Used to unzip the downloaded WARCs in a Linux environment when there is an error in Windows.
 It is a known bug that Windows zip programs sometimes results in errors for gzip.
 
 # Getting Started
@@ -29,12 +34,6 @@ It is a known bug that Windows zip programs sometimes results in errors for gzip
 ## Installation
 
 Before running the script, create a configuration.py file modeled after the configuration_template.py file.
-
-Script usage: `python warc_download.py date_start date_end`
-
-   * dates: the store date range for WARCs to be downloaded.
-   * date_start is inclusive: the download will include WARCs stored on date_start.
-   * date_end is exclusive: the download will not include WARCs stored on date_end.
 
 # Workflow
 
