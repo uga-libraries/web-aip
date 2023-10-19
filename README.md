@@ -1,6 +1,6 @@
-# AIP Workflow for Web Content
+# Download Archive-It Web Content for Preservation
 
-# Purpose and overview
+# Overview
 Downloads WARCs and six metadata reports for crawls saved during a specified time period 
 from the Archive-It web archiving service to use for creating a preservation backup of web crawls.
 The downloaded content is saved to folders organized by seed.
@@ -10,22 +10,34 @@ which prepares them for UGA's digital preservation system (ARCHive).
 
 UGA downloads web content using this script on a quarterly basis.  
 
-# Script usage
-`python warc_download.py date_start date_end`
+Additional script: linux_unzip.py
+Script usage: `python linux_unzip.py aips_directory`
+Checks the zipped WARC fixity, unzips the WARC using the gunzip command, and calculates the MD5 of the unzipped WARC.
+Must be run in a Linux environment.
+Use when 7zip or other Windows zip programs have errors while unzipping the gzipped WARCs.
+It is a known bug that Windows zip programs sometimes results in errors for gzip.
 
-   * dates: the store date range for WARCs to be downloaded.
-   * date_start is inclusive: the download will include WARCs stored on date_start.
-   * date_end is exclusive: the download will not include WARCs stored on date_end.
+# Getting Started
 
-Before running the script, create a configuration.py file modeled after the configuration_template.py file.
+## Dependencies
 
-# Dependencies
 * Archive-It login credentials
 * Python Library: requests `pip install requests`
 * md5deep (https://github.com/jessek/hashdeep)
 * 7-Zip (Windows only) (https://www.7-zip.org/download.html)
 
-# Workflow Details
+## Installation
+
+Before running the script, create a configuration.py file modeled after the configuration_template.py file.
+
+Script usage: `python warc_download.py date_start date_end`
+
+   * dates: the store date range for WARCs to be downloaded.
+   * date_start is inclusive: the download will include WARCs stored on date_start.
+   * date_end is exclusive: the download will not include WARCs stored on date_end.
+
+# Workflow
+
 Because the script can take days to run, due to the time required to download WARCs, it often gets interrupted. 
 If this happens, running the script again will cause it to restart the seed that was in-progress when the error happened 
 and download content for all seeds that had not started yet.
@@ -53,13 +65,5 @@ The script output is saved in the script output folder, defined in the configura
 4. If there were errors during unzipping, run the linux_unzip.py script to unzip them.
 
 
-# Additional scripts: linux_unzip.py
-Checks the zipped WARC fixity, unzips the WARC using the gunzip command, and calculates the MD5 of the unzipped WARC.
-Must be run in a Linux environment.
-Use when 7zip or other Windows zip programs have errors while unzipping the gzipped WARCs.
-It is a known bug that Windows zip programs sometimes results in errors for gzip.
-
-Script usage: `python linux_unzip.py aips_directory`
-
-# Initial Author
-Adriane Hanson, Head of Digital Stewardship, January 2020
+# Author
+Adriane Hanson, Head of Digital Stewardship, University of Georgia
