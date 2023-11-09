@@ -9,13 +9,7 @@ The metadata reports are collection, collection scope, crawl definition, crawl j
 After the script is complete, the folders are ready to use as input for the [UGA Libraries' General AIP Script](https://github.com/uga-libraries/general-aip), 
 which prepares them for UGA's digital preservation system (ARCHive).
 
-UGA downloads web content using this script on a quarterly basis.  
-
-Script usage: `python warc_download.py date_start date_end`
-
-   * dates: the store date range for WARCs to be downloaded.
-   * date_start is inclusive: the download will include WARCs stored on date_start.
-   * date_end is exclusive: the download will not include WARCs stored on date_end.
+UGA downloads web content using this script on a quarterly basis.
 
 Additional script: linux_unzip.py
 Script usage: `python linux_unzip.py aips_directory`
@@ -33,6 +27,15 @@ It is a known bug that Windows zip programs sometimes results in errors for gzip
 ## Installation
 
 Before running the script, create a configuration.py file modeled after the configuration_template.py file.
+
+## Script Arguments
+
+Run the script in the command line: `python warc_download.py date_start date_end`
+
+   * date_start is inclusive: the download will include WARCs stored on date_start.
+   * date_end is exclusive: the download will not include WARCs stored on date_end.
+   * Format both dates YYYY-MM-DD
+
 
 # Workflow
 
