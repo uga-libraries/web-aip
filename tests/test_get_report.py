@@ -40,14 +40,14 @@ class TestGetReport(unittest.TestCase):
         The MAGIL seed is for testing empty reports and the Russell seed is used for the rest.
         """
         # Makes the dataframe with metadata for both the Russell and MAGIL seeds.
+        columns_list = ["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                        "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"]
         self.seed_df = pd.DataFrame([["rbrl-1", "2027707", 12265, "943048", 0.01, 1, "AIT-12265-T-JOB-SEED.warc.gz",
                                       np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
                                      ["magil-1", "2783596", 15678, "1789232", 0.01, 1, "AIT-15678-T-JOB-SEED.warc.gz",
                                       np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                                    columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
-                                             "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                             "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
-                                             "WARC_Unzip_Errors", "Complete"])
+                                    columns=columns_list)
 
         # Makes the seed and seed folder for the Russell seed.
         self.seed_rbrl = [seed for seed in self.seed_df.itertuples()][0]
