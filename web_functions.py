@@ -109,7 +109,7 @@ def check_seeds(date_end, date_start, seed_df, seeds_directory):
                 warcs_exclude += 1
                 continue
 
-            # Checks if another WARC from this seed has been processed (there is data in seed_info. 
+            # Checks if another WARC from this seed has been processed (there is data in seed_info).
             # If so, updates the WARC count in the dictionary and starts processing the next WARC. 
             # If not, adds the seed to the dictionary.
             try:
@@ -362,7 +362,7 @@ def download_metadata(seed, row_index, seed_df):
         seed_df.loc[row_index, "Metadata_Report_Errors"] = "Successfully downloaded all metadata reports"
         seed_df.to_csv(os.path.join(config.script_output, "seeds_log.csv"), index=False)
 
-    # If there were no deleted empty reports (the dataframe still has not value in that cell), updates the log.
+    # If there were no deleted empty reports (the dataframe still has no value in that cell), updates the log.
     if pd.isnull(seed_df.at[row_index, "Metadata_Report_Empty"]):
         seed_df.loc[row_index, "Metadata_Report_Empty"] = "No empty reports"
         seed_df.to_csv(os.path.join(config.script_output, "seeds_log.csv"), index=False)
@@ -492,7 +492,7 @@ def get_warc_info(warc, seed_df, row_index):
 def log(message, df, row, column):
     """Adds log information to the seeds dataframe and saves an updated version of seeds_log.csv."""
 
-    # Updates the dataframe. Separates messages with a a semicolon if there is more than one.
+    # Updates the dataframe. Separates the messages with a semicolon if there is more than one.
     if pd.isnull(df.at[row, column]):
         df.loc[row, column] = message
     else:
@@ -520,7 +520,7 @@ def metadata_csv(seeds_list, date_end):
         row_list = []
 
         # Uses the Partner API to get the seed report.
-        # If the connection fails, logs an error and adds a row to the df so it is clear more work is needed.
+        # If the connection fails, logs an error and adds a row to the df, so it is clear more work is needed.
         api_result = requests.get(f"{config.partner_api}/seed?id={seed_id}", auth=(config.username, config.password))
         if not api_result.status_code == 200:
             row_list = [f"TBD: API error {api_result.status_code}", "TBD", seed_id, "TBD", "TBD", 1]
@@ -643,7 +643,7 @@ def redact_seed_report(seed_id, aip_id, seed_df, row_index):
 
 def reset_seed(seed_id, df):
     """Deletes the directories and log information for a seed
-    that was partially completed when the script broke so it can be remade."""
+    that was partially completed when the script broke so that it can be remade."""
 
     # Deletes the seed folder and all its contents.
     shutil.rmtree(seed_id)
