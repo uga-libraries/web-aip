@@ -17,17 +17,16 @@ class TestLog(unittest.TestCase):
         """
         Makes a dataframe and a CSV to use as the starting point for each test.
         """
-        self.seed_df = pd.DataFrame([[1111111, 12345, "1100000", 0.52, 1,
-                                      "ARCHIVEIT.warc.gz", "Successfully downloaded all metadata reports",
-                                      "No empty reports", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
-                                     [2222222, 12345, "2200000", 1.52, 2,
-                                      "ARCHIVEIT.warc.gz|ARCHIVEIT-1.warc.gz",
-                                      "Successfully downloaded all metadata reports", "2222222_seedscope.csv",
-                                      np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                                    columns=["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
-                                             "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                             "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
-                                             "WARC_Unzip_Errors", "Complete"])
+        row_list = [[1111111, 12345, "1100000", 0.52, 1, "ARCHIVEIT.warc.gz",
+                     "Successfully downloaded all metadata reports", "No empty reports",
+                     np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                    [2222222, 12345, "2200000", 1.52, 2, "ARCHIVEIT.warc.gz|ARCHIVEIT-1.warc.gz",
+                     "Successfully downloaded all metadata reports", "2222222_seedscope.csv",
+                     np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]]
+        columns_list = ["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                        "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                        "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"]
+        self.seed_df = pd.DataFrame(row_list, columns=columns_list)
         self.seed_df.to_csv(os.path.join(config.script_output, "seeds_log.csv"), index=False)
 
     def tearDown(self):
