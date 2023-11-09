@@ -15,6 +15,18 @@ import configuration as config
 from web_functions import download_metadata
 
 
+def make_df(df_row):
+    """
+    Makes a dataframe with the provided row information. The column values are the same for all tests.
+    Returns the dataframe.
+    """
+    column_list = ["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                   "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                   "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"]
+    df = pd.DataFrame([df_row], columns=column_list)
+    return df
+
+
 class TestDownloadMetadata(unittest.TestCase):
 
     def tearDown(self):
@@ -32,13 +44,8 @@ class TestDownloadMetadata(unittest.TestCase):
         for a Hargrett seed with one each of all six of the report types.
         """
         # Makes the data needed for the function input and runs the function.
-        seed_df = pd.DataFrame([["harg-1", 2187482, 12181, "1177700", 3.62, 3,
-                                 "name0.warc.gz|name1.warc.gz|name2.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
-                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
-                                        "WARC_Unzip_Errors", "Complete"])
+        seed_df = make_df(["harg-1", 2187482, 12181, "1177700", 3.62, 3, "name0.warc.gz|name1.warc.gz|name2.warc.gz",
+                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2187482")
         download_metadata(seed, 0, seed_df)
@@ -72,12 +79,8 @@ class TestDownloadMetadata(unittest.TestCase):
         for a MAGIL seed with one each of the four report types which always have data.
         """
         # Makes the data needed for the function input and runs the function.
-        seed_df = pd.DataFrame([["magil-1", 2529685, 15678, "1594228", 0.36, 1, "name.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
-                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
-                                        "WARC_Unzip_Errors", "Complete"])
+        seed_df = make_df(["magil-1", 2529685, 15678, "1594228", 0.36, 1, "name.warc.gz",
+                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2529685")
         download_metadata(seed, 0, seed_df)
@@ -109,13 +112,9 @@ class TestDownloadMetadata(unittest.TestCase):
         for a Russell two each of the crawl job and definition reports and one each of the other four report types.
         """
         # Makes the data needed for the function input and runs the function.
-        seed_df = pd.DataFrame([["rbrl-1", 2547528, 12265, "1436714|1718490", 0.72, 3,
-                                 "name0.warc.gz|name1.warc.gz|name2.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
-                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
-                                        "WARC_Unzip_Errors", "Complete"])
+        seed_df = make_df(["rbrl-1", 2547528, 12265, "1436714|1718490", 0.72, 3,
+                           "name0.warc.gz|name1.warc.gz|name2.warc.gz",
+                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2547528")
         download_metadata(seed, 0, seed_df)
