@@ -14,6 +14,18 @@ import configuration as config
 from web_functions import get_warc, verify_warc_fixity
 
 
+def make_df(df_row):
+    """
+    Makes a dataframe with the provided row information. The column values are the same for all tests.
+    Returns the dataframe.
+    """
+    column_list = ["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                   "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                   "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"]
+    df = pd.DataFrame([df_row], columns=column_list)
+    return df
+
+
 class TestVerifyWarcFixity(unittest.TestCase):
 
     def tearDown(self):
@@ -33,12 +45,8 @@ class TestVerifyWarcFixity(unittest.TestCase):
         # Makes the data needed for the function input and runs the function.
         warc = "ARCHIVEIT-12265-MONTHLY-JOB1718490-SEED2444051-20221203041251087-00001-h3.warc.gz"
         warc_path = os.path.join(os.getcwd(), "2444051", warc)
-        seed_df = pd.DataFrame([["rbrl-1", 2444051, 12265, "1718490", 0.01, 1, warc,
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
-                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
-                                        "WARC_Unzip_Errors", "Complete"])
+        seed_df = make_df(["rbrl-1", 2444051, 12265, "1718490", 0.01, 1, warc,
+                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
         os.mkdir("2444051")
         get_warc(seed_df, 0,  f"https://warcs.archive-it.org/webdatafile/{warc}", warc, warc_path)
         verify_warc_fixity(seed_df, 0, warc_path, warc, "7f0c9f11a27b06271b4137d99946fc52")
@@ -60,12 +68,8 @@ class TestVerifyWarcFixity(unittest.TestCase):
         # Makes the data needed for the function input and runs the function.
         warc = "ARCHIVEIT-12912-TEST-JOB1115532-SEED2173769-20200326213812038-00000-h3.warc.gz"
         warc_path = os.path.join(os.getcwd(), "2173769", warc)
-        seed_df = pd.DataFrame([["harg-1", 2173769, 12912, "1115532", 0.01, 1, warc,
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
-                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
-                                        "WARC_Unzip_Errors", "Complete"])
+        seed_df = make_df(["harg-1", 2173769, 12912, "1115532", 0.01, 1, warc,
+                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
         os.mkdir("2173769")
         get_warc(seed_df, 0,  f"https://warcs.archive-it.org/webdatafile/{warc}", warc, warc_path)
         with self.assertRaises(ValueError):
@@ -84,17 +88,13 @@ class TestVerifyWarcFixity(unittest.TestCase):
     def test_error_regex(self):
         """
         Tests that the function does not delete the WARC in the seed folder and updates the log correctly
-        when the WARC fixity cannot be does not match Archive-It.
+        when the WARC fixity cannot be extracted from the md5deep output.
         """
         # Makes the data needed for the function input and runs the function.
         warc = "ARCHIVEIT-12265-TEST-JOB1365541-SEED2454528-20210217005857702-00002-h3.warc.gz"
         warc_path = os.path.join(os.getcwd(), "2454528", warc)
-        seed_df = pd.DataFrame([["rbrl-1", 2454528, 12265, "1365541", 0.01, 1, warc,
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
-                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
-                                        "WARC_Unzip_Errors", "Complete"])
+        seed_df = make_df(["rbrl-1", 2454528, 12265, "1365541", 0.01, 1, warc,
+                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
         os.mkdir("2454528")
         get_warc(seed_df, 0,  f"https://warcs.archive-it.org/webdatafile/{warc}", warc, warc_path)
         with self.assertRaises(AttributeError):
