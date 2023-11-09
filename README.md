@@ -38,8 +38,7 @@ Run the script in the command line: `python warc_download.py date_start date_end
    * date_start is inclusive: the download will include WARCs stored on date_start.
    * date_end is exclusive: the download will not include WARCs stored on date_end.
    * Format both dates YYYY-MM-DD
-
-
+   
 # Workflow
 
 Because the script can take days to run, due to the time required to download WARCs, it often gets interrupted. 
