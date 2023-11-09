@@ -1,6 +1,6 @@
 """
 Purpose: Downloads archived web content (WARCs) and associated metadata for a group of seeds from Archive-It.org using
-their APIs and prepares them to be converted into AIPs with the general-aip.py script for long-term preservation.
+their APIs so that they can be converted into AIPs with the general-aip.py script for long-term preservation.
 At UGA, this script is run every three months to download content for all crawls saved that quarter.
 
 The download combines all WARCs saved within a quarter for a seed, even if that seed was crawled multiple times.
@@ -10,10 +10,11 @@ It also includes six of the metadata reports:
     * Crawl Definition (may be more than one)
     * Crawl Job (may be more than one)
     * Seed
-    * Seed Scope (not downloaded if not scope rules for the seed)
+    * Seed Scope (not downloaded if no scope rules for the seed)
 
 Prior to the preservation download, all seed metadata should be entered into Archive-It.
-Use the seed_metadata_report.py script to verify all required fields are present.
+Use the seed_metadata_report.py script (https://github.com/uga-libraries/web-archive-it-api)
+to verify all required fields are present.
 """
 
 # Usage: python ait_download.py date_start date_end
@@ -23,8 +24,7 @@ import pandas as pd
 import re
 import sys
 
-# Import functions and constant variables from other UGA scripts.
-# Configuration is made by the user and could be forgotten. The others are in the script repo.
+# Configuration is made by the user and could be forgotten.
 try:
     import configuration as c
 except ModuleNotFoundError:
@@ -33,8 +33,8 @@ except ModuleNotFoundError:
     sys.exit()
 import web_functions as fun
 
-# The preservation download is limited to warcs created during a particular time frame.
-# UGA downloads every quarter (2/1-4/30, 5/1-7/31, 8/1-10/31, 11/1-1/31)
+# Tests to validate the two date arguments, which specify the time frame for WARCs to include in the download.
+
 # Tests that both dates are provided. If not, ends the script.
 try:
     date_start, date_end = sys.argv[1:]
@@ -63,7 +63,7 @@ fun.check_config()
 seeds_directory = os.path.join(c.script_output, "preservation_download")
 
 # The script may be run repeatedly if there are interruptions, such as due to API connections.
-# If it has run, it will use the existing seeds_log.csv for seed_df and and skip seeds that were already done.
+# If it has run, it will use the existing seeds_log.csv for seed_df and skip seeds that were already done.
 # Otherwise, it makes seed_df and metadata_csv by getting data from the Archive-It APIs
 # and add the AIP_ID from metadata_csv to be the first column of seed_df.
 if os.path.exists(seeds_directory):
@@ -77,36 +77,36 @@ else:
     seed_df = pd.merge(seed_df, aip_id_df, how="left")
     seed_df.insert(0, "AIP_ID", seed_df.pop('AIP_ID'))
 
-# Starts counter for tracking script progress.
-# Some processes are slow, so this shows the script is still working and how much remains.
+# Starts a counter for tracking script progress.
+# Some processes are slow, so this shows the script is still working and how much work remains.
 current_seed = 0
 total_seeds = len(seed_df[seed_df["Complete"].isnull()])
 
 # Iterates through information about each seed, downloading metadata and WARC files from Archive-It.
-# Filtered for no data in the WARC_Unzip_Errors (last log column) to skip seeds done earlier if this is a restart.
+# Filtered for no data in the Complete column to skip seeds done earlier if this is a restart.
 for seed in seed_df[seed_df["Complete"].isnull()].itertuples():
 
     # Updates the current seed number and displays the script progress.
     current_seed += 1
     print(f"\nStarting seed {current_seed} of {total_seeds}.")
 
-    # Row index for the seed being processed in the dataframe, to use for adding logging information.
+    # Calculates the row index for the seed being processed in the dataframe, to use for adding log information.
     row_index = seed_df.index[seed_df["Seed_ID"] == seed.Seed_ID].tolist()[0]
 
     # If the seed already has a folder from an error in a previous iteration of the script,
-    # deletes the contents and anything in the seeds_log.csv from the previous iteration so it can be remade.
+    # deletes the contents and anything in the seeds_log.csv from the previous iteration, so it can be remade.
     if os.path.exists(str(seed.Seed_ID)):
         fun.reset_seed(seed.Seed_ID, seed_df)
 
-    # Makes a folder for the seed in the AIP directory,
+    # Makes a folder for the seed in the seeds directory,
     # and downloads the metadata and WARC files to that seed folder.
     os.mkdir(str(seed.Seed_ID))
     fun.download_metadata(seed, row_index, seed_df)
     fun.download_warcs(seed, row_index, seed_df)
 
-    # Updates the Complete column with a summary of error types or that the seed processed successfully.
+    # Updates the Complete column with the error type or that the seed processed successfully.
     fun.add_completeness(row_index, seed_df)
 
-# Verifies the all expected seed folders are present and have all the expected metadata files and WARCs.
-# Saves the result as a csv in the folder with the downloaded AIPs.
+# Verifies the all expected seed folders are present and contain all the expected metadata files and WARCs.
+# Saves the result as a csv in the folder with the downloaded content.
 fun.check_seeds(date_end, date_start, seed_df, seeds_directory)
