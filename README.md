@@ -21,6 +21,9 @@ It is a known bug that Windows zip programs sometimes results in errors for gzip
 ## Dependencies
 
 * md5deep (https://github.com/jessek/hashdeep)
+* numpy
+* pandas
+* requests - used to get data via Archive-It APIs
 * 7-Zip (Windows only) (https://www.7-zip.org/download.html)
 
 ## Installation
