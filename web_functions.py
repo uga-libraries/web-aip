@@ -529,7 +529,7 @@ def metadata_csv(seeds_list, date_end):
         seed_report = api_result.json()
 
         # Adds the department code, which is based on Collector from the seed report.
-        # Supplies a default value if the collector is not an expected value so it is clear more work is needed.
+        # Supplies a default value if the collector is not an expected value, so it is clear more work is needed.
         try:
             collector = seed_report[0]['metadata']['Collector'][0]['value']
             collector_to_dept = {"Hargrett Rare Book & Manuscript Library": "hargrett",
