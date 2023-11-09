@@ -45,7 +45,7 @@ class TestDownloadWarcs(unittest.TestCase):
         Deletes the script output directory and contents, if any, and seeds_log.csv produced by the tests.
         The directory is changed first because seeds_dir can't be deleted while it is the current working directory.
         """
-        os.chdir("..")
+        os.chdir(config.script_output)
         shutil.rmtree(self.seeds_dir)
         os.remove(os.path.join(config.script_output, "seeds_log.csv"))
 
