@@ -39,6 +39,13 @@ Run the script in the command line: `python warc_download.py date_start date_end
    * date_end is exclusive: the download will not include WARCs stored on date_end.
    * Format both dates YYYY-MM-DD
    
+## Testing
+
+There are unit tests for all the script functions used by warc_download.py except check_seeds(),
+which will be changed soon.
+
+There are no tests for linux_unzip.py, which will be integrated into warc_download.py soon.
+
 # Workflow
 
 Because the script can take days to run, due to the time required to download WARCs, it often gets interrupted. 
