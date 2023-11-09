@@ -14,6 +14,18 @@ import configuration as config
 from web_functions import get_warc
 
 
+def make_df(df_row):
+    """
+    Makes a dataframe with the provided row information. The column values are the same for all tests.
+    Returns the dataframe.
+    """
+    column_list = ["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                   "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                   "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"]
+    df = pd.DataFrame([df_row], columns=column_list)
+    return df
+
+
 class TestGetWarc(unittest.TestCase):
 
     def tearDown(self):
@@ -31,12 +43,8 @@ class TestGetWarc(unittest.TestCase):
         """
         # Makes the data needed for the function input and runs the function.
         warc = "ARCHIVEIT-15678-TEST-JOB1594318-0-SEED2529656-20220420025307556-00000-k3n6tj0y.warc.gz"
-        seed_df = pd.DataFrame([["magil-1", 2529656, 15678, "1594318", 0.01, 1, warc,
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
-                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
-                                        "WARC_Unzip_Errors", "Complete"])
+        seed_df = make_df(["magil-1", 2529656, 15678, "1594318", 0.01, 1, warc,
+                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
         os.mkdir("2529656")
         get_warc(seed_df, 0, f"https://warcs.archive-it.org/webdatafile/{warc}", warc, f"2529656/{warc}")
 
@@ -56,12 +64,8 @@ class TestGetWarc(unittest.TestCase):
         """
         # Makes the data needed for the function input and runs the function.
         warc = "ARCHIVEIT-error.warc.gz"
-        seed_df = pd.DataFrame([["magil-1", 2529656, 15678, "1594318", 0.01, 1, warc,
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
-                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
-                                        "WARC_Unzip_Errors", "Complete"])
+        seed_df = make_df(["magil-1", 2529656, 15678, "1594318", 0.01, 1, warc,
+                            np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
         os.mkdir("2529656")
 
         with self.assertRaises(ValueError):
