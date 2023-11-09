@@ -13,6 +13,18 @@ import configuration as config
 from web_functions import get_warc_info
 
 
+def make_df(df_row):
+    """
+    Makes a dataframe with the provided row information. The column values are the same for all tests.
+    Returns the dataframe.
+    """
+    column_list = ["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                   "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                   "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"]
+    df = pd.DataFrame([df_row], columns=column_list)
+    return df
+
+
 class TestGetWarcInfo(unittest.TestCase):
 
     def tearDown(self):
@@ -28,13 +40,9 @@ class TestGetWarcInfo(unittest.TestCase):
         Tests that the function returns the expected values for a BMA WARC.
         """
         # Makes the data needed for the function input and runs the function.
-        seed_df = pd.DataFrame([["harg-1", 2028986, 12470, "1085452", 0.01, 1,
-                                 "ARCHIVEIT-12470-TEST-JOB1085452-SEED2028986-20200129213514425-00000-h3.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
-                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
-                                        "WARC_Unzip_Errors", "Complete"])
+        seed_df = make_df(["harg-1", 2028986, 12470, "1085452", 0.01, 1,
+                           "ARCHIVEIT-12470-TEST-JOB1085452-SEED2028986-20200129213514425-00000-h3.warc.gz",
+                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
         warc_url, warc_md5 = get_warc_info(seed_df.at[0, 'WARC_Filenames'], seed_df, 0)
 
         # Test for the URL.
@@ -50,12 +58,8 @@ class TestGetWarcInfo(unittest.TestCase):
         Tests that the function raises an IndexError and updates the log for a WARC that is not in Archive-It
         """
         # Makes the data needed for the function input.
-        seed_df = pd.DataFrame([["harg-1", 2173769, 12912, "362980", 0.01, 1, "ARCHIVEIT-ERROR-SEED2173769.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
-                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
-                                        "WARC_Unzip_Errors", "Complete"])
+        seed_df = make_df(["harg-1", 2173769, 12912, "362980", 0.01, 1, "ARCHIVEIT-ERROR-SEED2173769.warc.gz",
+                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
 
         # Test for raising the error.
         with self.assertRaises(IndexError):
@@ -71,13 +75,9 @@ class TestGetWarcInfo(unittest.TestCase):
         Tests that the function returns the expected values for a Hargrett WARC.
         """
         # Makes the data needed for the function input and runs the function.
-        seed_df = pd.DataFrame([["harg-1", 2173769, 12912, "362980", 0.01, 1,
-                                 "ARCHIVEIT-12912-WEEKLY-JOB1362980-SEED2173769-20210210221704177-00000-h3.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
-                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
-                                        "WARC_Unzip_Errors", "Complete"])
+        seed_df = make_df(["harg-1", 2173769, 12912, "362980", 0.01, 1,
+                           "ARCHIVEIT-12912-WEEKLY-JOB1362980-SEED2173769-20210210221704177-00000-h3.warc.gz",
+                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
         warc_url, warc_md5 = get_warc_info(seed_df.at[0, 'WARC_Filenames'], seed_df, 0)
 
         # Test for the URL.
@@ -93,13 +93,9 @@ class TestGetWarcInfo(unittest.TestCase):
         Tests that the function returns the expected values for a MAGIL WARC.
         """
         # Makes the data needed for the function input and runs the function.
-        seed_df = pd.DataFrame([["magil-1", 2529646, 15678, "1585231", 0.01, 1,
-                                 "ARCHIVEIT-15678-TEST-JOB1585231-SEED2529646-20220406065532448-00002-h3.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
-                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
-                                        "WARC_Unzip_Errors", "Complete"])
+        seed_df = make_df(["magil-1", 2529646, 15678, "1585231", 0.01, 1,
+                           "ARCHIVEIT-15678-TEST-JOB1585231-SEED2529646-20220406065532448-00002-h3.warc.gz",
+                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
         warc_url, warc_md5 = get_warc_info(seed_df.at[0, 'WARC_Filenames'], seed_df, 0)
 
         # Test for the URL.
@@ -115,13 +111,9 @@ class TestGetWarcInfo(unittest.TestCase):
         Tests that the function returns the expected values for a Russell WARC.
         """
         # Makes the data needed for the function input and runs the function.
-        seed_df = pd.DataFrame([["rbrl-1", 2027713, 12264, "943066", 0.01, 1,
-                                 "ARCHIVEIT-12264-TEST-JOB943066-SEED2027713-20190709150720209-00000-h3.warc.gz",
-                                 np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]],
-                               columns=["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs",
-                                        "WARC_Filenames", "Metadata_Report_Errors", "Metadata_Report_Empty",
-                                        "Seed_Report_Redaction", "WARC_Download_Errors", "WARC_Fixity_Errors",
-                                        "WARC_Unzip_Errors", "Complete"])
+        seed_df = make_df(["rbrl-1", 2027713, 12264, "943066", 0.01, 1,
+                           "ARCHIVEIT-12264-TEST-JOB943066-SEED2027713-20190709150720209-00000-h3.warc.gz",
+                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
         warc_url, warc_md5 = get_warc_info(seed_df.at[0, 'WARC_Filenames'], seed_df, 0)
 
         # Test for the URL.
