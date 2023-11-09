@@ -20,13 +20,13 @@ It is a known bug that Windows zip programs sometimes results in errors for gzip
 
 ## Dependencies
 
-* Archive-It login credentials
 * md5deep (https://github.com/jessek/hashdeep)
 * 7-Zip (Windows only) (https://www.7-zip.org/download.html)
 
 ## Installation
 
-Before running the script, create a configuration.py file modeled after the configuration_template.py file.
+Before running the script, create a configuration.py file modeled after the configuration_template.py file
+with your Archive-It credentials.
 
 ## Script Arguments
 
