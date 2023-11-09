@@ -1,5 +1,5 @@
 """
-Tests the output of the warc_download.py script.
+Tests the output of the ait_download.py script.
 It downloads metadata and WARCs for the seeds saved during the specified date range.
 Multiple date ranges are used to test the main data variation while limiting the amount downloaded.
 """
@@ -26,7 +26,7 @@ class MyTestCase(unittest.TestCase):
         Tests the full script with a data range that has 1 Hargrett seed with 3 WARCs and multiple crawl jobs.
         Results for testing are the contents of the three CSVs made by the script.
         """
-        script_path = os.path.join("..", "warc_download.py")
+        script_path = os.path.join("..", "ait_download.py")
         subprocess.run(f"python {script_path} 2020-04-30 2020-05-15", shell=True)
 
         # Test for metadata.csv
@@ -75,7 +75,7 @@ class MyTestCase(unittest.TestCase):
         Tests the full script with a data range that has 2 Russell seeds, each with 1 WARC.
         Results for testing are the contents of the three CSVs made by the script.
         """
-        script_path = os.path.join("..", "warc_download.py")
+        script_path = os.path.join("..", "ait_download.py")
         subprocess.run(f"python {script_path} 2019-07-12 2019-07-13", shell=True)
 
         # Test for metadata.csv

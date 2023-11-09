@@ -16,7 +16,7 @@ Prior to the preservation download, all seed metadata should be entered into Arc
 Use the seed_metadata_report.py script to verify all required fields are present.
 """
 
-# Usage: python warc_download.py date_start date_end
+# Usage: python ait_download.py date_start date_end
 
 import os
 import pandas as pd
