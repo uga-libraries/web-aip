@@ -81,6 +81,28 @@ class TestAddCompleteness(unittest.TestCase):
         expected = "Metadata_Report_Errors; WARC_Download_Errors; WARC_Fixity_Errors; WARC_Unzip_Errors"
         self.assertEqual(actual, expected, "Problem with test for all four error types")
 
+    def test_error_mix(self):
+        """
+        Tests that the function updates the Complete column of the log correctly
+        if there are multiple warcs where the first had an error and the second did not.
+        """
+        # Makes dataframe needed for function input.
+        row = ["aip-id", 1000000, 12345, "1234567", 2.0, 2, "name.warc.gz|name2.warc.gz",
+               "Successfully downloaded all metadata reports", "No empty reports", "Successfully redacted",
+               "Successfully downloaded name.warc.gz; Successfully downloaded name2.warc.gz",
+               "Successfully verified name.warc.gz fixity on 2023-05-05; "
+               "Successfully verified name2.warc.gz fixity on 2023-05-05",
+               "Error unzipping name.warc.gz: ERROR; Successfully unzipped name2.warc.gz", np.nan]
+        seed_df = make_df(row)
+
+        # Runs the function being tested.
+        add_completeness(0, seed_df)
+
+        # Tests that Complete was updated.
+        actual = seed_df.at[0, 'Complete']
+        expected = "WARC_Unzip_Errors"
+        self.assertEqual(actual, expected, "Problem with test for error mixed with correct")
+
     def test_metadata_api(self):
         """
         Tests that the function updates the Complete column of the log correctly
