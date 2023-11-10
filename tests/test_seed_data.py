@@ -39,8 +39,8 @@ class TestSeedData(unittest.TestCase):
         # Test that the dataframe has the correct values.
         actual = df_to_list(seed_df)
         expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_Download_Errors",
-                     "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
+                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                     "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                     ["2016223", "12249", "918473|918474", 0.001, 2,
                      "ARCHIVEIT-12249-ONE_TIME-JOB918473-SEED2016223-20190603193416006-00000-h3.warc.gz|"
                      "ARCHIVEIT-12249-ONE_TIME-JOB918474-SEED2016223-20190603193421515-00000-h3.warc.gz",
@@ -61,8 +61,8 @@ class TestSeedData(unittest.TestCase):
         # Test that the dataframe has the correct values.
         actual = df_to_list(seed_df)
         expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_Download_Errors",
-                     "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
+                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                     "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                     ["2030942", "12181", "1177700", 0.053, 1,
                      "ARCHIVEIT-12181-TEST-JOB1177700-SEED2030942-20200601191649636-00000-h3.warc.gz",
                      "", "", "", "", "", "", ""],
@@ -94,8 +94,8 @@ class TestSeedData(unittest.TestCase):
         # Test that the dataframe has the correct values.
         actual = df_to_list(seed_df)
         expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_Download_Errors",
-                     "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
+                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                     "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                     ["2514060", "15678", "1691025", 0.012, 1,
                      "ARCHIVEIT-15678-TEST-JOB1691025-SEED2514060-20221014143847623-00000-h3.warc.gz",
                      "", "", "", "", "", "", ""],
@@ -140,8 +140,8 @@ class TestSeedData(unittest.TestCase):
         # Test that the dataframe has the correct values.
         actual = df_to_list(seed_df)
         expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_Download_Errors",
-                     "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
+                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                     "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                     ["2444045", "12265", "1365540", 0.989, 1,
                      "ARCHIVEIT-12265-TEST-JOB1365540-SEED2444045-20210216160638068-00000-h3.warc.gz",
                      "", "", "", "", "", "", ""],
@@ -177,8 +177,8 @@ class TestSeedData(unittest.TestCase):
         # Test that the dataframe has the correct values.
         actual = df_to_list(seed_df)
         expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
-                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_Download_Errors",
-                     "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
+                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                     "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                     ["2173769", "12912", "1130525", 0.002, 1,
                      "ARCHIVEIT-12912-TEST-JOB1130525-SEED2173769-20200416031337869-00000-h3.warc.gz",
                      "", "", "", "", "", "", ""],
