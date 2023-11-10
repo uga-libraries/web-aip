@@ -13,11 +13,12 @@ from web_functions import download_crawl_definition, get_report
 
 def csv_to_list(csv_path):
     """
-    Returns a list of lists, where each list is a row in a csv.
-    Fills na with string "BLANK" for easier comparison.
+    Reads a CSV into pandas and converts it to a list,
+    with the header and each data row as a list within that list.
+    Cells with no value are convert to empty strings for easier comparison.
     """
     df = pd.read_csv(csv_path)
-    df = df.fillna("BLANK")
+    df.fillna("", inplace=True)
     row_list = [df.columns.tolist()] + df.values.tolist()
     return row_list
 
@@ -91,7 +92,7 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         expected1 = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                       "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
                       "recurrence_type", "test", "time_limit"],
-                     [1468, False, "BLANK", 12264, "BLANK", 31104519042, "BLANK", "BLANK", "BLANK", False, False,
+                     [1468, False, "", 12264, "", 31104519042, "", "", "", False, False,
                       "ANNUAL", False, 432000]]
         self.assertEqual(actual1, expected1, "Problem with test for multi id/different, -9042")
 
@@ -100,7 +101,7 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         expected2 = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                       "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
                       "recurrence_type", "test", "time_limit"],
-                     [1468, False, "BLANK", 12264, "BLANK", 31104250884, "BLANK", "TEST", "BLANK", False, False,
+                     [1468, False, "", 12264, "", 31104250884, "", "TEST", "", False, False,
                       "NONE", True, 259200]]
         self.assertEqual(actual2, expected2, "Problem with test for multi id/different, -0884")
 
@@ -129,7 +130,7 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         expected1 = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                       "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
                       "recurrence_type", "test", "time_limit"],
-                     [1468, False, "BLANK", 12265, "BLANK", 31104392189, "BLANK", "BLANK", "BLANK", False, False,
+                     [1468, False, "", 12265, "", 31104392189, "", "", "", False, False,
                       "MONTHLY", False, 259200]]
         self.assertEqual(actual1, expected1, "Problem with test for multi id/different and same, -2189")
 
@@ -138,7 +139,7 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         expected2 = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                       "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
                       "recurrence_type", "test", "time_limit"],
-                     [1468, False, "BLANK", 12265, "BLANK", 31104419857, "BLANK", "TEST", "BLANK", False, False,
+                     [1468, False, "", 12265, "", 31104419857, "", "TEST", "", False, False,
                       "NONE", True, 259200]]
         self.assertEqual(actual2, expected2, "Problem with test for multi id/different and same, -9857")
 
@@ -165,7 +166,7 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         expected = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                      "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
                      "recurrence_type", "test", "time_limit"],
-                    [1468, False, "BLANK", 12249, "BLANK", 31104242954, "BLANK", "ONE_TIME", "BLANK", False, False,
+                    [1468, False, "", 12249, "", 31104242954, "", "ONE_TIME", "", False, False,
                      "NONE", False, 86400]]
         self.assertEqual(actual, expected, "Problem with test for multi id/same")
 
@@ -187,7 +188,7 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         expected = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                      "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
                      "recurrence_type", "test", "time_limit"],
-                    [1468, False, "BLANK", 12181, "BLANK", 31104315076, "BLANK", "TEST", "BLANK", False, False,
+                    [1468, False, "", 12181, "", 31104315076, "", "TEST", "", False, False,
                      "NONE", True, 86400]]
         self.assertEqual(actual, expected, "Problem with test for one id")
 

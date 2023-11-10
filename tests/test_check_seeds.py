@@ -12,6 +12,18 @@ import configuration as config
 from web_functions import check_seeds
 
 
+def csv_to_list(csv_path):
+    """
+    Reads a CSV into pandas and converts it to a list,
+    with the header and each data row as a list within that list.
+    Cells with no value are convert to empty strings for easier comparison.
+    """
+    df = pd.read_csv(csv_path)
+    df.fillna("", inplace=True)
+    row_list = [df.columns.tolist()] + df.values.tolist()
+    return row_list
+
+
 def make_df(df_rows):
     """
     Makes a dataframe with the provided row information. The column values are the same for all tests.
@@ -57,8 +69,7 @@ class MyTestCase(unittest.TestCase):
         check_seeds("2019-10-30", "2019-10-22", seed_df, seeds_directory)
 
         # Test for the completeness log.
-        df = pd.read_csv(os.path.join(config.script_output, "completeness_check.csv"))
-        actual = [df.columns.tolist()] + df.values.tolist()
+        actual = csv_to_list(os.path.join(config.script_output, "completeness_check.csv"))
         expected = [["Seed", "AIP", "Seed Folder Made", "coll.csv", "collscope.csv", "seed.csv", "seedscope.csv",
                      "crawldef.csv count", "crawljob.csv count", "WARC Count Correct", "All Expected File Types"],
                     [2090402, "rbrl-378-web-202002-0001", True, True, True, True, False, 1, 1, True, True],
@@ -92,9 +103,7 @@ class MyTestCase(unittest.TestCase):
         check_seeds("2019-10-30", "2019-10-22", seed_df, seeds_directory)
 
         # Test for the completeness log.
-        df = pd.read_csv(os.path.join(config.script_output, "completeness_check.csv"))
-        df.fillna("", inplace=True)
-        actual = [df.columns.tolist()] + df.values.tolist()
+        actual = csv_to_list(os.path.join(config.script_output, "completeness_check.csv"))
         expected = [["Seed", "AIP", "Seed Folder Made", "coll.csv", "collscope.csv", "seed.csv", "seedscope.csv",
                      "crawldef.csv count", "crawljob.csv count", "WARC Count Correct", "All Expected File Types"],
                     [2090402, "rbrl-378-web-202002-0001", "True", True, True, True, False, 1.0, 1.0, True, True],
@@ -131,9 +140,7 @@ class MyTestCase(unittest.TestCase):
         check_seeds("2019-10-30", "2019-10-22", seed_df, seeds_directory)
 
         # Test for the completeness log.
-        df = pd.read_csv(os.path.join(config.script_output, "completeness_check.csv"))
-        df.fillna("", inplace=True)
-        actual = [df.columns.tolist()] + df.values.tolist()
+        actual = csv_to_list(os.path.join(config.script_output, "completeness_check.csv"))
         expected = [["Seed", "AIP", "Seed Folder Made", "coll.csv", "collscope.csv", "seed.csv", "seedscope.csv",
                      "crawldef.csv count", "crawljob.csv count", "WARC Count Correct", "All Expected File Types"],
                     [2090402, "rbrl-378-web-202002-0001", False, "", "", "", "", "", "", "", ""],
@@ -168,8 +175,7 @@ class MyTestCase(unittest.TestCase):
         check_seeds("2019-10-30", "2019-10-22", seed_df, seeds_directory)
 
         # Test for the completeness log.
-        df = pd.read_csv(os.path.join(config.script_output, "completeness_check.csv"))
-        actual = [df.columns.tolist()] + df.values.tolist()
+        actual = csv_to_list(os.path.join(config.script_output, "completeness_check.csv"))
         expected = [["Seed", "AIP", "Seed Folder Made", "coll.csv", "collscope.csv", "seed.csv", "seedscope.csv",
                      "crawldef.csv count", "crawljob.csv count", "WARC Count Correct", "All Expected File Types"],
                     [2090402, "rbrl-378-web-202002-0001", True, True, True, True, False, 1, 1, False, True],

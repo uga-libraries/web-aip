@@ -11,23 +11,16 @@ import configuration as config
 from web_functions import get_report
 
 
-def csv_list(csv_path):
+def csv_to_list(csv_path):
     """
-    Reads a CSV and returns a list, with each row of the CSV as a list within that list.
+    Reads a CSV into pandas and converts it to a list,
+    with the header and each data row as a list within that list.
+    Columns that are only sometimes present are removed, if present,
+    and cells with no value are convert to empty strings for easier comparison.
     """
-
-    # Reads the CSV into a dataframe.
     df = pd.read_csv(csv_path)
-
-    # Removes columns that are only sometimes present in an API call for collection and seed reports
-    # so there is consistent information to compare.
-    # Ignoring errors so nothing happens if the column is not present.
     df = df.drop(["private_access_token", "login_username", "login_password"], axis=1, errors="ignore")
-
-    # Replaces NaN with empty strings for easier comparison.
     df = df.fillna("")
-
-    # Converts the dataframe into a list, including the column headers, and returns it.
     row_list = [df.columns.tolist()] + df.values.tolist()
     return row_list
 
@@ -84,7 +77,7 @@ class TestGetReport(unittest.TestCase):
         The result for testing is the contents of the report.
         """
         get_report(self.seed_rbrl, self.seed_df, 0, "id", "12265", "collection", "rbrl-1_coll.csv")
-        actual = csv_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_coll.csv"))
+        actual = csv_to_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_coll.csv"))
         expected = [["account", "created_by", "created_date", "deleted", "id", "image", "last_crawl_date",
                      "last_updated_by", "last_updated_date", "metadata.Collector.0.id", "metadata.Collector.0.value",
                      "metadata.Date.0.id", "metadata.Date.0.value", "metadata.Description.0.id",
@@ -108,7 +101,7 @@ class TestGetReport(unittest.TestCase):
         The result for testing is the contents of the report.
         """
         get_report(self.seed_rbrl, self.seed_df, 0, "collection", "12265", "scope_rule", "rbrl-1_collscope.csv")
-        actual = csv_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_collscope.csv"))
+        actual = csv_to_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_collscope.csv"))
         expected = [["abstract_scope_rule", "account", "collection", "created_by", "created_date", "enabled",
                      "host", "id", "last_updated_by", "last_updated_date", "scope_rule_template", "seed", "type",
                      "url_match", "value"],
@@ -143,7 +136,7 @@ class TestGetReport(unittest.TestCase):
         The result for testing is the contents of the report.
         """
         get_report(self.seed_rbrl, self.seed_df, 0, "id", "31104250630", "crawl_definition", "rbrl-1_31104250630_crawldef.csv")
-        actual = csv_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_31104250630_crawldef.csv"))
+        actual = csv_to_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_31104250630_crawldef.csv"))
         expected = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                      "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only", "recurrence_type",
                      "test", "time_limit"],
@@ -156,7 +149,7 @@ class TestGetReport(unittest.TestCase):
         The result for testing is the contents of the report.
         """
         get_report(self.seed_rbrl, self.seed_df, 0, "id", "943048", "crawl_job", "rbrl-1_943048_crawljob.csv")
-        actual = csv_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_943048_crawljob.csv"))
+        actual = csv_to_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_943048_crawljob.csv"))
         expected = [["account", "brozzler", "collection", "crawl_definition", "doc_rate", "downloaded_count",
                      "duplicate_bytes", "duplicate_count", "elapsed_ms", "end_date", "id", "novel_bytes",
                      "novel_count", "original_start_date", "status", "test_crawl_save_date", "test_crawl_state",
@@ -173,7 +166,7 @@ class TestGetReport(unittest.TestCase):
         The result for testing is the contents of the report.
         """
         get_report(self.seed_rbrl, self.seed_df, 0, "id", "2027707", "seed", "rbrl-1_seed.csv")
-        actual = csv_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_seed.csv"))
+        actual = csv_to_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_seed.csv"))
         expected = [["active", "canonical_url", "collection", "crawl_definition", "created_by", "created_date",
                      "deleted", "http_response_code", "id", "last_checked_http_response_code", "last_updated_by",
                      "last_updated_date", "metadata.Collector.0.id",
@@ -204,7 +197,7 @@ class TestGetReport(unittest.TestCase):
         The result for testing is the contents of the report.
         """
         get_report(self.seed_rbrl, self.seed_df, 0, "seed", "2027707", "scope_rule", "rbrl-1_seedscope.csv")
-        actual = csv_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_seedscope.csv"))
+        actual = csv_to_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_seedscope.csv"))
         expected = [["abstract_scope_rule", "account", "collection", "created_by", "created_date", "enabled",
                      "host", "id", "last_updated_by", "last_updated_date", "scope_rule_template", "seed",
                      "type", "url_match", "value"],
