@@ -5,7 +5,6 @@ It tests that everything which was expected was downloaded.
 These are preliminary tests for completeness and most common errors.
 More nuance is needed for each way something could be incomplete, but that will wait until this function is reworked.
 """
-import numpy as np
 import os
 import pandas as pd
 import unittest
@@ -26,6 +25,12 @@ def make_df(df_rows):
 
 
 class MyTestCase(unittest.TestCase):
+
+    def tearDown(self):
+        """
+        Deletes the completeness_check.csv made by each test.
+        """
+        os.remove(os.path.join(config.script_output, "completeness_check.csv"))
 
     def test_complete(self):
         """
