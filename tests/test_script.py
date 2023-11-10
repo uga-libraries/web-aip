@@ -11,6 +11,30 @@ import unittest
 import configuration as config
 
 
+def consistent_seeds_log(csv_path):
+    """
+    Reads the seeds_log.csv produced by the test into a dataframe,
+    and makes changes to data that can vary between tests to allow comparison to expected results.
+    Returns the dataframe.
+    """
+    # Reads the CSV into a dataframe.
+    df = pd.read_csv(csv_path)
+
+    # Replaces blanks with an empty string.
+    df.fillna("", inplace=True)
+
+    # Replaces the value of WARC_Fixity_Errors, which includes timestamps,
+    # with the number of WARCs that were successfully verified.
+    df['WARC_Fixity_Errors'] = df['WARC_Fixity_Errors'].str.count("Successfully")
+
+    # If Seed_Report_Redaction has no login columns, replaces with the other standard message of success.
+    # The same seed sometimes has the login columns and sometimes does not.
+    mask = df['Seed_Report_Redaction'] == "No login columns to redact"
+    df.loc[mask, 'Seed_Report_Redaction'] = "Successfully redacted"
+
+    return df
+
+
 class MyTestCase(unittest.TestCase):
 
     def tearDown(self):
@@ -38,9 +62,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(actual_metadata, expected_metadata, "Problem with test for multi WARC seed, metadata.csv")
 
         # Test for seeds_log.csv
-        # Changes column with time stamps to allow comparison to consistent expected values.
-        seeds_df = pd.read_csv(os.path.join(config.script_output, "seeds_log.csv"))
-        seeds_df["WARC_Fixity_Errors"] = seeds_df["WARC_Fixity_Errors"].str.count("Successfully")
+        seeds_df = consistent_seeds_log(os.path.join(config.script_output, "seeds_log.csv"))
         expected_seeds = [seeds_df.columns.tolist()] + seeds_df.values.tolist()
 
         actual_seeds = [["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
@@ -90,10 +112,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(actual_metadata, expected_metadata, "Problem with test for one WARC seeds, metadata.csv")
 
         # Test for seeds_log.csv
-        # Changes column with time stamps to allow comparison to consistent expected values.
-        seeds_df = pd.read_csv(os.path.join(config.script_output, "seeds_log.csv"))
-        fixity = "Successfully verified ARCHIVEIT"
-        seeds_df.loc[seeds_df["WARC_Fixity_Errors"].str.startswith(fixity), "WARC_Fixity_Errors"] = fixity
+        seeds_df = consistent_seeds_log(os.path.join(config.script_output, "seeds_log.csv"))
         actual_seeds = [seeds_df.columns.tolist()] + seeds_df.values.tolist()
 
         expected_seeds = [["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
@@ -103,7 +122,7 @@ class MyTestCase(unittest.TestCase):
                            "ARCHIVEIT-12265-TEST-JOB943048-SEED2027707-20190709144234143-00000-h3.warc.gz",
                            "Successfully downloaded all metadata reports", "No empty reports", "Successfully redacted",
                            "Successfully downloaded ARCHIVEIT-12265-TEST-JOB943048-SEED2027707-20190709144234143-00000-h3.warc.gz",
-                           "Successfully verified ARCHIVEIT",
+                           1,
                            "Successfully unzipped ARCHIVEIT-12265-TEST-JOB943048-SEED2027707-20190709144234143-00000-h3.warc.gz",
                            "Successfully completed"],
                           ["rbrl-377-web-201907-0001", 2027776, 12264, 943446, 0.096, 1,
@@ -111,7 +130,7 @@ class MyTestCase(unittest.TestCase):
                            "Successfully downloaded all metadata reports", "rbrl-377-web-201907-0001_seedscope.csv",
                            "Successfully redacted",
                            "Successfully downloaded ARCHIVEIT-12264-TEST-JOB943446-SEED2027776-20190710131748634-00000-h3.warc.gz",
-                           "Successfully verified ARCHIVEIT",
+                           1,
                            "Successfully unzipped ARCHIVEIT-12264-TEST-JOB943446-SEED2027776-20190710131748634-00000-h3.warc.gz",
                            "Successfully completed"]]
         self.assertEqual(actual_seeds, expected_seeds, "Problem with test for one WARC seeds, seeds_log.csv")
@@ -123,6 +142,111 @@ class MyTestCase(unittest.TestCase):
                       "crawldef.csv count", "crawljob.csv count", "WARC Count Correct", "All Expected File Types"],
                      [2027776, "rbrl-377-web-201907-0001", True, True, True, True, False, 1, 1, True, True],
                      [2027707, "rbrl-498-web-201907-0001", True, True, True, True, True, 1, 1, True, True]]
+        self.assertEqual(expected_cc, actual_cc, "Problem with test for one WARC seeds, completeness_check.csv")
+
+    def test_restart(self):
+        """
+        Tests the full script with a data range that has 4 MAGIL seeds, simulating a restart after an error.
+        Results for testing are the contents of the three CSVs made by the script.
+        """
+        # Copies files from the test folder which would be present if the script had run once
+        # and been interrupted while the 3rd seed (2529683) was in progress.
+        shutil.copytree(os.path.join(os.getcwd(), "script", "preservation_download"),
+                        os.path.join(config.script_output, "preservation_download"))
+        shutil.copy2(os.path.join(os.getcwd(), "script", "seeds_log.csv"), config.script_output)
+
+        # Runs the script
+        script_path = os.path.join("..", "ait_download.py")
+        subprocess.run(f"python {script_path} 2023-04-21 2023-05-02", shell=True)
+
+        # Test for metadata.csv
+        metadata_df = pd.read_csv(os.path.join(config.script_output, "preservation_download", "metadata.csv"))
+        actual_metadata = [metadata_df.columns.tolist()] + metadata_df.values.tolist()
+        expected_metadata = [["Department", "Collection", "Folder", "AIP_ID", "Title", "Version"],
+                             ["magil", "magil-0000", 2520379, "magil-ggp-2520379-2023-05",
+                              "Georgia Department of Natural Resources Wildlife Resources Division", 1],
+                             ["magil", "magil-0000", 2529671, "magil-ggp-2529671-2023-05",
+                              "Georgia Real Estate Commission & Appraisers Board", 1],
+                             ["magil", "magil-0000", 2529676, "magil-ggp-2529676-2023-05",
+                              "Georgia State Board of Accountancy", 1],
+                             ["magil", "magil-0000", 2529683, "magil-ggp-2529683-2023-05",
+                              "Georgia State Finance Commission", 1]]
+        self.assertEqual(actual_metadata, expected_metadata, "Problem with test for restart, metadata.csv")
+
+        # Test for seeds_log.csv
+        # Changes column with time stamps and convert blanks to empty strings
+        # to allow comparison to consistent expected values.
+        seeds_df = consistent_seeds_log(os.path.join(config.script_output, "seeds_log.csv"))
+        actual_seeds = [seeds_df.columns.tolist()] + seeds_df.values.tolist()
+        expected_seeds = [["AIP_ID", "Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                           "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
+                           "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
+                          ["magil-ggp-2520379-2023-05", 2520379, 15678, 1789230, 7.434, 7,
+                           "ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230416150811551-00000-sl63gmud.warc.gz|"
+                           "ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230417184230631-00001-sl63gmud.warc.gz|"
+                           "ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230417185737629-00002-sl63gmud.warc.gz|"
+                           "ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230417193251948-00003-sl63gmud.warc.gz|"
+                           "ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230417201414622-00004-sl63gmud.warc.gz|"
+                           "ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230417223344837-00005-sl63gmud.warc.gz|"
+                           "ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230419134031254-00000-dwz98uv7.warc.gz",
+                           "Successfully downloaded all metadata reports",
+                           "magil-ggp-2520379-2023-05_seedscope.csv; magil-ggp-2520379-2023-05_collscope.csv",
+                           "Successfully redacted",
+                           "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230416150811551-00000-sl63gmud.warc.gz; "
+                           "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230417184230631-00001-sl63gmud.warc.gz; "
+                           "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230417185737629-00002-sl63gmud.warc.gz; "
+                           "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230417193251948-00003-sl63gmud.warc.gz; "
+                           "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230417201414622-00004-sl63gmud.warc.gz; "
+                           "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230417223344837-00005-sl63gmud.warc.gz; "
+                           "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230419134031254-00000-dwz98uv7.warc.gz",
+                           7,
+                           "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230416150811551-00000-sl63gmud.warc.gz; "
+                           "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230417184230631-00001-sl63gmud.warc.gz; "
+                           "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230417185737629-00002-sl63gmud.warc.gz; "
+                           "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230417193251948-00003-sl63gmud.warc.gz; "
+                           "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230417201414622-00004-sl63gmud.warc.gz; "
+                           "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230417223344837-00005-sl63gmud.warc.gz; "
+                           "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230419134031254-00000-dwz98uv7.warc.gz",
+                           "Complete"],
+                          ["magil-ggp-2529671-2023-05", 2529671, 15678, 1791478, 0.028, 1,
+                           "ARCHIVEIT-15678-TEST-JOB1791478-0-SEED2529671-20230420155417222-00000-mntg8u5v.warc.gz",
+                           "Successfully downloaded all metadata reports",
+                           "magil-ggp-2529671-2023-05_seedscope.csv; magil-ggp-2529671-2023-05_collscope.csv",
+                           "Successfully redacted",
+                           "API error 404: can't downloaded ARCHIVEIT-15678-TEST-JOB1791478-0-SEED2529671-20230420155417222-00000-mntg8u5v.warc.gz",
+                           0, "", "WARC_downloaded_Errors"],
+                          ["magil-ggp-2529683-2023-05", 2529683, 15678, 1791489, 0.05, 2,
+                           "ARCHIVEIT-15678-TEST-JOB1791489-0-SEED2529683-20230420161205384-00000-qix5zv0f.warc.gz|"
+                           "ARCHIVEIT-15678-TEST-JOB1791489-0-SEED2529683-20230420230248436-00000-8bk2lsxt.warc.gz",
+                           "Successfully downloaded all metadata reports",
+                           "magil-ggp-2529683-2023-05_seedscope.csv; magil-ggp-2529683-2023-05_collscope.csv",
+                           "Successfully redacted",
+                           "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1791489-0-SEED2529683-20230420161205384-00000-qix5zv0f.warc.gz; "
+                           "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1791489-0-SEED2529683-20230420230248436-00000-8bk2lsxt.warc.gz",
+                           2,
+                           "Error unzipping ARCHIVEIT-15678-TEST-JOB1791489-0-SEED2529683-20230420161205384-00000-qix5zv0f.warc.gz: unzipped to '.gz.open' file; "
+                           "Error unzipping ARCHIVEIT-15678-TEST-JOB1791489-0-SEED2529683-20230420230248436-00000-8bk2lsxt.warc.gz: unzipped to '.gz.open' file",
+                           "WARC_Unzip_Errors"],
+                          ["magil-ggp-2529676-2023-05", 2529676, 15678, 1791480, 0.014, 1,
+                           "ARCHIVEIT-15678-TEST-JOB1791480-0-SEED2529676-20230420155757131-00000-zrl3k481.warc.gz",
+                           "Successfully downloaded all metadata reports",
+                           "magil-ggp-2529676-2023-05_seedscope.csv; magil-ggp-2529676-2023-05_collscope.csv",
+                           "Successfully redacted",
+                           "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1791480-0-SEED2529676-20230420155757131-00000-zrl3k481.warc.gz",
+                           1,
+                           "Error unzipping ARCHIVEIT-15678-TEST-JOB1791480-0-SEED2529676-20230420155757131-00000-zrl3k481.warc.gz: unzipped to '.gz.open' file",
+                           "WARC_Unzip_Errors"]]
+        self.assertEqual(actual_seeds, expected_seeds, "Problem with test for restart, seeds_log.csv")
+
+        # Test for completeness_check.csv
+        cc_df = pd.read_csv(os.path.join(config.script_output, "completeness_check.csv"))
+        expected_cc = [cc_df.columns.tolist()] + cc_df.values.tolist()
+        actual_cc = [["Seed", "AIP", "Seed Folder Made", "coll.csv", "collscope.csv", "seed.csv", "seedscope.csv",
+                      "crawldef.csv count", "crawljob.csv count", "WARC Count Correct", "All Expected File Types"],
+                     [2529683, "magil-ggp-2529683-2023-05", True, True, False, True, False, 1, 1, False, False],
+                     [2529676, "magil-ggp-2529676-2023-05", True, True, False, True, False, 1, 1, False, False],
+                     [2529671, "magil-ggp-2529671-2023-05", True, True, False, True, False, 1, 1, False, True],
+                     [2520379, "magil-ggp-2520379-2023-05", True, True, False, True, False, 1, 1, True, True]]
         self.assertEqual(expected_cc, actual_cc, "Problem with test for one WARC seeds, completeness_check.csv")
 
 
