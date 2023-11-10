@@ -161,6 +161,41 @@ class TestSeedData(unittest.TestCase):
         csv_path_exists = os.path.exists(os.path.join(config.script_output, "seeds_log.csv"))
         self.assertEqual(csv_path_exists, True, "Problem with test for Russell, CSV creation")
 
+    def test_two_jobs(self):
+        """
+        Tests that the function returns the correct dataframe and creates a csv
+        with a date range that includes a seed with multiple jobs.
+        """
+        seed_df = seed_data("2020-04-19", "2020-04-22")
+
+        # Test that the dataframe has the correct values.
+        seed_df = seed_df.fillna("BLANK")
+        actual = [seed_df.columns.tolist()] + seed_df.values.tolist()
+        expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
+                     "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_Download_Errors",
+                     "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
+                    ["2173769", "12912", "1130525", 0.002, 1,
+                     "ARCHIVEIT-12912-TEST-JOB1130525-SEED2173769-20200416031337869-00000-h3.warc.gz",
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"],
+                    ["2184360", "12912", "1130531|1130526", 10.214, 11,
+                     "ARCHIVEIT-12912-MONTHLY-JOB1130531-SEED2184360-20200421173343214-00025-h3.warc.gz|"
+                     "ARCHIVEIT-12912-MONTHLY-JOB1130531-SEED2184360-20200421171359626-00024-h3.warc.gz|"
+                     "ARCHIVEIT-12912-MONTHLY-JOB1130531-SEED2184360-20200421165804754-00023-h3.warc.gz|"
+                     "ARCHIVEIT-12912-MONTHLY-JOB1130531-SEED2184360-20200421143108960-00022-h3.warc.gz|"
+                     "ARCHIVEIT-12912-TEST-JOB1130526-SEED2184360-20200416031609218-00000-h3.warc.gz|"
+                     "ARCHIVEIT-12912-TEST-JOB1130526-SEED2184360-20200417073836591-00003-h3.warc.gz|"
+                     "ARCHIVEIT-12912-TEST-JOB1130526-SEED2184360-20200417080537836-00004-h3.warc.gz|"
+                     "ARCHIVEIT-12912-TEST-JOB1130526-SEED2184360-20200417162052872-00005-h3.warc.gz|"
+                     "ARCHIVEIT-12912-TEST-JOB1130526-SEED2184360-20200416143834702-00001-h3.warc.gz|"
+                     "ARCHIVEIT-12912-MONTHLY-JOB1130531-SEED2184360-20200419022328275-00021-h3.warc.gz|"
+                     "ARCHIVEIT-12912-MONTHLY-JOB1130531-SEED2184360-20200418233001610-00020-h3.warc.gz",
+                     "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK", "BLANK"]]
+        self.assertEqual(actual, expected, "Problem with test for two jobs, dataframe values")
+
+        # Test that the CSV was created.
+        csv_path_exists = os.path.exists(os.path.join(config.script_output, "seeds_log.csv"))
+        self.assertEqual(csv_path_exists, True, "Problem with test for two jobs, CSV creation")
+
 
 if __name__ == '__main__':
     unittest.main()
