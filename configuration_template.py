@@ -12,7 +12,3 @@ wasapi = 'https://warcs.archive-it.org/wasapi/v1/webdata'
 inst_page = 'https://partner.archive-it.org/INSERT-NUMBER'
 username = 'INSERT-USERNAME'
 password = 'INSERT-PASSWORD'
-
-# Path to md5deep64.exe, used for fixity calculations in Windows.
-# Use \ in the path or else it will not run.
-md5deep = r'INSERT-PATH'
