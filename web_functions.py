@@ -709,31 +709,19 @@ def seed_data(date_start, date_end):
     return seed_df
 
 
-def unzip_warc(seed_df, row_index, warc_path, warc, seed_id):
+def unzip_warc(seed_df, row_index, warc_path, warc):
     """
     Unzips the WARC, which is downloaded as a gzip file.
-    If it unzipped correctly, deletes the zip file.
-    If there was an unzip error, deletes the unzipped file and leaves the zip.
     """
+    # Extracts the WARC from the gzip file, which deletes the zipped WARC.
+    unzip_output = subprocess.run(f"gunzip -f {warc_path}", stdout=subprocess.DEVNULL, stderr=subprocess.PIPE,
+                                  shell=True)
 
-    # Extracts the WARC from the gzip file.
-    unzip_output = subprocess.run(f'"C:/Program Files/7-Zip/7z.exe" x "{warc_path}" -o"{seed_id}"',
-                                  stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, shell=True)
-
-    # Checks for and logs any 7-Zip errors.
+    # Logs the result of unzipping, based on the output of gunzip.
     if unzip_output.stderr == b'':
-        # A filename (warc.open) is an error from a known gzip bug. Deletes the erroneous unzipped file.
-        warc_open_path = os.path.join(config.script_output, "preservation_download", str(seed_id), f"{warc}.open")
-        if os.path.exists(warc_open_path):
-            os.remove(warc_open_path)
-            log(f"Error unzipping {warc}: unzipped to '.gz.open' file", seed_df, row_index, "WARC_Unzip_Errors")
-        # If it unzipped correctly, deletes the zip file.
-        else:
-            os.remove(warc_path)
-            log(f"Successfully unzipped {warc}", seed_df, row_index, "WARC_Unzip_Errors")
+        log(f"Successfully unzipped {warc}", seed_df, row_index, "WARC_Unzip_Errors")
     else:
-        log(f"Error unzipping {warc}: {unzip_output.stderr.decode('utf-8')}",
-            seed_df, row_index, "WARC_Unzip_Errors")
+        log(f"Error unzipping {warc}: {unzip_output.stderr.decode('utf-8')}", seed_df, row_index, "WARC_Unzip_Errors")
 
 
 def verify_warc_fixity(seed_df, row_index, warc_path, warc, warc_md5):
