@@ -731,7 +731,7 @@ def verify_warc_fixity(seed_df, row_index, warc_path, warc, warc_md5):
     """
 
     # Calculates the md5 for the downloaded zipped WARC with md5deep.
-    md5deep_output = subprocess.run(f'"{config.md5deep}" "{warc_path}"', stdout=subprocess.PIPE, shell=True)
+    md5deep_output = subprocess.run(f'md5deep "{warc_path}"', stdout=subprocess.PIPE, shell=True)
     try:
         regex_md5 = re.match("b['|\"]([a-z0-9]*) ", str(md5deep_output.stdout))
         downloaded_warc_md5 = regex_md5.group(1)
