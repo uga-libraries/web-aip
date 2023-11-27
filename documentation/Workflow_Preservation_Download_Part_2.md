@@ -40,7 +40,7 @@ to verify metadata completeness two weeks prior to the download and make a track
    To download fewer at a time, put text in the Complete column, leaving a few blank, and run the script multiple times, deleting the text from Complete a few at a time.
 
    
-4. Review seeds_log.csv and record the result in the preservation download tracker (Success or a summary of the errors)
+4. Review seeds_log.csv and record the results in the preservation download tracker (Success or a summary of the errors)
    1. Metadata_Report_Empty field: in the tracker, note if collection or seed scope were empty 
       (not an error if there is no scope rule of that type, which is common) in their own columns, 
       and if any other report was empty (likely an error) under Other Report.
@@ -51,6 +51,17 @@ to verify metadata completeness two weeks prior to the download and make a track
       If there is anything else, put it in the tracker under WARC Download.
    5. Complete: If a seed was successful, it will have Complete in the "Complete" column. 
       Otherwise, it will have the type of error and will need to be downloaded again.
+   
+   
+5. Review completeness_check.csv and record the results in the preservation download tracker (Success or a summary of the errors)
+   1. Seed Folder Made: should be TRUE 
+   2. coll.csv and seed.csv: should be TRUE 
+   3. collscope.csv and seedscope.csv: may be TRUE or FALSE, depending on if they are empty in seeds_log.csv. 
+      Only record an error if it is FALSE and not empty. 
+      During QC, we will check a few against Archive-It to confirm the empty had no scope rules of that type. 
+   4. crawldef.csv count and crawljob.csv count: match the tracker 
+   5. WARC Count Correct: should be TRUE 
+   6. All Expected File Types: should be TRUE
 
 ### Part 3
 
