@@ -39,8 +39,6 @@ Run the script in the command line: `python warc_download.py date_start date_end
 There are unit tests for all the script functions used by warc_download.py except check_seeds(),
 which will be changed soon.
 
-There are no tests for linux_unzip.py, which will be integrated into warc_download.py soon.
-
 # Workflow
 
 Because the script can take days to run, due to the time required to download WARCs, it often gets interrupted. 
@@ -65,9 +63,6 @@ The script output is saved in the script output folder, defined in the configura
 
    
 3. Checks if everything expected was downloaded and makes a log (completeness_check.csv).
-
-
-4. If there were errors during unzipping, run the linux_unzip.py script to unzip them.
 
 
 # Author
