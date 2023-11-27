@@ -41,6 +41,9 @@ Run the script in the command line: `python ait_download.py date_start date_end`
 There are unit tests for all the script functions used by ait_download.py.
 The tests for check_seeds() could use more detail, which will be done once the function is updated.
 
+The unit tests use UGA Archive-It data.
+Any other organization will need to update the expected results with their own data.
+
 # Workflow
 
 Because the script can take days to run, due to the time required to download WARCs, it often gets interrupted. 
