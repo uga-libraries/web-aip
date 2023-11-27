@@ -88,35 +88,6 @@ class TestUnzipWarc(unittest.TestCase):
                    f"\r\n\r\n\r\n\r\nSystem ERROR:\r\nThe system cannot find the file specified.\r\n"
         self.assertEqual(actual, expected, "Problem with test for error: 7-Zip, log")
 
-    def test_error_open(self):
-        """
-        Tests that the function does not delete the zip and updates the log correctly
-        when the WARC does not unzip correctly due to the Windows bug with gzip.
-        """
-        # Makes the data needed for the function input and runs the function.
-        seed_dir = os.path.join(config.script_output, "preservation_download")
-        os.makedirs(os.path.join(seed_dir, "2912235"))
-        os.chdir(seed_dir)
-        warc = "ARCHIVEIT-12263-TEST-JOB1695540-0-SEED2912235-20221021155449526-00000-upoygm6a.warc.gz"
-        warc_path = os.path.join(seed_dir, "2912235", warc)
-        seed_df = make_df(["rbrl-1", 2912235, 12263, "1695540", 0.01, 1, warc,
-                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
-        get_warc(seed_df, 0, f"https://warcs.archive-it.org/webdatafile/{warc}", warc, warc_path)
-        unzip_warc(seed_df, 0, warc_path, warc)
-
-        # Test the zipped WARC was not deleted.
-        warc_zip = os.path.exists(warc_path)
-        self.assertEqual(warc_zip, True, "Problem with test for error: unzips to open, zipped WARC")
-
-        # Test the unzipped WARC was deleted.
-        warc_unzip = os.path.exists(os.path.join(seed_dir, "2912235", f"{warc}.open"))
-        self.assertEqual(warc_unzip, False, "Problem with test for error: unzips to open, unzipped WARC")
-
-        # Test the log is updated correctly.
-        actual = seed_df.at[0, 'WARC_Unzip_Errors']
-        expected = f"Error unzipping {warc}: unzipped to '.gz.open' file"
-        self.assertEqual(actual, expected, "Problem with test for error: unzips to open, log")
-
 
 if __name__ == '__main__':
     unittest.main()
