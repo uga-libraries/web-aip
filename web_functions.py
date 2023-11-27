@@ -1,9 +1,4 @@
-"""Purpose: functions used by the preservation scripts for web content in Archive-It.
-
-Dependencies:
-    * Python library: requests
-    * Tool: md5deep
-"""
+"""Functions used by the ait_download.py script, to download web content from Archive-It."""
 
 import csv
 import datetime
