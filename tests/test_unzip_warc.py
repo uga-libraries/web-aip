@@ -67,9 +67,9 @@ class TestUnzipWarc(unittest.TestCase):
         expected = f"Successfully unzipped {warc}"
         self.assertEqual(actual, expected, "Problem with test for correct, log")
 
-    def test_error_7zip(self):
+    def test_error(self):
         """
-        Tests that the function updates the log correctly when the WARC cannot be unzipped due to an error from 7-Zip.
+        Tests that the function updates the log correctly when the WARC cannot be unzipped.
         The error is caused by not downloading the AIP to be unzipped.
         """
         # Makes the data needed for the function input and runs the function.
@@ -86,7 +86,7 @@ class TestUnzipWarc(unittest.TestCase):
         actual = seed_df.at[0, 'WARC_Unzip_Errors']
         expected = f"Error unzipping {warc}: \r\nERROR: The system cannot find the file specified.\r\n{warc_path}" \
                    f"\r\n\r\n\r\n\r\nSystem ERROR:\r\nThe system cannot find the file specified.\r\n"
-        self.assertEqual(actual, expected, "Problem with test for error: 7-Zip, log")
+        self.assertEqual(actual, expected, "Problem with test for error, log")
 
 
 if __name__ == '__main__':
