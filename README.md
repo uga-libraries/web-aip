@@ -19,7 +19,6 @@ UGA downloads web content using this script on a quarterly basis.
 * numpy
 * pandas
 * requests - used to get data via Archive-It APIs
-* 7-Zip (Windows only) (https://www.7-zip.org/download.html)
 
 ## Installation
 
