@@ -11,11 +11,6 @@ which prepares them for UGA's digital preservation system (ARCHive).
 
 UGA downloads web content using this script on a quarterly basis.
 
-Additional script: linux_unzip.py
-Script usage: `python linux_unzip.py aips_directory`
-Used to unzip the downloaded WARCs in a Linux environment when there is an error in Windows.
-It is a known bug that Windows zip programs sometimes results in errors for gzip.
-
 # Getting Started
 
 ## Dependencies
