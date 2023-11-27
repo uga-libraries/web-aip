@@ -47,29 +47,10 @@ Any other organization will need to update the expected results with their own d
 
 # Workflow
 
-Because the script can take days to run, due to the time required to download WARCs, it often gets interrupted. 
-If this happens, running the script again will cause it to restart the seed that was in-progress when the error happened 
-and download content for all seeds that had not started yet.
-Any seed that already completed, even if it had errors, will not be downloaded again.
-
-The script output is saved in the script output folder, defined in the configuration file.
-
-1. Uses Archive-It API's, or the seeds_log.csv from an earlier iteration of the script, 
-   to get data about the seeds for this download and make the metadata.csv used by the general-aip.py script. 
-   
-
-2. For each seed in the download:
-   1. Makes a folder named with the seed id.
-   2. Downloads the metadata reports.
-   3. Deletes empty metadata reports (there is no metadata of that type in Archive-It).
-   4. Redacts login information from the seed report.
-   5. Downloads each WARC and verifies the fixity against the MD5 in Archive-It.
-   6. Unzips each WARC.      
-   7. Saves a summary of the errors, if any, to the log (seeds_log.csv).
-
-   
-3. Checks if everything expected was downloaded and makes a log (completeness_check.csv).
-
+1. Verify metadata completeness with the [Archive-It APIs scripts](https://github.com/uga-libraries/web-archive-it-api)
+2. Download the WARCs and related metadata with this script: [download workflow documentation](documentation/Workflow_Preservation_Download_Part_2.md)
+3. Transform the downloaded content into AIPs with the [General AIP script](https://github.com/uga-libraries/general-aip)
+4. Ingest the AIPs into our digital preservation system (ARCHive)
 
 # Author
 
