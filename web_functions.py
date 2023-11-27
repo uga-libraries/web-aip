@@ -416,7 +416,7 @@ def download_warcs(seed, row_index, seed_df):
             continue
 
         # Unzips the WARC and handles any errors.
-        unzip_warc(seed_df, row_index, warc_path, warc, seed.Seed_ID)
+        unzip_warc(seed_df, row_index, warc_path, warc)
 
         # Waits 15 second to give the API a rest.
         time.sleep(15)
