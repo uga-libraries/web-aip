@@ -63,6 +63,12 @@ to verify metadata completeness two weeks prior to the download and make a track
    5. WARC Count Correct: should be TRUE 
    6. All Expected File Types: should be TRUE
 
+   
+6. Address any errors. This usually involves deleting the information from "Complete" in seeds_log.csv for any with errors and running the script again to re-download them. 
+   Review seeds_log.csv (see step 4) and completeness_check.csv (see Step 5) for the re-downloads, and continue until all errors are addressed.
+   If any errors are addressed manually (e.g., downloading directly from Archive-It interface), document the steps in seeds_log.csv.
+   However, run the script again as much as possible for consistency and automatic logging.
+
 ### Part 3
 
 Use the [General AIP script](https://github.com/uga-libraries/general-aip) 
