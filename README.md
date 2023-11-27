@@ -26,6 +26,8 @@ Prior to running the script, create a file named configuration.py, modeled after
 and save it to your local copy of this repository.
 This defines a place for script output to be saved and includes your Archive-It login credentials.
 
+This script must be run in Linux, due to Windows commonly having unzip errors with gzip.
+
 ## Script Arguments
 
 Run the script in the command line: `python warc_download.py date_start date_end`
