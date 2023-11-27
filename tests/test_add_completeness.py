@@ -69,8 +69,7 @@ class TestAddCompleteness(unittest.TestCase):
                "API Error 4040: can't download name.warc.gz",
                "Error: fixity for name.warc.gz cannot be extracted from md5deep output;"
                "Error: fixity for name.warc.gz changed and it was deleted",
-               "Error unzipping name.warc.gz: file not found; "
-               "Error unzipping name.warc.gz: unzipped to '.gz.open' file", np.nan]
+               "Error unzipping name.warc.gz: file not found", np.nan]
         seed_df = make_df(row)
 
         # Runs the function being tested.
@@ -244,30 +243,10 @@ class TestAddCompleteness(unittest.TestCase):
         expected = "WARC_Fixity_Errors"
         self.assertEqual(actual, expected, "Problem with test for WARC_Fixity_Errors, can't extract from MD5deep")
 
-    def test_warc_unzip_open(self):
+    def test_warc_unzip(self):
         """
         Tests that the function updates the Complete column of the log correctly
-        if there is an error form unzipping to .gz.open in WARC_Unzip_Errors.
-        """
-        # Makes dataframe needed for function input.
-        row = ["aip-id", 1000000, 12345, "1234567", 1.0, 1, "name.warc.gz",
-               "Successfully downloaded all metadata reports", "No empty reports", "Successfully redacted",
-               "Successfully downloaded name.warc.gz", "Successfully verified name.warc.gz fixity on 2023-05-05",
-               "Error unzipping name.warc.gz: unzipped to '.gz.open' file", np.nan]
-        seed_df = make_df(row)
-
-        # Runs the function being tested.
-        add_completeness(0, seed_df)
-
-        # Tests that Complete was updated.
-        actual = seed_df.at[0, 'Complete']
-        expected = "WARC_Unzip_Errors"
-        self.assertEqual(actual, expected, "Problem with test for WARC_Unzip_Errors, unzipped to .gz.open")
-
-    def test_warc_unzip_tool(self):
-        """
-        Tests that the function updates the Complete column of the log correctly
-        if there is an error from the unzipping tool in WARC_Fixity_Errors.
+        if there is an error from unzipping in WARC_Unzip_Errors.
         """
         # Makes dataframe needed for function input.
         row = ["aip-id", 1000000, 12345, "1234567", 1.0, 1, "name.warc.gz",
