@@ -39,6 +39,19 @@ to verify metadata completeness two weeks prior to the download and make a track
    It will not retry a seed that completed but had errors.
    To download fewer at a time, put text in the Complete column, leaving a few blank, and run the script multiple times, deleting the text from Complete a few at a time.
 
+   
+4. Review seeds_log.csv and record the result in the preservation download tracker (Success or a summary of the errors)
+   1. Metadata_Report_Empty field: in the tracker, note if collection or seed scope were empty 
+      (not an error if there is no scope rule of that type, which is common) in their own columns, 
+      and if any other report was empty (likely an error) under Other Report.
+   2. Metadata_Report_Errors: in the tracker, note any errors to review under Other Report.
+   3. Seed_Report_Redaction: in the tracker, note anything except "Successfully redacted" or "No login columns to redact". 
+      Archive-It is inconsistent about if the login fields are present, even for the same seed.
+   4. WARC_Download_Errors, WARC_Fixity_Errors, and WARC_Unzip_Errors should have a success message for every WARC. 
+      If there is anything else, put it in the tracker under WARC Download.
+   5. Complete: If a seed was successful, it will have Complete in the "Complete" column. 
+      Otherwise, it will have the type of error and will need to be downloaded again.
+
 ### Part 3
 
 Use the [General AIP script](https://github.com/uga-libraries/general-aip) 
