@@ -1,9 +1,8 @@
-"""
-Purpose: Downloads archived web content (WARCs) and associated metadata for a group of seeds from Archive-It.org using
-their APIs so that they can be converted into AIPs with the general-aip.py script for long-term preservation.
-At UGA, this script is run every three months to download content for all crawls saved that quarter.
+"""Download WARCs and associated metadata from Archive-It for long-term preservation.
 
+At UGA, this script is run every three months to download content for all crawls saved that quarter.
 The download combines all WARCs saved within a quarter for a seed, even if that seed was crawled multiple times.
+
 It also includes six of the metadata reports:
     * Collection
     * Collection Scope (not downloaded if no scope rules for the collection)
@@ -12,9 +11,16 @@ It also includes six of the metadata reports:
     * Seed
     * Seed Scope (not downloaded if no scope rules for the seed)
 
-Prior to the preservation download, all seed metadata should be entered into Archive-It.
-Use the seed_metadata_report.py script (https://github.com/uga-libraries/web-archive-it-api)
-to verify all required fields are present.
+Parameters:
+    There are two date parameters, formatted YYYY-MM-DD, which define which WARCs to include in the download.
+    date_start : required. WARCs stored on this day will be included.
+    date_end : required. WARCs stored on this day will NOT be included.
+
+Returns:
+    One folder for each seed, with the WARCs and metadata reports.
+    A metadata.csv file needed for the general-aip script to prepare the folders for preservation.
+    A seeds_log.csv file with information about each workflow step.
+    A completeness_log.csv file with information about the download's completeness.
 """
 
 # Usage: python ait_download.py date_start date_end
