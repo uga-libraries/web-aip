@@ -38,8 +38,8 @@ Run the script in the command line: `python ait_download.py date_start date_end`
    
 ## Testing
 
-There are unit tests for all the script functions used by ait_download.py except check_seeds(),
-which will be changed soon.
+There are unit tests for all the script functions used by ait_download.py.
+The tests for check_seeds() could use more detail, which will be done once the function is updated.
 
 # Workflow
 
