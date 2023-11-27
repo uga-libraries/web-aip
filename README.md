@@ -1,6 +1,7 @@
 # Download Archive-It Web Content for Preservation
 
 # Overview
+
 Downloads WARCs and six metadata reports for crawls saved during a specified time period 
 from the Archive-It web archiving service to use for creating a preservation copy of web crawls.
 
@@ -71,4 +72,5 @@ The script output is saved in the script output folder, defined in the configura
 
 
 # Author
+
 Adriane Hanson, Head of Digital Stewardship, University of Georgia
