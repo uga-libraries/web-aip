@@ -74,3 +74,11 @@ The script output is saved in the script output folder, defined in the configura
 # Author
 
 Adriane Hanson, Head of Digital Stewardship, University of Georgia
+
+# History
+
+UGA Libraries has downloaded all WARCs and the six associated metadata reports for local preservation since 2020.
+Originally, the WARCs were stored as zipped (gzip) files, which is how they are downloaded from Archive-It.
+The WARCs were unzipped beginning with the August 2022 download, in line with new preservation format procedures.
+They often had to be unzipped in Linux due to a Windows bug with gzip.
+In November 2023, the entire script was switched to Linux to be more efficient.
