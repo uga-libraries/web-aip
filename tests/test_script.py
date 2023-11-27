@@ -224,9 +224,9 @@ class MyTestCase(unittest.TestCase):
                            "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1791489-0-SEED2529683-20230420161205384-00000-qix5zv0f.warc.gz; "
                            "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1791489-0-SEED2529683-20230420230248436-00000-8bk2lsxt.warc.gz",
                            2,
-                           "Error unzipping ARCHIVEIT-15678-TEST-JOB1791489-0-SEED2529683-20230420161205384-00000-qix5zv0f.warc.gz: unzipped to '.gz.open' file; "
-                           "Error unzipping ARCHIVEIT-15678-TEST-JOB1791489-0-SEED2529683-20230420230248436-00000-8bk2lsxt.warc.gz: unzipped to '.gz.open' file",
-                           "WARC_Unzip_Errors"],
+                           "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1791489-0-SEED2529683-20230420161205384-00000-qix5zv0f.warc.gz; "
+                           "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1791489-0-SEED2529683-20230420230248436-00000-8bk2lsxt.warc.gz",
+                           "Complete"],
                           ["magil-ggp-2529676-2023-05", 2529676, 15678, 1791480, 0.014, 1,
                            "ARCHIVEIT-15678-TEST-JOB1791480-0-SEED2529676-20230420155757131-00000-zrl3k481.warc.gz",
                            "Successfully downloaded all metadata reports",
@@ -234,8 +234,8 @@ class MyTestCase(unittest.TestCase):
                            "Successfully redacted",
                            "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1791480-0-SEED2529676-20230420155757131-00000-zrl3k481.warc.gz",
                            1,
-                           "Error unzipping ARCHIVEIT-15678-TEST-JOB1791480-0-SEED2529676-20230420155757131-00000-zrl3k481.warc.gz: unzipped to '.gz.open' file",
-                           "WARC_Unzip_Errors"]]
+                           "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1791480-0-SEED2529676-20230420155757131-00000-zrl3k481.warc.gz",
+                           "Complete"]]
         self.assertEqual(actual_seeds, expected_seeds, "Problem with test for restart, seeds_log.csv")
 
         # Test for completeness_check.csv
@@ -243,8 +243,8 @@ class MyTestCase(unittest.TestCase):
         expected_cc = [cc_df.columns.tolist()] + cc_df.values.tolist()
         actual_cc = [["Seed", "AIP", "Seed Folder Made", "coll.csv", "collscope.csv", "seed.csv", "seedscope.csv",
                       "crawldef.csv count", "crawljob.csv count", "WARC Count Correct", "All Expected File Types"],
-                     [2529683, "magil-ggp-2529683-2023-05", True, True, False, True, False, 1, 1, False, False],
-                     [2529676, "magil-ggp-2529676-2023-05", True, True, False, True, False, 1, 1, False, False],
+                     [2529683, "magil-ggp-2529683-2023-05", True, True, False, True, False, 1, 1, True, True],
+                     [2529676, "magil-ggp-2529676-2023-05", True, True, False, True, False, 1, 1, True, True],
                      [2529671, "magil-ggp-2529671-2023-05", True, True, False, True, False, 1, 1, False, True],
                      [2520379, "magil-ggp-2520379-2023-05", True, True, False, True, False, 1, 1, True, True]]
         self.assertEqual(expected_cc, actual_cc, "Problem with test for one WARC seeds, completeness_check.csv")
