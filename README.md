@@ -30,7 +30,7 @@ This script must be run in Linux, due to Windows commonly having unzip errors wi
 
 ## Script Arguments
 
-Run the script in the command line: `python warc_download.py date_start date_end`
+Run the script in the command line: `python ait_download.py date_start date_end`
 
    * date_start is inclusive: the download will include WARCs stored on date_start.
    * date_end is exclusive: the download will not include WARCs stored on date_end.
@@ -38,7 +38,7 @@ Run the script in the command line: `python warc_download.py date_start date_end
    
 ## Testing
 
-There are unit tests for all the script functions used by warc_download.py except check_seeds(),
+There are unit tests for all the script functions used by ait_download.py except check_seeds(),
 which will be changed soon.
 
 # Workflow
