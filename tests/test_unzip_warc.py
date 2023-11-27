@@ -51,7 +51,7 @@ class TestUnzipWarc(unittest.TestCase):
         seed_df = make_df(["harg-1", 2173769, 12912, "1215043", 0.01, 1, warc,
                            np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
         get_warc(seed_df, 0, f"https://warcs.archive-it.org/webdatafile/{warc}", warc, warc_path)
-        unzip_warc(seed_df, 0, warc_path, warc, "2173769")
+        unzip_warc(seed_df, 0, warc_path, warc)
 
         # Test the zipped WARC was deleted.
         warc_zip = os.path.exists(warc_path)
@@ -80,7 +80,7 @@ class TestUnzipWarc(unittest.TestCase):
         warc_path = os.path.join(seed_dir, "0000000", warc)
         seed_df = make_df(["aip-0", 0000000, 00000, "0000000", 0.01, 1, warc,
                            np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
-        unzip_warc(seed_df, 0, warc_path, warc, "0000000")
+        unzip_warc(seed_df, 0, warc_path, warc)
 
         # Test the log is updated correctly.
         actual = seed_df.at[0, 'WARC_Unzip_Errors']
@@ -102,7 +102,7 @@ class TestUnzipWarc(unittest.TestCase):
         seed_df = make_df(["rbrl-1", 2912235, 12263, "1695540", 0.01, 1, warc,
                            np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
         get_warc(seed_df, 0, f"https://warcs.archive-it.org/webdatafile/{warc}", warc, warc_path)
-        unzip_warc(seed_df, 0, warc_path, warc, "2912235")
+        unzip_warc(seed_df, 0, warc_path, warc)
 
         # Test the zipped WARC was not deleted.
         warc_zip = os.path.exists(warc_path)
