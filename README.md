@@ -22,8 +22,9 @@ UGA downloads web content using this script on a quarterly basis.
 
 ## Installation
 
-Before running the script, create a configuration.py file modeled after the configuration_template.py file
-with your Archive-It credentials.
+Prior to running the script, create a file named configuration.py, modeled after the configuration_template.py,
+and save it to your local copy of this repository.
+This defines a place for script output to be saved and includes your Archive-It login credentials.
 
 ## Script Arguments
 
