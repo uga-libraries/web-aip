@@ -84,8 +84,7 @@ class TestUnzipWarc(unittest.TestCase):
 
         # Test the log is updated correctly.
         actual = seed_df.at[0, 'WARC_Unzip_Errors']
-        expected = f"Error unzipping {warc}: \r\nERROR: The system cannot find the file specified.\r\n{warc_path}" \
-                   f"\r\n\r\n\r\n\r\nSystem ERROR:\r\nThe system cannot find the file specified.\r\n"
+        expected = f"Error unzipping {warc}: gzip: {warc_path}: No such file or directory\n"
         self.assertEqual(actual, expected, "Problem with test for error, log")
 
 
