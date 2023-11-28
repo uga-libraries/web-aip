@@ -207,14 +207,14 @@ class MyTestCase(unittest.TestCase):
                            "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230417201414622-00004-sl63gmud.warc.gz; "
                            "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230417223344837-00005-sl63gmud.warc.gz; "
                            "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1789230-0-SEED2520379-20230419134031254-00000-dwz98uv7.warc.gz",
-                           "Complete"],
+                           "Successfully completed"],
                           ["magil-ggp-2529671-2023-05", 2529671, 15678, 1791478, 0.028, 1,
                            "ARCHIVEIT-15678-TEST-JOB1791478-0-SEED2529671-20230420155417222-00000-mntg8u5v.warc.gz",
                            "Successfully downloaded all metadata reports",
                            "magil-ggp-2529671-2023-05_seedscope.csv; magil-ggp-2529671-2023-05_collscope.csv",
                            "Successfully redacted",
                            "API error 404: can't downloaded ARCHIVEIT-15678-TEST-JOB1791478-0-SEED2529671-20230420155417222-00000-mntg8u5v.warc.gz",
-                           0, "", "WARC_downloaded_Errors"],
+                           0, "", "WARC_Downloaded_Errors"],
                           ["magil-ggp-2529683-2023-05", 2529683, 15678, 1791489, 0.05, 2,
                            "ARCHIVEIT-15678-TEST-JOB1791489-0-SEED2529683-20230420161205384-00000-qix5zv0f.warc.gz|"
                            "ARCHIVEIT-15678-TEST-JOB1791489-0-SEED2529683-20230420230248436-00000-8bk2lsxt.warc.gz",
@@ -226,7 +226,7 @@ class MyTestCase(unittest.TestCase):
                            2,
                            "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1791489-0-SEED2529683-20230420161205384-00000-qix5zv0f.warc.gz; "
                            "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1791489-0-SEED2529683-20230420230248436-00000-8bk2lsxt.warc.gz",
-                           "Complete"],
+                           "Successfully completed"],
                           ["magil-ggp-2529676-2023-05", 2529676, 15678, 1791480, 0.014, 1,
                            "ARCHIVEIT-15678-TEST-JOB1791480-0-SEED2529676-20230420155757131-00000-zrl3k481.warc.gz",
                            "Successfully downloaded all metadata reports",
@@ -235,7 +235,7 @@ class MyTestCase(unittest.TestCase):
                            "Successfully downloaded ARCHIVEIT-15678-TEST-JOB1791480-0-SEED2529676-20230420155757131-00000-zrl3k481.warc.gz",
                            1,
                            "Successfully unzipped ARCHIVEIT-15678-TEST-JOB1791480-0-SEED2529676-20230420155757131-00000-zrl3k481.warc.gz",
-                           "Complete"]]
+                           "Successfully completed"]]
         self.assertEqual(actual_seeds, expected_seeds, "Problem with test for restart, seeds_log.csv")
 
         # Test for completeness_check.csv
