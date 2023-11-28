@@ -1,0 +1,2 @@
+account,brozzler,collection,crawl_definition,doc_rate,downloaded_count,duplicate_bytes,duplicate_count,elapsed_ms,end_date,id,novel_bytes,novel_count,original_start_date,status,test_crawl_save_date,test_crawl_state,test_crawl_state_changed_by,total_data_in_kbs,type,warc_content_bytes,warc_url_count
+1468,True,15678,31104642577,0.00,39516,10761202255,28714,253955975,2023-04-19 21:40:27.700127,1789230,7527587087,7757,2023-04-16 15:07:42.290205,FINISHED,2023-04-21 15:36:07.654796,SAVED,scausey,19018745,TEST_SAVED,7527587087,39516
