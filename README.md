@@ -39,8 +39,11 @@ Run the script in the command line: `python ait_download.py date_start date_end`
    
 ## Testing
 
-There are unit tests for all the script functions used by ait_download.py.
+There are unit tests for all the script functions used by ait_download.py and for running the entire script.
 The tests for check_seeds() could use more detail, which will be done once the function is updated.
+The tests in test_script.py will fail if run at the same time as all other tests in the folder,
+because one of the previous tests changes the current directory. 
+Run test_script.py on its own for an accurate result.
 
 The unit tests use UGA Archive-It data.
 Any other organization will need to update the expected results with their own data.
