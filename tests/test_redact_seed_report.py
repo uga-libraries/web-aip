@@ -45,7 +45,7 @@ class TestRedactSeedReport(unittest.TestCase):
         # Input needed for the test: seed_df has the progress of the script so far,
         # and a folder named with the seed ID.
         seed_df = make_df(["aip-1", "1234567", 123465, "900000", 0.01, 1, "ARCHIVEIT-1.warc.gz",
-                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
+                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
         os.mkdir("1234567")
 
         redact_seed_report("1234567", "aip-1", seed_df, 0)
@@ -64,7 +64,7 @@ class TestRedactSeedReport(unittest.TestCase):
         # a folder named with the Seed ID and a seeds_log.csv file inside the AIP folder.
         # The seeds_log.csv file only has a few of the actual columns, since only logins are needed for testing.
         seed_df = make_df(["aip-1", "1234567", 123465, "900000", 0.01, 1, "ARCHIVEIT-1.warc.gz",
-                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
+                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
         os.mkdir("1234567")
         seed_csv_path = os.path.join(os.getcwd(), "1234567", "aip-1_seed.csv")
         with open(seed_csv_path, "w", newline="") as file:
@@ -94,7 +94,7 @@ class TestRedactSeedReport(unittest.TestCase):
         # a folder named with the Seed ID and a seeds_log.csv file inside the AIP folder.
         # The seeds_log.csv file only has a few of the actual columns, since only logins are needed for testing.
         seed_df = make_df(["aip-1", "1234567", 123465, "900000", 0.01, 1, "ARCHIVEIT-1.warc.gz",
-                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
+                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
         os.mkdir("1234567")
         seed_csv_path = os.path.join(os.getcwd(), "1234567", "aip-1_seed.csv")
         with open(seed_csv_path, "w", newline="") as file:

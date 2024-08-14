@@ -59,7 +59,7 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         """
         # Makes data needed as function input and runs the function.
         seed_df = make_df(["harg-0000-web-0001", 2202440, 12181, "1137665", 1.0, 1, "name.warc.gz",
-                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
+                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2202440")
         download_crawl_definition("1137665", seed, seed_df, 0)
@@ -77,7 +77,7 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         # Makes data needed as function input,
         # including downloading the crawl job reports which are read by this function.
         seed_df = make_df(["rbrl-0000-web-0001", 2027776, 12264, "1718467|943446", 1.0, 1, "name.warc.gz",
-                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
+                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2027776")
         get_report(seed, seed_df, 0, "id", "1718467", "crawl_job", f"{seed.AIP_ID}_1718467_crawljob.csv")
@@ -113,7 +113,7 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         # Makes data needed as function input,
         # including downloading the crawl job reports which are read by this function.
         seed_df = make_df(["rbrl-0000-web-0001", 2467332, 12265, "1360420|1365539|1718490", 1.0, 1,
-                           "name.warc.gz", np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
+                           "name.warc.gz", np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2467332")
         get_report(seed, seed_df, 0, "id", "1360420", "crawl_job", f"{seed.AIP_ID}_1360420_crawljob.csv")
@@ -151,7 +151,7 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         # Makes data needed as function input,
         # including downloading the crawl job reports which are read by this function.
         seed_df = make_df(["harg-0000-web-0001", 2016223, 12249, "918473|918474", 1.0, 1, "name.warc.gz",
-                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
+                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2016223")
         get_report(seed, seed_df, 0, "id", "918473", "crawl_job", f"{seed.AIP_ID}_918473_crawljob.csv")
@@ -177,7 +177,7 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         """
         # Makes data needed as function input, including downloading the crawl job report, and runs the function.
         seed_df = make_df(["harg-0000-web-0001", 2202440, 12181, "1137665", 1.0, 1, "name.warc.gz",
-                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
+                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2202440")
         get_report(seed, seed_df, 0, "id", "1137665", "crawl_job", f"{seed.AIP_ID}_1137665_crawljob.csv")
