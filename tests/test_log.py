@@ -40,10 +40,10 @@ class TestLog(unittest.TestCase):
         """
         row_list = [[1111111, 12345, "1100000", 0.52, 1, "ARCHIVEIT.warc.gz",
                      "Successfully downloaded all metadata reports", "No empty reports",
-                     np.NaN, np.NaN, np.NaN, np.NaN, np.NaN],
+                     np.nan, np.nan, np.nan, np.nan, np.nan],
                     [2222222, 12345, "2200000", 1.52, 2, "ARCHIVEIT.warc.gz|ARCHIVEIT-1.warc.gz",
                      "Successfully downloaded all metadata reports", "2222222_seedscope.csv",
-                     np.NaN, np.NaN, np.NaN, np.NaN, np.NaN]]
+                     np.nan, np.nan, np.nan, np.nan, np.nan]]
         columns_list = ["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
                         "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"]

@@ -42,7 +42,7 @@ class TestGetWarcInfo(unittest.TestCase):
         # Makes the data needed for the function input and runs the function.
         seed_df = make_df(["harg-1", 2028986, 12470, "1085452", 0.01, 1,
                            "ARCHIVEIT-12470-TEST-JOB1085452-SEED2028986-20200129213514425-00000-h3.warc.gz",
-                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
+                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
         warc_url, warc_md5 = get_warc_info(seed_df.at[0, 'WARC_Filenames'], seed_df, 0)
 
         # Test for the URL.
@@ -59,7 +59,7 @@ class TestGetWarcInfo(unittest.TestCase):
         """
         # Makes the data needed for the function input.
         seed_df = make_df(["harg-1", 2173769, 12912, "362980", 0.01, 1, "ARCHIVEIT-ERROR-SEED2173769.warc.gz",
-                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
+                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
 
         # Test for raising the error.
         with self.assertRaises(IndexError):
@@ -77,7 +77,7 @@ class TestGetWarcInfo(unittest.TestCase):
         # Makes the data needed for the function input and runs the function.
         seed_df = make_df(["harg-1", 2173769, 12912, "362980", 0.01, 1,
                            "ARCHIVEIT-12912-WEEKLY-JOB1362980-SEED2173769-20210210221704177-00000-h3.warc.gz",
-                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
+                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
         warc_url, warc_md5 = get_warc_info(seed_df.at[0, 'WARC_Filenames'], seed_df, 0)
 
         # Test for the URL.
@@ -95,7 +95,7 @@ class TestGetWarcInfo(unittest.TestCase):
         # Makes the data needed for the function input and runs the function.
         seed_df = make_df(["magil-1", 2529646, 15678, "1585231", 0.01, 1,
                            "ARCHIVEIT-15678-TEST-JOB1585231-SEED2529646-20220406065532448-00002-h3.warc.gz",
-                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
+                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
         warc_url, warc_md5 = get_warc_info(seed_df.at[0, 'WARC_Filenames'], seed_df, 0)
 
         # Test for the URL.
@@ -113,7 +113,7 @@ class TestGetWarcInfo(unittest.TestCase):
         # Makes the data needed for the function input and runs the function.
         seed_df = make_df(["rbrl-1", 2027713, 12264, "943066", 0.01, 1,
                            "ARCHIVEIT-12264-TEST-JOB943066-SEED2027713-20190709150720209-00000-h3.warc.gz",
-                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
+                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
         warc_url, warc_md5 = get_warc_info(seed_df.at[0, 'WARC_Filenames'], seed_df, 0)
 
         # Test for the URL.

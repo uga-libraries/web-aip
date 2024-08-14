@@ -45,7 +45,7 @@ class TestDownloadMetadata(unittest.TestCase):
         """
         # Makes the data needed for the function input and runs the function.
         seed_df = make_df(["harg-1", 2187482, 12181, "1177700", 3.62, 3, "name0.warc.gz|name1.warc.gz|name2.warc.gz",
-                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
+                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2187482")
         download_metadata(seed, 0, seed_df)
@@ -80,7 +80,7 @@ class TestDownloadMetadata(unittest.TestCase):
         """
         # Makes the data needed for the function input and runs the function.
         seed_df = make_df(["magil-1", 2529685, 15678, "1594228", 0.36, 1, "name.warc.gz",
-                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
+                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2529685")
         download_metadata(seed, 0, seed_df)
@@ -114,7 +114,7 @@ class TestDownloadMetadata(unittest.TestCase):
         # Makes the data needed for the function input and runs the function.
         seed_df = make_df(["rbrl-1", 2547528, 12265, "1436714|1718490", 0.72, 3,
                            "name0.warc.gz|name1.warc.gz|name2.warc.gz",
-                           np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN, np.NaN])
+                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2547528")
         download_metadata(seed, 0, seed_df)

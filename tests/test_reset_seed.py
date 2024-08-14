@@ -40,10 +40,10 @@ class TestResetSeed(unittest.TestCase):
                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", 
                         "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"]
         seed_df = pd.DataFrame([["aip-1", "1111111", "12345", "1000000", 0.521, 1, "ARCHIVEIT.warc.gz", "Success",
-                                 "No empty reports", "Success", "Success", "Success", "Success", np.NaN],
+                                 "No empty reports", "Success", "Success", "Success", "Success", np.nan],
                                 ["aip-2", "2222222", "12345", "2000000", 0.522, 2,
                                  "ARCHIVEIT.warc.gz|ARCHIVEIT-1.warc.gz", "Success", "seed.csv", "Success", "Success",
-                                 "Success", "Error", np.NaN]], columns=columns_list)
+                                 "Success", "Error", np.nan]], columns=columns_list)
         seed_df.to_csv(os.path.join(config.script_output, "seeds_log.csv"), index=False)
 
         # Runs the function being tested.
