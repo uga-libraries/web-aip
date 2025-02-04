@@ -2,23 +2,13 @@
 Tests for the seed_data() function.
 It returns a dataframe with seed information and also saves the data to a spreadsheet.
 
-The tests convert the dataframe to a list and fill blank cells with a string for easier comparisons.
+The tests convert the dataframe to a list for easier comparisons.
 For the CSV, the test only checks that it exists, not its contents, since those are identical to the dataframe.
 """
 import os
 import unittest
 import configuration as config
 from web_functions import seed_data
-
-
-def df_to_list(df):
-    """
-    Converts a dataframe into a list, with the header and each data row as a list within that list.
-    Cells with no value are convert to empty strings for easier comparison.
-    """
-    df.fillna("", inplace=True)
-    row_list = [df.columns.tolist()] + df.values.tolist()
-    return row_list
 
 
 class TestSeedData(unittest.TestCase):
@@ -37,7 +27,7 @@ class TestSeedData(unittest.TestCase):
         seed_df = seed_data("2019-06-03", "2019-06-04")
 
         # Test that the dataframe has the correct values.
-        actual = df_to_list(seed_df)
+        actual = [seed_df.columns.tolist()] + seed_df.values.tolist()
         expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                      "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
                      "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
@@ -59,7 +49,7 @@ class TestSeedData(unittest.TestCase):
         seed_df = seed_data("2020-06-08", "2020-06-09")
 
         # Test that the dataframe has the correct values.
-        actual = df_to_list(seed_df)
+        actual = [seed_df.columns.tolist()] + seed_df.values.tolist()
         expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                      "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
                      "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
@@ -92,7 +82,7 @@ class TestSeedData(unittest.TestCase):
         seed_df = seed_data("2022-10-25", "2022-10-27")
 
         # Test that the dataframe has the correct values.
-        actual = df_to_list(seed_df)
+        actual = [seed_df.columns.tolist()] + seed_df.values.tolist()
         expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                      "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
                      "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
@@ -138,7 +128,7 @@ class TestSeedData(unittest.TestCase):
         seed_df = seed_data("2021-04-13", "2021-04-14")
 
         # Test that the dataframe has the correct values.
-        actual = df_to_list(seed_df)
+        actual = [seed_df.columns.tolist()] + seed_df.values.tolist()
         expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                      "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
                      "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
@@ -175,7 +165,7 @@ class TestSeedData(unittest.TestCase):
         seed_df = seed_data("2020-04-19", "2020-04-22")
 
         # Test that the dataframe has the correct values.
-        actual = df_to_list(seed_df)
+        actual = [seed_df.columns.tolist()] + seed_df.values.tolist()
         expected = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                      "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
                      "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
