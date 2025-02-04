@@ -5,7 +5,6 @@ It downloads and saves the WARC.
 To save time, fake data is supplied in seed_df for fields that are not used in these tests
 and seed_df only has the WARC being tested, no other WARCs for that seed.
 """
-import numpy as np
 import os
 import pandas as pd
 import shutil
@@ -44,7 +43,7 @@ class TestGetWarc(unittest.TestCase):
         # Makes the data needed for the function input and runs the function.
         warc = "ARCHIVEIT-15678-TEST-JOB1594318-0-SEED2529656-20220420025307556-00000-k3n6tj0y.warc.gz"
         seed_df = make_df(["magil-1", 2529656, 15678, "1594318", 0.01, 1, warc,
-                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
+                           "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"])
         os.mkdir("2529656")
         get_warc(seed_df, 0, f"https://warcs.archive-it.org/webdatafile/{warc}", warc, f"2529656/{warc}")
 
@@ -65,7 +64,7 @@ class TestGetWarc(unittest.TestCase):
         # Makes the data needed for the function input and runs the function.
         warc = "ARCHIVEIT-error.warc.gz"
         seed_df = make_df(["magil-1", 2529656, 15678, "1594318", 0.01, 1, warc,
-                            np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
+                            "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"])
         os.mkdir("2529656")
 
         with self.assertRaises(ValueError):
