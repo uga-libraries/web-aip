@@ -50,7 +50,7 @@ class MyTestCase(unittest.TestCase):
         Tests the full script with a data range that has 1 Hargrett seed with 3 WARCs and multiple crawl jobs.
         Results for testing are the contents of the three CSVs made by the script.
         """
-        script_path = os.path.join("..", "ait_download.py")
+        script_path = os.path.join(os.getcwd(), "..", "ait_download.py")
         subprocess.run(f"python {script_path} 2020-04-30 2020-05-15", shell=True)
 
         # Test for metadata.csv
@@ -97,7 +97,7 @@ class MyTestCase(unittest.TestCase):
         Tests the full script with a data range that has 2 Russell seeds, each with 1 WARC.
         Results for testing are the contents of the three CSVs made by the script.
         """
-        script_path = os.path.join("..", "ait_download.py")
+        script_path = os.path.join(os.getcwd(), "..", "ait_download.py")
         subprocess.run(f"python {script_path} 2019-07-12 2019-07-13", shell=True)
 
         # Test for metadata.csv
@@ -156,7 +156,7 @@ class MyTestCase(unittest.TestCase):
         shutil.copy2(os.path.join(os.getcwd(), "script", "seeds_log.csv"), config.script_output)
 
         # Runs the script
-        script_path = os.path.join("..", "ait_download.py")
+        script_path = os.path.join(os.getcwd(), "..", "ait_download.py")
         subprocess.run(f"python {script_path} 2023-04-21 2023-05-02", shell=True)
 
         # Test for metadata.csv
