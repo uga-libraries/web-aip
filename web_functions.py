@@ -769,10 +769,12 @@ def seed_data(date_start, date_end):
     seed_df.columns = ["AIT_Collection", "Job_ID", "Size_GB", 'WARCs', "WARC_Filenames"]
     seed_df = seed_df.reset_index()
 
-    # Adds columns for logging the workflow steps.
+    # Adds columns for logging the workflow steps with default text of "TBD".
+    # It needs to have text instead of being blank to avoid a dtype error when the result (string) is added to the log.
     log_columns = ["Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_Download_Errors",
                    "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"]
-    seed_df = seed_df.reindex(columns=seed_df.columns.tolist() + log_columns)
+    for log_column in log_columns:
+        seed_df[log_column] = 'TBD'
 
     # Saves the dataframe as a CSV in the script output folder for splitting or restarting a batch.
     # Returns the dataframe for when the entire group will be downloaded as one batch.

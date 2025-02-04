@@ -44,7 +44,7 @@ class TestSeedData(unittest.TestCase):
                     ["2016223", "12249", "918473|918474", 0.001, 2,
                      "ARCHIVEIT-12249-ONE_TIME-JOB918473-SEED2016223-20190603193416006-00000-h3.warc.gz|"
                      "ARCHIVEIT-12249-ONE_TIME-JOB918474-SEED2016223-20190603193421515-00000-h3.warc.gz",
-                     "", "", "", "", "", "", ""]]
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"]]
         self.assertEqual(actual, expected, "Problem with test for error no metadata, dataframe values")
 
         # Test that the CSV was created.
@@ -65,19 +65,19 @@ class TestSeedData(unittest.TestCase):
                      "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                     ["2030942", "12181", "1177700", 0.053, 1,
                      "ARCHIVEIT-12181-TEST-JOB1177700-SEED2030942-20200601191649636-00000-h3.warc.gz",
-                     "", "", "", "", "", "", ""],
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"],
                     ["2084785", "12181", "1177700", 0.106, 1,
                      "ARCHIVEIT-12181-TEST-JOB1177700-SEED2084785-20200601191752355-00000-h3.warc.gz",
-                     "", "", "", "", "", "", ""],
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"],
                     ["2187482", "12181", "1177700", 3.624, 4,
                      "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601191649570-00000-h3.warc.gz|"
                      "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601195532797-00002-h3.warc.gz|"
                      "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601194617707-00001-h3.warc.gz|"
                      "ARCHIVEIT-12181-TEST-JOB1177700-SEED2187482-20200601200733748-00003-h3.warc.gz",
-                     "", "", "", "", "", "", ""],
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"],
                     ["2270486", "12912", "1176433", 0.06, 1,
                      "ARCHIVEIT-12912-TEST-JOB1176433-SEED2270486-20200529202848582-00000-h3.warc.gz",
-                     "", "", "", "", "", "", ""]]
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"]]
         self.assertEqual(actual, expected, "Problem with test for Hargrett, dataframe values")
 
         # Test that the CSV was created.
@@ -98,32 +98,32 @@ class TestSeedData(unittest.TestCase):
                      "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                     ["2514060", "15678", "1691025", 0.012, 1,
                      "ARCHIVEIT-15678-TEST-JOB1691025-SEED2514060-20221014143847623-00000-h3.warc.gz",
-                     "", "", "", "", "", "", ""],
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"],
                     ["2527198", "15678", "1691033", 0.016, 1,
                      "ARCHIVEIT-15678-TEST-JOB1691033-SEED2527198-20221014143741584-00000-h3.warc.gz",
-                     "", "", "", "", "", "", ""],
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"],
                     ["2527200", "15678", "1691026", 0.088, 1,
                      "ARCHIVEIT-15678-TEST-JOB1691026-SEED2527200-20221014140418701-00000-h3.warc.gz",
-                     "", "", "", "", "", "", ""],
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"],
                     ["2529627", "15678", "1676002", 0.085, 1,
                      "ARCHIVEIT-15678-TEST-JOB1676002-SEED2529627-20220918140010019-00000-h3.warc.gz",
-                     "", "", "", "", "", "", ""],
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"],
                     ["2529629", "15678", "1676316", 0.659, 1,
                      "ARCHIVEIT-15678-TEST-JOB1676316-SEED2529629-20220919135032204-00000-h3.warc.gz",
-                     "", "", "", "", "", "", ""],
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"],
                     ["2529631", "15678", "1676317", 0.184, 1,
                      "ARCHIVEIT-15678-TEST-JOB1676317-SEED2529631-20220919135146371-00000-h3.warc.gz",
-                     "", "", "", "", "", "", ""],
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"],
                     ["2529634", "15678", "1672420", 1.145, 2,
                      "ARCHIVEIT-15678-TEST-JOB1672420-SEED2529634-20220911193609257-00000-h3.warc.gz|"
                      "ARCHIVEIT-15678-TEST-JOB1672420-SEED2529634-20220913205209833-00001-h3.warc.gz",
-                     "", "", "", "", "", "", ""],
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"],
                     ["2529642", "15678", "1672436", 0.874, 1,
                      "ARCHIVEIT-15678-TEST-JOB1672436-SEED2529642-20220911194518522-00000-h3.warc.gz",
-                     "", "", "", "", "", "", ""],
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"],
                     ["2529660", "15678", "1675831", 0.1, 1,
                      "ARCHIVEIT-15678-TEST-JOB1675831-SEED2529660-20220917193734423-00000-h3.warc.gz",
-                     "", "", "", "", "", "", ""]]
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"]]
         self.assertEqual(actual, expected, "Problem with test for MAGIL, dataframe values")
 
         # Test that the CSV was created.
@@ -144,23 +144,23 @@ class TestSeedData(unittest.TestCase):
                      "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                     ["2444045", "12265", "1365540", 0.989, 1,
                      "ARCHIVEIT-12265-TEST-JOB1365540-SEED2444045-20210216160638068-00000-h3.warc.gz",
-                     "", "", "", "", "", "", ""],
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"],
                     ["2481700", "12265", "1365540", 0.751, 1,
                      "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481700-20210216163119142-00000-h3.warc.gz",
-                     "", "", "", "", "", "", ""],
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"],
                     ["2481701", "12265", "1365540", 0.778, 1,
                      "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481701-20210216163428706-00000-h3.warc.gz",
-                     "", "", "", "", "", "", ""],
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"],
                     ["2481702", "12265", "1365540", 1.143, 2,
                      "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481702-20210216163706632-00000-h3.warc.gz|"
                      "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481702-20210219082614225-00001-h3.warc.gz",
-                     "", "", "", "", "", "", ""],
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"],
                     ["2481703", "12265", "1365540", 0.774, 1,
                      "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481703-20210216165052332-00000-h3.warc.gz",
-                     "", "", "", "", "", "", ""],
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"],
                     ["2481704", "12265", "1365540", 0.802, 1,
                      "ARCHIVEIT-12265-TEST-JOB1365540-SEED2481704-20210216165149447-00000-h3.warc.gz",
-                     "", "", "", "", "", "", ""]]
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"]]
         self.assertEqual(actual, expected, "Problem with test for Russell, dataframe values")
 
         # Test that the CSV was created.
@@ -181,7 +181,7 @@ class TestSeedData(unittest.TestCase):
                      "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                     ["2173769", "12912", "1130525", 0.002, 1,
                      "ARCHIVEIT-12912-TEST-JOB1130525-SEED2173769-20200416031337869-00000-h3.warc.gz",
-                     "", "", "", "", "", "", ""],
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"],
                     ["2184360", "12912", "1130531|1130526", 10.214, 11,
                      "ARCHIVEIT-12912-MONTHLY-JOB1130531-SEED2184360-20200421173343214-00025-h3.warc.gz|"
                      "ARCHIVEIT-12912-MONTHLY-JOB1130531-SEED2184360-20200421171359626-00024-h3.warc.gz|"
@@ -194,7 +194,7 @@ class TestSeedData(unittest.TestCase):
                      "ARCHIVEIT-12912-TEST-JOB1130526-SEED2184360-20200416143834702-00001-h3.warc.gz|"
                      "ARCHIVEIT-12912-MONTHLY-JOB1130531-SEED2184360-20200419022328275-00021-h3.warc.gz|"
                      "ARCHIVEIT-12912-MONTHLY-JOB1130531-SEED2184360-20200418233001610-00020-h3.warc.gz",
-                     "", "", "", "", "", "", ""]]
+                     "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"]]
         self.assertEqual(actual, expected, "Problem with test for two jobs, dataframe values")
 
         # Test that the CSV was created.
