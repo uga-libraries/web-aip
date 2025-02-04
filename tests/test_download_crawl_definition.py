@@ -16,8 +16,8 @@ def csv_to_list(csv_path):
     with the header and each data row as a list within that list.
     Cells with no value are convert to empty strings for easier comparison.
     """
-    df = pd.read_csv(csv_path)
-    df.fillna("", inplace=True)
+    df = pd.read_csv(csv_path, dtype=object)
+    df.fillna("blank_cell", inplace=True)
     row_list = [df.columns.tolist()] + df.values.tolist()
     return row_list
 
@@ -57,7 +57,7 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         Causes the error by not running the function which downloads the crawl job report.
         """
         # Makes data needed as function input and runs the function.
-        seed_df = make_df(["harg-0000-web-0001", 2202440, 12181, "1137665", 1.0, 1, "name.warc.gz",
+        seed_df = make_df(["harg-0000-web-0001", "2202440", "12181", "1137665", "1", "1", "name.warc.gz",
                            "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"])
         seed = [seed for seed in seed_df.itertuples()][0]
         os.mkdir("2202440")
@@ -91,8 +91,8 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         expected1 = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                       "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
                       "recurrence_type", "test", "time_limit"],
-                     [1468, False, "", 12264, "", 31104519042, "", "", "", False, False,
-                      "ANNUAL", False, 432000]]
+                     ["1468", "False", "blank_cell", "12264", "blank_cell", "31104519042", "blank_cell", "blank_cell",
+                      "blank_cell", "False", "False", "ANNUAL", "False", "432000"]]
         self.assertEqual(actual1, expected1, "Problem with test for multi id/different, -9042")
 
         # Test that the crawl definition 31104250884 report have the expected values.
@@ -100,8 +100,8 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         expected2 = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                       "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
                       "recurrence_type", "test", "time_limit"],
-                     [1468, False, "", 12264, "", 31104250884, "", "TEST", "", False, False,
-                      "NONE", True, 259200]]
+                     ["1468", "False", "blank_cell", "12264", "blank_cell", "31104250884", "blank_cell", "TEST",
+                      "blank_cell", "False", "False", "NONE", "True", "259200"]]
         self.assertEqual(actual2, expected2, "Problem with test for multi id/different, -0884")
 
     def test_multi_id_different_and_same(self):
@@ -129,8 +129,8 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         expected1 = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                       "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
                       "recurrence_type", "test", "time_limit"],
-                     [1468, False, "", 12265, "", 31104392189, "", "", "", False, False,
-                      "MONTHLY", False, 259200]]
+                     ["1468", "False", "blank_cell", "12265", "blank_cell", "31104392189", "blank_cell", "blank_cell",
+                      "blank_cell", "False", "False", "MONTHLY", "False", "259200"]]
         self.assertEqual(actual1, expected1, "Problem with test for multi id/different and same, -2189")
 
         # Test that the crawl definition 31104419857 report has the expected values.
@@ -138,8 +138,8 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         expected2 = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                       "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
                       "recurrence_type", "test", "time_limit"],
-                     [1468, False, "", 12265, "", 31104419857, "", "TEST", "", False, False,
-                      "NONE", True, 259200]]
+                     ["1468", "False", "blank_cell", "12265", "blank_cell", "31104419857", "blank_cell", "TEST",
+                      "blank_cell", "False", "False", "NONE", "True", "259200"]]
         self.assertEqual(actual2, expected2, "Problem with test for multi id/different and same, -9857")
 
     def test_multi_id_same(self):
@@ -165,8 +165,8 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         expected = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                      "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
                      "recurrence_type", "test", "time_limit"],
-                    [1468, False, "", 12249, "", 31104242954, "", "ONE_TIME", "", False, False,
-                     "NONE", False, 86400]]
+                    ["1468", "False", "blank_cell", "12249", "blank_cell", "31104242954", "blank_cell", "ONE_TIME",
+                     "blank_cell", "False", "False", "NONE", "False", "86400"]]
         self.assertEqual(actual, expected, "Problem with test for multi id/same")
 
     def test_one_id(self):
@@ -187,8 +187,8 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
         expected = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
                      "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
                      "recurrence_type", "test", "time_limit"],
-                    [1468, False, "", 12181, "", 31104315076, "", "TEST", "", False, False,
-                     "NONE", True, 86400]]
+                    ["1468", "False", "blank_cell", "12181", "blank_cell", "31104315076", "blank_cell", "TEST",
+                     "blank_cell", "False", "False", "NONE", "True", "86400"]]
         self.assertEqual(actual, expected, "Problem with test for one id")
 
 
