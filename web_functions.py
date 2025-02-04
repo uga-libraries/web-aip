@@ -38,9 +38,9 @@ def add_completeness(row_index, seed_df):
     if "Error" in seed_df.at[row_index, 'WARC_Unzip_Errors']:
         log("WARC_Unzip_Errors", seed_df, row_index, "Complete")
 
-    # If none of the previous columns had errors, so the Complete column does not have a string with the error types,
-    # adds default text for no errors.
-    if type(seed_df.at[row_index, 'Complete']) is not str:
+    # If none of the previous columns had errors, Complete column still has the initial default text of TBD.
+    # Adds default text for no errors.
+    if "TBD" in seed_df.at[row_index, 'Complete'] == 'TBD':
         log("Successfully completed", seed_df, row_index, "Complete")
 
 
@@ -527,8 +527,10 @@ def log(message, seed_df, row_index, column):
         column : the name of the column to add the log message to
     """
 
-    # Updates the dataframe. Separates the messages with a semicolon if there is more than one.
-    if pd.isnull(seed_df.at[row_index, column]):
+    # Updates the dataframe.
+    # If the cell has the default log value of TBD, it replaces it with the message.
+    # Otherwise, it separates the existing message(s) and new message with a semicolon.
+    if seed_df.loc[row_index, column] == "TBD":
         seed_df.loc[row_index, column] = message
     else:
         seed_df.loc[row_index, column] += "; " + message
