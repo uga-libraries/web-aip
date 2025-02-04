@@ -106,13 +106,16 @@ class MyTestCase(unittest.TestCase):
         actual = csv_to_list(os.path.join(config.script_output, "completeness_check.csv"))
         expected = [["Seed", "AIP", "Seed Folder Made", "coll.csv", "collscope.csv", "seed.csv", "seedscope.csv",
                      "crawldef.csv count", "crawljob.csv count", "WARC Count Correct", "All Expected File Types"],
-                    [2090402, "rbrl-378-web-202002-0001", "True", True, True, True, False, 1.0, 1.0, True, True],
-                    [2090407, "rbrl-270-web-202002-0002", "True", True, True, True, True, 1.0, 1.0, True, True],
-                    [2024639, "rbrl-086-web-202002-0001", "True", True, True, True, True, 1.0, 1.0, True, True],
-                    [2084816, "harg-0000-web-202007-0013", "True", True, True, True, False, 1.0, 1.0, True, True],
-                    [2000000, "", "Not expected", "", "", "", "", "", "", "", ""],
-                    [2050000, "", "Not expected", "", "", "", "", "", "", "", ""],
-                    [2100000, "", "Not expected", "", "", "", "", "", "", "", ""]]
+                    [2090402, "rbrl-378-web-202002-0001", "True", "True", "True", "True", "False", "1", "1", "True", "True"],
+                    [2090407, "rbrl-270-web-202002-0002", "True", "True", "True", "True", "True", "1", "1", "True", "True"],
+                    [2024639, "rbrl-086-web-202002-0001", "True", "True", "True", "True", "True", "1", "1", "True", "True"],
+                    [2084816, "harg-0000-web-202007-0013", "True", "True", "True", "True", "False", "1", "1", "True", "True"],
+                    [2000000, "Not expected", "Not expected", "Not expected", "Not expected", "Not expected",
+                     "Not expected", "Not expected", "Not expected", "Not expected", "Not expected"],
+                    [2050000, "Not expected", "Not expected", "Not expected", "Not expected", "Not expected",
+                     "Not expected", "Not expected", "Not expected", "Not expected", "Not expected"],
+                    [2100000, "Not expected", "Not expected", "Not expected", "Not expected", "Not expected",
+                     "Not expected", "Not expected", "Not expected", "Not expected", "Not expected"]]
         self.assertEqual(actual, expected, "Problem with test for extra seeds")
 
     def test_missing(self):

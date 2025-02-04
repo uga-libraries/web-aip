@@ -216,8 +216,9 @@ def check_seeds(date_end, date_start, seed_df, seeds_directory):
             # If there is a seed folder that is not named with one of the expected seed ids,
             # adds a list with the values for that seed's row in the completeness check csv to the extras list.
             if seed_folder not in expected_seed_ids:
-                extras.append([seed_folder, "n/a", "Not expected", "n/a", "n/a", "n/a", "n/a", "n/a", "n/a",
-                               "n/a", "n/a"])
+                extras.append([seed_folder, "Not expected", "Not expected", "Not expected", "Not expected",
+                               "Not expected", "Not expected", "Not expected", "Not expected", "Not expected",
+                               "Not expected"])
 
         # Only returns the extras list if at least one unexpected seed was found.
         if len(extras) > 0:
