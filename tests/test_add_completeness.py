@@ -5,7 +5,6 @@ It calculates the value for Complete based on other data in seed_df for a seed.
 To save time, fake data is supplied in seed_df for fields that are not used in these tests
 and errors are combined which would not be given the workflow so the combinations can be tested all at once.
 """
-import numpy as np
 import os
 import pandas as pd
 import unittest

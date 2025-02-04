@@ -3,7 +3,6 @@ Tests for the log() function.
 It updates and returns a dataframe with the log message and also saves the data to a spreadsheet.
 """
 import os
-import numpy as np
 import pandas as pd
 import unittest
 import configuration as config
