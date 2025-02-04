@@ -17,7 +17,6 @@ UGA downloads web content using this script on a quarterly basis.
 ## Dependencies
 
 * md5deep (https://github.com/jessek/hashdeep) - used to calculate fixity of the downloaded WARC
-* numpy - used in unit tests to indicate blank cells
 * pandas - used to work with API data and CSV (log) data
 * requests - used to get data via Archive-It APIs
 
