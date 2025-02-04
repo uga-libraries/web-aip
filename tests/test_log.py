@@ -3,7 +3,6 @@ Tests for the log() function.
 It updates and returns a dataframe with the log message and also saves the data to a spreadsheet.
 """
 import os
-import numpy as np
 import pandas as pd
 import unittest
 import configuration as config
@@ -14,20 +13,8 @@ def csv_to_list(csv_path):
     """
     Reads a CSV into pandas and converts it to a list,
     with the header and each data row as a list within that list.
-    Cells with no value are convert to empty strings for easier comparison.
     """
     df = pd.read_csv(csv_path)
-    df.fillna("", inplace=True)
-    row_list = [df.columns.tolist()] + df.values.tolist()
-    return row_list
-
-
-def df_to_list(df):
-    """
-    Converts a dataframe into a list, with the header and each data row as a list within that list.
-    Cells with no value are convert to empty strings for easier comparison.
-    """
-    df.fillna("", inplace=True)
     row_list = [df.columns.tolist()] + df.values.tolist()
     return row_list
 
@@ -40,10 +27,10 @@ class TestLog(unittest.TestCase):
         """
         row_list = [[1111111, 12345, "1100000", 0.52, 1, "ARCHIVEIT.warc.gz",
                      "Successfully downloaded all metadata reports", "No empty reports",
-                     np.nan, np.nan, np.nan, np.nan, np.nan],
+                     "TBD", "TBD", "TBD", "TBD", "TBD"],
                     [2222222, 12345, "2200000", 1.52, 2, "ARCHIVEIT.warc.gz|ARCHIVEIT-1.warc.gz",
                      "Successfully downloaded all metadata reports", "2222222_seedscope.csv",
-                     np.nan, np.nan, np.nan, np.nan, np.nan]]
+                     "TBD", "TBD", "TBD", "TBD", "TBD"]]
         columns_list = ["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
                         "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"]
@@ -64,15 +51,16 @@ class TestLog(unittest.TestCase):
         log("Successfully downloaded ARCHIVEIT.warc.gz", self.seed_df, 0, "WARC_Download_Errors")
         
         # Test that the dataframe has the correct values.
-        actual_df = df_to_list(self.seed_df)
+        actual_df = [self.seed_df.columns.tolist()] + self.seed_df.values.tolist()
         expected_df = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
                         "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                        [1111111, 12345, "1100000", 0.52, 1, "ARCHIVEIT.warc.gz", 
-                        "Successfully downloaded all metadata reports", "No empty reports", "",
-                        "Successfully downloaded ARCHIVEIT.warc.gz", "", "", ""],
+                        "Successfully downloaded all metadata reports", "No empty reports", "TBD",
+                        "Successfully downloaded ARCHIVEIT.warc.gz", "TBD", "TBD", "TBD"],
                        [2222222, 12345, "2200000", 1.52, 2, "ARCHIVEIT.warc.gz|ARCHIVEIT-1.warc.gz",
-                        "Successfully downloaded all metadata reports", "2222222_seedscope.csv", "", "", "", "", ""]]
+                        "Successfully downloaded all metadata reports", "2222222_seedscope.csv",
+                        "TBD", "TBD", "TBD", "TBD", "TBD"]]
         self.assertEqual(actual_df, expected_df, "Problem with test for first message, dataframe values")
 
         # Test that the CSV has the correct values.
@@ -82,9 +70,10 @@ class TestLog(unittest.TestCase):
                          "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                         [1111111, 12345, 1100000, 0.52, 1, "ARCHIVEIT.warc.gz",
                          "Successfully downloaded all metadata reports", "No empty reports",
-                         "", "Successfully downloaded ARCHIVEIT.warc.gz", "", "", ""],
+                         "TBD", "Successfully downloaded ARCHIVEIT.warc.gz", "TBD", "TBD", "TBD"],
                         [2222222, 12345, 2200000, 1.52, 2, "ARCHIVEIT.warc.gz|ARCHIVEIT-1.warc.gz",
-                         "Successfully downloaded all metadata reports", "2222222_seedscope.csv", "", "", "", "", ""]]
+                         "Successfully downloaded all metadata reports", "2222222_seedscope.csv",
+                         "TBD", "TBD", "TBD", "TBD", "TBD"]]
         self.assertEqual(actual_csv, expected_csv, "Problem with test for first message, CSV values")
 
     def test_second_message(self):
@@ -95,15 +84,16 @@ class TestLog(unittest.TestCase):
         log("2222222_collscope.csv", self.seed_df, 1, "Metadata_Report_Empty")
 
         # Test that the dataframe has the correct values.
-        actual_df = df_to_list(self.seed_df)
+        actual_df = [self.seed_df.columns.tolist()] + self.seed_df.values.tolist()
         expected_df = [["Seed_ID", "AIT_Collection", "Job_ID", "Size_GB", "WARCs", "WARC_Filenames",
                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
                         "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                        [1111111, 12345, "1100000", 0.52, 1, "ARCHIVEIT.warc.gz",
-                        "Successfully downloaded all metadata reports", "No empty reports", "", "", "", "", ""],
+                        "Successfully downloaded all metadata reports", "No empty reports",
+                        "TBD", "TBD", "TBD", "TBD", "TBD"],
                        [2222222, 12345, "2200000", 1.52, 2, "ARCHIVEIT.warc.gz|ARCHIVEIT-1.warc.gz",
                         "Successfully downloaded all metadata reports", "2222222_seedscope.csv; 2222222_collscope.csv",
-                        "", "", "", "", ""]]
+                        "TBD", "TBD", "TBD", "TBD", "TBD"]]
         self.assertEqual(actual_df, expected_df, "Problem with test for second message, dataframe values")
 
         # Test that the CSV has the correct values.
@@ -112,10 +102,11 @@ class TestLog(unittest.TestCase):
                          "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
                          "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"],
                         [1111111, 12345, 1100000, 0.52, 1, "ARCHIVEIT.warc.gz",
-                         "Successfully downloaded all metadata reports", "No empty reports", "", "", "", "", ""],
+                         "Successfully downloaded all metadata reports", "No empty reports",
+                         "TBD", "TBD", "TBD", "TBD", "TBD"],
                         [2222222, 12345, 2200000, 1.52, 2, "ARCHIVEIT.warc.gz|ARCHIVEIT-1.warc.gz",
                          "Successfully downloaded all metadata reports",
-                         "2222222_seedscope.csv; 2222222_collscope.csv", "", "", "", "", ""]]
+                         "2222222_seedscope.csv; 2222222_collscope.csv", "TBD", "TBD", "TBD", "TBD", "TBD"]]
         self.assertEqual(actual_csv, expected_csv, "Problem with test for second message, CSV values")
 
 

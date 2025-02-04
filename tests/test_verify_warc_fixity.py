@@ -5,7 +5,6 @@ It compares the fixity of the downloaded WARC to Archive-It and deletes the file
 To save time, fake data is supplied in seed_df for fields that are not used in these tests
 and seed_df only has the WARC being tested, not other WARCs for that seed.
 """
-import numpy as np
 import os
 import pandas as pd
 import shutil
@@ -46,7 +45,7 @@ class TestVerifyWarcFixity(unittest.TestCase):
         warc = "ARCHIVEIT-12265-MONTHLY-JOB1718490-SEED2444051-20221203041251087-00001-h3.warc.gz"
         warc_path = os.path.join(os.getcwd(), "2444051", warc)
         seed_df = make_df(["rbrl-1", 2444051, 12265, "1718490", 0.01, 1, warc,
-                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
+                           "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"])
         os.mkdir("2444051")
         get_warc(seed_df, 0,  f"https://warcs.archive-it.org/webdatafile/{warc}", warc, warc_path)
         verify_warc_fixity(seed_df, 0, warc_path, warc, "7f0c9f11a27b06271b4137d99946fc52")
@@ -69,7 +68,7 @@ class TestVerifyWarcFixity(unittest.TestCase):
         warc = "ARCHIVEIT-12912-TEST-JOB1115532-SEED2173769-20200326213812038-00000-h3.warc.gz"
         warc_path = os.path.join(os.getcwd(), "2173769", warc)
         seed_df = make_df(["harg-1", 2173769, 12912, "1115532", 0.01, 1, warc,
-                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
+                           "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"])
         os.mkdir("2173769")
         get_warc(seed_df, 0,  f"https://warcs.archive-it.org/webdatafile/{warc}", warc, warc_path)
         with self.assertRaises(ValueError):
@@ -94,7 +93,7 @@ class TestVerifyWarcFixity(unittest.TestCase):
         warc = "ARCHIVEIT-12265-TEST-JOB1365541-SEED2454528-20210217005857702-00002-h3.warc.gz"
         warc_path = os.path.join(os.getcwd(), "2454528", warc)
         seed_df = make_df(["rbrl-1", 2454528, 12265, "1365541", 0.01, 1, warc,
-                           np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan])
+                           "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"])
         os.mkdir("2454528")
         get_warc(seed_df, 0,  f"https://warcs.archive-it.org/webdatafile/{warc}", warc, warc_path)
         with self.assertRaises(AttributeError):

@@ -86,11 +86,11 @@ else:
 # Starts a counter for tracking script progress.
 # Some processes are slow, so this shows the script is still working and how much work remains.
 current_seed = 0
-total_seeds = len(seed_df[seed_df["Complete"].isnull()])
+total_seeds = len(seed_df[seed_df["Complete"] == "TBD"])
 
 # Iterates through information about each seed, downloading metadata and WARC files from Archive-It.
-# Filtered for no data in the Complete column to skip seeds done earlier if this is a restart.
-for seed in seed_df[seed_df["Complete"].isnull()].itertuples():
+# Filtered for "TBD" in the Complete column to skip seeds done earlier if this is a restart.
+for seed in seed_df[seed_df["Complete"] == "TBD"].itertuples():
 
     # Updates the current seed number and displays the script progress.
     current_seed += 1

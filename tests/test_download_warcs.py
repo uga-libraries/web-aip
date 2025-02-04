@@ -5,7 +5,6 @@ It downloads every WARC for a seed, verifies its fixity, and unzips it.
 To save time, fake data is supplied in seed_df for fields that are not used in these tests
 and seed_df only has the WARC(s) being tested, not other WARCs for that seed.
 """
-import numpy as np
 import os
 import pandas as pd
 import shutil
@@ -26,14 +25,14 @@ class TestDownloadWarcs(unittest.TestCase):
                    "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"]
         error = ["russell-1", 2018086, 12264, "921631", 0.01, 2,
                  "error.warc.gz|ARCHIVEIT-12264-TEST-JOB921631-SEED2018086-20190607140142542-00000-h3.warc.gz",
-                 np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]
+                 "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"]
         harg = ["harg-1", 2173769, 12912, "1415330", 0.01, 1,
                 "ARCHIVEIT-12912-WEEKLY-JOB1415330-SEED2173769-20210519233828683-00001-h3.warc.gz",
-                np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]
+                "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"]
         rbrl = ["rbrl-1", 2485678, 12265, "718490", 0.02, 2,
                 "ARCHIVEIT-12265-MONTHLY-JOB1718490-SEED2485678-20221203180441653-00001-h3.warc.gz|"
                 "ARCHIVEIT-12265-MONTHLY-JOB1718490-SEED2485678-20221202160754903-00000-h3.warc.gz",
-                np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]
+                "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"]
         self.seed_df = pd.DataFrame([error, harg, rbrl], columns=columns)
 
         self.seeds_dir = os.path.join(config.script_output, "preservation_download")

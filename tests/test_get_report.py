@@ -2,7 +2,6 @@
 Tests for the get_report function.
 It downloads the specified report using the Partner API and saves it as a CSV.
 """
-import numpy as np
 import os
 import pandas as pd
 import shutil
@@ -37,9 +36,9 @@ class TestGetReport(unittest.TestCase):
                         "Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction",
                         "WARC_Download_Errors", "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"]
         self.seed_df = pd.DataFrame([["rbrl-1", "2027707", 12265, "943048", 0.01, 1, "AIT-12265-T-JOB-SEED.warc.gz",
-                                      np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
+                                      "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"],
                                      ["magil-1", "2783596", 15678, "1789232", 0.01, 1, "AIT-15678-T-JOB-SEED.warc.gz",
-                                      np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]],
+                                      "TBD", "TBD", "TBD", "TBD", "TBD", "TBD", "TBD"]],
                                     columns=columns_list)
 
         # Makes the seed and seed folder for the Russell seed.

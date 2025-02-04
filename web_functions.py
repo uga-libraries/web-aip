@@ -38,9 +38,9 @@ def add_completeness(row_index, seed_df):
     if "Error" in seed_df.at[row_index, 'WARC_Unzip_Errors']:
         log("WARC_Unzip_Errors", seed_df, row_index, "Complete")
 
-    # If none of the previous columns had errors, so the Complete column does not have a string with the error types,
-    # adds default text for no errors.
-    if type(seed_df.at[row_index, 'Complete']) is not str:
+    # If none of the previous columns had errors, Complete column still has the initial default text of TBD.
+    # Adds default text for no errors.
+    if "TBD" in seed_df.at[row_index, 'Complete'] == 'TBD':
         log("Successfully completed", seed_df, row_index, "Complete")
 
 
@@ -158,7 +158,7 @@ def check_seeds(date_end, date_start, seed_df, seeds_directory):
         if seed_id in os.listdir(seeds_directory):
             result.append(True)
         else:
-            result.extend([False, "n/a", "n/a", "n/a", "n/a", "n/a", "n/a", "n/a", "n/a"])
+            result.extend([False, "missing", "missing", "missing", "missing", "missing", "missing", "missing", "missing"])
             return result
 
         # Folder referenced frequently through the rest of the function.
@@ -216,8 +216,9 @@ def check_seeds(date_end, date_start, seed_df, seeds_directory):
             # If there is a seed folder that is not named with one of the expected seed ids,
             # adds a list with the values for that seed's row in the completeness check csv to the extras list.
             if seed_folder not in expected_seed_ids:
-                extras.append([seed_folder, "n/a", "Not expected", "n/a", "n/a", "n/a", "n/a", "n/a", "n/a",
-                               "n/a", "n/a"])
+                extras.append([seed_folder, "Not expected", "Not expected", "Not expected", "Not expected",
+                               "Not expected", "Not expected", "Not expected", "Not expected", "Not expected",
+                               "Not expected"])
 
         # Only returns the extras list if at least one unexpected seed was found.
         if len(extras) > 0:
@@ -365,13 +366,13 @@ def download_metadata(seed, row_index, seed_df):
         get_report(seed, seed_df, row_index, "id", job, "crawl_job", f"{seed.AIP_ID}_{job}_crawljob.csv")
         download_crawl_definition(job, seed, seed_df, row_index)
 
-    # If there were no download errors (the dataframe still has no value in that cell), updates the log to show success.
-    if pd.isnull(seed_df.at[row_index, "Metadata_Report_Errors"]):
+    # If there were no download errors (the dataframe still has "TBD" in that cell), updates the log to show success.
+    if seed_df.at[row_index, "Metadata_Report_Errors"] == "TBD":
         seed_df.loc[row_index, "Metadata_Report_Errors"] = "Successfully downloaded all metadata reports"
         seed_df.to_csv(os.path.join(config.script_output, "seeds_log.csv"), index=False)
 
-    # If there were no deleted empty reports (the dataframe still has no value in that cell), updates the log.
-    if pd.isnull(seed_df.at[row_index, "Metadata_Report_Empty"]):
+    # If there were no deleted empty reports (the dataframe still has "TBD" in that cell), updates the log.
+    if seed_df.at[row_index, "Metadata_Report_Empty"] == "TBD":
         seed_df.loc[row_index, "Metadata_Report_Empty"] = "No empty reports"
         seed_df.to_csv(os.path.join(config.script_output, "seeds_log.csv"), index=False)
 
@@ -527,8 +528,10 @@ def log(message, seed_df, row_index, column):
         column : the name of the column to add the log message to
     """
 
-    # Updates the dataframe. Separates the messages with a semicolon if there is more than one.
-    if pd.isnull(seed_df.at[row_index, column]):
+    # Updates the dataframe.
+    # If the cell has the default log value of TBD, it replaces it with the message.
+    # Otherwise, it separates the existing message(s) and new message with a semicolon.
+    if seed_df.loc[row_index, column] == "TBD":
         seed_df.loc[row_index, column] = message
     else:
         seed_df.loc[row_index, column] += "; " + message
@@ -703,15 +706,14 @@ def reset_seed(seed_id, seed_df):
     # Deletes the seed folder and all its contents.
     shutil.rmtree(seed_id)
 
-    # Clears data in the seed dataframe related to successfully completing metadata and WARC downloading
-    # from the failed attempt.
+    # Returns log columns back to the initial default of TBD, removing the record of the failed attempt.
     row_index = seed_df.index[seed_df['Seed_ID'] == seed_id].tolist()[0]
-    seed_df.loc[row_index, 'Metadata_Report_Errors'] = None
-    seed_df.loc[row_index, 'Metadata_Report_Empty'] = None
-    seed_df.loc[row_index, 'Seed_Report_Redaction'] = None
-    seed_df.loc[row_index, 'WARC_Download_Errors'] = None
-    seed_df.loc[row_index, 'WARC_Fixity_Errors'] = None
-    seed_df.loc[row_index, 'WARC_Unzip_Errors'] = None
+    seed_df.loc[row_index, 'Metadata_Report_Errors'] = "TBD"
+    seed_df.loc[row_index, 'Metadata_Report_Empty'] = "TBD"
+    seed_df.loc[row_index, 'Seed_Report_Redaction'] = "TBD"
+    seed_df.loc[row_index, 'WARC_Download_Errors'] = "TBD"
+    seed_df.loc[row_index, 'WARC_Fixity_Errors'] = "TBD"
+    seed_df.loc[row_index, 'WARC_Unzip_Errors'] = "TBD"
 
     # Saves a new version of seeds_log.csv with the updated information.
     # The previous version of the file is overwritten.
@@ -769,10 +771,12 @@ def seed_data(date_start, date_end):
     seed_df.columns = ["AIT_Collection", "Job_ID", "Size_GB", 'WARCs', "WARC_Filenames"]
     seed_df = seed_df.reset_index()
 
-    # Adds columns for logging the workflow steps.
+    # Adds columns for logging the workflow steps with default text of "TBD".
+    # It needs to have text instead of being blank to avoid a dtype error when the result (string) is added to the log.
     log_columns = ["Metadata_Report_Errors", "Metadata_Report_Empty", "Seed_Report_Redaction", "WARC_Download_Errors",
                    "WARC_Fixity_Errors", "WARC_Unzip_Errors", "Complete"]
-    seed_df = seed_df.reindex(columns=seed_df.columns.tolist() + log_columns)
+    for log_column in log_columns:
+        seed_df[log_column] = 'TBD'
 
     # Saves the dataframe as a CSV in the script output folder for splitting or restarting a batch.
     # Returns the dataframe for when the entire group will be downloaded as one batch.

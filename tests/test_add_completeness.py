@@ -5,7 +5,6 @@ It calculates the value for Complete based on other data in seed_df for a seed.
 To save time, fake data is supplied in seed_df for fields that are not used in these tests
 and errors are combined which would not be given the workflow so the combinations can be tested all at once.
 """
-import numpy as np
 import os
 import pandas as pd
 import unittest
@@ -44,7 +43,7 @@ class TestAddCompleteness(unittest.TestCase):
                "Successfully downloaded name.warc.gz; Successfully downloaded name2.warc.gz",
                "Successfully verified name.warc.gz fixity on 2023-05-05; "
                "Successfully verified name2.warc.gz fixity on 2023-05-05",
-               "Successfully unzipped name.warc.gz; Successfully unzipped name2.warc.gz", np.nan]
+               "Successfully unzipped name.warc.gz; Successfully unzipped name2.warc.gz", "TBD"]
         seed_df = make_df(row)
 
         # Runs the function being tested.
@@ -69,7 +68,7 @@ class TestAddCompleteness(unittest.TestCase):
                "API Error 4040: can't download name.warc.gz",
                "Error: fixity for name.warc.gz cannot be extracted from md5deep output;"
                "Error: fixity for name.warc.gz changed and it was deleted",
-               "Error unzipping name.warc.gz: file not found", np.nan]
+               "Error unzipping name.warc.gz: file not found", "TBD"]
         seed_df = make_df(row)
 
         # Runs the function being tested.
@@ -91,7 +90,7 @@ class TestAddCompleteness(unittest.TestCase):
                "Successfully downloaded name.warc.gz; Successfully downloaded name2.warc.gz",
                "Successfully verified name.warc.gz fixity on 2023-05-05; "
                "Successfully verified name2.warc.gz fixity on 2023-05-05",
-               "Error unzipping name.warc.gz: ERROR; Successfully unzipped name2.warc.gz", np.nan]
+               "Error unzipping name.warc.gz: ERROR; Successfully unzipped name2.warc.gz", "TBD"]
         seed_df = make_df(row)
 
         # Runs the function being tested.
@@ -110,7 +109,7 @@ class TestAddCompleteness(unittest.TestCase):
         # Makes dataframe needed for function input.
         row = ["aip-id", 1000000, 12345, "1234567", 1.0, 1, "name.warc.gz", "1000000_seed.csv API Error 500",
                "No empty reports", "Successfully redacted", "Successfully downloaded name.warc.gz",
-               "Successfully verified name.warc.gz fixity on 2023-05-05", "Successfully unzipped name.warc.gz", np.nan]
+               "Successfully verified name.warc.gz fixity on 2023-05-05", "Successfully unzipped name.warc.gz", "TBD"]
         seed_df = make_df(row)
 
         # Runs the function being tested.
@@ -130,7 +129,7 @@ class TestAddCompleteness(unittest.TestCase):
         row = ["aip-id", 1000000, 12345, "1234567", 1.0, 1, "name.warc.gz",
                "Error: crawl job was not downloaded so can't get crawl definition id", "No empty reports",
                "Successfully redacted", "Successfully downloaded name.warc.gz",
-               "Successfully verified name.warc.gz fixity on 2023-05-05", "Successfully unzipped name.warc.gz", np.nan]
+               "Successfully verified name.warc.gz fixity on 2023-05-05", "Successfully unzipped name.warc.gz", "TBD"]
         seed_df = make_df(row)
 
         # Runs the function being tested.
@@ -150,7 +149,7 @@ class TestAddCompleteness(unittest.TestCase):
         row = ["aip-id", 1000000, 12345, "1234567", 1.0, 1, "name.warc.gz",
                "Successfully downloaded all metadata reports", "No empty reports", "Successfully redacted",
                "API Error 404: can't download name.warc.gz", "Successfully verified name.warc.gz fixity on 2023-05-05",
-               "Successfully unzipped name.warc.gz", np.nan]
+               "Successfully unzipped name.warc.gz", "TBD"]
         seed_df = make_df(row)
 
         # Runs the function being tested.
@@ -171,7 +170,7 @@ class TestAddCompleteness(unittest.TestCase):
                "Successfully downloaded all metadata reports", "No empty reports", "Successfully redacted",
                "Index Error: cannot get the WARC URL or MD5 for name.warc.gz",
                "Successfully verified name.warc.gz fixity on 2023-05-05",
-               "Successfully unzipped name.warc.gz", np.nan]
+               "Successfully unzipped name.warc.gz", "TBD"]
         seed_df = make_df(row)
 
         # Runs the function being tested.
@@ -191,7 +190,7 @@ class TestAddCompleteness(unittest.TestCase):
         row = ["aip-id", 1000000, 12345, "1234567", 1.0, 1, "name.warc.gz",
                "Successfully downloaded all metadata reports", "No empty reports", "Successfully redacted",
                "API Error 500: can't get info about name.warc.gz",
-               "Successfully verified name.warc.gz fixity on 2023-05-05", "Successfully unzipped name.warc.gz", np.nan]
+               "Successfully verified name.warc.gz fixity on 2023-05-05", "Successfully unzipped name.warc.gz", "TBD"]
         seed_df = make_df(row)
 
         # Runs the function being tested.
@@ -211,7 +210,7 @@ class TestAddCompleteness(unittest.TestCase):
         row = ["aip-id", 1000000, 12345, "1234567", 1.0, 1, "name.warc.gz",
                "Successfully downloaded all metadata reports", "No empty reports", "Successfully redacted",
                "Successfully downloaded name.warc.gz", "Error: fixity for name.warc.gz changed and it was deleted",
-               "Successfully unzipped name.warc.gz", np.nan]
+               "Successfully unzipped name.warc.gz", "TBD"]
         seed_df = make_df(row)
 
         # Runs the function being tested.
@@ -232,7 +231,7 @@ class TestAddCompleteness(unittest.TestCase):
                "Successfully downloaded all metadata reports", "No empty reports", "Successfully redacted",
                "Successfully downloaded name.warc.gz",
                "Error: fixity for name.warc.gz cannot be extracted from md5deep output",
-               "Successfully unzipped name.warc.gz", np.nan]
+               "Successfully unzipped name.warc.gz", "TBD"]
         seed_df = make_df(row)
 
         # Runs the function being tested.
@@ -252,7 +251,7 @@ class TestAddCompleteness(unittest.TestCase):
         row = ["aip-id", 1000000, 12345, "1234567", 1.0, 1, "name.warc.gz",
                "Successfully downloaded all metadata reports", "No empty reports", "Successfully redacted",
                "Successfully downloaded name.warc.gz", "Successfully verified name.warc.gz fixity on 2023-05-05",
-               "Error unzipping name.warc.gz: file not found", np.nan]
+               "Error unzipping name.warc.gz: file not found", "TBD"]
         seed_df = make_df(row)
 
         # Runs the function being tested.
