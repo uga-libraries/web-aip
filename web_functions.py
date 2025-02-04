@@ -706,15 +706,14 @@ def reset_seed(seed_id, seed_df):
     # Deletes the seed folder and all its contents.
     shutil.rmtree(seed_id)
 
-    # Clears data in the seed dataframe related to successfully completing metadata and WARC downloading
-    # from the failed attempt.
+    # Returns log columns back to the initial default of TBD, removing the record of the failed attempt.
     row_index = seed_df.index[seed_df['Seed_ID'] == seed_id].tolist()[0]
-    seed_df.loc[row_index, 'Metadata_Report_Errors'] = None
-    seed_df.loc[row_index, 'Metadata_Report_Empty'] = None
-    seed_df.loc[row_index, 'Seed_Report_Redaction'] = None
-    seed_df.loc[row_index, 'WARC_Download_Errors'] = None
-    seed_df.loc[row_index, 'WARC_Fixity_Errors'] = None
-    seed_df.loc[row_index, 'WARC_Unzip_Errors'] = None
+    seed_df.loc[row_index, 'Metadata_Report_Errors'] = "TBD"
+    seed_df.loc[row_index, 'Metadata_Report_Empty'] = "TBD"
+    seed_df.loc[row_index, 'Seed_Report_Redaction'] = "TBD"
+    seed_df.loc[row_index, 'WARC_Download_Errors'] = "TBD"
+    seed_df.loc[row_index, 'WARC_Fixity_Errors'] = "TBD"
+    seed_df.loc[row_index, 'WARC_Unzip_Errors'] = "TBD"
 
     # Saves a new version of seeds_log.csv with the updated information.
     # The previous version of the file is overwritten.
