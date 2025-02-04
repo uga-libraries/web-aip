@@ -158,7 +158,7 @@ def check_seeds(date_end, date_start, seed_df, seeds_directory):
         if seed_id in os.listdir(seeds_directory):
             result.append(True)
         else:
-            result.extend([False, "n/a", "n/a", "n/a", "n/a", "n/a", "n/a", "n/a", "n/a"])
+            result.extend([False, "missing", "missing", "missing", "missing", "missing", "missing", "missing", "missing"])
             return result
 
         # Folder referenced frequently through the rest of the function.
