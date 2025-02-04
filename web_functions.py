@@ -366,13 +366,13 @@ def download_metadata(seed, row_index, seed_df):
         get_report(seed, seed_df, row_index, "id", job, "crawl_job", f"{seed.AIP_ID}_{job}_crawljob.csv")
         download_crawl_definition(job, seed, seed_df, row_index)
 
-    # If there were no download errors (the dataframe still has no value in that cell), updates the log to show success.
-    if pd.isnull(seed_df.at[row_index, "Metadata_Report_Errors"]):
+    # If there were no download errors (the dataframe still has "TBD" in that cell), updates the log to show success.
+    if seed_df.at[row_index, "Metadata_Report_Errors"] == "TBD":
         seed_df.loc[row_index, "Metadata_Report_Errors"] = "Successfully downloaded all metadata reports"
         seed_df.to_csv(os.path.join(config.script_output, "seeds_log.csv"), index=False)
 
-    # If there were no deleted empty reports (the dataframe still has no value in that cell), updates the log.
-    if pd.isnull(seed_df.at[row_index, "Metadata_Report_Empty"]):
+    # If there were no deleted empty reports (the dataframe still has "TBD" in that cell), updates the log.
+    if seed_df.at[row_index, "Metadata_Report_Empty"] == "TBD":
         seed_df.loc[row_index, "Metadata_Report_Empty"] = "No empty reports"
         seed_df.to_csv(os.path.join(config.script_output, "seeds_log.csv"), index=False)
 
