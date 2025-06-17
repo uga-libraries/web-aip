@@ -3,3 +3,5 @@ configuration.py
 _pycache_
 *.pyc
 tests/.pytest_cache
+/venv
+/venv/Lib
