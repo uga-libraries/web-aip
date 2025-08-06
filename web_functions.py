@@ -598,7 +598,7 @@ def metadata_csv(seeds_list, date_end):
             collection = "magil-0000"
         elif department == "russell":
             try:
-                relation = seed_report[0]['metadata']['Relation'][0]['value']
+                relation = seed_report[0]['metadata']['Relation'][-1]['value']
                 collection_id = re.match("^RBRL/(\d{3})", relation)[1]
                 collection = f"rbrl-{collection_id}"
             except (KeyError, AttributeError):
