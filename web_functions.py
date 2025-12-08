@@ -744,11 +744,13 @@ def seed_data(date_start, date_end):
 
     # Saves WARC data from WASAPI (which downloads as a dictionary) to a dataframe and reorganizes it by seed.
     # For each seed: Archive-It collection, seed id, job, size in GB, number of WARCs, and all the WARC filenames.
+    # The seed id is unknown if it is a patch crawl.
     rows = []
     for file in warcs.json()['files']:
         rows.append([file['collection'], file['crawl'], file['size'], file['filename']])
     warc_df = pd.DataFrame(rows, columns=["AIT_Collection", "Job_ID", "Size", "WARC_Filename"])
     warc_df['Seed_ID'] = warc_df['WARC_Filename'].str.extract(r"^.*-SEED(\d+)-")
+    warc_df['Seed_ID'] = warc_df['Seed_ID'].fillna('seed-id-unknown')
 
     coll_df = warc_df[['Seed_ID', 'AIT_Collection']].copy()
     coll_df = coll_df.drop_duplicates()
