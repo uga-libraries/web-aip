@@ -97,8 +97,7 @@ def check_seeds(date_end, date_start, seed_df, seeds_directory):
                 regex_seed = re.match(r".*-SEED(\d+)-.*", warc_info['filename'])
                 seed_identifier = regex_seed.group(1)
             except AttributeError:
-                print(f"Unable to get seed ID for {warc_info['filename']}")
-                raise ValueError
+                seed_identifier = 'seed-id-unknown'
 
             # Filter one: only includes the WARC in the dictionary if it was created since the last download and
             # before the current download. Store time is used so test crawls are evaluated based on the date they
