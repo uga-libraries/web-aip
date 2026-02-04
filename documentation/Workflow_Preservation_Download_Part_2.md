@@ -49,7 +49,9 @@ to verify metadata completeness two weeks prior to the download and make a track
       Archive-It is inconsistent about if the login fields are present, even for the same seed.
    4. WARC_Download_Errors, WARC_Fixity_Errors, and WARC_Unzip_Errors should have a success message for every WARC. 
       If there is anything else, put it in the tracker under WARC Download.
-   5. Complete: If a seed was successful, it will have Complete in the "Complete" column. 
+      Use this formula in Excel to count how many successes in each column and compare to the number of WARCs:
+      `=(LEN(K2)-LEN(SUBSTITUTE(LOWER(K2),"successfully","")))/LEN("successfully")`
+   6. Complete: If a seed was successful, it will have Complete in the "Complete" column. 
       Otherwise, it will have the type of error and will need to be downloaded again.
    
    
