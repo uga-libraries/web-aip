@@ -137,10 +137,14 @@ class TestGetReport(unittest.TestCase):
         """
         get_report(self.seed_rbrl, self.seed_df, 0, "id", "31104250630", "crawl_definition", "rbrl-1_31104250630_crawldef.csv")
         actual = csv_to_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_31104250630_crawldef.csv"))
-        expected = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
-                     "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only", "recurrence_type",
-                     "test", "time_limit"],
-                    [1468, False, "", 12265, "", 31104250630, "", "TEST", "", False, False, "NONE", True, 259200]]
+        expected = [['account', 'brozzler', 'byte_limit', 'collection', 'crawl_queue', 'crawl_technology',
+                     'created_at', 'document_limit', 'id', 'last_crawl_datetime', 'last_crawl_job_id',
+                     'machine_count', 'modified_at', 'name', 'next_scheduled_crawl_event', 'num_active_seeds',
+                     'num_inactive_seeds', 'one_time_subtype', 'patch_for_qa_job_id', 'patch_ignore_robots',
+                     'pdfs_only', 'recurrence_type', 'test', 'time_limit', 'visibility'],
+                    [1468, False, '', 12265, 1, 'HERITRIX', '', '', 31104250630, '2019-07-09T14:42:30.426000Z',
+                     943048, '', '', 'Legacy Test with ID 31104250630', '', 0, 0, 'TEST', '', False, False,
+                     'NONE', True, 259200, 'VISIBLE']]
         self.assertEqual(actual, expected, "Problem with test for crawl definition")
 
     def test_crawl_job(self):

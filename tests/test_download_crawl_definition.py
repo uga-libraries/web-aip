@@ -88,20 +88,28 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
 
         # Test that the crawl definition 31104519042 report has the expected values.
         actual1 = csv_to_list(os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104519042_crawldef.csv"))
-        expected1 = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
-                      "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
-                      "recurrence_type", "test", "time_limit"],
-                     ["1468", "False", "blank_cell", "12264", "blank_cell", "31104519042", "blank_cell", "blank_cell",
-                      "blank_cell", "False", "False", "ANNUAL", "False", "432000"]]
+        expected1 = [['account', 'brozzler', 'byte_limit', 'collection', 'crawl_queue', 'crawl_technology',
+                     'created_at', 'document_limit', 'id', 'last_crawl_datetime', 'last_crawl_job_id',
+                     'machine_count', 'modified_at', 'name', 'next_scheduled_crawl_event', 'num_active_seeds',
+                     'num_inactive_seeds', 'one_time_subtype', 'patch_for_qa_job_id', 'patch_ignore_robots',
+                     'pdfs_only', 'recurrence_type', 'test', 'time_limit', 'visibility'],
+                     ['1468', 'False', 'blank_cell', '12264', '1', 'HERITRIX', 'blank_cell', 'blank_cell',
+                      '31104519042', '2022-12-02T15:34:50.574147Z', '1718467', 'blank_cell', 'blank_cell',
+                      'Annual', 'blank_cell', '4', '0', 'blank_cell', 'blank_cell', 'False', 'False',
+                      'ANNUAL', 'False', '432000', 'VISIBLE']]
         self.assertEqual(actual1, expected1, "Problem with test for multi id/different, -9042")
 
         # Test that the crawl definition 31104250884 report have the expected values.
         actual2 = csv_to_list(os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104250884_crawldef.csv"))
-        expected2 = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
-                      "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
-                      "recurrence_type", "test", "time_limit"],
-                     ["1468", "False", "blank_cell", "12264", "blank_cell", "31104250884", "blank_cell", "TEST",
-                      "blank_cell", "False", "False", "NONE", "True", "259200"]]
+        expected2 = [['account', 'brozzler', 'byte_limit', 'collection', 'crawl_queue', 'crawl_technology',
+                     'created_at', 'document_limit', 'id', 'last_crawl_datetime', 'last_crawl_job_id',
+                     'machine_count', 'modified_at', 'name', 'next_scheduled_crawl_event', 'num_active_seeds',
+                     'num_inactive_seeds', 'one_time_subtype', 'patch_for_qa_job_id', 'patch_ignore_robots',
+                     'pdfs_only', 'recurrence_type', 'test', 'time_limit', 'visibility'],
+                     ['1468', 'False', 'blank_cell', '12264', '1', 'HERITRIX', 'blank_cell', 'blank_cell', 
+                      '31104250884', '2019-07-10T13:17:44.208000Z', '943446', 'blank_cell', 'blank_cell', 
+                      'Legacy Test with ID 31104250884', 'blank_cell', '0', '0','TEST', 'blank_cell', 'False', 
+                      'False', 'NONE', 'True', '259200', 'VISIBLE']]
         self.assertEqual(actual2, expected2, "Problem with test for multi id/different, -0884")
 
     def test_multi_id_different_and_same(self):
@@ -126,20 +134,28 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
 
         # Test that the crawl definition 31104392189 report has the expected values.
         actual1 = csv_to_list(os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104392189_crawldef.csv"))
-        expected1 = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
-                      "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
-                      "recurrence_type", "test", "time_limit"],
-                     ["1468", "False", "blank_cell", "12265", "blank_cell", "31104392189", "blank_cell", "blank_cell",
-                      "blank_cell", "False", "False", "MONTHLY", "False", "259200"]]
+        expected1 = [['account', 'brozzler', 'byte_limit', 'collection', 'crawl_queue', 'crawl_technology',
+                     'created_at', 'document_limit', 'id', 'last_crawl_datetime', 'last_crawl_job_id',
+                     'machine_count', 'modified_at', 'name', 'next_scheduled_crawl_event', 'num_active_seeds',
+                     'num_inactive_seeds', 'one_time_subtype', 'patch_for_qa_job_id', 'patch_ignore_robots',
+                     'pdfs_only', 'recurrence_type', 'test', 'time_limit', 'visibility'],
+                     ['1468', 'False', 'blank_cell', '12265', '1', 'HERITRIX', 'blank_cell', 'blank_cell',
+                      '31104392189', '2022-12-02T16:07:48.753667Z', '1718490', 'blank_cell', 'blank_cell',
+                      'Monthly', 'blank_cell', '0', '0', 'blank_cell', 'blank_cell', 'False', 'False',
+                      'MONTHLY', 'False', '259200', 'VISIBLE']]
         self.assertEqual(actual1, expected1, "Problem with test for multi id/different and same, -2189")
 
         # Test that the crawl definition 31104419857 report has the expected values.
         actual2 = csv_to_list(os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104419857_crawldef.csv"))
-        expected2 = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
-                      "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
-                      "recurrence_type", "test", "time_limit"],
-                     ["1468", "False", "blank_cell", "12265", "blank_cell", "31104419857", "blank_cell", "TEST",
-                      "blank_cell", "False", "False", "NONE", "True", "259200"]]
+        expected2 = [['account', 'brozzler', 'byte_limit', 'collection', 'crawl_queue', 'crawl_technology',
+                     'created_at', 'document_limit', 'id', 'last_crawl_datetime', 'last_crawl_job_id',
+                     'machine_count', 'modified_at', 'name', 'next_scheduled_crawl_event', 'num_active_seeds',
+                     'num_inactive_seeds', 'one_time_subtype', 'patch_for_qa_job_id', 'patch_ignore_robots',
+                     'pdfs_only', 'recurrence_type', 'test', 'time_limit', 'visibility'],
+                     ['1468', 'False', 'blank_cell', '12265', '1', 'HERITRIX', 'blank_cell', 'blank_cell',
+                      '31104419857', '2021-02-16T16:05:31.601697Z', '1365539', 'blank_cell', 'blank_cell',
+                      'Legacy Test with ID 31104419857', 'blank_cell', '0', '0', 'TEST', 'blank_cell', 'False',
+                      'False', 'NONE', 'True', '259200', 'VISIBLE']]
         self.assertEqual(actual2, expected2, "Problem with test for multi id/different and same, -9857")
 
     def test_multi_id_same(self):
@@ -162,11 +178,15 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
 
         # Test that the crawl definition report has the expected values.
         actual = csv_to_list(os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104242954_crawldef.csv"))
-        expected = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
-                     "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
-                     "recurrence_type", "test", "time_limit"],
-                    ["1468", "False", "blank_cell", "12249", "blank_cell", "31104242954", "blank_cell", "ONE_TIME",
-                     "blank_cell", "False", "False", "NONE", "False", "86400"]]
+        expected = [['account', 'brozzler', 'byte_limit', 'collection', 'crawl_queue', 'crawl_technology',
+                     'created_at', 'document_limit', 'id', 'last_crawl_datetime', 'last_crawl_job_id',
+                     'machine_count', 'modified_at', 'name', 'next_scheduled_crawl_event', 'num_active_seeds',
+                     'num_inactive_seeds', 'one_time_subtype', 'patch_for_qa_job_id', 'patch_ignore_robots',
+                     'pdfs_only', 'recurrence_type', 'test', 'time_limit', 'visibility'],
+                    ['1468', 'False', 'blank_cell', '12249', '1', 'HERITRIX', 'blank_cell', 'blank_cell',
+                     '31104242954', '2019-06-03T19:34:16.916000Z', '918474', 'blank_cell', 'blank_cell',
+                     'One-Time', 'blank_cell', '0', '1', 'ONE_TIME', 'blank_cell', 'False', 'False', 'NONE',
+                     'False', '86400', 'VISIBLE']]
         self.assertEqual(actual, expected, "Problem with test for multi id/same")
 
     def test_one_id(self):
@@ -184,11 +204,15 @@ class TestDownloadCrawlDefinition(unittest.TestCase):
 
         # Test that the crawl definition report has the expected values.
         actual = csv_to_list(os.path.join(os.getcwd(), str(seed.Seed_ID), f"{seed.AIP_ID}_31104315076_crawldef.csv"))
-        expected = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
-                     "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only",
-                     "recurrence_type", "test", "time_limit"],
-                    ["1468", "False", "blank_cell", "12181", "blank_cell", "31104315076", "blank_cell", "TEST",
-                     "blank_cell", "False", "False", "NONE", "True", "86400"]]
+        expected = [['account', 'brozzler', 'byte_limit', 'collection', 'crawl_queue', 'crawl_technology',
+                     'created_at', 'document_limit', 'id', 'last_crawl_datetime', 'last_crawl_job_id',
+                     'machine_count', 'modified_at', 'name', 'next_scheduled_crawl_event', 'num_active_seeds',
+                     'num_inactive_seeds', 'one_time_subtype', 'patch_for_qa_job_id', 'patch_ignore_robots',
+                     'pdfs_only', 'recurrence_type', 'test', 'time_limit', 'visibility'],
+                    ['1468', 'False', 'blank_cell', '12181', '1', 'HERITRIX', 'blank_cell', 'blank_cell',
+                     '31104315076', '2020-04-21T19:23:16.730574Z', '1137665', 'blank_cell', 'blank_cell',
+                     'Legacy Test with ID 31104315076', 'blank_cell', '0', '0', 'TEST', 'blank_cell', 'False',
+                     'False', 'NONE', 'True', '86400', 'VISIBLE']]
         self.assertEqual(actual, expected, "Problem with test for one id")
 
 
