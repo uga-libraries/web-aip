@@ -77,13 +77,14 @@ class TestGetReport(unittest.TestCase):
         """
         get_report(self.seed_rbrl, self.seed_df, 0, "id", "12265", "collection", "rbrl-1_coll.csv")
         actual = csv_to_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_coll.csv"))
-        expected = [["account", "created_by", "created_date", "deleted", "id", "image", "last_crawl_date",
-                     "last_updated_by", "last_updated_date", "metadata.Collector.0.id", "metadata.Collector.0.value",
-                     "metadata.Date.0.id", "metadata.Date.0.value", "metadata.Description.0.id",
-                     "metadata.Description.0.value", "metadata.Identifier.0.id", "metadata.Identifier.0.value",
-                     "metadata.Title.0.id", "metadata.Title.0.value", "name", "num_active_seeds", "num_inactive_seeds",
-                     "oai_exported", "publicly_visible", "state", "topics", "total_warc_bytes"],
-                    [1468, "bpieczko", "2019-06-07T13:53:19.132354Z", False, 12265, 2883884,
+        expected = [["account", "created_by", "created_date", "custom_user_agent", "deleted", "id", "image",
+                     "last_crawl_date", "last_updated_by", "last_updated_date", "metadata.Collector.0.id",
+                     "metadata.Collector.0.value", "metadata.Date.0.id", "metadata.Date.0.value",
+                     "metadata.Description.0.id", "metadata.Description.0.value", "metadata.Identifier.0.id",
+                     "metadata.Identifier.0.value", "metadata.Title.0.id", "metadata.Title.0.value", "name",
+                     "num_active_seeds", "num_inactive_seeds", "oai_exported", "publicly_visible", "state",
+                     "topics", "total_warc_bytes"],
+                    [1468, "bpieczko", "2019-06-07T13:53:19.132354Z", "", False, 12265, 2883884,
                      "2022-12-05T21:20:48.348624Z", "ahanson", "2020-07-27T14:24:29.521230Z", 5035337,
                      "Richard B. Russell Library for Political Research and Studies", 5035338, "Captured 2019-",
                      5035357, "This collection contains websites documenting political activity in the state of "
