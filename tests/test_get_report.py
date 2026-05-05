@@ -77,13 +77,14 @@ class TestGetReport(unittest.TestCase):
         """
         get_report(self.seed_rbrl, self.seed_df, 0, "id", "12265", "collection", "rbrl-1_coll.csv")
         actual = csv_to_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_coll.csv"))
-        expected = [["account", "created_by", "created_date", "deleted", "id", "image", "last_crawl_date",
-                     "last_updated_by", "last_updated_date", "metadata.Collector.0.id", "metadata.Collector.0.value",
-                     "metadata.Date.0.id", "metadata.Date.0.value", "metadata.Description.0.id",
-                     "metadata.Description.0.value", "metadata.Identifier.0.id", "metadata.Identifier.0.value",
-                     "metadata.Title.0.id", "metadata.Title.0.value", "name", "num_active_seeds", "num_inactive_seeds",
-                     "oai_exported", "publicly_visible", "state", "topics", "total_warc_bytes"],
-                    [1468, "bpieczko", "2019-06-07T13:53:19.132354Z", False, 12265, 2883884,
+        expected = [["account", "created_by", "created_date", "custom_user_agent", "deleted", "id", "image",
+                     "last_crawl_date", "last_updated_by", "last_updated_date", "metadata.Collector.0.id",
+                     "metadata.Collector.0.value", "metadata.Date.0.id", "metadata.Date.0.value",
+                     "metadata.Description.0.id", "metadata.Description.0.value", "metadata.Identifier.0.id",
+                     "metadata.Identifier.0.value", "metadata.Title.0.id", "metadata.Title.0.value", "name",
+                     "num_active_seeds", "num_inactive_seeds", "oai_exported", "publicly_visible", "state",
+                     "topics", "total_warc_bytes"],
+                    [1468, "bpieczko", "2019-06-07T13:53:19.132354Z", "", False, 12265, 2883884,
                      "2022-12-05T21:20:48.348624Z", "ahanson", "2020-07-27T14:24:29.521230Z", 5035337,
                      "Richard B. Russell Library for Political Research and Studies", 5035338, "Captured 2019-",
                      5035357, "This collection contains websites documenting political activity in the state of "
@@ -136,10 +137,14 @@ class TestGetReport(unittest.TestCase):
         """
         get_report(self.seed_rbrl, self.seed_df, 0, "id", "31104250630", "crawl_definition", "rbrl-1_31104250630_crawldef.csv")
         actual = csv_to_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_31104250630_crawldef.csv"))
-        expected = [["account", "brozzler", "byte_limit", "collection", "document_limit", "id", "machine_count",
-                     "one_time_subtype", "patch_for_qa_job_id", "patch_ignore_robots", "pdfs_only", "recurrence_type",
-                     "test", "time_limit"],
-                    [1468, False, "", 12265, "", 31104250630, "", "TEST", "", False, False, "NONE", True, 259200]]
+        expected = [['account', 'brozzler', 'byte_limit', 'collection', 'crawl_queue', 'crawl_technology',
+                     'created_at', 'document_limit', 'id', 'last_crawl_datetime', 'last_crawl_job_id',
+                     'machine_count', 'modified_at', 'name', 'next_scheduled_crawl_event', 'num_active_seeds',
+                     'num_inactive_seeds', 'one_time_subtype', 'patch_for_qa_job_id', 'patch_ignore_robots',
+                     'pdfs_only', 'recurrence_type', 'test', 'time_limit', 'visibility'],
+                    [1468, False, '', 12265, 1, 'HERITRIX', '', '', 31104250630, '2019-07-09T14:42:30.426000Z',
+                     943048, '', '', 'Legacy Test with ID 31104250630', '', 0, 0, 'TEST', '', False, False,
+                     'NONE', True, 259200, 'VISIBLE']]
         self.assertEqual(actual, expected, "Problem with test for crawl definition")
 
     def test_crawl_job(self):
@@ -166,21 +171,19 @@ class TestGetReport(unittest.TestCase):
         """
         get_report(self.seed_rbrl, self.seed_df, 0, "id", "2027707", "seed", "rbrl-1_seed.csv")
         actual = csv_to_list(os.path.join(os.getcwd(), "2027707", "rbrl-1_seed.csv"))
-        expected = [["active", "canonical_url", "collection", "crawl_definition", "created_by", "created_date",
-                     "deleted", "http_response_code", "id", "last_checked_http_response_code", "last_updated_by",
-                     "last_updated_date", "metadata.Collector.0.id",
-                     "metadata.Collector.0.value", "metadata.Creator.0.id", "metadata.Creator.0.value",
-                     "metadata.Date.0.id", "metadata.Date.0.value", "metadata.Description.0.id",
-                     "metadata.Description.0.value", "metadata.Identifier.0.id", "metadata.Identifier.0.value",
-                     "metadata.Language.0.id", "metadata.Language.0.value", "metadata.Language.1.id",
-                     "metadata.Language.1.value", "metadata.Relation.0.id", "metadata.Relation.0.value",
-                     "metadata.Rights.0.id", "metadata.Rights.0.value", "metadata.Title.0.id",
-                     "metadata.Title.0.value", "publicly_visible", "seed_groups.0.account",
-                     "seed_groups.0.collections.0", "seed_groups.0.id", "seed_groups.0.name",
+        expected = [["active", "canonical_url", "collection", "created_by", "created_date", "deleted",
+                     "http_response_code", "id", "last_checked_http_response_code", "last_updated_by",
+                     "last_updated_date", "metadata.Collector.0.id", "metadata.Collector.0.value",
+                     "metadata.Creator.0.id", "metadata.Creator.0.value", "metadata.Date.0.id",
+                     "metadata.Date.0.value", "metadata.Description.0.id", "metadata.Description.0.value",
+                     "metadata.Identifier.0.id", "metadata.Identifier.0.value", "metadata.Language.0.id",
+                     "metadata.Language.0.value", "metadata.Language.1.id", "metadata.Language.1.value",
+                     "metadata.Relation.0.id", "metadata.Relation.0.value", "metadata.Rights.0.id",
+                     "metadata.Rights.0.value", "metadata.Title.0.id", "metadata.Title.0.value", "publicly_visible",
+                     "seed_groups.0.account", "seed_groups.0.collections.0", "seed_groups.0.id", "seed_groups.0.name",
                      "seed_groups.0.visibility", "seed_type", "url", "valid"],
-                    [True, "https://openrecords.podbean.com/", 12265, 31104243713, "bpieczko",
-                     "2019-07-09T14:38:48.931071Z", False, "", 2027707, "", "robert.lay",
-                     "2023-08-31T18:43:03.717017Z", 4591702,
+                    [True, "https://openrecords.podbean.com/", 12265, "bpieczko", "2019-07-09T14:38:48.931071Z",
+                     False, "", 2027707, "", "robert.lay", "2023-08-31T18:43:03.717017Z", 4591702,
                      "Richard B. Russell Library for Political Research and Studies", 4591701, "Gonzalez, Deborah",
                      4660749, "Captured 2019-", 4660889, "Podcast series hosted by Deborah Gonzalez.", 4596520,
                      "https://wayback.archive-it.org/12265/*/https://openrecords.podbean.com/", 4970089, "Spanish",
